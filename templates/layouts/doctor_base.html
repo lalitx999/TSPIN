@@ -160,25 +160,25 @@
                     <!-- หมวดที่ 2: กลไก 39 แกนชีววิทยา -->
                     <li class="nav-header">กลไก 39 แกนชีววิทยา</li>
                     <li class="nav-item">
-                        <a href="/doctor/axes/" class="nav-link">
+                        <a href="{% url 'clinical:axes_explorer' %}" class="nav-link {% if request.resolver_match.url_name == 'axes_explorer' %}active{% endif %}">
                             <i class="nav-icon fas fa-project-diagram"></i>
                             <p>39 Biological Axes</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/doctor/axis-graph/" class="nav-link">
+                        <a href="{% url 'clinical:axis_graph' %}" class="nav-link {% if request.resolver_match.url_name == 'axis_graph' %}active{% endif %}">
                             <i class="nav-icon fas fa-network-wired"></i>
                             <p>เครือข่ายชีวภาพ (Topology)</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/doctor/axis-timeline/" class="nav-link">
+                        <a href="{% url 'clinical:axis_timeline' %}" class="nav-link {% if request.resolver_match.url_name == 'axis_timeline' %}active{% endif %}">
                             <i class="nav-icon fas fa-history"></i>
                             <p>เส้นเวลาสุขภาพ (Timeline)</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/doctor/therapeutic-matrix/" class="nav-link">
+                        <a href="{% url 'clinical:therapeutic_matrix' %}" class="nav-link {% if request.resolver_match.url_name == 'therapeutic_matrix' %}active{% endif %}">
                             <i class="nav-icon fas fa-capsules"></i>
                             <p>เมทริกซ์การรักษา (Therapeutic)</p>
                         </a>

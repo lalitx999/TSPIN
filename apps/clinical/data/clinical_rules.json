@@ -1,0 +1,37 @@
+{
+  "rules": [
+    {
+      "id": "RULE_001",
+      "name": "Neuroinflammation Alert",
+      "condition": "AXIS_1 > 70 AND AXIS_19 > 60",
+      "action": "RECOMMEND_MODULE",
+      "params": {
+        "moduleId": "TSPI-NEURO-01",
+        "priority": "CRITICAL",
+        "reason": "High systemic inflammation paired with brain waste clearance dysfunction suggests Neuroinflammation."
+      }
+    },
+    {
+      "id": "RULE_002",
+      "name": "Metabolic Distress",
+      "condition": "AXIS_5 > 80 AND AXIS_12 > 50",
+      "action": "RECOMMEND_MODULE",
+      "params": {
+        "moduleId": "TSPI-METAB-01",
+        "priority": "HIGH",
+        "reason": "Severe glucose dysregulation causing mitochondrial stress."
+      }
+    },
+    {
+      "id": "RULE_003",
+      "name": "Liver-Gut Feedback Loop",
+      "condition": "AXIS_15 > 60 AND AXIS_18 > 60",
+      "action": "RECOMMEND_MODULE",
+      "params": {
+        "moduleId": "TSPI-DETOX-01",
+        "priority": "MODERATE",
+        "reason": "Dysbiosis contributing to liver detoxification burden (Endotoxemia)."
+      }
+    }
+  ]
+}

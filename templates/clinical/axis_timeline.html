@@ -1,0 +1,200 @@
+{% extends 'layouts/doctor_base.html' %}
+{% load static %}
+
+{% block title %}เส้นเวลาสุขภาพ (Health Timeline) | Dr. Patt EMR{% endblock %}
+
+{% block extra_doctor_head %}
+<link rel="stylesheet" href="{% static 'vendor/adminlte/plugins/chart.js/Chart.min.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2" style="border-bottom: 1px solid #1e293b;">
+        <div>
+            <h2 class="font-weight-bold text-white mb-1" style="font-size: 1.6rem;">
+                <i class="fas fa-history text-cyan mr-2"></i>เส้นเวลาพัฒนาการสุขภาพ (Biological Axes Timeline)
+            </h2>
+            <p class="text-muted mb-0 font-sm">
+                ติดตามแนวโน้มการฟื้นตัวของเซลล์และกลไกชีวภาพตามช่วงเวลาการรักษา
+            </p>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            {% if patient %}
+            <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}" class="btn btn-outline-info shadow-sm mr-2">
+                <i class="fas fa-edit mr-1"></i>ประเมินคะแนน 39 แกน
+            </a>
+            <a href="{% url 'clinical:axis_graph' %}?patient_id={{ patient.pk }}" class="btn btn-outline-primary shadow-sm">
+                <i class="fas fa-chart-pie mr-1"></i>เรดาร์ชาร์ต
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if patient %}
+    <!-- Patient Info -->
+    <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
+        <div class="card-body p-3 d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="text-white font-weight-bold mb-0">
+                    <i class="fas fa-user-injured text-cyan mr-2"></i>{{ patient.full_name }} (HN: {{ patient.hn }})
+                </h5>
+                <small class="text-muted">จำนวนการตรวจประเมินชีวภาพ: {{ records|length }} ครั้ง</small>
+            </div>
+            <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left mr-1"></i>กลับหน้าแฟ้ม EMR
+            </a>
+        </div>
+    </div>
+
+    <!-- Timeline Chart -->
+    <div class="card shadow mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; overflow: hidden;">
+        <div class="card-header py-3" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+            <h5 class="card-title text-white font-weight-bold mb-0" style="font-size: 1.05rem;">
+                <i class="fas fa-chart-line text-cyan mr-2"></i>แนวโน้มคะแนน 4 เสาหลักชีวภาพเมื่อเวลาผ่านไป
+            </h5>
+        </div>
+        <div class="card-body p-4">
+            <div style="position: relative; height: 380px; width: 100%;">
+                <canvas id="timelineChartCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Records History Table -->
+    <div class="card shadow" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; overflow: hidden;">
+        <div class="card-header py-3" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+            <h5 class="card-title text-white font-weight-bold mb-0" style="font-size: 1rem;">
+                <i class="fas fa-list-alt text-cyan mr-2"></i>บันทึกประวัติการประเมินย้อนหลังทั้งหมด
+            </h5>
+        </div>
+        <div class="card-body p-0 table-responsive">
+            <table class="table table-hover mb-0" style="color: #cbd5e1;">
+                <thead style="background: #090d16; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase;">
+                    <tr>
+                        <th>วันที่ตรวจ</th>
+                        <th>แพทย์ผู้ประเมิน</th>
+                        <th>ประเภท</th>
+                        <th>Axis 1 (การอักเสบ)</th>
+                        <th>Axis 5 (อินซูลิน)</th>
+                        <th>Axis 8 (ไมโตคอนเดรีย)</th>
+                        <th>Axis 15 (ดีท็อกซ์)</th>
+                        <th>บันทึกความเห็นแพทย์</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rec in records %}
+                    <tr>
+                        <td class="font-mono text-cyan">{{ rec.record_date|date:"d M Y H:i" }}</td>
+                        <td>{{ rec.doctor.get_full_name|default:rec.doctor.username|default:"-" }}</td>
+                        <td>
+                            {% if rec.is_baseline %}
+                                <span class="badge badge-info px-2 py-1">Baseline</span>
+                            {% else %}
+                                <span class="badge badge-secondary px-2 py-1">Follow-up</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="badge badge-danger font-mono">{{ rec.axis_1 }}</span></td>
+                        <td><span class="badge badge-primary font-mono">{{ rec.axis_5 }}</span></td>
+                        <td><span class="badge badge-success font-mono">{{ rec.axis_8 }}</span></td>
+                        <td><span class="badge badge-warning font-mono text-dark">{{ rec.axis_15 }}</span></td>
+                        <td class="text-sm text-light">{{ rec.notes|default:"-"|truncatewords:8 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            ยังไม่มีบันทึกคะแนนชีวภาพสำหรับคนไข้รายนี้
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card shadow p-5 text-center" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 14px;">
+        <i class="fas fa-user-clock fa-3x text-muted mb-3 d-block"></i>
+        <h4 class="text-white font-weight-normal mb-2">กรุณาเลือกคนไข้เพื่อดูเส้นเวลาสุขภาพ</h4>
+        <p class="text-muted mb-4">คุณสามารถเลือกคนไข้จากหน้ารายชื่อเวชระเบียนเพื่อดูการฟื้นฟูของเซลล์ย้อนหลัง</p>
+        <div>
+            <a href="{% url 'patients:patient_list' %}" class="btn btn-primary">
+                <i class="fas fa-users mr-1"></i>ไปที่หน้ารายชื่อคนไข้
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if patient and records %}
+<script src="{% static 'vendor/adminlte/plugins/chart.js/Chart.bundle.min.js' %}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const dates = {{ timeline_dates_json|safe }};
+    const axis1 = {{ axis_1_trend_json|safe }};
+    const axis5 = {{ axis_5_trend_json|safe }};
+    const axis8 = {{ axis_8_trend_json|safe }};
+    const axis15 = {{ axis_15_trend_json|safe }};
+
+    const ctx = document.getElementById('timelineChartCanvas').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Axis 1: การอักเสบทั้งระบบ (Inflammation)',
+                    data: axis1,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    fill: false,
+                    tension: 0.3
+                },
+                {
+                    label: 'Axis 5: อินซูลินและน้ำตาล (Insulin)',
+                    data: axis5,
+                    borderColor: '#0284c7',
+                    backgroundColor: 'rgba(2, 132, 199, 0.1)',
+                    fill: false,
+                    tension: 0.3
+                },
+                {
+                    label: 'Axis 8: พลังงานไมโตคอนเดรีย (Mitochondria)',
+                    data: axis8,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: false,
+                    tension: 0.3
+                },
+                {
+                    label: 'Axis 15: การขับสารพิษระดับเซลล์ (Detox)',
+                    data: axis15,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    fill: false,
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                xAxes: [{
+                    gridLines: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { fontColor: '#94a3b8' }
+                }],
+                yAxes: [{
+                    gridLines: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { min: 0, max: 100, fontColor: '#94a3b8' }
+                }]
+            },
+            legend: {
+                labels: { fontColor: '#f1f5f9' }
+            }
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,7 @@
+{% if error %}
+    <span class="badge badge-danger text-xs">{{ error }}</span>
+{% else %}
+    <span class="badge {% if score >= 70 %}badge-danger{% elif score >= 40 %}badge-warning text-dark{% else %}badge-success{% endif %} px-2 py-1 font-mono">
+        {{ score }} / 100
+    </span>
+{% endif %}

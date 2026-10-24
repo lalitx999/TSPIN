@@ -9,6 +9,7 @@ from accounts.models import User, AuditLog
 from patients.models import Patient
 from clinical.models import BiologicalRecord, AnalysisRecord
 from clinical.engine import TspiClinicalEngine
+from clinical.reports import PrecisionReportGenerator
 
 
 class ClinicalAxesEngineTests(TestCase):
@@ -147,3 +148,143 @@ class ClinicalAxesEngineTests(TestCase):
         record = self.patient.biological_records.first()
         self.assertIsNotNone(record)
         self.assertEqual(record.axis_11, 88)
+
+
+class PrecisionReportTests(TestCase):
+    def setUp(self):
+        # Create Doctor user
+        self.doctor = User.objects.create_user(
+            username='dr_reports',
+            email='dr_reports@tspi.com',
+            password='Password12345!',
+            role='doctor',
+            first_name='หมอรายงาน',
+            last_name='แม่นยำ'
+        )
+
+        # Create Patient user
+        self.patient_user = User.objects.create_user(
+            username='pt_reports',
+            email='pt_reports@tspi.com',
+            password='Password12345!',
+            role='patient',
+            first_name='คนไข้',
+            last_name='ทดสอบรายงาน'
+        )
+
+        # Create Patient
+        self.patient = Patient.objects.create(
+            hn='HN-REP-001',
+            first_name='ประเสริฐ',
+            last_name='ดีเลิศ',
+            gender='M',
+            phone='0888888888',
+            allergies='Penicillin'
+        )
+
+        # Create Biological Record
+        self.bio_record = BiologicalRecord.objects.create(
+            patient=self.patient,
+            doctor=self.doctor,
+            is_baseline=True,
+            axis_1=80,
+            axis_5=75,
+            axis_11=65
+        )
+
+        self.client = Client()
+
+    def test_report_create_and_snapshot_frozen(self):
+        """ทดสอบการสร้าง Snapshot รายงานและแช่แข็งคะแนน 39 แกน"""
+        self.client.force_login(self.doctor)
+
+        url = reverse('clinical:report_create', args=[self.patient.pk])
+        resp = self.client.post(url, data={
+            'status': 'draft',
+            'doctor_summary': 'ตรวจพบการอักเสบระดับเซลล์สูง'
+        })
+        self.assertEqual(resp.status_code, 302)
+
+        analysis = AnalysisRecord.objects.filter(patient=self.patient).first()
+        self.assertIsNotNone(analysis)
+        self.assertEqual(int(analysis.snapshot_scores.get('1') or analysis.snapshot_scores.get(1)), 80)
+        self.assertEqual(int(analysis.snapshot_scores.get('5') or analysis.snapshot_scores.get(5)), 75)
+
+    def test_report_draft_has_watermark_and_approved_removes_it(self):
+        """Pillar 15: ฉบับร่างต้องมีลายน้ำ DRAFT และเมื่ออนุมัติลายน้ำจะหายไป"""
+        analysis = AnalysisRecord.objects.create(
+            patient=self.patient,
+            biological_record=self.bio_record,
+            physician=self.doctor,
+            status='draft',
+            snapshot_scores=self.bio_record.to_scores_dict()
+        )
+
+        # 1. ทดสอบฉบับร่าง (Draft)
+        context_draft = PrecisionReportGenerator.get_report_context(analysis)
+        self.assertIsNotNone(context_draft['watermark_text'])
+        self.assertIn("DRAFT", context_draft['watermark_text'])
+
+        # 2. ทำการอนุมัติ (Approve Sign-off)
+        self.client.force_login(self.doctor)
+        signoff_url = reverse('clinical:report_signoff', args=[analysis.pk])
+        resp = self.client.post(signoff_url, data={'action': 'approve'})
+        self.assertEqual(resp.status_code, 302)
+
+        analysis.refresh_from_db()
+        self.assertEqual(analysis.status, 'approved')
+        self.assertIsNotNone(analysis.approved_at)
+
+        # ตรวจสอบว่าลายน้ำถูกลบออก
+        context_approved = PrecisionReportGenerator.get_report_context(analysis)
+        self.assertIsNone(context_approved['watermark_text'])
+        self.assertTrue(context_approved['is_approved'])
+
+    def test_report_pdf_binary_generation_weasyprint(self):
+        """ทดสอบเครื่องยนต์ WeasyPrint สร้างไฟล์ PDF ไบนารีสมบูรณ์ (ขึ้นต้นด้วย %PDF)"""
+        analysis = AnalysisRecord.objects.create(
+            patient=self.patient,
+            biological_record=self.bio_record,
+            physician=self.doctor,
+            status='approved',
+            snapshot_scores=self.bio_record.to_scores_dict()
+        )
+
+        pdf_bytes = PrecisionReportGenerator.generate_pdf(analysis, edition='physician')
+        self.assertIsInstance(pdf_bytes, bytes)
+        self.assertTrue(pdf_bytes.startswith(b'%PDF'))
+        self.assertGreater(len(pdf_bytes), 1000)
+
+    def test_report_pdf_download_view_and_auditlog(self):
+        """Pillar 8: ตรวจสอบการดาวน์โหลด PDF สำเร็จและบันทึก AuditLog"""
+        self.client.force_login(self.doctor)
+
+        analysis = AnalysisRecord.objects.create(
+            patient=self.patient,
+            biological_record=self.bio_record,
+            physician=self.doctor,
+            status='approved',
+            snapshot_scores=self.bio_record.to_scores_dict()
+        )
+
+        pdf_url = reverse('clinical:report_pdf', args=[analysis.pk])
+        resp = self.client.get(pdf_url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp['Content-Type'], 'application/pdf')
+        self.assertTrue(resp.content.startswith(b'%PDF'))
+
+        # ตรวจสอบ AuditLog
+        audit = AuditLog.objects.filter(
+            action="REPORT_PDF_DOWNLOADED",
+            user=self.doctor,
+            object_id=str(analysis.pk)
+        ).first()
+        self.assertIsNotNone(audit)
+
+    def test_report_rbac_blocking_for_patient_role(self):
+        """Pillar 2: คนไข้ทั่วไปต้องถูกบล็อกด้วย 403 Forbidden ไม่ให้เข้าศูนย์รายงานแพทย์"""
+        self.client.force_login(self.patient_user)
+
+        resp = self.client.get(reverse('clinical:report_dashboard'))
+        self.assertEqual(resp.status_code, 403)
+

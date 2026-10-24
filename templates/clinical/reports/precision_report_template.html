@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>รายงานการแพทย์แม่นยำ 39 แกนชีววิทยา - {{ patient.full_name }} (HN: {{ patient.hn }})</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm 12mm 18mm 12mm;
+            @bottom-right {
+                content: "หน้า " counter(page) " จาก " counter(pages);
+                font-family: 'Sarabun', sans-serif;
+                font-size: 8pt;
+                color: #64748b;
+            }
+            @bottom-left {
+                content: "TSPI Precision Clinical Intelligence OS &bull; Dr. Patt EMR";
+                font-family: 'Sarabun', sans-serif;
+                font-size: 8pt;
+                color: #64748b;
+            }
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            color: #0f172a;
+            background: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-size: 10pt;
+            line-height: 1.5;
+        }
+
+        /* Watermark styling for Draft reports */
+        .watermark {
+            position: fixed;
+            top: 40%;
+            left: 5%;
+            width: 90%;
+            text-align: center;
+            font-size: 34pt;
+            font-weight: bold;
+            color: rgba(239, 68, 68, 0.15);
+            transform: rotate(-35deg);
+            z-index: 9999;
+            pointer-events: none;
+            border: 4px dashed rgba(239, 68, 68, 0.15);
+            padding: 20px;
+            text-transform: uppercase;
+        }
+
+        .header-box {
+            border-bottom: 3px solid #0284c7;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+        }
+
+        .clinic-brand {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .report-title {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #0284c7;
+            margin: 4px 0 0 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .patient-dossier-grid {
+            width: 100%;
+            border-collapse: collapse;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 18px;
+        }
+
+        .patient-dossier-grid td {
+            padding: 6px 10px;
+            font-size: 9pt;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .label {
+            color: #64748b;
+            font-weight: bold;
+            width: 18%;
+        }
+
+        .val {
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .section-heading {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #0f172a;
+            border-left: 4px solid #0284c7;
+            padding-left: 8px;
+            margin: 18px 0 10px 0;
+            text-transform: uppercase;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+            margin-bottom: 15px;
+        }
+
+        .data-table th {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 6px 8px;
+            text-align: left;
+            font-size: 8pt;
+            text-transform: uppercase;
+        }
+
+        .data-table td {
+            padding: 5px 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        .badge-optimal {
+            background: #dcfce7;
+            color: #166534;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 7.5pt;
+        }
+
+        .badge-stress {
+            background: #fef9c3;
+            color: #854d0e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 7.5pt;
+        }
+
+        .badge-severe {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 7.5pt;
+        }
+
+        .module-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+            page-break-inside: avoid;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        .doctor-signature-box {
+            margin-top: 25px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            page-break-inside: avoid;
+        }
+
+        .disclaimer {
+            font-size: 7pt;
+            color: #94a3b8;
+            margin-top: 20px;
+            line-height: 1.4;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+{% if watermark_text %}
+<div class="watermark">
+    {{ watermark_text }}
+</div>
+{% endif %}
+
+<!-- ========================================== -->
+<!-- PAGE 1: EXECUTIVE SUMMARY & PATIENT DOSSIER -->
+<!-- ========================================== -->
+<div class="header-box">
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 65%;">
+                <div class="clinic-brand">TSPI CLINICAL INTELLIGENCE</div>
+                <div class="report-title">
+                    PRECISION MEDICINE REPORT &bull; {{ edition|upper }} EDITION
+                </div>
+                <div style="font-size: 8pt; color: #64748b; margin-top: 2px;">
+                    ระบบเวชระเบียนและการแพทย์แม่นยำเชิงกลไก 39 แกนชีววิทยา (Mechanistic Medicine)
+                </div>
+            </td>
+            <td style="width: 35%; text-align: right; vertical-align: bottom;">
+                <div style="font-size: 8pt; color: #64748b;">รหัสรายงาน: <strong style="color: #0f172a;">#TSPI-{{ analysis.pk }}-{{ patient.hn }}</strong></div>
+                <div style="font-size: 8pt; color: #64748b;">วันที่ออกรายงาน: <strong style="color: #0f172a;">{{ generation_time|date:"d F Y H:i" }}</strong></div>
+                {% if is_approved %}
+                    <span style="display: inline-block; background: #10b981; color: #ffffff; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 8pt; margin-top: 4px;">
+                        ✓ CLINICALLY APPROVED
+                    </span>
+                {% else %}
+                    <span style="display: inline-block; background: #f59e0b; color: #000000; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 8pt; margin-top: 4px;">
+                        ⏳ DRAFT FOR PHYSICIAN REVIEW
+                    </span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- Patient Master Dossier -->
+<table class="patient-dossier-grid">
+    <tr>
+        <td class="label">ชื่อ - นามสกุล:</td>
+        <td class="val">{{ patient.full_name }}</td>
+        <td class="label">หมายเลข HN:</td>
+        <td class="val" style="font-family: monospace;">{{ patient.hn }}</td>
+    </tr>
+    <tr>
+        <td class="label">เพศสภาพ / อายุ:</td>
+        <td class="val">{{ patient.get_gender_display }} / {{ patient.age|default:"-" }} ปี</td>
+        <td class="label">กรุ๊ปเลือด:</td>
+        <td class="val">{{ patient.blood_type }}</td>
+    </tr>
+    <tr>
+        <td class="label">เบอร์โทรศัพท์:</td>
+        <td class="val">{{ patient.phone }}</td>
+        <td class="label">แพทย์ผู้ดูแล:</td>
+        <td class="val">นพ./พญ. {{ analysis.physician.get_full_name|default:analysis.physician.username }}</td>
+    </tr>
+    {% if patient.allergies %}
+    <tr>
+        <td class="label" style="color: #ef4444;">⚠️ ประวัติแพ้ยา:</td>
+        <td class="val" colspan="3" style="color: #dc2626;">{{ patient.allergies }}</td>
+    </tr>
+    {% endif %}
+</table>
+
+<!-- Clinical Summary Section -->
+<div class="section-heading">1. บทสรุปการประเมินทางคลินิก (Executive Clinical Summary)</div>
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; font-size: 9.5pt; margin-bottom: 18px;">
+    {{ analysis.doctor_summary|default:"จากการประเมินด้วยกลไก 39 แกนชีววิทยา พบว่าสภาวะร่างกายของผู้ป่วยมีความผิดปกติระดับเซลล์ที่เชื่อมโยงระหว่างระบบภูมิคุ้มกัน เมตาบอลิซึม และกระบวนการขับสารพิษ แนะนำให้ดำเนินการตามแผนบำบัดฟื้นฟูด้วยสารอาหารและพฤกษเคมีเฉพาะบุคคลเพื่อปรับสมดุลชีวโมเลกุลสู่สภาวะปกติ"|linebreaks }}
+</div>
+
+<!-- 12 Domains Overview Table -->
+<div class="section-heading">2. ภาพรวม 12 โดเมนชีวภาพหลัก (12 Biological Domains Overview)</div>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th style="width: 10%;">โดเมน</th>
+            <th style="width: 50%;">ชื่อโดเมนชีวภาพ (Biological Domain)</th>
+            <th style="width: 20%; text-align: center;">คะแนนเฉลี่ย (0 - 100)</th>
+            <th style="width: 20%; text-align: center;">สถานะการประเมิน</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dom in domain_scores %}
+        <tr>
+            <td style="font-weight: bold; font-family: monospace;">D{{ dom.domain_id }}</td>
+            <td style="font-weight: 600;">{{ dom.title }}</td>
+            <td style="text-align: center; font-family: monospace; font-weight: bold;">
+                {{ dom.average_score }}
+            </td>
+            <td style="text-align: center;">
+                {% if dom.average_score >= 70 %}
+                    <span class="badge-severe">พยาธิสภาพรุนแรง</span>
+                {% elif dom.average_score >= 40 %}
+                    <span class="badge-stress">ความเครียดปานกลาง</span>
+                {% else %}
+                    <span class="badge-optimal">สมบูรณ์ปกติ</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- ========================================== -->
+<!-- PAGE 2: 39 BIOLOGICAL AXES DETAILED MATRIX -->
+<!-- ========================================== -->
+<div class="header-box">
+    <table style="width: 100%;">
+        <tr>
+            <td>
+                <div class="clinic-brand">TSPI CLINICAL INTELLIGENCE</div>
+                <div class="report-title">39 BIOLOGICAL AXES MECHANISTIC EVALUATION</div>
+            </td>
+            <td style="text-align: right; font-size: 8pt; color: #64748b;">
+                คนไข้: <strong>{{ patient.full_name }}</strong> (HN: {{ patient.hn }})
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="section-heading">3. ตารางวิเคราะห์คะแนนละเอียด 39 แกนชีววิทยา (Mechanistic Axes Breakdown)</div>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th style="width: 10%;">แกนที่</th>
+            <th style="width: 50%;">ชื่อแกนชีวภาพ (Biological Axis)</th>
+            <th style="width: 22%;">โดเมน</th>
+            <th style="width: 9%; text-align: center;">คะแนน</th>
+            <th style="width: 9%; text-align: center;">แปลผล</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ax in all_axes %}
+        <tr>
+            <td style="font-weight: bold; font-family: monospace;">Axis {{ ax.axis_id }}</td>
+            <td style="font-weight: 600;">{{ ax.name }}</td>
+            <td style="color: #64748b; font-size: 8pt;">{{ ax.domain_title }}</td>
+            <td style="text-align: center; font-family: monospace; font-weight: bold;">
+                {% for k, v in scores_dict.items %}
+                    {% if k == ax.axis_id or k == ax.axis_id|stringformat:"s" %}{{ v }}{% endif %}
+                {% endfor %}
+            </td>
+            <td style="text-align: center;">
+                {% for k, v in scores_dict.items %}
+                    {% if k == ax.axis_id or k == ax.axis_id|stringformat:"s" %}
+                        {% if v >= 70 %}
+                            <span class="badge-severe">Severe</span>
+                        {% elif v >= 40 %}
+                            <span class="badge-stress">Stress</span>
+                        {% else %}
+                            <span class="badge-optimal">Optimal</span>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- ========================================== -->
+<!-- PAGE 3: THERAPEUTIC PLAN & DOCTOR SIGN-OFF -->
+<!-- ========================================== -->
+<div class="header-box">
+    <table style="width: 100%;">
+        <tr>
+            <td>
+                <div class="clinic-brand">TSPI CLINICAL INTELLIGENCE</div>
+                <div class="report-title">THERAPEUTIC INTERVENTION PROTOCOL & DOCTOR SIGN-OFF</div>
+            </td>
+            <td style="text-align: right; font-size: 8pt; color: #64748b;">
+                คนไข้: <strong>{{ patient.full_name }}</strong> (HN: {{ patient.hn }})
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="section-heading">4. แกนชีวภาพที่ต้องเฝ้าระวังเร่งด่วน (High Priority Dysfunctional Axes)</div>
+{% if dysfunctional_axes %}
+    <table class="data-table" style="margin-bottom: 20px;">
+        <thead>
+            <tr>
+                <th style="width: 15%;">รหัสแกน</th>
+                <th style="width: 55%;">ชื่อแกนและพยาธิสภาพ</th>
+                <th style="width: 15%; text-align: center;">คะแนนความเสี่ยง</th>
+                <th style="width: 15%; text-align: center;">ระดับความเร่งด่วน</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ax in dysfunctional_axes %}
+            <tr>
+                <td style="font-weight: bold; font-family: monospace;">AXIS {{ ax.axis_id }}</td>
+                <td style="font-weight: 600;">{{ ax.name }} <br><small style="color: #64748b;">{{ ax.domain_title }}</small></td>
+                <td style="text-align: center; font-family: monospace; font-weight: bold; color: #dc2626;">{{ ax.score }}/100</td>
+                <td style="text-align: center;"><span class="badge-severe">Priority Alert</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p style="font-size: 9pt; color: #166534; background: #dcfce7; padding: 10px; border-radius: 6px;">
+        ✓ ไม่พบแกนชีวภาพที่มีระดับคะแนนความผิดปกติรุนแรงเกินเกณฑ์วิกฤต (&ge; 60)
+    </p>
+{% endif %}
+
+<div class="section-heading">5. แผนการบำบัดด้วยสารพฤกษเคมีเฉพาะบุคคล (TSPI 200 Therapeutic Modules)</div>
+<div style="margin-bottom: 20px;">
+    {% for mod in recommendations %}
+    <div class="module-card">
+        <table style="width: 100%;">
+            <tr>
+                <td style="width: 75%;">
+                    <strong style="color: #0284c7; font-size: 9.5pt;">[{{ mod.code|default:"MODULE" }}] {{ mod.name }}</strong>
+                    <div style="font-size: 8.5pt; color: #475569; margin-top: 3px;">
+                        {{ mod.description }}
+                    </div>
+                </td>
+                <td style="width: 25%; text-align: right; vertical-align: top;">
+                    <span style="font-size: 7.5pt; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: bold;">
+                        Targeted Protocol
+                    </span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    {% empty %}
+    <p style="font-size: 9pt; color: #64748b;">ใช้สูตรสารอาหารบำบัดขั้นพื้นฐานเพื่อรักษาสภาวะสมดุล</p>
+    {% endfor %}
+</div>
+
+<!-- Doctor Approval Box -->
+<div class="doctor-signature-box">
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 60%; vertical-align: top;">
+                <strong style="font-size: 9.5pt; color: #0f172a; display: block; margin-bottom: 5px;">
+                    การรับรองและความเห็นของแพทย์ผู้ตรวจรักษา (Physician Certification):
+                </strong>
+                <p style="font-size: 8.5pt; color: #475569; margin: 0; line-height: 1.4;">
+                    ข้าพเจ้าได้ตรวจสอบผลการประเมินคะแนน 39 แกนชีววิทยา ผลตรวจแล็บ และประวัติสุขภาพของผู้ป่วยรายนี้อย่างถี่ถ้วน และได้กำหนดแนวทางการรักษาตามหลักเวชศาสตร์แม่นยำเชิงกลไกเรียบร้อยแล้ว
+                </p>
+            </td>
+            <td style="width: 40%; text-align: center; vertical-align: bottom;">
+                <div style="border-bottom: 1px dotted #94a3b8; width: 80%; margin: 0 auto 5px auto; height: 35px;"></div>
+                <div style="font-weight: bold; font-size: 9.5pt; color: #0f172a;">
+                    (นพ./พญ. {{ analysis.physician.get_full_name|default:analysis.physician.username }})
+                </div>
+                <div style="font-size: 8pt; color: #64748b;">
+                    แพทย์ผู้ตรวจทานและลงนามรับรอง
+                </div>
+                {% if is_approved %}
+                <div style="font-size: 7.5pt; color: #10b981; margin-top: 4px; font-weight: bold;">
+                    ✓ ตรวจสอบลายมือชื่อดิจิทัลแล้ว ณ {{ analysis.approved_at|date:"d/m/Y H:i"|default:generation_time|date:"d/m/Y" }}
+                </div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- Legal Disclaimer -->
+<div class="disclaimer">
+    <strong>ข้อสงวนสิทธิ์ทางการแพทย์ (Medical Disclaimer):</strong> เอกสารฉบับนี้เป็นรายงานการวิเคราะห์เชิงกลไกชีววิทยาเพื่อสนับสนุนการดูแลสุขภาพและการแพทย์แม่นยำเฉพาะบุคคล (Personalized Precision Medicine) ห้ามมิให้นำไปใช้เพื่อการซื้อหรือปรับเปลี่ยนยาโดยไม่ได้รับคำแนะนำจากแพทย์ผู้รักษา ข้อมูลในเอกสารนี้ได้รับการคุ้มครองสิทธิ์และความลับตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล (PDPA)
+</div>
+
+</body>
+</html>

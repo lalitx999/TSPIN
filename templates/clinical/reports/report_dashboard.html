@@ -1,0 +1,232 @@
+{% extends 'layouts/doctor_base.html' %}
+{% load static %}
+
+{% block title %}ศูนย์รายงานการแพทย์แม่นยำ (Precision Reports) | Dr. Patt EMR{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2" style="border-bottom: 1px solid #1e293b;">
+        <div>
+            <h2 class="font-weight-bold text-white mb-1" style="font-size: 1.6rem;">
+                <i class="fas fa-file-medical text-cyan mr-2"></i>ศูนย์ออกรายงานการแพทย์แม่นยำ (Precision Medicine Reports)
+            </h2>
+            <p class="text-muted mb-0 font-sm">
+                จัดการและดาวน์โหลดรายงาน 30 หน้าคุณภาพการพิมพ์ 300 DPI พร้อมระบบลงนามดิจิทัล (Physician Sign-Off)
+            </p>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            <button class="btn btn-primary shadow-sm" data-toggle="modal" data-target="#newReportModal" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: none;">
+                <i class="fas fa-plus-circle mr-1"></i>สร้างรายงานฉบับใหม่
+            </button>
+        </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-2 mb-md-0">
+            <div class="info-box shadow-sm" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
+                <span class="info-box-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-radius: 10px;">
+                    <i class="fas fa-file-alt"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted">รายงานทั้งหมดในระบบ</span>
+                    <span class="info-box-number text-light font-weight-bold font-mono" style="font-size: 1.4rem;">{{ total_count }} ฉบับ</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-2 mb-md-0">
+            <div class="info-box shadow-sm" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
+                <span class="info-box-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-radius: 10px;">
+                    <i class="fas fa-check-double"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted">อนุมัติและส่งมอบแล้ว</span>
+                    <span class="info-box-number text-success font-weight-bold font-mono" style="font-size: 1.4rem;">{{ approved_count }} ฉบับ</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-box shadow-sm" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
+                <span class="info-box-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-radius: 10px;">
+                    <i class="fas fa-edit"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-muted">ฉบับร่างรอตรวจทาน (Draft)</span>
+                    <span class="info-box-number text-warning font-weight-bold font-mono" style="font-size: 1.4rem;">{{ draft_count }} ฉบับ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
+        <div class="card-body p-3">
+            <form method="get" action="{% url 'clinical:report_dashboard' %}">
+                <div class="row align-items-center">
+                    <div class="col-md-5 mb-2 mb-md-0">
+                        <select name="patient_id" class="form-control bg-dark text-white border-secondary">
+                            <option value="">คนไข้ทั้งหมด (All Patients)</option>
+                            {% for pt in patients %}
+                            <option value="{{ pt.pk }}" {% if selected_patient_id == pt.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ pt.full_name }} (HN: {{ pt.hn }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-2 mb-md-0">
+                        <select name="status" class="form-control bg-dark text-white border-secondary">
+                            <option value="all" {% if status_filter == 'all' %}selected{% endif %}>ทุกสถานะการลงนาม (All Status)</option>
+                            <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>⏳ ฉบับร่าง (Draft - มีลายน้ำ)</option>
+                            <option value="reviewed" {% if status_filter == 'reviewed' %}selected{% endif %}>🔍 ตรวจทานแล้ว (Reviewed)</option>
+                            <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>✅ แพทย์อนุมัติแล้ว (Approved)</option>
+                            <option value="released" {% if status_filter == 'released' %}selected{% endif %}>🚀 ส่งมอบคนไข้แล้ว (Released)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: none;">
+                            <i class="fas fa-filter mr-1"></i>กรองข้อมูล
+                        </button>
+                        {% if selected_patient_id or status_filter != 'all' %}
+                        <a href="{% url 'clinical:report_dashboard' %}" class="btn btn-outline-secondary ml-2">
+                            ล้างตัวกรอง
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reports Table Card -->
+    <div class="card shadow" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; overflow: hidden;">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+            <h5 class="card-title text-white font-weight-bold mb-0" style="font-size: 1rem;">
+                <i class="fas fa-list-alt text-cyan mr-2"></i>รายการรายงานเวชศาสตร์แม่นยำ
+            </h5>
+            <span class="text-xs text-muted">
+                <i class="fas fa-shield-alt text-success mr-1"></i>Pillar 8 AuditLog & Pillar 15 Watermark Protection
+            </span>
+        </div>
+
+        <div class="card-body p-0 table-responsive">
+            <table class="table table-hover mb-0" style="color: #cbd5e1;">
+                <thead style="background: #090d16; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase;">
+                    <tr>
+                        <th style="width: 130px;">รหัสรายงาน</th>
+                        <th>ชื่อคนไข้ (Patient)</th>
+                        <th>แพทย์ผู้รับผิดชอบ</th>
+                        <th>วันที่ออกรายงาน</th>
+                        <th class="text-center">สถานะ</th>
+                        <th class="text-right" style="width: 220px;">การดำเนินการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for analysis in analyses %}
+                    <tr>
+                        <td class="align-middle">
+                            <a href="{% url 'clinical:report_preview' analysis.pk %}" class="badge badge-dark text-cyan font-mono px-2 py-1" style="border: 1px solid #0891b2; font-size: 0.85rem;">
+                                #TSPI-{{ analysis.pk }}
+                            </a>
+                        </td>
+                        <td class="align-middle">
+                            <strong class="text-white d-block">{{ analysis.patient.full_name }}</strong>
+                            <small class="text-muted font-mono">HN: {{ analysis.patient.hn }}</small>
+                        </td>
+                        <td class="align-middle text-light text-sm">
+                            <i class="fas fa-user-md text-info mr-1"></i>
+                            {{ analysis.physician.get_full_name|default:analysis.physician.username }}
+                        </td>
+                        <td class="align-middle text-muted text-sm font-mono">
+                            {{ analysis.analysis_date|date:"d M Y H:i" }}
+                        </td>
+                        <td class="align-middle text-center">
+                            {% if analysis.status == 'approved' or analysis.status == 'released' %}
+                                <span class="badge badge-success px-2 py-1">
+                                    <i class="fas fa-check-circle mr-1"></i>{{ analysis.get_status_display }}
+                                </span>
+                            {% elif analysis.status == 'reviewed' %}
+                                <span class="badge badge-info px-2 py-1">
+                                    <i class="fas fa-user-check mr-1"></i>{{ analysis.get_status_display }}
+                                </span>
+                            {% else %}
+                                <span class="badge badge-warning text-dark px-2 py-1">
+                                    <i class="fas fa-clock mr-1"></i>{{ analysis.get_status_display }}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle text-right text-nowrap">
+                            <a href="{% url 'clinical:report_preview' analysis.pk %}" class="btn btn-sm btn-outline-info mr-1" title="เปิดดูตัวอย่าง HTML">
+                                <i class="fas fa-eye mr-1"></i>ดูรายงาน
+                            </a>
+                            <a href="{% url 'clinical:report_pdf' analysis.pk %}" target="_blank" class="btn btn-sm btn-outline-danger" title="ดาวน์โหลด PDF 300 DPI">
+                                <i class="fas fa-file-pdf mr-1"></i>PDF
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fas fa-file-medical fa-3x mb-3 text-secondary d-block"></i>
+                            <h5 class="font-weight-normal text-light">ยังไม่มีรายงานการแพทย์แม่นยำในระบบ</h5>
+                            <p class="text-sm mb-3">คุณสามารถสร้างรายงานฉบับใหม่จากข้อมูล 39 แกนของคนไข้ได้ทันที</p>
+                            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#newReportModal">
+                                <i class="fas fa-plus mr-1"></i>สร้างรายงานฉบับแรก
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Select Patient to Create Report -->
+<div class="modal fade" id="newReportModal" tabindex="-1" role="dialog" aria-labelledby="newReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="background: #0f172a; border: 1px solid #1e293b; color: #f1f5f9;">
+            <div class="modal-header" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+                <h5 class="modal-title font-weight-bold" id="newReportModalLabel">
+                    <i class="fas fa-file-medical text-cyan mr-2"></i>เลือกคนไข้เพื่อสร้างรายงาน Precision Report
+                </h5>
+                <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-sm text-muted mb-3">
+                    ระบบจะนำข้อมูลการประเมินคะแนน 39 แกนชีวภาพล่าสุดของคนไข้มาสร้างเป็น Snapshot รายงาน:
+                </p>
+                <div class="form-group">
+                    <label class="text-light text-sm font-weight-bold">ค้นหาและเลือกคนไข้:</label>
+                    <select id="modal-patient-select" class="form-control bg-dark text-white border-secondary">
+                        {% for pt in patients %}
+                        <option value="{{ pt.pk }}">{{ pt.full_name }} (HN: {{ pt.hn }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer" style="background: #131d35; border-top: 1px solid #1e293b;">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary" onclick="proceedToCreateReport()">
+                    <i class="fas fa-arrow-right mr-1"></i>ดำเนินการต่อไป
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function proceedToCreateReport() {
+    const ptId = document.getElementById('modal-patient-select').value;
+    if (ptId) {
+        window.location.href = "{% url 'clinical:report_dashboard' %}create/" + ptId + "/";
+    }
+}
+</script>
+{% endblock %}

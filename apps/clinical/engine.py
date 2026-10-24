@@ -38,7 +38,24 @@ class TspiClinicalEngine:
             file_path = DATA_DIR / '200_module_tspi.json'
             if file_path.exists():
                 with open(file_path, 'r', encoding='utf-8') as f:
-                    cls._modules_cache = json.load(f)
+                    raw = json.load(f)
+                    items = []
+                    if isinstance(raw, dict) and 'data' in raw:
+                        items = raw['data']
+                    elif isinstance(raw, list):
+                        items = raw
+                    
+                    # Normalize common fields for template and matching convenience
+                    normalized = []
+                    for item in items:
+                        if not isinstance(item, dict):
+                            continue
+                        mod = dict(item)
+                        mod['code'] = mod.get('code') or mod.get('PhytoCore Code') or mod.get('Code /_Product ID') or 'MOD'
+                        mod['name'] = mod.get('name') or mod.get('Product Derived From') or mod.get('Botanical Composition') or 'Therapeutic Module'
+                        mod['description'] = mod.get('description') or mod.get('Main Key Mechanism_(3 Pillars)') or mod.get('Mechanistic Function') or ''
+                        normalized.append(mod)
+                    cls._modules_cache = normalized
             else:
                 cls._modules_cache = []
         return cls._modules_cache
@@ -121,7 +138,13 @@ class TspiClinicalEngine:
             mod_axes = mod.get('axes', []) or mod.get('target_axes', [])
             # ตรวจสอบว่าโมดูลมีแกนตรงกับแกนที่มีปัญหาหรือไม่
             has_match = False
-            if isinstance(mod_axes, list):
+            mapping_text = str(mod.get('TSPI Axis Mapping', '') or '')
+            for tid in target_axis_ids:
+                if f"Axis {tid} " in mapping_text or f"Axis {tid} –" in mapping_text or f"Axis {tid}:" in mapping_text or f"Axis {tid}-" in mapping_text:
+                    has_match = True
+                    break
+
+            if not has_match and isinstance(mod_axes, list):
                 for ax_val in mod_axes:
                     if isinstance(ax_val, int) and ax_val in target_axis_ids:
                         has_match = True

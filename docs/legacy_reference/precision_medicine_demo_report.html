@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายงานผลวิเคราะห์การแพทย์ชีววิทยาเครือข่าย - TSPI AI Twin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0F172A;
+            --accent: #0D9488;
+            --accent-light: #CCFBF1;
+            --neutral-bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --border-color: #E2E8F0;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+        }
+        body {
+            font-family: 'Sarabun', 'Outfit', sans-serif;
+            background-color: var(--neutral-bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+            word-break: keep-all;
+            letter-spacing: normal;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            color: #FFFFFF;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 4px solid var(--accent);
+        }
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            letter-spacing: 0.5px;
+        }
+        .header p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .content {
+            padding: 40px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            border-left: 4px solid var(--accent);
+            padding-left: 12px;
+            margin-bottom: 20px;
+            margin-top: 30px;
+        }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+            background: #F1F5F9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .meta-item span {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .meta-item strong {
+            font-size: 16px;
+            color: var(--primary);
+        }
+        .score-pill {
+            background: #FEF2F2;
+            color: #DC2626;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 18px;
+            display: inline-block;
+        }
+        .report-block {
+            background: #FAFAFA;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            white-space: pre-line;
+            font-size: 14px;
+            color: #334155;
+            margin-bottom: 30px;
+        }
+        .table-responsive {
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            background: #F8FAFC;
+            color: var(--text-muted);
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-gray {
+            background: #E2E8F0;
+            color: #475569;
+        }
+        .badge-red {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        .badge-yellow {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        .footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .signature {
+            margin-top: 20px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>รายงานวิเคราะห์ความเสี่ยงเครือข่ายสรีรวิทยา (TSPI Systems EMR)</h1>
+            <p>สหคลินิกสมุฏฐาน (Samutthan Polyclinic) • ระบบรายงานทางการแพทย์ชีววิทยาเครือข่าย</p>
+        </div>
+        
+        <div class="content">
+            <div class="section-title">ข้อมูลผู้เข้ารับการตรวจ (Patient Profile)</div>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <span>ชื่อผู้ป่วย / HN</span>
+                    <strong>Adej Chotichuti (HN: N/A)</strong>
+                </div>
+                <div class="meta-item">
+                    <span>ความเสี่ยงรวม (NSS Index)</span>
+                    <div>
+                        <span class="score-pill">
+                            
+                                79.8
+                            
+                            / 100
+                        </span>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <span>อาการที่นำเข้าประเมิน (Symptoms)</span>
+                    <strong>เหนื่อยง่าย เพลีย และท้องผูก</strong>
+                </div>
+                <div class="meta-item">
+                    <span>ผลตรวจห้องปฏิบัติการ (Lab Inputs)</span>
+                    <strong>
+                        FBS: 105.0 mg/dL, 
+                        HbA1c: 5.9%, 
+                        Hb: 10.1 g/dL, 
+                        MCV: 47.5 fL, 
+                        Hct: 32.1%
+                    </strong>
+                </div>
+            </div>
+
+            <div class="section-title">เอกสารประกอบคำวิเคราะห์สรีรวิทยา (Systems Biology Impression)</div>
+            <div class="report-block">[Clinical Impression]
+คนไข้: Adej Chotichuti (HN: N/A)
+ผลประเมินดัชนีความเสี่ยงรวมชีววิทยาเครือข่าย (NSS): 79.8/100 - สภาวะสรีรวิทยาอยู่ในเกณฑ์: Level 3: Advanced Network Failure
+
+การวิเคราะห์ระบบชีวภาพรายโดเมนหลัก:
+• [ระบบ Domain 6 — Repair–Fibrosis–Regeneration - คะแนนรุนแรง 85.0%]: กระบวนการซ่อมแซมและสร้างเซลล์ใหม่ชะงักงันรุนแรง (Severe Repair-Regeneration Deficit) เนื้อเยื่อรอบข้างเสี่ยงต่อภาวะพังผืดเรื้อรังและการสะสมคราบไกลเคชั่น (AGEs)
+• [ระบบ Domain 11 — Regeneration & Repair System - คะแนนรุนแรง 85.0%]: ประสิทธิภาพความทนทานและการฟื้นตัวฟื้นฟูหลังความเครียดหรือการบาดเจ็บระดับเซลล์ล้มเหลวรุนแรง (Severe Systemic Regeneration Failure)
+• [ระบบ Domain 8 — Endocrine Network - คะแนนรุนแรง 75.0%]: มีสัญญาณความไม่สมดุลของฮอร์โมนต่อมไร้ท่อและแกนหมวกไตปานกลาง (Mild Hormone Dysregulation)
+
+[Mechanistic Pathophysiology Pathways]
+🔗 [ทางเดิน Domain 2 — Metabolic–Energy Core ↔️ Domain 1 — Immune–Infection Governance]: ภาวะเมแทบอลิซึมระดับเซลล์ที่ล้าสะสมเหนี่ยวนำให้เกิดกระบวนการอักเสบเรื้อรังระดับเซลล์ (Metaflammation) ส่งผลกระตุ้นทางเดินอักเสบข้ามระบบ รบกวนวิถีการสังเคราะห์พลังงานของไมโตคอนเดรีย
+🔗 [ทางเดิน Domain 2 — Metabolic–Energy Core ↔️ Domain 4 — Detox–Digestive–Gut Ecosystem]: การมีปริมาณจุลชีพก่อโรคสะสมในทางเดินอาหารเหนี่ยวนำให้ผนังลำไส้รั่วซึม เกิดภาวะเมแทบอลิกเอนโดท็อกซีเมีย (Metabolic Endotoxemia) ซึ่งขัดขวางการตอบสนองต่ออินซูลินและรบกวนวิถีการสลายกรดไขมัน
+
+💡 [กลไกการสั่งใช้ยาบำบัดพิเศษ]: 
+- ขนาดปริมาณการใช้สารอาหารตามระดับ NSS: 3 แคปซูล × 5 ครั้งต่อวัน (ตื่นนอน, เช้า, กลางวัน, เย็น, ก่อนนอน) รวม 15 แคปซูล/วัน
+- การปรับขนาดระบบขับถ่ายและการระบายความร้อนทางลำไส้ (KS): ตื่นนอน 2 แคปซูล + ก่อนนอน 4 แคปซูล (เพิ่มครั้งละ 2 เม็ดทุกๆ 3-7 วันจนกว่าจะขับถ่ายได้อย่างน้อย 2 ครั้งต่อวัน สูงสุดไม่เกิน 12 แคปซูล/วัน)
+
+[Biomarker Burden Interlinkage]
+🩸 [FBS: 105.0 mg/dL]: อยู่ในเกณฑ์เสี่ยงก่อนเบาหวาน (Prediabetes) ร่างกายเริ่มหลั่งอินซูลินมากขึ้นเพื่อต้านทาน สัมพันธ์กับการอักเสบเรื้อรังระดับต่ำ
+🩸 [HbA1c: 5.9%]: อยู่ในกลุ่มเสี่ยงเผาผลาญคาร์โบไฮเดรตบกพร่องสะสม (Impaired Glycemia)
+🩸 [ภาวะโลหิตจางเม็ดเลือดแดงขนาดเล็ก - Hb: 10.1 g/dL MCV: 47.5 fL ]: บ่งชี้ความผิดปกติของการสร้างฮีโมโกลบินและการสุกแก่ของเม็ดเลือดแดง (Impaired Hematopoiesis) จัดกลุ่มประเมินผลลัพธ์ภายใต้ Axis 26 และ Axis 1
+
+🌿 [โมดูลสมุนไพรฟื้นฟูแนะนำหลัก]:
+   1. Blood Nourishing (BLOOD_NOURISHING) - คะแนนการจับคู่วิถีรักษา: 85.0%
+   2. Ampur (AMPUR) - คะแนนการจับคู่วิถีรักษา: 80.0%
+   3. Vitalis (VITALIS) - คะแนนการจับคู่วิถีรักษา: 80.0%</div>
+
+            <div class="section-title">ตารางการประเมินคะแนนแยกตาม 39 แกนระบบหลัก (39-Axes Assessment Summary)</div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>แกนระบบชีวภาพ (Biological Axis)</th>
+                            <th>สถานะการประเมิน (Status)</th>
+                            <th>ระดับคะแนน (Score)</th>
+                            <th>ความหมายทางคลินิก (Clinical Severity)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 1:</strong> Systemic Inflammatory Load</td>
+                                <td>
+                                    
+                                        <span class="badge badge-yellow">มีการตรวจประเมิน</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        <strong>65%</strong>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        
+                                            <span class="badge badge-red">วิกฤต (Critical)</span>
+                                        
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 2:</strong> Immune Homeostasis</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 3:</strong> Pathogen Defense (Host Defense)</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 4:</strong> Post‑Infectious Persistence</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 5:</strong> Glucose–Insulin Regulation</td>
+                                <td>
+                                    
+                                        <span class="badge badge-yellow">มีการตรวจประเมิน</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        <strong>65%</strong>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        
+                                            <span class="badge badge-red">วิกฤต (Critical)</span>
+                                        
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 6:</strong> Lipid–Lipotoxicity</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 7:</strong> Nutrient Sensing (AMPK–mTOR)</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 8:</strong> Mitochondrial Network</td>
+                                <td>
+                                    
+                                        <span class="badge badge-yellow">มีการตรวจประเมิน</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        <strong>75%</strong>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        
+                                            <span class="badge badge-red">วิกฤต (Critical)</span>
+                                        
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 9:</strong> Oxidative Stress</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 10:</strong> Proteostasis–Autophagy–Lysosome</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 11:</strong> DNA Repair & Genomic Stability</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 12:</strong> Epigenetic Regulation</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 13:</strong> Longevity Signaling (SIRT–FOXO–IGF)</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 14:</strong> Senescence & SASP</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 15:</strong> Detoxification & Cellular Defense</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 16:</strong> Digestive–Absorptive</td>
+                                <td>
+                                    
+                                        <span class="badge badge-yellow">มีการตรวจประเมิน</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        <strong>70%</strong>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        
+                                            <span class="badge badge-red">วิกฤต (Critical)</span>
+                                        
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 17:</strong> Microbiome Ecology</td>
+                                <td>
+                                    
+                                        <span class="badge badge-yellow">มีการตรวจประเมิน</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        <strong>75%</strong>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        
+                                            <span class="badge badge-red">วิกฤต (Critical)</span>
+                                        
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 18:</strong> Gut Barrier & Mucosal Integrity</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 19:</strong> Colon Biofilm & Mucosal Burden</td>
+                                <td>
+                                    
+                                        <span class="badge badge-yellow">มีการตรวจประเมิน</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        <strong>70%</strong>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        
+                                            <span class="badge badge-red">วิกฤต (Critical)</span>
+                                        
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 20:</strong> Endothelial Function</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 21:</strong> Vascular Remodeling & Microcirculation</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 22:</strong> Thrombosis–Hemostasis</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 23:</strong> Hemodynamics & Arterial Elasticity</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 24:</strong> Wound Healing (Internal + External)</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 25:</strong> Fibrosis & ECM Remodeling</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 26:</strong> Stem Cell & Hematopoiesis</td>
+                                <td>
+                                    
+                                        <span class="badge badge-yellow">มีการตรวจประเมิน</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        <strong>85%</strong>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        
+                                            <span class="badge badge-red">วิกฤต (Critical)</span>
+                                        
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 27:</strong> Glycation / Carbonyl Stress (AGE)</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 28:</strong> Muscle Protein Turnover</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 29:</strong> Bone Remodeling</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 30:</strong> Connective Tissue Integrity</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 31:</strong> Female Hormone</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 32:</strong> Male Androgen</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 33:</strong> Thyroid–Adrenal–Growth</td>
+                                <td>
+                                    
+                                        <span class="badge badge-yellow">มีการตรวจประเมิน</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        <strong>75%</strong>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        
+                                            <span class="badge badge-red">วิกฤต (Critical)</span>
+                                        
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 34:</strong> Neuro–Sleep–Stress–Brain Clearance (Meta‑Axis)</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 35:</strong> Organ Resilience & Functional Reserve (Organ Meta‑Axis)</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 36:</strong> Oncology</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 37:</strong> Protein Quality Control System</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 38:</strong> Protein Clearance & Proteotoxic Stress</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                            
+                            
+                            
+                            
+                            <tr>
+                                <td><strong>แกนที่ 39:</strong> Cognitive-Emotional Loop Axis (CELA)</td>
+                                <td>
+                                    
+                                        <span class="badge badge-gray">ไม่ได้ประเมิน (Not Assessed)</span>
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                                <td>
+                                    
+                                        -
+                                    
+                                </td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="footer">
+                <div class="signature">รับรองผลวิเคราะห์ระบบโดย สหคลินิกสมุฏฐาน (Samutthan Polyclinic)</div>
+                <p>รายงานนี้จัดทำขึ้นโดยโมเดลปัญญาประดิษฐ์ TSPI-AI 39-Axes Clinical Analytics Engine v2.0</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

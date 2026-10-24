@@ -4,172 +4,179 @@
 {% block title %}ระบบตรวจทานผลวิเคราะห์ AI (Artifact Review Gate) | Dr. Patt EMR{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3">
+<div class="space-y-6">
     <!-- Header -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2" style="border-bottom: 1px solid #1e293b;">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-200">
         <div>
-            <h2 class="font-weight-bold text-white mb-1" style="font-size: 1.6rem;">
-                <i class="fas fa-tasks text-cyan mr-2"></i>ระบบตรวจทานผลวิเคราะห์ AI (Artifact Review Gate)
-            </h2>
-            <p class="text-muted mb-0 font-sm">
-                เกตความปลอดภัยขั้นเด็ดขาด (Pillar 15: Safety Boundary) — แพทย์ผู้รักษาต้องลงนามอนุมัติก่อนนำข้อมูลเข้าสู่เวชระเบียนจริง
-            </p>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <i class="fas fa-tasks text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 font-kanit flex items-center gap-2">
+                        ระบบตรวจทานผลวิเคราะห์ AI (Artifact Review Gate)
+                    </h1>
+                    <p class="text-sm text-gray-500 font-kanit">
+                        เกตความปลอดภัยขั้นเด็ดขาด (Pillar 15: Safety Boundary) — แพทย์ผู้รักษาต้องลงนามอนุมัติก่อนนำข้อมูลเข้าสู่เวชระเบียนจริง
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="mt-3 mt-md-0 d-flex gap-2">
-            <span class="badge badge-warning text-dark px-3 py-2 font-mono">
-                <i class="fas fa-hourglass-half mr-1"></i>รอตรวจทาน {{ pending_count }} รายการ
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200 font-kanit">
+                <i class="fas fa-hourglass-half text-amber-600"></i> รอตรวจทาน {{ pending_count }} รายการ
             </span>
         </div>
     </div>
 
     <!-- Status Filter Bar -->
-    <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
-        <div class="card-body p-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <div class="btn-group btn-group-sm" role="group">
-                <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-dark{% endif %}">
-                    <i class="fas fa-clock mr-1"></i>รอดำเนินการ (Pending)
-                </a>
-                <a href="?status=approved" class="btn {% if status_filter == 'approved' %}btn-primary{% else %}btn-dark{% endif %}">
-                    <i class="fas fa-check-circle mr-1"></i>อนุมัติแล้ว (Approved)
-                </a>
-                <a href="?status=rejected" class="btn {% if status_filter == 'rejected' %}btn-primary{% else %}btn-dark{% endif %}">
-                    <i class="fas fa-times-circle mr-1"></i>ปฏิเสธแล้ว (Rejected)
-                </a>
-                <a href="?status=all" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-dark{% endif %}">
-                    ทั้งหมด (All Artifacts)
-                </a>
-            </div>
-            <span class="text-xs text-muted">
-                <i class="fas fa-shield-alt text-success mr-1"></i>คุ้มครองด้วย Pillar 8 AuditLog และ Pillar 15 Human-in-the-loop Gate
-            </span>
+    <div class="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex flex-wrap gap-1.5">
+            <a href="?status=pending" class="px-3 py-1.5 rounded-xl text-xs font-medium transition-colors font-kanit {% if status_filter == 'pending' %}bg-primary text-white shadow-sm{% else %}bg-secondary text-gray-700 hover:bg-gray-200{% endif %}">
+                <i class="fas fa-clock mr-1"></i> รอดำเนินการ (Pending)
+            </a>
+            <a href="?status=approved" class="px-3 py-1.5 rounded-xl text-xs font-medium transition-colors font-kanit {% if status_filter == 'approved' %}bg-primary text-white shadow-sm{% else %}bg-secondary text-gray-700 hover:bg-gray-200{% endif %}">
+                <i class="fas fa-check-circle mr-1"></i> อนุมัติแล้ว (Approved)
+            </a>
+            <a href="?status=rejected" class="px-3 py-1.5 rounded-xl text-xs font-medium transition-colors font-kanit {% if status_filter == 'rejected' %}bg-primary text-white shadow-sm{% else %}bg-secondary text-gray-700 hover:bg-gray-200{% endif %}">
+                <i class="fas fa-times-circle mr-1"></i> ปฏิเสธแล้ว (Rejected)
+            </a>
+            <a href="?status=all" class="px-3 py-1.5 rounded-xl text-xs font-medium transition-colors font-kanit {% if status_filter == 'all' %}bg-primary text-white shadow-sm{% else %}bg-secondary text-gray-700 hover:bg-gray-200{% endif %}">
+                ทั้งหมด (All)
+            </a>
         </div>
+        <span class="text-xs text-gray-500 font-kanit flex items-center gap-1.5">
+            <i class="fas fa-shield-alt text-primary"></i> คุ้มครองด้วย Pillar 8 AuditLog & Pillar 15 Gate
+        </span>
     </div>
 
     <!-- Artifacts Queue Cards -->
-    <div class="row">
+    <div class="space-y-4">
         {% for artifact in artifacts %}
-        <div class="col-12 mb-4">
-            <div class="card shadow" style="background: #0f172a; border: 1px solid {% if artifact.status == 'approved' %}#10b981{% elif artifact.status == 'rejected' %}#ef4444{% else %}#f59e0b{% endif %}; border-radius: 14px; overflow: hidden;">
-                <!-- Header -->
-                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: #131d35; border-bottom: 1px solid #1e293b;">
-                    <div>
-                        <span class="badge {% if artifact.status == 'approved' %}badge-success{% elif artifact.status == 'rejected' %}badge-danger{% else %}badge-warning text-dark{% endif %} px-2 py-1 mr-2 font-mono">
-                            {{ artifact.get_status_display }}
-                        </span>
-                        <strong class="text-white font-sm">{{ artifact.title }}</strong>
-                        <span class="text-muted text-xs ml-2">#{{ artifact.pk }}</span>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <!-- Card Header -->
+            <div class="px-5 py-3.5 bg-secondary/50 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-medium font-kanit {% if artifact.status == 'approved' %}bg-emerald-100 text-emerald-800{% elif artifact.status == 'rejected' %}bg-red-100 text-red-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                        {{ artifact.get_status_display }}
+                    </span>
+                    <h3 class="text-sm font-bold text-gray-900 font-kanit">{{ artifact.title }}</h3>
+                    <span class="text-xs text-gray-400 font-mono">#{{ artifact.pk }}</span>
+                </div>
+                <span class="text-xs text-gray-500 font-kanit">
+                    <i class="far fa-clock mr-1"></i>{{ artifact.created_at|date:"d M Y H:i" }}
+                </span>
+            </div>
+
+            <div class="p-5 space-y-4">
+                <!-- Patient Info -->
+                <div class="flex items-center gap-3 pb-3 border-b border-gray-100">
+                    <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+                        {{ artifact.patient.first_name|slice:":1" }}
                     </div>
-                    <div class="text-right">
-                        <span class="text-light text-xs font-mono mr-2">
-                            <i class="far fa-clock mr-1 text-muted"></i>{{ artifact.created_at|date:"d M Y H:i" }}
-                        </span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-gray-900 text-sm font-kanit">{{ artifact.patient.full_name }}</span>
+                            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-primary/10 text-primary font-medium">
+                                HN: {{ artifact.patient.hn }}
+                            </span>
+                        </div>
+                        <div class="text-xs text-gray-500 font-kanit">
+                            เพศ: {{ artifact.patient.get_gender_display }} | อายุ: {{ artifact.patient.age|default:"-" }} ปี
+                        </div>
                     </div>
                 </div>
 
-                <div class="card-body p-4">
-                    <!-- Patient Summary Info -->
-                    <div class="d-flex align-items-center mb-3 pb-3" style="border-bottom: 1px solid #1e293b;">
-                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #0284c7; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;" class="mr-3">
-                            {{ artifact.patient.first_name|slice:":1" }}
-                        </div>
-                        <div>
-                            <strong class="text-white d-block">{{ artifact.patient.full_name }}</strong>
-                            <span class="badge badge-dark text-cyan font-mono text-xs">HN: {{ artifact.patient.hn }}</span>
-                            <span class="text-muted text-xs ml-2">เพศ: {{ artifact.patient.get_gender_display }} &bull; อายุ: {{ artifact.patient.age|default:"-" }} ปี</span>
-                        </div>
+                <!-- Safety Check Alerts (Pillar 15) -->
+                {% if artifact.safety_checks.flags %}
+                <div class="p-4 rounded-xl bg-red-50 border border-red-200">
+                    <div class="flex items-center gap-2 text-xs font-bold text-red-800 mb-1 font-kanit">
+                        <i class="fas fa-exclamation-triangle"></i> การแจ้งเตือนความปลอดภัยทางการแพทย์ (Safety Boundary Alerts):
                     </div>
+                    <ul class="text-xs text-red-700 space-y-0.5 list-disc list-inside font-kanit">
+                        {% for flag in artifact.safety_checks.flags %}
+                        <li><strong class="text-red-900">[{{ flag.type }}]:</strong> {{ flag.message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
 
-                    <!-- Safety Check Alerts (Pillar 15) -->
-                    {% if artifact.safety_checks.flags %}
-                    <div class="p-3 rounded mb-3" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35);">
-                        <div class="d-flex align-items-center mb-1">
-                            <i class="fas fa-exclamation-triangle text-danger mr-2"></i>
-                            <strong class="text-danger text-sm">การแจ้งเตือนความปลอดภัยทางการแพทย์ (Safety Boundary Alerts):</strong>
-                        </div>
-                        <ul class="mb-0 pl-3 text-xs text-light">
-                            {% for flag in artifact.safety_checks.flags %}
-                            <li><strong class="text-warning">[{{ flag.type }}]:</strong> {{ flag.message }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
+                <!-- Proposed Data Preview -->
+                <div class="p-4 rounded-xl bg-secondary/30 border border-gray-200">
+                    <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2 font-kanit flex items-center gap-1.5">
+                        <i class="fas fa-database text-primary"></i> ข้อมูลที่ AI เสนอแนะ (Proposed Data Summary):
+                    </h4>
 
-                    <!-- Proposed Data Preview -->
-                    <div class="p-3 rounded mb-3" style="background: #090d16; border: 1px solid #1e293b;">
-                        <h6 class="text-cyan font-sm font-weight-bold mb-2">
-                            <i class="fas fa-database mr-1"></i>ข้อมูลที่ AI เสนอแนะ (Proposed Data Summary):
-                        </h6>
-
-                        {% if artifact.artifact_type == 'lab_extraction' %}
-                            <div class="row">
-                                <div class="col-md-6 mb-2">
-                                    <small class="text-muted d-block font-xs">ค่าแล็บผิดปกติที่ตรวจพบ:</small>
-                                    <div class="d-flex flex-wrap gap-1 mt-1">
-                                        {% for k, bio in artifact.proposed_data.extracted_biomarkers.items %}
-                                            {% if bio.is_abnormal %}
-                                                <span class="badge badge-danger px-2 py-1 mr-1 mb-1 font-mono text-xs">
-                                                    {{ bio.name }}: {{ bio.value }} {{ bio.unit }}
-                                                </span>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-2">
-                                    <small class="text-muted d-block font-xs">คะแนนแกนชีวภาพที่เสนอแนะให้อัปเดต:</small>
-                                    <div class="d-flex flex-wrap gap-1 mt-1">
-                                        {% for ax_id, score in artifact.proposed_data.affected_axes_scores.items %}
-                                            <span class="badge badge-dark text-cyan font-mono px-2 py-1 mr-1 mb-1" style="border: 1px solid #0891b2;">
-                                                Axis {{ ax_id }} &rarr; {{ score }}/100
+                    {% if artifact.artifact_type == 'lab_extraction' %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-kanit">
+                            <div>
+                                <span class="text-gray-500 block mb-1.5">ค่าแล็บผิดปกติที่ตรวจพบ:</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    {% for k, bio in artifact.proposed_data.extracted_biomarkers.items %}
+                                        {% if bio.is_abnormal %}
+                                            <span class="px-2.5 py-1 rounded-lg bg-red-100 text-red-800 font-mono text-[11px] font-medium">
+                                                {{ bio.name }}: {{ bio.value }} {{ bio.unit }}
                                             </span>
-                                        {% endfor %}
-                                    </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
                             </div>
-                        {% else %}
-                            <pre class="text-xs text-light font-mono mb-0" style="max-height: 120px; overflow-y: auto;">{{ artifact.proposed_data }}</pre>
-                        {% endif %}
-                    </div>
-
-                    <!-- Action Controls for Pending Artifacts -->
-                    {% if artifact.status == 'pending' %}
-                    <form method="post" action="{% url 'intelligence:artifact_action' artifact.pk %}" class="mt-3 pt-3" style="border-top: 1px solid #1e293b;">
-                        {% csrf_token %}
-                        <div class="form-group mb-3">
-                            <label class="text-light text-xs font-weight-bold">
-                                บันทึกความเห็นแพทย์ผู้ตรวจทาน (Doctor Sign-Off Notes):
-                            </label>
-                            <input type="text" name="doctor_notes" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="ระบุเหตุผลการอนุมัติหรือปรับแก้คะแนนเพิ่มเติม...">
+                            <div>
+                                <span class="text-gray-500 block mb-1.5">คะแนนแกนชีวภาพที่เสนอแนะให้อัปเดต:</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    {% for ax_id, score in artifact.proposed_data.affected_axes_scores.items %}
+                                        <span class="px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-mono text-[11px] font-medium border border-primary/20">
+                                            Axis {{ ax_id }} &rarr; {{ score }}/100
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" name="action" value="reject" class="btn btn-sm btn-outline-danger mr-2">
-                                <i class="fas fa-times-circle mr-1"></i>ปฏิเสธผลวิเคราะห์ (Reject)
-                            </button>
-                            <button type="submit" name="action" value="approve" class="btn btn-sm btn-success shadow px-3">
-                                <i class="fas fa-check-circle mr-1"></i>อนุมัติและปรับปรุงเข้าแฟ้ม EMR (Approve & Apply)
-                            </button>
-                        </div>
-                    </form>
                     {% else %}
-                    <!-- Already Reviewed Info -->
-                    <div class="pt-2 text-xs text-muted d-flex justify-content-between align-items-center" style="border-top: 1px solid #1e293b;">
-                        <span>
-                            <i class="fas fa-user-check text-success mr-1"></i>ตรวจทานโดย: 
-                            <strong class="text-light">{{ artifact.doctor.get_full_name|default:artifact.doctor.username }}</strong>
-                            ณ เวลา {{ artifact.reviewed_at|date:"d M Y H:i" }}
-                        </span>
-                        {% if artifact.doctor_notes %}
-                        <span><strong>ความเห็น:</strong> {{ artifact.doctor_notes }}</span>
-                        {% endif %}
-                    </div>
+                        <pre class="text-xs text-gray-800 font-mono bg-white p-3 rounded-lg border border-gray-200 max-h-36 overflow-y-auto">{{ artifact.proposed_data }}</pre>
                     {% endif %}
                 </div>
+
+                <!-- Action Controls for Pending Artifacts -->
+                {% if artifact.status == 'pending' %}
+                <form method="post" action="{% url 'intelligence:artifact_action' artifact.pk %}" class="pt-3 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    {% csrf_token %}
+                    <div class="flex-1">
+                        <input type="text" 
+                               name="doctor_notes" 
+                               class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-xs text-gray-900 font-kanit"
+                               placeholder="บันทึกความเห็นแพทย์ผู้ตรวจทาน (Doctor Sign-Off Notes)...">
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button type="submit" name="action" value="reject" class="px-4 py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 text-xs font-medium transition-colors font-kanit">
+                            <i class="fas fa-times-circle mr-1"></i> ปฏิเสธ (Reject)
+                        </button>
+                        <button type="submit" name="action" value="approve" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-medium transition-colors shadow-sm font-kanit">
+                            <i class="fas fa-check-circle mr-1"></i> อนุมัติเข้า EMR (Approve)
+                        </button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="pt-3 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-gray-500 font-kanit">
+                    <span class="flex items-center gap-1.5">
+                        <i class="fas fa-user-check text-emerald-600"></i> ตรวจทานโดย: 
+                        <strong class="text-gray-900">{{ artifact.doctor.get_full_name|default:artifact.doctor.username }}</strong>
+                        ณ เวลา {{ artifact.reviewed_at|date:"d M Y H:i" }}
+                    </span>
+                    {% if artifact.doctor_notes %}
+                    <span><strong class="text-gray-700">ความเห็น:</strong> {{ artifact.doctor_notes }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
         </div>
         {% empty %}
-        <div class="col-12 text-center py-5">
-            <i class="fas fa-check-double fa-3x text-muted mb-3 d-block"></i>
-            <h5 class="text-light font-weight-normal">ไม่มีรายการชิ้นงานในสถานะนี้</h5>
-            <p class="text-muted text-sm">การวิเคราะห์จาก Lab OCR หรือ AI ทั้งหมดได้รับการตรวจทานเรียบร้อยแล้ว</p>
+        <div class="bg-white rounded-2xl border border-gray-200 p-12 text-center">
+            <div class="w-16 h-16 rounded-full bg-secondary flex items-center justify-center text-gray-400 mx-auto mb-3">
+                <i class="fas fa-check-double text-2xl"></i>
+            </div>
+            <h4 class="text-base font-bold text-gray-800 mb-1 font-kanit">ไม่มีรายการชิ้นงานในสถานะนี้</h4>
+            <p class="text-xs text-gray-500 font-kanit">การวิเคราะห์จาก Lab OCR หรือ AI ทั้งหมดได้รับการตรวจทานเรียบร้อยแล้ว</p>
         </div>
         {% endfor %}
     </div>

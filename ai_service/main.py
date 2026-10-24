@@ -42,7 +42,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "tspi-ai-service",
-        "port": 8001,
+        "port": 8088,
         "engine": "FastAPI + SSE Streamer"
     }
 

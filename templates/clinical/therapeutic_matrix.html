@@ -4,134 +4,128 @@
 {% block title %}เมทริกซ์การรักษาและสารพฤกษเคมีบำบัด | Dr. Patt EMR{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3">
+<div class="space-y-6">
     <!-- Header -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2" style="border-bottom: 1px solid #1e293b;">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-200">
         <div>
-            <h2 class="font-weight-bold text-white mb-1" style="font-size: 1.6rem;">
-                <i class="fas fa-capsules text-cyan mr-2"></i>เมทริกซ์การรักษาและสารอาหารบำบัด (Therapeutic Matrix)
-            </h2>
-            <p class="text-muted mb-0 font-sm">
-                คลังตำรับสารพฤกษเคมี 200 โมดูลมาตรฐาน TSPI™ เพื่อปรับสมดุล 39 แกนชีววิทยา
-            </p>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <i class="fas fa-capsules text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 font-kanit flex items-center gap-2">
+                        เมทริกซ์การรักษาและสารอาหารบำบัด (Therapeutic Matrix)
+                    </h1>
+                    <p class="text-sm text-gray-500 font-kanit">
+                        คลังตำรับสารพฤกษเคมี 200 โมดูลมาตรฐาน TSPI™ เพื่อปรับสมดุล 39 แกนชีววิทยา
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="mt-3 mt-md-0 d-flex gap-2">
-            <a href="{% url 'clinical:axes_explorer' %}" class="btn btn-outline-info shadow-sm mr-2">
-                <i class="fas fa-project-diagram mr-1"></i>ดูนิยาม 39 แกนชีวภาพ
+        <div class="flex items-center gap-2">
+            <a href="{% url 'clinical:axes_explorer' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-gray-700 bg-secondary hover:bg-gray-200 transition-colors font-kanit">
+                <i class="fas fa-project-diagram"></i> นิยาม 39 แกนชีวภาพ
             </a>
-            <a href="{% url 'clinical:axis_graph' %}" class="btn btn-outline-primary shadow-sm">
-                <i class="fas fa-chart-pie mr-1"></i>เรดาร์โทโพโลยี
+            <a href="{% url 'clinical:axis_graph' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors font-kanit">
+                <i class="fas fa-chart-pie"></i> เรดาร์โทโพโลยี
             </a>
         </div>
     </div>
 
     <!-- Search & Filter Card -->
-    <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
-        <div class="card-body p-3">
-            <form method="get" action="{% url 'clinical:therapeutic_matrix' %}">
-                <div class="row align-items-center">
-                    <!-- Search Input -->
-                    <div class="col-md-6 col-lg-5 mb-2 mb-md-0">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-dark border-secondary text-cyan">
-                                    <i class="fas fa-search"></i>
-                                </span>
-                            </div>
-                            <input type="text" 
-                                   name="q" 
-                                   class="form-control bg-dark text-white border-secondary" 
-                                   placeholder="ค้นหาชื่อสารสำคัญ, รหัสโมดูล, กลไก..." 
-                                   value="{{ search_q }}">
-                        </div>
-                    </div>
+    <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
+        <form method="get" action="{% url 'clinical:therapeutic_matrix' %}" class="grid grid-cols-1 md:grid-cols-12 gap-3">
+            <!-- Search Input -->
+            <div class="md:col-span-6 relative">
+                <i class="fas fa-search absolute left-3.5 top-3 text-gray-400 text-xs"></i>
+                <input type="text" 
+                       name="q" 
+                       class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-xs text-gray-900 font-kanit" 
+                       placeholder="ค้นหาชื่อสารสำคัญ, รหัสโมดูล, กลไก..." 
+                       value="{{ search_q }}">
+            </div>
 
-                    <!-- Target Axis Filter -->
-                    <div class="col-md-4 col-lg-4 mb-2 mb-md-0">
-                        <select name="axis" class="form-control bg-dark text-white border-secondary">
-                            <option value="">ทุกแกนชีวภาพเป้าหมาย (All 39 Axes)</option>
-                            {% for ax in all_axes %}
-                            <option value="{{ ax.axis_id }}" {% if selected_axis == ax.axis_id|stringformat:"s" %}selected{% endif %}>
-                                Axis {{ ax.axis_id }}: {{ ax.name }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+            <!-- Target Axis Filter -->
+            <div class="md:col-span-4">
+                <select name="axis" class="w-full px-3 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-xs text-gray-900 font-kanit bg-white">
+                    <option value="">ทุกแกนชีวภาพเป้าหมาย (All 39 Axes)</option>
+                    {% for ax in all_axes %}
+                    <option value="{{ ax.axis_id }}" {% if selected_axis == ax.axis_id|stringformat:"s" %}selected{% endif %}>
+                        Axis {{ ax.axis_id }}: {{ ax.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-                    <!-- Submit & Clear Button -->
-                    <div class="col-md-2 col-lg-3 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary mr-2" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: none;">
-                            <i class="fas fa-filter mr-1"></i>กรองข้อมูล
-                        </button>
-                        {% if search_q or selected_axis %}
-                        <a href="{% url 'clinical:therapeutic_matrix' %}" class="btn btn-outline-secondary">
-                            ล้างตัวกรอง
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </form>
-        </div>
+            <!-- Submit & Clear Button -->
+            <div class="md:col-span-2 flex gap-2">
+                <button type="submit" class="flex-1 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-medium transition-colors shadow-sm font-kanit flex items-center justify-center gap-1.5">
+                    <i class="fas fa-filter"></i> กรอง
+                </button>
+                {% if search_q or selected_axis %}
+                <a href="{% url 'clinical:therapeutic_matrix' %}" class="px-3 py-2.5 rounded-xl bg-secondary hover:bg-gray-200 text-gray-700 text-xs font-medium transition-colors font-kanit flex items-center justify-center">
+                    ล้าง
+                </a>
+                {% endif %}
+            </div>
+        </form>
     </div>
 
     <!-- Modules Count Badge -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <span class="text-muted text-sm">
-            แสดง <strong class="text-white">{{ modules|length }}</strong> โมดูลจากทั้งหมด <strong class="text-cyan">{{ total_modules_count }}</strong> รายการ
+    <div class="flex items-center justify-between text-xs text-gray-500 font-kanit">
+        <span>
+            แสดง <strong class="text-gray-900 font-semibold">{{ modules|length }}</strong> โมดูลจากทั้งหมด <strong class="text-primary font-semibold">{{ total_modules_count }}</strong> รายการ
         </span>
-        <span class="badge badge-secondary px-3 py-1 font-mono">
-            <i class="fas fa-dna mr-1 text-cyan"></i>Phytochemicals Intelligence
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-gray-700 border border-gray-200">
+            <i class="fas fa-dna text-primary"></i> Phytochemicals Intelligence
         </span>
     </div>
 
     <!-- Modules Grid -->
-    <div class="row">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {% for mod in modules %}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100 shadow-sm" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden; transition: transform 0.2s;" onmouseover="this.style.borderColor='#38bdf8';" onmouseout="this.style.borderColor='#1e293b';">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: #131d35; border-bottom: 1px solid #1e293b;">
-                    <div>
-                        <span class="badge badge-primary px-2 py-1 font-mono mr-1" style="background: #0369a1;">
-                            {{ mod.code|default:"MOD" }}
-                        </span>
-                        <strong class="text-white font-sm">{{ mod.name }}</strong>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-primary/40 transition-all p-5 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <span class="px-2.5 py-0.5 rounded text-[11px] font-mono bg-primary/10 text-primary font-bold">
+                        {{ mod.code|default:"MOD" }}
+                    </span>
+                    <span class="text-[11px] font-kanit text-emerald-600 flex items-center gap-1">
+                        <i class="fas fa-check-circle"></i> Validated
+                    </span>
+                </div>
+                <h3 class="font-bold text-gray-900 text-sm font-kanit mb-2">{{ mod.name }}</h3>
+                <p class="text-xs text-gray-600 font-kanit leading-relaxed mb-4">
+                    {{ mod.description|default:"โมดูลการรักษาระดับชีวโมเลกุลเพื่อฟื้นฟูสภาวะสมดุลของเซลล์" }}
+                </p>
+
+                <!-- Target Axes Badges -->
+                {% if mod.axes or mod.target_axes %}
+                <div class="space-y-1.5 mb-4">
+                    <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider font-kanit block">แกนเป้าหมายการออกฤทธิ์:</span>
+                    <div class="flex flex-wrap gap-1">
+                        {% for target_ax in mod.axes|default:mod.target_axes %}
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-secondary text-gray-700 border border-gray-200">
+                                Axis {{ target_ax }}
+                            </span>
+                        {% endfor %}
                     </div>
                 </div>
-                <div class="card-body p-3 d-flex flex-column justify-content-between">
-                    <div>
-                        <p class="text-muted text-xs mb-3" style="line-height: 1.5;">
-                            {{ mod.description|default:"โมดูลการรักษาระดับชีวโมเลกุลเพื่อฟื้นฟูสภาวะสมดุลของเซลล์" }}
-                        </p>
+                {% endif %}
+            </div>
 
-                        <!-- Target Axes Badges -->
-                        {% if mod.axes or mod.target_axes %}
-                        <div class="mb-3">
-                            <small class="text-muted font-weight-bold d-block mb-1 font-xs text-uppercase">แกนเป้าหมายการออกฤทธิ์:</small>
-                            <div class="d-flex flex-wrap gap-1">
-                                {% for target_ax in mod.axes|default:mod.target_axes %}
-                                    <span class="badge badge-dark text-cyan font-mono text-xs px-2 py-1 mr-1 mb-1" style="border: 1px solid #0891b2;">
-                                        Axis {{ target_ax }}
-                                    </span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="pt-2 d-flex justify-content-between align-items-center" style="border-top: 1px solid #1e293b;">
-                        <span class="badge badge-clinical text-xs">
-                            <i class="fas fa-check-circle mr-1"></i>Validated Module
-                        </span>
-                        <small class="text-muted text-xs font-mono">TSPI Precision</small>
-                    </div>
-                </div>
+            <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400 font-kanit">
+                <span>TSPI Precision Botanical</span>
+                <span class="font-mono">Pillar 3</span>
             </div>
         </div>
         {% empty %}
-        <div class="col-12 text-center py-5">
-            <i class="fas fa-capsules fa-3x text-muted mb-3 d-block"></i>
-            <h5 class="text-light font-weight-normal">ไม่พบโมดูลสารพฤกษเคมีที่ตรงกับเงื่อนไข</h5>
-            <p class="text-muted text-sm">ลองค้นหาด้วยคำอื่น หรือเลือกแกนชีวภาพเป้าหมายใหม่</p>
+        <div class="col-span-full bg-white rounded-2xl border border-gray-200 p-12 text-center">
+            <div class="w-16 h-16 rounded-full bg-secondary flex items-center justify-center text-gray-400 mx-auto mb-3">
+                <i class="fas fa-capsules text-2xl"></i>
+            </div>
+            <h4 class="text-base font-bold text-gray-800 mb-1 font-kanit">ไม่พบโมดูลสารพฤกษเคมีที่ตรงกับเงื่อนไข</h4>
+            <p class="text-xs text-gray-500 font-kanit">ลองค้นหาด้วยคำอื่น หรือเลือกแกนชีวภาพเป้าหมายใหม่</p>
         </div>
         {% endfor %}
     </div>

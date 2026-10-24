@@ -11,9 +11,10 @@
         max-width: 850px;
         margin: 20px auto;
         padding: 40px;
-        border-radius: 8px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        color: #0f172a;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+        color: #111827;
         position: relative;
     }
     @media print {
@@ -32,6 +33,7 @@
             padding: 0;
             margin: 0;
             box-shadow: none;
+            border: none;
         }
         .no-print {
             display: none !important;
@@ -41,92 +43,95 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3">
+<div class="space-y-6">
     <!-- Top Action Toolbar -->
-    <div class="card shadow mb-4 no-print" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
-        <div class="card-body p-3">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div class="d-flex align-items-center mb-2 mb-lg-0">
-                    <a href="{% url 'clinical:report_dashboard' %}" class="btn btn-sm btn-outline-secondary mr-3">
-                        <i class="fas fa-arrow-left mr-1"></i>กลับศูนย์รายงาน
-                    </a>
-                    <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <h5 class="text-white font-weight-bold mb-0 mr-2">
-                                รายงาน #TSPI-{{ analysis.pk }} &bull; {{ analysis.patient.full_name }}
-                            </h5>
-                            <span class="badge {% if analysis.status == 'approved' or analysis.status == 'released' %}badge-success{% else %}badge-warning text-dark{% endif %} px-2 py-1 font-mono">
-                                {{ analysis.get_status_display }}
-                            </span>
-                        </div>
-                        <small class="text-muted">HN: {{ analysis.patient.hn }} &bull; ออกรายงานเมื่อ: {{ analysis.analysis_date|date:"d M Y H:i" }}</small>
+    <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm no-print">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <a href="{% url 'clinical:report_dashboard' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-gray-700 bg-secondary hover:bg-gray-200 transition-colors font-kanit">
+                    <i class="fas fa-arrow-left"></i> กลับศูนย์รายงาน
+                </a>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-base font-bold text-gray-900 font-kanit">
+                            รายงาน #TSPI-{{ analysis.pk }} &bull; {{ analysis.patient.full_name }}
+                        </h2>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium font-kanit {% if analysis.status == 'approved' or analysis.status == 'released' %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                            {{ analysis.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="text-xs text-gray-500 font-kanit">
+                        HN: {{ analysis.patient.hn }} | ออกรายงานเมื่อ: {{ analysis.analysis_date|date:"d M Y H:i" }}
                     </div>
                 </div>
+            </div>
 
-                <!-- Edition Switcher & Action Buttons -->
-                <div class="d-flex flex-wrap align-items-center gap-2">
-                    <!-- Edition Selector -->
-                    <div class="btn-group btn-group-sm mr-2" role="group">
-                        <a href="?edition=physician" class="btn {% if edition == 'physician' %}btn-primary{% else %}btn-dark{% endif %}">
-                            ฉบับแพทย์ (Physician)
-                        </a>
-                        <a href="?edition=patient" class="btn {% if edition == 'patient' %}btn-primary{% else %}btn-dark{% endif %}">
-                            ฉบับคนไข้ (Patient)
-                        </a>
-                        <a href="?edition=omics" class="btn {% if edition == 'omics' %}btn-primary{% else %}btn-dark{% endif %}">
-                            Multi-Omics
-                        </a>
-                    </div>
-
-                    <!-- PDF Download Button -->
-                    <a href="{% url 'clinical:report_pdf' analysis.pk %}?edition={{ edition }}" target="_blank" class="btn btn-sm btn-danger shadow mr-2">
-                        <i class="fas fa-file-pdf mr-1"></i>ดาวน์โหลด PDF (300 DPI)
+            <!-- Edition Switcher & Action Buttons -->
+            <div class="flex flex-wrap items-center gap-2" x-data="{ openDropdown: false }">
+                <!-- Edition Selector -->
+                <div class="flex rounded-xl bg-secondary p-1 text-xs font-medium font-kanit">
+                    <a href="?edition=physician" class="px-3 py-1.5 rounded-lg transition-colors {% if edition == 'physician' %}bg-white text-gray-900 shadow-xs{% else %}text-gray-600 hover:text-gray-900{% endif %}">
+                        ฉบับแพทย์
                     </a>
+                    <a href="?edition=patient" class="px-3 py-1.5 rounded-lg transition-colors {% if edition == 'patient' %}bg-white text-gray-900 shadow-xs{% else %}text-gray-600 hover:text-gray-900{% endif %}">
+                        ฉบับคนไข้
+                    </a>
+                    <a href="?edition=omics" class="px-3 py-1.5 rounded-lg transition-colors {% if edition == 'omics' %}bg-white text-gray-900 shadow-xs{% else %}text-gray-600 hover:text-gray-900{% endif %}">
+                        Multi-Omics
+                    </a>
+                </div>
 
-                    <!-- Browser Print Button -->
-                    <button class="btn btn-sm btn-outline-light mr-2" onclick="window.print()">
-                        <i class="fas fa-print mr-1"></i>พิมพ์
+                <!-- PDF Download Button -->
+                <a href="{% url 'clinical:report_pdf' analysis.pk %}?edition={{ edition }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-medium transition-colors shadow-sm font-kanit">
+                    <i class="fas fa-file-pdf"></i> ดาวน์โหลด PDF
+                </a>
+
+                <!-- Browser Print Button -->
+                <button type="button" onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-secondary text-xs font-medium transition-colors font-kanit">
+                    <i class="fas fa-print"></i> พิมพ์
+                </button>
+
+                <!-- Sign-off Dropdown -->
+                {% if analysis.status != 'released' %}
+                <div class="relative">
+                    <button type="button" @click="openDropdown = !openDropdown" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-medium transition-colors shadow-sm font-kanit">
+                        <i class="fas fa-file-signature"></i> ลงนาม / สถานะ <i class="fas fa-chevron-down text-[10px] ml-1"></i>
                     </button>
-
-                    <!-- Sign-off Dropdown -->
-                    {% if analysis.status != 'released' %}
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-success dropdown-toggle shadow" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-file-signature mr-1"></i>ลงนาม / จัดการสถานะ
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" style="background: #0f172a; border: 1px solid #1e293b;">
-                            {% if analysis.status == 'draft' or analysis.status == 'reviewed' %}
-                            <form method="post" action="{% url 'clinical:report_signoff' analysis.pk %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="approve">
-                                <button type="submit" class="dropdown-item text-success">
-                                    <i class="fas fa-check-circle mr-2"></i>อนุมัติทางการแพทย์ (ลบลายน้ำ Draft)
-                                </button>
-                            </form>
-                            {% endif %}
-                            {% if analysis.status == 'approved' %}
-                            <form method="post" action="{% url 'clinical:report_signoff' analysis.pk %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="release">
-                                <button type="submit" class="dropdown-item text-cyan">
-                                    <i class="fas fa-paper-plane mr-2"></i>ส่งมอบให้คนไข้ในพอร์ทัล (Release)
-                                </button>
-                            </form>
-                            {% endif %}
-                            {% if analysis.status != 'draft' %}
-                            <div class="dropdown-divider" style="border-color: #1e293b;"></div>
-                            <form method="post" action="{% url 'clinical:report_signoff' analysis.pk %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="revert">
-                                <button type="submit" class="dropdown-item text-warning">
-                                    <i class="fas fa-undo mr-2"></i>ปรับกลับเป็นฉบับร่าง (Draft)
-                                </button>
-                            </form>
-                            {% endif %}
-                        </div>
+                    <div x-show="openDropdown" 
+                         @click.outside="openDropdown = false" 
+                         x-cloak
+                         class="absolute right-0 mt-2 w-56 rounded-xl bg-white border border-gray-200 shadow-lg py-1 z-20 text-xs font-kanit">
+                        {% if analysis.status == 'draft' or analysis.status == 'reviewed' %}
+                        <form method="post" action="{% url 'clinical:report_signoff' analysis.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-emerald-700 hover:bg-emerald-50 flex items-center gap-2">
+                                <i class="fas fa-check-circle"></i> อนุมัติทางการแพทย์ (ลบลายน้ำ)
+                            </button>
+                        </form>
+                        {% endif %}
+                        {% if analysis.status == 'approved' %}
+                        <form method="post" action="{% url 'clinical:report_signoff' analysis.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="release">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 flex items-center gap-2">
+                                <i class="fas fa-paper-plane"></i> ส่งมอบให้คนไข้ (Release)
+                            </button>
+                        </form>
+                        {% endif %}
+                        {% if analysis.status != 'draft' %}
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <form method="post" action="{% url 'clinical:report_signoff' analysis.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="revert">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-amber-700 hover:bg-amber-50 flex items-center gap-2">
+                                <i class="fas fa-undo"></i> ปรับกลับเป็นฉบับร่าง (Draft)
+                            </button>
+                        </form>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

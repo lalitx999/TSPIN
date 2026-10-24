@@ -5,28 +5,35 @@
 
 {% block extra_doctor_head %}
 <!-- Chart.js Plugin -->
-<link rel="stylesheet" href="{% static 'vendor/adminlte/plugins/chart.js/Chart.min.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3">
+<div class="space-y-6">
     <!-- Header -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2" style="border-bottom: 1px solid #1e293b;">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-200">
         <div>
-            <h2 class="font-weight-bold text-white mb-1" style="font-size: 1.6rem;">
-                <i class="fas fa-network-wired text-cyan mr-2"></i>แผนผังเรดาร์ชีวภาพและโทโพโลยี (Biological Topology)
-            </h2>
-            <p class="text-muted mb-0 font-sm">
-                วิเคราะห์ความสมดุลและความสัมพันธ์ของระบบชีวภาพ 12 โดเมน และ 39 แกนกลไก
-            </p>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <i class="fas fa-network-wired text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 font-kanit flex items-center gap-2">
+                        แผนผังเรดาร์ชีวภาพและโทโพโลยี (Biological Topology)
+                    </h1>
+                    <p class="text-sm text-gray-500 font-kanit">
+                        วิเคราะห์ความสมดุลและความสัมพันธ์ของระบบชีวภาพ 12 โดเมน และ 39 แกนกลไก
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="mt-3 mt-md-0 d-flex gap-2">
-            <a href="{% url 'clinical:axes_explorer' %}{% if patient %}?patient_id={{ patient.pk }}{% endif %}" class="btn btn-outline-info shadow-sm mr-2">
-                <i class="fas fa-list-ul mr-1"></i>ดูรายการนิยาม 39 แกน
+        <div class="flex items-center gap-2">
+            <a href="{% url 'clinical:axes_explorer' %}{% if patient %}?patient_id={{ patient.pk }}{% endif %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-gray-700 bg-secondary hover:bg-gray-200 transition-colors font-kanit">
+                <i class="fas fa-list-ul"></i> นิยาม 39 แกน
             </a>
             {% if patient %}
-            <a href="{% url 'clinical:axis_timeline' %}?patient_id={{ patient.pk }}" class="btn btn-outline-warning shadow-sm">
-                <i class="fas fa-history mr-1"></i>เส้นเวลาสุขภาพ (Timeline)
+            <a href="{% url 'clinical:axis_timeline' %}?patient_id={{ patient.pk }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors font-kanit">
+                <i class="fas fa-history"></i> เส้นเวลาสุขภาพ (Timeline)
             </a>
             {% endif %}
         </div>
@@ -34,74 +41,75 @@
 
     <!-- Patient Header (if active) -->
     {% if patient %}
-    <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
-        <div class="card-body p-3 d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-user-circle fa-2x text-cyan mr-3"></i>
-                <div>
-                    <h5 class="text-white font-weight-bold mb-0">{{ patient.full_name }} (HN: {{ patient.hn }})</h5>
-                    <small class="text-muted">
-                        ผลตรวจล่าสุด: {{ latest_record.record_date|date:"d M Y H:i"|default:"ยังไม่มีบันทึก" }}
-                        {% if baseline_record %} &bull; มีข้อมูลเปรียบเทียบกับ Baseline{% endif %}
-                    </small>
-                </div>
+    <div class="bg-white rounded-2xl border border-primary/20 p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold">
+                {{ patient.first_name|slice:":1" }}
             </div>
             <div>
-                <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-secondary">
-                    <i class="fas fa-arrow-left mr-1"></i>กลับแฟ้มคนไข้
-                </a>
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-gray-900 font-kanit text-base">{{ patient.full_name }}</h3>
+                    <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-primary/10 text-primary font-medium">
+                        HN: {{ patient.hn }}
+                    </span>
+                </div>
+                <div class="text-xs text-gray-500 font-kanit">
+                    ผลตรวจล่าสุด: {{ latest_record.record_date|date:"d M Y H:i"|default:"ยังไม่มีบันทึก" }}
+                    {% if baseline_record %} &bull; เปรียบเทียบกับ Baseline{% endif %}
+                </div>
             </div>
+        </div>
+        <div>
+            <a href="{% url 'patients:patient_detail' patient.pk %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-700 bg-secondary hover:bg-gray-200 transition-colors font-kanit">
+                <i class="fas fa-arrow-left"></i> กลับแฟ้มคนไข้
+            </a>
         </div>
     </div>
     {% endif %}
 
     <!-- Radar Chart Area -->
-    <div class="row">
-        <!-- Main Radar Canvas Card -->
-        <div class="col-lg-8 mb-4">
-            <div class="card shadow" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; overflow: hidden;">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: #131d35; border-bottom: 1px solid #1e293b;">
-                    <h5 class="card-title text-white font-weight-bold mb-0" style="font-size: 1.05rem;">
-                        <i class="fas fa-chart-area text-cyan mr-2"></i>แผนภูมิเรดาร์ชีววิทยา 12 โดเมนหลัก
-                    </h5>
-                    <span class="badge badge-clinical text-xs font-mono">
-                        <i class="fas fa-shield-alt mr-1"></i>TSPI Mechanistic Topology
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Main Radar Canvas Card (8 cols) -->
+        <div class="lg:col-span-8">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="px-5 py-3.5 bg-secondary/50 border-b border-gray-200 flex items-center justify-between">
+                    <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider font-kanit flex items-center gap-2">
+                        <i class="fas fa-chart-area text-primary"></i> แผนภูมิเรดาร์ชีววิทยา 12 โดเมนหลัก
+                    </span>
+                    <span class="px-2.5 py-0.5 rounded text-[11px] font-mono bg-primary/10 text-primary font-medium">
+                        TSPI Mechanistic Topology
                     </span>
                 </div>
-                <div class="card-body p-4 text-center">
-                    <div style="position: relative; height: 460px; width: 100%;">
+                <div class="p-6">
+                    <div class="relative h-[480px] w-full">
                         <canvas id="domainRadarCanvas"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 12 Domains Breakdown Progress List -->
-        <div class="col-lg-4 mb-4">
-            <div class="card shadow" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; overflow: hidden;">
-                <div class="card-header py-3" style="background: #131d35; border-bottom: 1px solid #1e293b;">
-                    <h5 class="card-title text-white font-weight-bold mb-0" style="font-size: 1.05rem;">
-                        <i class="fas fa-poll text-cyan mr-2"></i>คะแนนเฉลี่ยรายโดเมน (0 - 100)
-                    </h5>
+        <!-- 12 Domains Breakdown Progress List (4 cols) -->
+        <div class="lg:col-span-4">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="px-5 py-3.5 bg-secondary/50 border-b border-gray-200">
+                    <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider font-kanit flex items-center gap-2">
+                        <i class="fas fa-poll text-primary"></i> คะแนนเฉลี่ยรายโดเมน (0 - 100)
+                    </span>
                 </div>
-                <div class="card-body p-3" style="max-height: 480px; overflow-y: auto;">
+                <div class="p-4 space-y-3 max-h-[500px] overflow-y-auto">
                     {% for dom in domain_data %}
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-xs text-light font-weight-bold">
+                    <div>
+                        <div class="flex justify-between items-center text-xs mb-1 font-kanit">
+                            <span class="font-medium text-gray-800">
                                 D{{ dom.domain_id }}: {{ dom.title }}
                             </span>
-                            <span class="badge {% if dom.average_score >= 70 %}badge-danger{% elif dom.average_score >= 40 %}badge-warning text-dark{% else %}badge-success{% endif %} font-mono text-xs">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-mono font-medium {% if dom.average_score >= 70 %}bg-red-100 text-red-800{% elif dom.average_score >= 40 %}bg-amber-100 text-amber-800{% else %}bg-emerald-100 text-emerald-800{% endif %}">
                                 {{ dom.average_score }}
                             </span>
                         </div>
-                        <div class="progress" style="height: 6px; background-color: #1e293b; border-radius: 4px;">
-                            <div class="progress-bar {% if dom.average_score >= 70 %}bg-danger{% elif dom.average_score >= 40 %}bg-warning{% else %}bg-success{% endif %}" 
-                                 role="progressbar" 
-                                 style="width: {{ dom.average_score }}%;" 
-                                 aria-valuenow="{{ dom.average_score }}" 
-                                 aria-valuemin="0" 
-                                 aria-valuemax="100">
+                        <div class="w-full h-2 bg-secondary rounded-full overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-300 {% if dom.average_score >= 70 %}bg-red-500{% elif dom.average_score >= 40 %}bg-amber-500{% else %}bg-primary{% endif %}" 
+                                 style="width: {{ dom.average_score }}%;">
                             </div>
                         </div>
                     </div>
@@ -113,7 +121,6 @@
 </div>
 
 <!-- Chart.js Scripts -->
-<script src="{% static 'vendor/adminlte/plugins/chart.js/Chart.bundle.min.js' %}"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const domainLabels = {{ domain_labels_json|safe }};
@@ -129,13 +136,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     label: 'คะแนนการประเมินปัจจุบัน (Current Score)',
                     data: domainScores,
-                    backgroundColor: 'rgba(56, 189, 248, 0.25)',
-                    borderColor: '#38bdf8',
+                    backgroundColor: 'rgba(104, 157, 75, 0.2)',
+                    borderColor: '#689D4B',
                     borderWidth: 2,
-                    pointBackgroundColor: '#38bdf8',
+                    pointBackgroundColor: '#689D4B',
                     pointBorderColor: '#ffffff',
                     pointHoverBackgroundColor: '#ffffff',
-                    pointHoverBorderColor: '#38bdf8',
+                    pointHoverBorderColor: '#689D4B',
                     pointRadius: 4,
                 }
             ]
@@ -143,38 +150,50 @@ document.addEventListener("DOMContentLoaded", function () {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scale: {
-                angleLines: {
-                    color: 'rgba(255, 255, 255, 0.1)'
-                },
-                gridLines: {
-                    color: 'rgba(255, 255, 255, 0.1)'
-                },
-                pointLabels: {
-                    fontColor: '#94a3b8',
-                    fontSize: 11
-                },
-                ticks: {
+            scales: {
+                r: {
+                    angleLines: {
+                        color: 'rgba(0, 0, 0, 0.08)'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.08)'
+                    },
+                    pointLabels: {
+                        font: {
+                            family: 'Kanit',
+                            size: 11
+                        },
+                        color: '#4b5563'
+                    },
                     suggestedMin: 0,
                     suggestedMax: 100,
-                    stepSize: 20,
-                    backdropColor: 'transparent',
-                    fontColor: '#64748b'
+                    ticks: {
+                        stepSize: 20,
+                        backdropColor: 'transparent',
+                        color: '#9ca3af'
+                    }
                 }
             },
-            legend: {
-                position: 'top',
-                labels: {
-                    fontColor: '#f1f5f9',
-                    fontSize: 12
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            family: 'Kanit',
+                            size: 12
+                        },
+                        color: '#111827'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#ffffff',
+                    borderColor: '#e5e7eb',
+                    borderWidth: 1,
+                    titleColor: '#111827',
+                    bodyColor: '#4b5563',
+                    titleFont: { family: 'Kanit' },
+                    bodyFont: { family: 'Kanit' }
                 }
-            },
-            tooltips: {
-                backgroundColor: '#0f172a',
-                borderColor: '#1e293b',
-                borderWidth: 1,
-                titleFontColor: '#38bdf8',
-                bodyFontColor: '#f1f5f9'
             }
         }
     });

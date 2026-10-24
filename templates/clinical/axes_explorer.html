@@ -4,124 +4,119 @@
 {% block title %}39 Biological Axes Explorer | Dr. Patt EMR{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3">
+<div class="space-y-6">
     <!-- Header -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2" style="border-bottom: 1px solid #1e293b;">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-200">
         <div>
-            <h2 class="font-weight-bold text-white mb-1" style="font-size: 1.6rem;">
-                <i class="fas fa-project-diagram text-cyan mr-2"></i>TSPI™ 39 Mechanistic Biological Axes
-            </h2>
-            <p class="text-muted mb-0 font-sm">
-                กรอบแนวคิดชีววิทยาโมเลกุล 12 โดเมน 39 แกนกลไก เพื่อการแพทย์แม่นยำระดับเซลล์
-            </p>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <i class="fas fa-project-diagram text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 font-kanit flex items-center gap-2">
+                        TSPI™ 39 Mechanistic Biological Axes
+                    </h1>
+                    <p class="text-sm text-gray-500 font-kanit">
+                        กรอบแนวคิดชีววิทยาโมเลกุล 12 โดเมน 39 แกนกลไก เพื่อการแพทย์แม่นยำระดับเซลล์
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="mt-3 mt-md-0 d-flex gap-2">
-            <a href="{% url 'clinical:axis_graph' %}{% if patient %}?patient_id={{ patient.pk }}{% endif %}" class="btn btn-outline-info shadow-sm mr-2">
-                <i class="fas fa-chart-pie mr-1"></i>เปิดดูเรดาร์ชาร์ต (Topology)
+        <div class="flex items-center gap-2">
+            <a href="{% url 'clinical:axis_graph' %}{% if patient %}?patient_id={{ patient.pk }}{% endif %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-gray-700 bg-secondary hover:bg-gray-200 transition-colors font-kanit">
+                <i class="fas fa-chart-pie"></i> เรดาร์ชาร์ต (Topology)
             </a>
-            <a href="{% url 'clinical:therapeutic_matrix' %}" class="btn btn-outline-success shadow-sm">
-                <i class="fas fa-capsules mr-1"></i>เมทริกซ์การรักษา 200 โมดูล
+            <a href="{% url 'clinical:therapeutic_matrix' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors font-kanit">
+                <i class="fas fa-capsules"></i> เมทริกซ์การรักษา 200 โมดูล
             </a>
         </div>
     </div>
 
     <!-- Patient Context Banner (if active) -->
     {% if patient %}
-    <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #0284c7; border-radius: 12px;">
-        <div class="card-body p-3">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                <div class="d-flex align-items-center mb-2 mb-md-0">
-                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #0284c7; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 1.2rem;" class="mr-3">
-                        {{ patient.first_name|slice:":1" }}
-                    </div>
-                    <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <h4 class="text-white font-weight-bold mb-0 mr-2" style="font-size: 1.15rem;">
-                                {{ patient.full_name }}
-                            </h4>
-                            <span class="badge badge-dark text-cyan font-mono px-2 py-1" style="border: 1px solid #0284c7;">
-                                HN: {{ patient.hn }}
-                            </span>
-                            {% if latest_record and latest_record.is_baseline %}
-                                <span class="badge badge-info px-2 py-1">ค่าพื้นฐาน (Baseline)</span>
-                            {% endif %}
-                        </div>
-                        <small class="text-muted">
-                            ประเมินล่าสุด: {{ latest_record.record_date|date:"d M Y H:i"|default:"ยังไม่มีบันทึกคะแนน" }}
-                        </small>
-                    </div>
+    <div class="bg-white rounded-2xl border border-primary/20 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold">
+                    {{ patient.first_name|slice:":1" }}
                 </div>
-
-                <div class="d-flex gap-2">
-                    <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-secondary mr-2">
-                        <i class="fas fa-folder-open mr-1"></i>ดูแฟ้ม EMR
-                    </a>
-                    <button type="submit" form="axes-score-form" class="btn btn-sm btn-primary shadow" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: none;">
-                        <i class="fas fa-save mr-1"></i>บันทึกคะแนน 39 แกนทั้งหมด
-                    </button>
-                </div>
-            </div>
-
-            <!-- Dysfunctional Axes Highlights -->
-            {% if dysfunctional_axes %}
-            <div class="mt-3 p-3 rounded" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3);">
-                <div class="d-flex align-items-center mb-2">
-                    <i class="fas fa-exclamation-circle text-danger mr-2"></i>
-                    <strong class="text-danger font-sm">แกนชีวภาพที่มีความผิดปกติรุนแรง / เร่งด่วน (คะแนน &ge; 60):</strong>
-                </div>
-                <div class="d-flex flex-wrap gap-2">
-                    {% for ax in dysfunctional_axes %}
-                        <span class="badge badge-danger px-2 py-1 mr-2 mb-1" style="font-size: 0.85rem;">
-                            <strong>Axis {{ ax.axis_id }}:</strong> {{ ax.name }} ({{ ax.score }}/100)
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-bold text-gray-900 font-kanit text-base">{{ patient.full_name }}</h3>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-primary/10 text-primary font-medium">
+                            HN: {{ patient.hn }}
                         </span>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Matched Recommendations -->
-            {% if recommendations %}
-            <div class="mt-3 p-3 rounded" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
-                <div class="d-flex align-items-center mb-2">
-                    <i class="fas fa-seedling text-success mr-2"></i>
-                    <strong class="text-success font-sm">โมดูลสารอาหารและสารพฤกษเคมีบำบัดที่แนะนำ (Therapeutic Matching):</strong>
-                </div>
-                <div class="row">
-                    {% for mod in recommendations %}
-                    <div class="col-md-6 col-lg-3 mb-2">
-                        <div class="p-2 rounded h-100" style="background: #090d16; border: 1px solid #1e293b;">
-                            <strong class="text-cyan d-block font-xs font-mono">{{ mod.code|default:"MODULE" }}</strong>
-                            <span class="text-light text-xs font-weight-bold d-block">{{ mod.name }}</span>
-                            <small class="text-muted d-block text-xs mt-1" style="max-height: 38px; overflow: hidden;">{{ mod.description|truncatewords:8 }}</small>
-                        </div>
+                        {% if latest_record and latest_record.is_baseline %}
+                            <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-blue-100 text-blue-800">Baseline</span>
+                        {% endif %}
                     </div>
-                    {% endfor %}
+                    <div class="text-xs text-gray-500 font-kanit">
+                        ประเมินล่าสุด: {{ latest_record.record_date|date:"d M Y H:i"|default:"ยังไม่มีบันทึกคะแนน" }}
+                    </div>
                 </div>
             </div>
-            {% endif %}
+
+            <div class="flex items-center gap-2">
+                <a href="{% url 'patients:patient_detail' patient.pk %}" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-gray-700 bg-secondary hover:bg-gray-200 transition-colors font-kanit">
+                    <i class="fas fa-folder-open"></i> ดูแฟ้ม EMR
+                </a>
+                <button type="submit" form="axes-score-form" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-medium transition-colors shadow-sm font-kanit">
+                    <i class="fas fa-save"></i> บันทึกคะแนน 39 แกนทั้งหมด
+                </button>
+            </div>
         </div>
+
+        <!-- Dysfunctional Axes Highlights -->
+        {% if dysfunctional_axes %}
+        <div class="p-3.5 rounded-xl bg-red-50 border border-red-200">
+            <div class="flex items-center gap-2 text-xs font-bold text-red-800 mb-1.5 font-kanit">
+                <i class="fas fa-exclamation-circle text-red-600"></i> แกนชีวภาพที่มีความผิดปกติรุนแรง / เร่งด่วน (คะแนน &ge; 60):
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+                {% for ax in dysfunctional_axes %}
+                    <span class="px-2.5 py-1 rounded-lg bg-red-100 text-red-800 text-xs font-kanit font-medium">
+                        <strong>Axis {{ ax.axis_id }}:</strong> {{ ax.name }} ({{ ax.score }}/100)
+                    </span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Matched Recommendations -->
+        {% if recommendations %}
+        <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200">
+            <div class="flex items-center gap-2 text-xs font-bold text-emerald-800 mb-2 font-kanit">
+                <i class="fas fa-seedling text-emerald-600"></i> โมดูลสารอาหารและสารพฤกษเคมีบำบัดที่แนะนำ (Therapeutic Matching):
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                {% for mod in recommendations %}
+                <div class="p-2.5 rounded-lg bg-white border border-emerald-100 shadow-xs">
+                    <span class="font-mono text-[10px] font-bold text-primary block">{{ mod.code|default:"MODULE" }}</span>
+                    <h5 class="text-xs font-bold text-gray-900 font-kanit">{{ mod.name }}</h5>
+                    <p class="text-[11px] text-gray-500 font-kanit mt-0.5 line-clamp-2">{{ mod.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
     </div>
     {% endif %}
 
     <!-- Score Guide Legend -->
-    <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
-        <div class="card-body p-3">
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 text-xs">
-                <span class="text-muted font-weight-bold text-uppercase">
-                    <i class="fas fa-info-circle mr-1 text-cyan"></i>เกณฑ์การแปลผลระดับความผิดปกติ (Clinical Scoring Range):
-                </span>
-                <div class="d-flex flex-wrap gap-3">
-                    <span class="badge badge-success px-2 py-1 mr-2">
-                        <i class="fas fa-check mr-1"></i>0 - 39: สมบูรณ์ปกติ (Optimal)
-                    </span>
-                    <span class="badge badge-warning text-dark px-2 py-1 mr-2">
-                        <i class="fas fa-exclamation mr-1"></i>40 - 69: ภาวะเครียดปานกลาง (Mild/Moderate Stress)
-                    </span>
-                    <span class="badge badge-danger px-2 py-1">
-                        <i class="fas fa-fire mr-1"></i>70 - 100: พยาธิสภาพรุนแรง (Severe Dysfunction)
-                    </span>
-                </div>
-            </div>
+    <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-kanit">
+        <span class="font-semibold text-gray-700 flex items-center gap-1.5">
+            <i class="fas fa-info-circle text-primary"></i> เกณฑ์การแปลผลระดับความผิดปกติ (Clinical Scoring Range):
+        </span>
+        <div class="flex flex-wrap gap-2">
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-medium">
+                <i class="fas fa-check text-[10px]"></i> 0 - 39: สมบูรณ์ปกติ (Optimal)
+            </span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 font-medium">
+                <i class="fas fa-exclamation text-[10px]"></i> 40 - 69: ภาวะเครียดปานกลาง (Mild/Moderate)
+            </span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-100 text-red-800 font-medium">
+                <i class="fas fa-fire text-[10px]"></i> 70 - 100: พยาธิสภาพรุนแรง (Severe Dysfunction)
+            </span>
         </div>
     </div>
 
@@ -130,85 +125,65 @@
         {% csrf_token %}
 
         {% if form %}
-            <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
-                <div class="card-body p-3">
-                    <div class="form-row align-items-center">
-                        <div class="col-md-3 mb-2 mb-md-0">
-                            <div class="custom-control custom-checkbox">
-                                {{ form.is_baseline }}
-                                <label class="custom-control-label text-light text-sm font-weight-bold" for="{{ form.is_baseline.id_for_label }}">
-                                    ตั้งเป็นค่าพื้นฐาน (Baseline Assessment)
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-9">
-                            {{ form.notes }}
-                        </div>
+            <div class="bg-white rounded-2xl border border-gray-200 p-4 mb-6 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-medium text-gray-700 font-kanit">
+                        {{ form.is_baseline }}
+                        <span>ตั้งเป็นค่าพื้นฐาน (Baseline Assessment)</span>
+                    </label>
+                    <div class="flex-1">
+                        {{ form.notes }}
                     </div>
                 </div>
             </div>
         {% endif %}
 
-        <div class="row">
+        <div class="space-y-6">
             {% for domain in domains %}
-            <div class="col-12 mb-4">
-                <div class="card shadow-sm" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden;">
-                    <!-- Domain Header -->
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: #131d35; border-bottom: 1px solid #1e293b;">
-                        <div>
-                            <span class="badge badge-info px-2 py-1 mr-2 font-mono">DOMAIN {{ domain.domain_id }}</span>
-                            <strong class="text-white font-weight-bold" style="font-size: 1.05rem;">
-                                {{ domain.title }}
-                            </strong>
-                        </div>
-                        <span class="badge badge-secondary px-2 py-1 text-xs">
-                            {{ domain.axes|length }} แกนชีวภาพ
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <!-- Domain Header -->
+                <div class="px-5 py-3.5 bg-secondary/50 border-b border-gray-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-primary/10 text-primary font-bold">
+                            DOMAIN {{ domain.domain_id }}
                         </span>
+                        <h3 class="text-sm font-bold text-gray-900 font-kanit">
+                            {{ domain.title }}
+                        </h3>
                     </div>
+                    <span class="text-xs text-gray-500 font-kanit">
+                        {{ domain.axes|length }} แกนชีวภาพ
+                    </span>
+                </div>
 
-                    <!-- Domain Axes Body -->
-                    <div class="card-body p-3">
-                        <div class="row">
-                            {% for axis in domain.axes %}
-                            <div class="col-lg-6 mb-3">
-                                <div class="p-3 rounded h-100" style="background: #090d16; border: 1px solid #1e293b;">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <span class="badge badge-dark text-cyan font-mono px-2 py-1 mr-1" style="border: 1px solid #0891b2;">
-                                                AXIS {{ axis.axis_id }}
-                                            </span>
-                                            <strong class="text-light" style="font-size: 0.95rem;">
-                                                {{ axis.name }}
-                                            </strong>
-                                        </div>
-
-                                        <!-- Score Display or Input -->
-                                        {% if patient and form %}
-                                            <div style="width: 90px;">
-                                                {% with field_name="axis_"|add:axis.axis_id|stringformat:"s" %}
-                                                    {{ form|dictsort:field_name }}
-                                                {% endwith %}
-                                            </div>
-                                        {% else %}
-                                            <span class="badge badge-secondary px-2 py-1 font-mono">
-                                                ID: {{ axis.axis_id }}
-                                            </span>
-                                        {% endif %}
+                <!-- Domain Axes Body -->
+                <div class="p-5">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {% for axis in domain.axes %}
+                        <div class="p-4 rounded-xl bg-secondary/20 border border-gray-200 hover:border-primary/40 transition-colors flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-start justify-between gap-2 mb-2">
+                                    <div>
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-mono bg-primary/10 text-primary font-medium mb-1">
+                                            AXIS {{ axis.axis_id }}
+                                        </span>
+                                        <h4 class="text-xs font-bold text-gray-900 font-kanit">{{ axis.name }}</h4>
                                     </div>
+                                    <span class="text-[11px] font-mono text-gray-400">#{{ axis.axis_id }}</span>
+                                </div>
 
-                                    <!-- Sub-axes Descriptions -->
-                                    <div class="mt-2 pt-2" style="border-top: 1px solid #1e293b;">
-                                        {% for sub_k, sub_v in axis.sub_axes.items %}
-                                        <div class="mb-1 text-xs text-slate-400">
-                                            <strong class="text-cyan font-mono mr-1">[{{ sub_k }}] {{ sub_v.name }}:</strong>
-                                            <span class="text-muted">{{ sub_v.description|truncatewords:14 }}</span>
-                                        </div>
-                                        {% endfor %}
+                                <!-- Sub-axes Descriptions -->
+                                <div class="space-y-1 pt-2 border-t border-gray-100 text-[11px] font-kanit">
+                                    {% for sub_k, sub_v in axis.sub_axes.items %}
+                                    <div class="text-gray-600">
+                                        <strong class="text-primary font-mono mr-1">[{{ sub_k }}] {{ sub_v.name }}:</strong>
+                                        <span>{{ sub_v.description|truncatewords:12 }}</span>
                                     </div>
+                                    {% endfor %}
                                 </div>
                             </div>
-                            {% endfor %}
                         </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -216,9 +191,9 @@
         </div>
 
         {% if patient %}
-        <div class="text-center py-4 mb-4">
-            <button type="submit" class="btn btn-primary btn-lg px-5 shadow" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: none;">
-                <i class="fas fa-save mr-2"></i>บันทึกผลการประเมิน 39 แกนของคนไข้
+        <div class="text-center py-6">
+            <button type="submit" class="px-8 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white font-medium text-sm transition-colors shadow-sm font-kanit inline-flex items-center gap-2">
+                <i class="fas fa-save"></i> บันทึกผลการประเมิน 39 แกนของคนไข้
             </button>
         </div>
         {% endif %}

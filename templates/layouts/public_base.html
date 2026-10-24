@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<style>
+    .public-navbar {
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid #1e293b;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        padding: 1rem 0;
+    }
+    .public-footer {
+        background: #090d16;
+        border-top: 1px solid #1e293b;
+        padding: 3rem 0 2rem;
+        margin-top: auto;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+    .nav-btn-outline {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #f8fafc;
+        padding: 0.5rem 1.25rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    .nav-btn-outline:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #ffffff;
+    }
+    .nav-btn-primary {
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+        color: #ffffff;
+        padding: 0.5rem 1.25rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    }
+</style>
+{% block extra_public_head %}{% endblock %}
+{% endblock %}
+
+{% block layout %}
+<header class="public-navbar">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="{% url 'core:home' %}" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+            <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(2, 132, 199, 0.2); border: 1px solid #38bdf8; display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 1.25rem;">
+                <i class="fas fa-dna"></i>
+            </div>
+            <div>
+                <span style="font-weight: 800; color: #f8fafc; font-size: 1.2rem; letter-spacing: -0.02em; display: block; line-height: 1.1;">TSPI CLINIC</span>
+                <small style="color: #38bdf8; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase;">Mechanistic Medicine OS</small>
+            </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav style="display: flex; align-items: center; gap: 2rem;" class="d-none d-md-flex">
+            <a href="{% url 'core:home' %}" style="color: #cbd5e1; text-decoration: none; font-size: 0.95rem;">หน้าแรก</a>
+            <a href="{% url 'core:about' %}" style="color: #cbd5e1; text-decoration: none; font-size: 0.95rem;">เกี่ยวกับคลินิก</a>
+            <a href="{% url 'core:privacy' %}" style="color: #cbd5e1; text-decoration: none; font-size: 0.95rem;">นโยบาย PDPA</a>
+        </nav>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <a href="{% url 'accounts:patient_login' %}" class="nav-btn-outline">
+                <i class="fas fa-user mr-1 text-success"></i> คนไข้
+            </a>
+            <a href="{% url 'accounts:doctor_login' %}" class="nav-btn-primary">
+                <i class="fas fa-user-md mr-1"></i> เข้าสู่ระบบแพทย์
+            </a>
+        </div>
+    </div>
+</header>
+
+<main style="flex: 1;">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="public-footer">
+    <div class="container">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 2.5rem; margin-bottom: 2.5rem;">
+            <div>
+                <h4 style="color: #f8fafc; font-size: 1.1rem; margin-bottom: 1rem; font-weight: 700;">TSPI Clinic</h4>
+                <p style="line-height: 1.6; margin-bottom: 1rem;">
+                    การแพทย์เชิงกลไกแห่งอนาคต วิเคราะห์ความเชื่อมโยงของระบบร่างกายผ่าน 39 Mechanistic Biological Axes และความฉลาดเทียมทางการแพทย์
+                </p>
+                <div class="badge badge-clinical">Pure Django Monolith &bull; High Security</div>
+            </div>
+            <div>
+                <h4 style="color: #f8fafc; font-size: 1rem; margin-bottom: 1rem;">บริการและพอร์ทัล</h4>
+                <ul style="list-style: none; padding: 0; line-height: 2;">
+                    <li><a href="{% url 'accounts:doctor_login' %}" style="color: #94a3b8; text-decoration: none;">ระบบเวชระเบียนแพทย์ (EMR)</a></li>
+                    <li><a href="{% url 'accounts:patient_login' %}" style="color: #94a3b8; text-decoration: none;">พอร์ทัลผลตรวจคนไข้</a></li>
+                    <li><a href="{% url 'accounts:patient_register' %}" style="color: #94a3b8; text-decoration: none;">ลงทะเบียนคนไข้ใหม่</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #f8fafc; font-size: 1rem; margin-bottom: 1rem;">กฎหมายและความเป็นส่วนตัว</h4>
+                <ul style="list-style: none; padding: 0; line-height: 2;">
+                    <li><a href="{% url 'core:privacy' %}" style="color: #94a3b8; text-decoration: none;">นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)</a></li>
+                    <li><a href="{% url 'core:terms' %}" style="color: #94a3b8; text-decoration: none;">ข้อตกลงและเงื่อนไขการใช้บริการ</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="padding-top: 1.5rem; border-top: 1px solid #1e293b; text-align: center;">
+            &copy; 2026 TSPI Clinic. Advanced Clinical Intelligence System. All rights reserved.
+        </div>
+    </div>
+</footer>
+{% endblock %}

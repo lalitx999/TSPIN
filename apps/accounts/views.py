@@ -1,0 +1,183 @@
+"""
+Authentication Views for Dr. Patt Clinical EMR.
+Enforces Rate Limiting, Session Fixation Rotation, and Full AuditLog (Pillars 1, 7, 8).
+"""
+
+import hashlib
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout
+from django.contrib import messages
+from django.views.decorators.http import require_http_methods
+from django_ratelimit.decorators import ratelimit
+from accounts.models import AuditLog, User
+from accounts.forms import DoctorLoginForm, PatientLoginForm, PatientRegistrationForm
+
+def get_client_ip(request):
+    """ดึง Client IP Address จริงแม้จะผ่าน Reverse Proxy"""
+    forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+    if forwarded:
+        return forwarded.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR', '')
+
+
+@ratelimit(key='ip', rate='5/m', block=True)
+@require_http_methods(["GET", "POST"])
+def doctor_login_view(request):
+    """
+    พอร์ทัลเข้าสู่ระบบสำหรับแพทย์และบุคลากรทางการแพทย์
+    """
+    if request.user.is_authenticated:
+        if request.user.is_clinical_staff:
+            return redirect('patients:dashboard')
+        return redirect('portal_patient:dashboard')
+
+    if request.method == 'POST':
+        form = DoctorLoginForm(request.POST, request=request)
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            login(request, user)
+            
+            # ⚠️ ป้องกัน Session Fixation Attack: หมุนเวียน Session Key ทันทีหลังล็อกอินสำเร็จ
+            request.session.cycle_key()
+            
+            # บันทึก IP ลงในโปรไฟล์ผู้ใช้
+            client_ip = get_client_ip(request)
+            user.last_login_ip = client_ip
+            user.save(update_fields=['last_login_ip'])
+
+            # ⚠️ บันทึก AuditLog
+            AuditLog.objects.create(
+                user=user,
+                action="DOCTOR_LOGIN_SUCCESS",
+                model="User",
+                object_id=str(user.pk),
+                client_ip=client_ip,
+                user_agent=request.META.get('HTTP_USER_AGENT', '')[:500]
+            )
+
+            messages.success(request, f"ยินดีต้อนรับ นพ./พญ. {user.get_full_name() or user.username}")
+            next_url = request.GET.get('next')
+            if next_url and next_url.startswith('/'):
+                return redirect(next_url)
+            return redirect('patients:dashboard')
+    else:
+        form = DoctorLoginForm(request=request)
+
+    return render(request, 'accounts/doctor_login.html', {'form': form})
+
+
+@ratelimit(key='ip', rate='5/m', block=True)
+@require_http_methods(["GET", "POST"])
+def patient_login_view(request):
+    """
+    พอร์ทัลเข้าสู่ระบบสำหรับคนไข้
+    """
+    if request.user.is_authenticated:
+        if request.user.is_clinical_staff:
+            return redirect('patients:dashboard')
+        return redirect('portal_patient:dashboard')
+
+    if request.method == 'POST':
+        form = PatientLoginForm(request.POST, request=request)
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            login(request, user)
+            request.session.cycle_key()
+
+            client_ip = get_client_ip(request)
+            user.last_login_ip = client_ip
+            user.save(update_fields=['last_login_ip'])
+
+            AuditLog.objects.create(
+                user=user,
+                action="PATIENT_LOGIN_SUCCESS",
+                model="User",
+                object_id=str(user.pk),
+                client_ip=client_ip,
+                user_agent=request.META.get('HTTP_USER_AGENT', '')[:500]
+            )
+
+            messages.success(request, f"ยินดีต้อนรับ คุณ{user.get_full_name() or user.username}")
+            next_url = request.GET.get('next')
+            if next_url and next_url.startswith('/'):
+                return redirect(next_url)
+            return redirect('portal_patient:dashboard')
+    else:
+        form = PatientLoginForm(request=request)
+
+    return render(request, 'accounts/patient_login.html', {'form': form})
+
+
+@ratelimit(key='ip', rate='3/h', block=True)
+@require_http_methods(["GET", "POST"])
+def patient_register_view(request):
+    """
+    ลงทะเบียนคนไข้ใหม่ พร้อมตรวจสอบ PDPA Consent
+    """
+    if request.user.is_authenticated:
+        return redirect('portal_patient:dashboard')
+
+    if request.method == 'POST':
+        form = PatientRegistrationForm(request.POST)
+        if form.is_valid():
+            raw_id = form.cleaned_data['id_card']
+            
+            # บันทึก User คนไข้ใหม่
+            user = form.save(commit=False)
+            user.username = raw_id
+            user.role = User.Role.PATIENT
+            user.set_password(form.cleaned_data['password'])
+            user.phone = form.cleaned_data['phone']
+            # เข้ารหัส SHA-256 ของเลขบัตรประชาชน
+            user.id_card_hash = hashlib.sha256(raw_id.encode('utf-8')).hexdigest()
+            user.save()
+
+            client_ip = get_client_ip(request)
+            AuditLog.objects.create(
+                user=user,
+                action="PATIENT_REGISTRATION_SUCCESS",
+                model="User",
+                object_id=str(user.pk),
+                changes={"username": raw_id, "role": user.role},
+                client_ip=client_ip,
+                user_agent=request.META.get('HTTP_USER_AGENT', '')[:500]
+            )
+
+            messages.success(request, "ลงทะเบียนสำเร็จแล้ว! กรุณาเข้าสู่ระบบด้วยเลขบัตรประชาชนและรหัสผ่านของคุณ")
+            return redirect('accounts:patient_login')
+    else:
+        form = PatientRegistrationForm()
+
+    return render(request, 'accounts/patient_register.html', {'form': form})
+
+
+@require_http_methods(["GET", "POST"])
+def user_logout_view(request):
+    """
+    ออกจากระบบ: ล้างเซสชัน ขจัดคุกกี้ หมุนเวียนคีย์ และบันทึก AuditLog (Pillar 1 & 8)
+    """
+    if request.user.is_authenticated:
+        user = request.user
+        AuditLog.objects.create(
+            user=user,
+            action="USER_LOGOUT_SUCCESS",
+            model="User",
+            object_id=str(user.pk),
+            client_ip=get_client_ip(request),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')[:500]
+        )
+    
+    logout(request)
+    request.session.flush()
+    messages.info(request, "คุณได้ออกจากระบบอย่างปลอดภัยแล้ว")
+    return redirect('core:home')
+
+
+def lockout_view(request, credentials=None):
+    """
+    หน้าแจ้งเตือนเมื่อระบบล็อกอินถูกระงับชั่วคราวจากการกรอกรหัสผ่านผิดเกิน 5 ครั้ง (django-axes)
+    """
+    return render(request, 'accounts/lockout.html', {
+        'cooloff_minutes': 15,
+        'client_ip': get_client_ip(request)
+    }, status=429)

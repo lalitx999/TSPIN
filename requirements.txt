@@ -1,0 +1,32 @@
+# ==============================================================================
+# Dr. Patt Clinical EMR - Production Requirements
+# ==============================================================================
+
+# Core Framework
+Django>=5.1,<7.0
+
+# Password & Authentication Security (Pillar 1)
+argon2-cffi>=23.1.0
+django-axes>=7.0.0
+
+# Rate Limiting & Denial of Service Protection (Pillar 7)
+django-ratelimit>=4.1.0
+
+# Content Security Policy & Headers (Pillar 4)
+django-csp>=4.0
+
+# Database Driver (PostgreSQL)
+psycopg2-binary>=2.9.9
+
+# Environment Configuration & Secrets Management (Pillar 13)
+python-dotenv>=1.0.1
+
+# File & Image Upload Sanitization (Pillar 3 & 9)
+Pillow>=10.4.0
+bleach>=6.1.0
+
+# Asynchronous & ASGI
+asgiref>=3.8.1
+
+# PDF Report Generation
+weasyprint>=62.0

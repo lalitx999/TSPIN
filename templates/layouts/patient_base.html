@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .patient-navbar {
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid #1e293b;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        padding: 0.875rem 1.5rem;
+    }
+    .patient-bottom-nav {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid #1e293b;
+        padding: 0.5rem 0;
+        z-index: 100;
+        justify-content: space-around;
+    }
+    .patient-bottom-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 0.75rem;
+        gap: 4px;
+    }
+    .patient-bottom-nav a.active, .patient-bottom-nav a:hover {
+        color: #10b981;
+    }
+    @media (max-width: 768px) {
+        .patient-bottom-nav { display: flex; }
+        .patient-content { padding-bottom: 5rem; }
+    }
+</style>
+{% block extra_patient_head %}{% endblock %}
+{% endblock %}
+
+{% block layout %}
+<header class="patient-navbar">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="{% url 'portal_patient:dashboard' %}" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; display: flex; align-items: center; justify-content: center; color: #10b981;">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div>
+                <span style="font-weight: 700; color: #f8fafc; font-size: 1.1rem; display: block; line-height: 1.2;">TSPI Health</span>
+                <small style="color: #6ee7b7; font-size: 0.75rem;">พอร์ทัลคนไข้ส่วนบุคคล</small>
+            </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav style="display: flex; align-items: center; gap: 1.5rem;" class="d-none d-md-flex">
+            <a href="{% url 'portal_patient:dashboard' %}" style="color: #cbd5e1; text-decoration: none; font-size: 0.95rem; font-weight: 500;">ภาพรวมสุขภาพ</a>
+            <a href="/patient/axes-result/" style="color: #cbd5e1; text-decoration: none; font-size: 0.95rem;">คะแนน 39 แกน</a>
+            <a href="/patient/appointments/" style="color: #cbd5e1; text-decoration: none; font-size: 0.95rem;">นัดหมายแพทย์</a>
+            <a href="/patient/history/" style="color: #cbd5e1; text-decoration: none; font-size: 0.95rem;">ประวัติการรักษา</a>
+            <a href="/patient/ai-intake/" style="color: #cbd5e1; text-decoration: none; font-size: 0.95rem;">AI ซักประวัติ</a>
+        </nav>
+
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span style="color: #94a3b8; font-size: 0.9rem;" class="d-none d-sm-inline">
+                คุณ {{ request.user.first_name|default:request.user.username }}
+            </span>
+            <a href="{% url 'accounts:logout' %}" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); padding: 0.4rem 0.85rem; border-radius: 8px; text-decoration: none; font-size: 0.85rem;">
+                <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Main Patient Content -->
+<main class="patient-content container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;" id="main-content">
+    {% if messages %}
+        <div style="margin-bottom: 1.5rem;">
+            {% for message in messages %}
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Mobile Bottom Navigation Bar -->
+<div class="patient-bottom-nav">
+    <a href="{% url 'portal_patient:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <i class="fas fa-home fa-lg"></i>
+        <span>หน้าหลัก</span>
+    </a>
+    <a href="/patient/axes-result/">
+        <i class="fas fa-chart-pie fa-lg"></i>
+        <span>39 แกน</span>
+    </a>
+    <a href="/patient/ai-intake/">
+        <i class="fas fa-comment-medical fa-lg"></i>
+        <span>AI ซักประวัติ</span>
+    </a>
+    <a href="/patient/appointments/">
+        <i class="fas fa-calendar-alt fa-lg"></i>
+        <span>นัดหมาย</span>
+    </a>
+    <a href="/patient/settings/">
+        <i class="fas fa-user-cog fa-lg"></i>
+        <span>โปรไฟล์</span>
+    </a>
+</div>
+{% endblock %}

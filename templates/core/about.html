@@ -1,0 +1,39 @@
+{% extends 'layouts/public_base.html' %}
+
+{% block title %}เกี่ยวกับ TSPI Clinic | การแพทย์เชิงกลไกแห่งอนาคต{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 4rem 1.5rem; max-width: 900px;">
+    <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid #1e293b; border-radius: 20px; padding: 3rem;">
+        <span class="badge badge-clinical mb-3">TSPI CLINICAL PHILOSOPHY</span>
+        <h1 style="font-size: 2.25rem; font-weight: 800; color: #f8fafc; margin-bottom: 1.5rem;">
+            เกี่ยวกับ TSPI Clinic และระบบการแพทย์ 39 แกนชีววิทยา
+        </h1>
+
+        <div style="color: #cbd5e1; font-size: 1.05rem; line-height: 1.8;">
+            <p>
+                <strong>TSPI Clinic</strong> เป็นผู้นำด้านการแพทย์เชิงกลไก (Mechanistic Medicine) ที่มองร่างกายมนุษย์ในฐานะ <em>"ระบบเครือข่ายชีวภาพที่เชื่อมโยงถึงกันอย่างสมบูรณ์ (Interconnected Biological Network)"</em> มิใช่การมองแยกส่วนตามอวัยวะเดี่ยว
+            </p>
+
+            <h3 style="color: #38bdf8; font-size: 1.35rem; margin-top: 2rem; margin-bottom: 0.75rem;">
+                ปรัชญาการรักษา: 3 Keys &amp; 9-Step Restoration Ladder
+            </h3>
+            <p>
+                เราไม่ได้มุ่งเน้นเพียงแค่การใช้ยาเพื่อกดอาการที่ปลายเหตุ แต่ใช้ปัญญาประดิษฐ์และความฉลาดทางการแพทย์ในการตรวจวิเคราะห์หาจุดติดขัด (Bottleneck) หรือความผิดปกติในระดับไมโทคอนเดรีย ดีท็อกซิฟิเคชัน การอักเสบระดับเซลล์ และแกนประสาทต่อมไร้ท่อ เพื่อฟื้นฟูกลไกธรรมชาติของร่างกายให้กลับมาทำงานได้อย่างเต็มประสิทธิภาพ
+            </p>
+
+            <div style="background: rgba(30, 41, 59, 0.5); border-left: 4px solid #10b981; padding: 1.25rem; border-radius: 0 12px 12px 0; margin: 2rem 0;">
+                <p style="margin: 0; color: #f8fafc; font-style: italic;">
+                    "AI เป็นเครื่องมือเสริมพลังแพทย์ ไม่ใช่ผู้ตัดสินใจแทนแพทย์ผู้เชี่ยวชาญ ทุกคำแนะนำต้องผ่านการตรวจสอบจากแพทย์ผู้รักษาตัวจริงเสมอ"
+                </p>
+            </div>
+        </div>
+
+        <div style="margin-top: 2.5rem; pt-3; border-top: 1px solid #1e293b;">
+            <a href="{% url 'core:home' %}" style="color: #38bdf8; text-decoration: none; font-weight: 600;">
+                &larr; กลับสู่หน้าแรก
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

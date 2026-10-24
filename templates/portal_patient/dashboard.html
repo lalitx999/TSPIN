@@ -1,0 +1,83 @@
+{% extends 'layouts/patient_base.html' %}
+
+{% block title %}หน้าหลักคนไข้ | TSPI Health Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Patient Profile Header Card -->
+    <div class="col-12 mb-4">
+        <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 20px; padding: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 6px 12px; border-radius: 9999px; font-size: 0.8rem; margin-bottom: 0.5rem; display: inline-block;">
+                        <i class="fas fa-check-circle mr-1"></i> เวชระเบียนยืนยันตัวตนสำเร็จ
+                    </span>
+                    <h2 style="font-size: 1.75rem; font-weight: 800; color: #f8fafc; margin-bottom: 0.25rem;">
+                        สวัสดีคุณ {{ patient.get_full_name|default:patient.username }}
+                    </h2>
+                    <p style="color: #94a3b8; font-size: 0.95rem; margin: 0;">
+                        หมายเลขประจำตัว: <code style="color: #6ee7b7;">{{ patient.username }}</code> &bull; เข้าสู่ระบบครั้งล่าสุด: {{ patient.last_login|date:"d M Y H:i"|default:"ครั้งแรก" }}
+                    </p>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <a href="/patient/ai-intake/" style="background: #10b981; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 12px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                        <i class="fas fa-comment-medical mr-1"></i> ปรึกษาอาการกับ AI
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Action Cards for Patients -->
+    <div class="col-12 col-md-4 mb-4">
+        <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid #1e293b; border-radius: 16px; padding: 1.5rem; height: 100%;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 1.2rem;">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <h4 style="font-size: 1.1rem; color: #f8fafc; margin: 0; font-weight: 700;">คะแนน 39 แกนชีวภาพ</h4>
+            </div>
+            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                ติดตามสมดุลการทำงานของระบบเซลล์ ไมโทคอนเดรีย ดีท็อกซ์ และภูมิคุ้มกันร่างกาย
+            </p>
+            <a href="/patient/axes-result/" style="color: #38bdf8; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                ดูผลคะแนนล่าสุด &rarr;
+            </a>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-4 mb-4">
+        <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid #1e293b; border-radius: 16px; padding: 1.5rem; height: 100%;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; display: flex; align-items: center; justify-content: center; color: #f59e0b; font-size: 1.2rem;">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h4 style="font-size: 1.1rem; color: #f8fafc; margin: 0; font-weight: 700;">นัดหมายคลินิก</h4>
+            </div>
+            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                ตรวจสอบวันเวลานัดพบแพทย์ และประวัติการรับคำปรึกษาการฟื้นฟูสุขภาพ
+            </p>
+            <a href="/patient/appointments/" style="color: #fbbf24; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                จัดการตารางนัดหมาย &rarr;
+            </a>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-4 mb-4">
+        <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid #1e293b; border-radius: 16px; padding: 1.5rem; height: 100%;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(168, 85, 247, 0.15); border: 1px solid #a855f7; display: flex; align-items: center; justify-content: center; color: #c084fc; font-size: 1.2rem;">
+                    <i class="fas fa-file-download"></i>
+                </div>
+                <h4 style="font-size: 1.1rem; color: #f8fafc; margin: 0; font-weight: 700;">เอกสารและใบผลตรวจ</h4>
+            </div>
+            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                ดาวน์โหลดรายงานฉบับเต็มและใบผลแล็บทางการแพทย์ที่แพทย์ได้ลงนามอนุมัติแล้ว
+            </p>
+            <a href="/patient/download/" style="color: #c084fc; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                ดาวน์โหลดเอกสาร &rarr;
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

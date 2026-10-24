@@ -1,0 +1,55 @@
+# ==============================================================================
+# Security & Git Ignore - Dr. Patt Clinical EMR
+# ==============================================================================
+
+# Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment & Secrets (NEVER COMMIT!)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+
+# Database Dumps & SQLite
+*.sql
+*.sqlite3
+*.db
+*.dump
+
+# Media & User Uploaded Files (Private Clinical Data)
+media/
+media/*
+!media/.gitkeep
+
+# Static collections
+staticfiles/
+
+# Logs & Debugging
+*.log
+sentry.log
+
+# IDE & OS Artifacts
+.DS_Store
+.DS_Store?
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test & Coverage
+.coverage
+htmlcov/
+.pytest_cache/

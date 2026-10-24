@@ -1,0 +1,66 @@
+{% extends 'layouts/public_base.html' %}
+{% load static %}
+
+{% block title %}TSPI Clinic - Next-Generation Mechanistic Medicine OS{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="padding: 5rem 0 4rem; position: relative; overflow: hidden;">
+    <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3rem; align-items: center;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 6px 16px; border-radius: 9999px; margin-bottom: 1.5rem;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #38bdf8;"></span>
+                <span style="color: #7dd3fc; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">
+                    39 Mechanistic Biological Axes
+                </span>
+            </div>
+
+            <h1 style="font-size: 3rem; font-weight: 900; line-height: 1.15; margin-bottom: 1.5rem; background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                ระบบการแพทย์เชิงกลไกแห่งอนาคต
+            </h1>
+
+            <p style="color: #94a3b8; font-size: 1.15rem; line-height: 1.7; margin-bottom: 2.5rem;">
+                TSPI Clinic ผสานพลังปัญญาประดิษฐ์ทางการแพทย์เข้ากับชีววิทยาระดับเซลล์ วิเคราะห์สุขภาพเชิงบูรณาการผ่าน 39 แกนชีวภาพ เพื่อการฟื้นฟูสุขภาพที่แม่นยำและตรงจุดที่สุด
+            </p>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="{% url 'accounts:doctor_login' %}" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; text-decoration: none; padding: 0.9rem 2rem; border-radius: 12px; font-weight: 600; font-size: 1rem; box-shadow: 0 10px 20px -5px rgba(2, 132, 199, 0.5);">
+                    <i class="fas fa-user-md mr-2"></i> พอร์ทัลแพทย์ (Doctor EMR)
+                </a>
+                <a href="{% url 'accounts:patient_login' %}" style="background: rgba(30, 41, 59, 0.8); color: #f8fafc; text-decoration: none; padding: 0.9rem 2rem; border-radius: 12px; font-weight: 600; font-size: 1rem; border: 1px solid rgba(255, 255, 255, 0.15);">
+                    <i class="fas fa-heartbeat mr-2 text-success"></i> พอร์ทัลคนไข้ (Patient)
+                </a>
+            </div>
+        </div>
+
+        <!-- Hero Visual Card -->
+        <div style="text-align: center;">
+            <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 24px; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(2, 132, 199, 0.25);">
+                <div style="font-size: 3.5rem; color: #38bdf8; margin-bottom: 1rem;">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+                <h3 style="color: #f8fafc; font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">
+                    Precision Clinical Intelligence
+                </h3>
+                <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                    เปลี่ยนผ่านจากการแพทย์เชิงสถิติ (Statistical Medicine) สู่การแพทย์เชิงกลไกและเครือข่ายชีวภาพ (Mechanistic Biological Medicine)
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding-top: 1.5rem; border-top: 1px solid #1e293b;">
+                    <div>
+                        <div style="color: #38bdf8; font-size: 1.5rem; font-weight: 800;">39</div>
+                        <small style="color: #64748b;">Biological Axes</small>
+                    </div>
+                    <div>
+                        <div style="color: #10b981; font-size: 1.5rem; font-weight: 800;">271</div>
+                        <small style="color: #64748b;">Active Modules</small>
+                    </div>
+                    <div>
+                        <div style="color: #f59e0b; font-size: 1.5rem; font-weight: 800;">100%</div>
+                        <small style="color: #64748b;">Deterministic</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

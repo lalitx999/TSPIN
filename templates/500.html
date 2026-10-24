@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}500 - ระบบเกิดข้อผิดพลาดชั่วคราว | TSPI Clinical EMR{% endblock %}
+
+{% block content %}
+<div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;">
+    <div style="max-width: 480px; width: 100%; text-align: center; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 20px; padding: 3rem 2rem;">
+        <h1 style="font-size: 4rem; font-weight: 900; color: #f59e0b; line-height: 1; margin-bottom: 1rem;">500</h1>
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.75rem;">ระบบขัดข้องชั่วคราว</h2>
+        <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem;">
+            ทีมวิศวกรความปลอดภัยได้รับการแจ้งเตือนอัตโนมัติแล้ว กรุณาลองใหม่อีกครั้งในภายหลัง หรือติดต่อเจ้าหน้าที่คลินิก
+        </p>
+        <a href="{% url 'core:home' %}" style="display: inline-block; background: #0284c7; color: #ffffff; text-decoration: none; padding: 0.75rem 1.75rem; border-radius: 10px; font-weight: 600;">
+            กลับสู่หน้าหลัก
+        </a>
+    </div>
+</div>
+{% endblock %}

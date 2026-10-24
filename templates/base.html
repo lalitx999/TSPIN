@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dr. Patt Clinical EMR - Precision Intelligence OS{% endblock %}</title>
+    
+    <!-- Local Offline Fonts (Sarabun) - Pillar 4 & 11 -->
+    <style>
+        @font-face {
+            font-family: 'Sarabun';
+            src: url("{% static 'fonts/Sarabun-Regular.ttf' %}") format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sarabun';
+            src: url("{% static 'fonts/Sarabun-Medium.ttf' %}") format('truetype');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sarabun';
+            src: url("{% static 'fonts/Sarabun-SemiBold.ttf' %}") format('truetype');
+            font-weight: 600;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sarabun';
+            src: url("{% static 'fonts/Sarabun-Bold.ttf' %}") format('truetype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --bg-dark: #090d16;
+            --surface: #0f172a;
+            --surface-card: rgba(15, 23, 42, 0.75);
+            --surface-border: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --accent-amber: #f59e0b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    </style>
+
+    <!-- FontAwesome Free Icons (Local Vendor) -->
+    <link rel="stylesheet" href="{% static 'vendor/adminlte/plugins/fontawesome-free/css/all.min.css' %}">
+    
+    <!-- HTMX 2.0.4 & Alpine.js 3.14 (Local Vendor - Zero CDN Dependency) -->
+    <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+    <script defer src="{% static 'vendor/alpine/alpine.min.js' %}"></script>
+
+    <!-- CSRF Token Integration for HTMX (Pillar 4) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.body.addEventListener('htmx:configRequest', function (evt) {
+                const csrfToken = '{{ csrf_token }}';
+                if (csrfToken) {
+                    evt.detail.headers['X-CSRFToken'] = csrfToken;
+                }
+            });
+        });
+    </script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    {% block layout %}{% block content %}{% endblock %}{% endblock %}
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

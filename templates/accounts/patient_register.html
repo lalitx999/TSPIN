@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}ลงทะเบียนผู้รับบริการรายใหม่ | TSPI Clinic{% endblock %}
+
+{% block content %}
+<div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2.5rem 1rem;">
+    <div style="max-width: 540px; width: 100%; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);">
+        
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 1.75rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.5rem;">ลงทะเบียนคนไข้ใหม่</h2>
+            <p style="color: #94a3b8; font-size: 0.875rem;">สร้างโปรไฟล์เวชระเบียนคลินิกเพื่อติดตามผลการตรวจเชิงลึก</p>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.875rem; margin-bottom: 1.5rem;">
+                {% for error in form.non_field_errors %}
+                    <p style="margin: 0;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'accounts:patient_register' %}">
+            {% csrf_token %}
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                <div>
+                    <label for="{{ form.first_name.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #cbd5e1; margin-bottom: 0.4rem;">ชื่อจริง</label>
+                    <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}" required
+                           value="{{ form.first_name.value|default:'' }}"
+                           style="width: 100%; background: #0b1120; border: 1px solid #334155; border-radius: 10px; padding: 0.75rem 1rem; color: #f8fafc; font-size: 0.95rem; outline: none;"
+                           placeholder="ชื่อจริง">
+                    {% if form.first_name.errors %}<span style="color: #f87171; font-size: 0.8rem;">{{ form.first_name.errors.0 }}</span>{% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.last_name.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #cbd5e1; margin-bottom: 0.4rem;">นามสกุล</label>
+                    <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}" required
+                           value="{{ form.last_name.value|default:'' }}"
+                           style="width: 100%; background: #0b1120; border: 1px solid #334155; border-radius: 10px; padding: 0.75rem 1rem; color: #f8fafc; font-size: 0.95rem; outline: none;"
+                           placeholder="นามสกุล">
+                    {% if form.last_name.errors %}<span style="color: #f87171; font-size: 0.8rem;">{{ form.last_name.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+                <label for="{{ form.id_card.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #cbd5e1; margin-bottom: 0.4rem;">
+                    เลขบัตรประจำตัวประชาชน 13 หลัก
+                </label>
+                <input type="text" name="{{ form.id_card.name }}" id="{{ form.id_card.id_for_label }}" required
+                       value="{{ form.id_card.value|default:'' }}"
+                       style="width: 100%; background: #0b1120; border: 1px solid #334155; border-radius: 10px; padding: 0.75rem 1rem; color: #f8fafc; font-size: 0.95rem; outline: none;"
+                       placeholder="1100400123456">
+                {% if form.id_card.errors %}<span style="color: #f87171; font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.id_card.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                <div>
+                    <label for="{{ form.phone.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #cbd5e1; margin-bottom: 0.4rem;">เบอร์โทรศัพท์</label>
+                    <input type="tel" name="{{ form.phone.name }}" id="{{ form.phone.id_for_label }}" required
+                           value="{{ form.phone.value|default:'' }}"
+                           style="width: 100%; background: #0b1120; border: 1px solid #334155; border-radius: 10px; padding: 0.75rem 1rem; color: #f8fafc; font-size: 0.95rem; outline: none;"
+                           placeholder="0812345678">
+                    {% if form.phone.errors %}<span style="color: #f87171; font-size: 0.8rem;">{{ form.phone.errors.0 }}</span>{% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.email.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #cbd5e1; margin-bottom: 0.4rem;">อีเมล</label>
+                    <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" required
+                           value="{{ form.email.value|default:'' }}"
+                           style="width: 100%; background: #0b1120; border: 1px solid #334155; border-radius: 10px; padding: 0.75rem 1rem; color: #f8fafc; font-size: 0.95rem; outline: none;"
+                           placeholder="patient@example.com">
+                    {% if form.email.errors %}<span style="color: #f87171; font-size: 0.8rem;">{{ form.email.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <label for="{{ form.password.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #cbd5e1; margin-bottom: 0.4rem;">กำหนดรหัสผ่าน (12+ ตัว)</label>
+                    <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" required
+                           style="width: 100%; background: #0b1120; border: 1px solid #334155; border-radius: 10px; padding: 0.75rem 1rem; color: #f8fafc; font-size: 0.95rem; outline: none;"
+                           placeholder="••••••••••••">
+                    {% if form.password.errors %}<span style="color: #f87171; font-size: 0.8rem;">{{ form.password.errors.0 }}</span>{% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.confirm_password.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #cbd5e1; margin-bottom: 0.4rem;">ยืนยันรหัสผ่าน</label>
+                    <input type="password" name="{{ form.confirm_password.name }}" id="{{ form.confirm_password.id_for_label }}" required
+                           style="width: 100%; background: #0b1120; border: 1px solid #334155; border-radius: 10px; padding: 0.75rem 1rem; color: #f8fafc; font-size: 0.95rem; outline: none;"
+                           placeholder="••••••••••••">
+                    {% if form.confirm_password.errors %}<span style="color: #f87171; font-size: 0.8rem;">{{ form.confirm_password.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <!-- PDPA Checkbox -->
+            <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1rem; margin-bottom: 2rem;">
+                <label style="display: flex; gap: 12px; cursor: pointer; align-items: flex-start;">
+                    <input type="checkbox" name="{{ form.pdpa_accepted.name }}" id="{{ form.pdpa_accepted.id_for_label }}" required
+                           style="margin-top: 3px; accent-color: #10b981; width: 18px; height: 18px;">
+                    <span style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5;">
+                        ข้าพเจ้ายินยอมให้ TSPI Clinic จัดเก็บและประมวลผลข้อมูลสุขภาพ ผลการตรวจทางห้องปฏิบัติการ เพื่อการวิเคราะห์ทางชีววิทยาการแพทย์ ตาม <a href="{% url 'core:privacy' %}" target="_blank" style="color: #38bdf8;">นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)</a>
+                    </span>
+                </label>
+                {% if form.pdpa_accepted.errors %}
+                    <span style="color: #f87171; font-size: 0.8rem; margin-top: 6px; display: block;">{{ form.pdpa_accepted.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <button type="submit" style="width: 100%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: none; padding: 0.875rem; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4); transition: transform 0.15s;">
+                ยืนยันการลงทะเบียน
+            </button>
+        </form>
+
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center;">
+            <p style="color: #94a3b8; font-size: 0.875rem;">
+                มีบัญชีอยู่แล้ว? 
+                <a href="{% url 'accounts:patient_login' %}" style="color: #34d399; text-decoration: none; font-weight: 600;">เข้าสู่ระบบ</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

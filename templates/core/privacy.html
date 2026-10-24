@@ -1,0 +1,51 @@
+{% extends 'layouts/public_base.html' %}
+
+{% block title %}นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA) | TSPI Clinic{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 4rem 1.5rem; max-width: 900px;">
+    <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid #1e293b; border-radius: 20px; padding: 3rem;">
+        <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.8rem;">
+            PDPA COMPLIANT &bull; พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562
+        </span>
+        <h1 style="font-size: 2.25rem; font-weight: 800; color: #f8fafc; margin-top: 1rem; margin-bottom: 1.5rem;">
+            นโยบายการคุ้มครองข้อมูลส่วนบุคคลและข้อมูลสุขภาพ
+        </h1>
+
+        <div style="color: #cbd5e1; font-size: 1rem; line-height: 1.8;">
+            <p>
+                TSPI Clinic ให้ความสำคัญสูงสุดต่อการรักษาความปลอดภัยของข้อมูลส่วนบุคคล (Personal Data) และข้อมูลสุขภาพที่มีความอ่อนไหวสูง (Sensitive Health Data) ของผู้รับบริการทุกท่าน ตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562
+            </p>
+
+            <h3 style="color: #38bdf8; font-size: 1.25rem; margin-top: 1.75rem; margin-bottom: 0.5rem;">
+                1. ข้อมูลที่เราจัดเก็บและประมวลผล
+            </h3>
+            <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+                <li>ข้อมูลระบุตัวตน: ชื่อ, นามสกุล, หมายเลขประจำตัวประชาชน (จัดเก็บในรูปแบบการเข้ารหัสปลอดภัย)</li>
+                <li>ข้อมูลติดต่อ: เบอร์โทรศัพท์มือถือ, อีเมล</li>
+                <li>ข้อมูลสุขภาพ: ผลการตรวจวิเคราะห์ทางห้องปฏิบัติการ (Labs), อาการสำคัญ (Symptoms), คะแนนทางชีววิทยา 39 แกน</li>
+            </ul>
+
+            <h3 style="color: #38bdf8; font-size: 1.25rem; margin-top: 1.75rem; margin-bottom: 0.5rem;">
+                2. วัตถุประสงค์ในการนำข้อมูลไปใช้
+            </h3>
+            <p>
+                เราใช้ข้อมูลสุขภาพเพื่อวัตถุประสงค์ในการตรวจวินิจฉัย การวางแผนบำบัดรักษาฟื้นฟูโดยแพทย์ผู้รักษา และการประมวลผลคะแนนชีวภาพผ่านระบบ AI ปัญญาประดิษฐ์ทางการแพทย์ที่ผ่านการรับรอง โดยไม่มีการนำข้อมูลไปจำหน่ายหรือส่งต่อให้บุคคลภายนอกโดยไม่ได้รับความยินยอมเป็นลายลักษณ์อักษร
+            </p>
+
+            <h3 style="color: #38bdf8; font-size: 1.25rem; margin-top: 1.75rem; margin-bottom: 0.5rem;">
+                3. มาตรการรักษาความปลอดภัยข้อมูล
+            </h3>
+            <p>
+                ระบบทำงานภายใต้สถาปัตยกรรมความปลอดภัยระดับสูง การแฮชรหัสผ่านด้วย Argon2, การควบคุมสิทธิ์แบบเข้มงวด (Role-Based Access Control), การจัดเก็บประวัติการเข้าถึงข้อมูล (Audit Logging), และการหมดอายุเซสชันอัตโนมัติ (Idle Session Timeout)
+            </p>
+        </div>
+
+        <div style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #1e293b;">
+            <a href="{% url 'core:home' %}" style="color: #38bdf8; text-decoration: none; font-weight: 600;">
+                &larr; กลับสู่หน้าแรก
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

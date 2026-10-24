@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}เข้าสู่ระบบผู้รับบริการ / คนไข้ | TSPI Clinic{% endblock %}
+
+{% block content %}
+<div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;">
+    <div style="max-width: 440px; width: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 2.5rem 2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);">
+        
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px; margin-bottom: 1rem;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </div>
+            <h2 style="font-size: 1.75rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.5rem;">พอร์ทัลคนไข้ TSPI</h2>
+            <p style="color: #94a3b8; font-size: 0.875rem;">ตรวจสอบผลตรวจ 39 แกนชีวภาพ และใบนัดหมายแพทย์</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.875rem; margin-bottom: 1.5rem;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if form.non_field_errors %}
+            <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.875rem; margin-bottom: 1.5rem;">
+                {% for error in form.non_field_errors %}
+                    <p style="margin: 0;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'accounts:patient_login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 1.25rem;">
+                <label for="{{ form.identifier.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #cbd5e1; margin-bottom: 0.5rem;">
+                    เลขบัตรประชาชน 13 หลัก หรือ HN
+                </label>
+                <input type="text" name="{{ form.identifier.name }}" id="{{ form.identifier.id_for_label }}" required
+                       style="width: 100%; background: #0b1120; border: 1px solid #334155; border-radius: 10px; padding: 0.75rem 1rem; color: #f8fafc; font-size: 0.95rem; outline: none; transition: border 0.2s;"
+                       onfocus="this.style.borderColor='#10b981';" onblur="this.style.borderColor='#334155';"
+                       placeholder="1-XXXX-XXXXX-XX-X">
+                {% if form.identifier.errors %}
+                    <span style="color: #f87171; font-size: 0.8rem; margin-top: 4px; display: block;">{{ form.identifier.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div style="margin-bottom: 1.75rem;">
+                <label for="{{ form.password.id_for_label }}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #cbd5e1; margin-bottom: 0.5rem;">
+                    รหัสผ่าน
+                </label>
+                <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" required
+                       style="width: 100%; background: #0b1120; border: 1px solid #334155; border-radius: 10px; padding: 0.75rem 1rem; color: #f8fafc; font-size: 0.95rem; outline: none; transition: border 0.2s;"
+                       onfocus="this.style.borderColor='#10b981';" onblur="this.style.borderColor='#334155';"
+                       placeholder="••••••••••••">
+                {% if form.password.errors %}
+                    <span style="color: #f87171; font-size: 0.8rem; margin-top: 4px; display: block;">{{ form.password.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <button type="submit" style="width: 100%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: none; padding: 0.875rem; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4); transition: transform 0.15s;">
+                เข้าสู่ระบบผู้ป่วย
+            </button>
+        </form>
+
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center; display: flex; flex-direction: column; gap: 0.75rem;">
+            <p style="color: #94a3b8; font-size: 0.875rem; margin: 0;">
+                ยังไม่มีบัญชีผู้รับบริการ? 
+                <a href="{% url 'accounts:patient_register' %}" style="color: #34d399; text-decoration: none; font-weight: 600;">ลงทะเบียนคนไข้ใหม่</a>
+            </p>
+            <p style="color: #64748b; font-size: 0.8rem; margin: 0;">
+                สำหรับแพทย์และบุคลากรคลินิก? 
+                <a href="{% url 'accounts:doctor_login' %}" style="color: #38bdf8; text-decoration: none;">เข้าสู่ระบบแพทย์ที่นี่</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

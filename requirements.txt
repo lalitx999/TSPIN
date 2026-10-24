@@ -30,3 +30,10 @@ asgiref>=3.8.1
 
 # PDF Report Generation
 weasyprint>=62.0
+
+# Production WSGI & Concurrency Server
+gunicorn>=22.0.0
+
+# Cache & Rate Limiting Backend
+redis>=5.0.0
+

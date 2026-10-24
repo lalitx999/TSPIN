@@ -68,3 +68,25 @@ class CorePagesLayoutTests(TestCase):
         self.assertTemplateUsed(response, 'portal_patient/dashboard.html')
         self.assertTemplateUsed(response, 'layouts/patient_base.html')
         self.assertContains(response, "TSPI Health")
+
+    def test_health_check_endpoint_returns_healthy(self):
+        """Pillar 6: ตรวจสอบสถานะความพร้อมระบบผ่าน /health/ ต้องคืนค่า 200 และสถานะ healthy"""
+        response = self.client.get(reverse('core:health'))
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data.get('status'), 'healthy')
+        self.assertEqual(data.get('database'), 'connected')
+        self.assertEqual(data.get('service'), 'tspi-clinical-emr')
+
+    def test_production_hardening_rules(self):
+        """Pillar 6: ตรวจสอบการตั้งค่าความปลอดภัยระดับ Production"""
+        import os
+        from unittest.mock import patch
+
+        # ตรวจสอบว่าถ้า SECRET_KEY ว่างหรือสั้นเกินไป ต้องเกิด ValueError
+        with patch.dict(os.environ, {'DJANGO_SECRET_KEY': 'short', 'ALLOWED_HOSTS': 'example.com'}, clear=True):
+            with self.assertRaises(ValueError):
+                import importlib
+                from config.settings import prod
+                importlib.reload(prod)
+

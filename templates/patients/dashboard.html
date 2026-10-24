@@ -29,7 +29,7 @@
                 </span>
                 <div class="info-box-content">
                     <span class="info-box-text text-muted">คนไข้ทั้งหมดในระบบ</span>
-                    <span class="info-box-number text-light font-weight-bold" style="font-size: 1.4rem;">-- เคส</span>
+                    <span class="info-box-number text-light font-weight-bold" style="font-size: 1.4rem;">{{ total_patients }} เคส</span>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
                 </span>
                 <div class="info-box-content">
                     <span class="info-box-text text-muted">เคสด่วนเฝ้าระวัง</span>
-                    <span class="info-box-number text-danger font-weight-bold" style="font-size: 1.4rem;">0 เคส</span>
+                    <span class="info-box-number text-danger font-weight-bold" style="font-size: 1.4rem;">{{ urgent_cases }} เคส</span>
                 </div>
             </div>
         </div>
@@ -55,7 +55,7 @@
                 </span>
                 <div class="info-box-content">
                     <span class="info-box-text text-muted">นัดหมายวันนี้</span>
-                    <span class="info-box-number text-success font-weight-bold" style="font-size: 1.4rem;">0 รายการ</span>
+                    <span class="info-box-number text-success font-weight-bold" style="font-size: 1.4rem;">{{ today_appointments }} รายการ</span>
                 </div>
             </div>
         </div>

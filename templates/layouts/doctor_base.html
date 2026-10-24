@@ -139,7 +139,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/doctor/patients/" class="nav-link">
+                        <a href="{% url 'patients:patient_list' %}" class="nav-link {% if 'patient' in request.resolver_match.url_name and request.resolver_match.url_name != 'dashboard' %}active{% endif %}">
                             <i class="nav-icon fas fa-user-injured"></i>
                             <p>แฟ้มคนไข้ (EMR Roster)</p>
                         </a>

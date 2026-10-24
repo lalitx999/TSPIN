@@ -1,0 +1,331 @@
+{% extends 'layouts/doctor_base.html' %}
+{% load static %}
+
+{% block title %}เวชระเบียน: {{ patient.full_name }} (HN: {{ patient.hn }}) | Dr. Patt EMR{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3">
+    <!-- Breadcrumb & Top Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <a href="{% url 'patients:patient_list' %}" class="btn btn-sm btn-outline-secondary mb-2">
+                <i class="fas fa-arrow-left mr-1"></i>กลับหน้ารายชื่อคนไข้
+            </a>
+            <h2 class="text-white font-weight-bold mb-0" style="font-size: 1.5rem;">
+                <i class="fas fa-folder-open text-cyan mr-2"></i>แฟ้มเวชระเบียนผู้ป่วย (Clinical Dossier)
+            </h2>
+        </div>
+        <div>
+            <a href="{% url 'patients:patient_edit' patient.pk %}" class="btn btn-sm btn-outline-info mr-2">
+                <i class="fas fa-user-edit mr-1"></i>แก้ไขข้อมูลคนไข้
+            </a>
+            <button class="btn btn-sm btn-success" data-toggle="collapse" data-target="#newSoapCollapse" aria-expanded="false">
+                <i class="fas fa-plus-circle mr-1"></i>บันทึก SOAP Note ใหม่
+            </button>
+        </div>
+    </div>
+
+    <!-- Patient Header Master Card -->
+    <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden;">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <!-- Patient Avatar & Basic Info -->
+                <div class="col-lg-7 d-flex align-items-center mb-3 mb-lg-0">
+                    <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: #fff; font-weight: bold; border: 2px solid #38bdf8; flex-shrink: 0;" class="mr-3 shadow">
+                        {{ patient.first_name|slice:":1" }}
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                            <h3 class="text-white font-weight-bold mb-0 mr-2" style="font-size: 1.4rem;">
+                                {{ patient.full_name }}
+                            </h3>
+                            {% if patient.nickname %}
+                                <span class="text-muted mr-2">({{ patient.nickname }})</span>
+                            {% endif %}
+                            <span class="badge badge-dark text-cyan font-mono px-2 py-1" style="border: 1px solid #0284c7;">
+                                HN: {{ patient.hn }}
+                            </span>
+                            {% if patient.status == 'urgent' %}
+                                <span class="badge badge-danger px-2 py-1"><i class="fas fa-fire mr-1"></i>เคสด่วน</span>
+                            {% elif patient.status == 'medicine' %}
+                                <span class="badge badge-primary px-2 py-1"><i class="fas fa-capsules mr-1"></i>บำบัด/ยา</span>
+                            {% elif patient.status == 'completed' %}
+                                <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i>เสร็จสิ้น</span>
+                            {% else %}
+                                <span class="badge badge-warning text-dark px-2 py-1"><i class="fas fa-clock mr-1"></i>รอดำเนินการ</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-sm text-slate-400 d-flex flex-wrap gap-3 mt-1">
+                            <span><i class="fas fa-venus-mars text-muted mr-1"></i>{{ patient.get_gender_display }}</span>
+                            <span><i class="fas fa-birthday-cake text-muted mr-1"></i>อายุ: <strong class="text-light">{{ patient.age|default:"-" }}</strong> ปี</span>
+                            <span><i class="fas fa-tint text-danger mr-1"></i>กรุ๊ปเลือด: <strong class="text-light">{{ patient.blood_type }}</strong></span>
+                            <span><i class="fas fa-phone text-muted mr-1"></i>{{ patient.phone }}</span>
+                            {% if patient.email %}
+                                <span><i class="fas fa-envelope text-muted mr-1"></i>{{ patient.email }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Precision Action Shortcuts -->
+                <div class="col-lg-5 text-lg-right">
+                    <div class="d-flex flex-wrap justify-content-lg-end gap-2">
+                        <a href="/doctor/axes/?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-primary mb-1">
+                            <i class="fas fa-project-diagram mr-1 text-cyan"></i>39 Biological Axes
+                        </a>
+                        <a href="/doctor/ai-physician/?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-info mb-1">
+                            <i class="fas fa-brain mr-1 text-info"></i>AI Physician
+                        </a>
+                        <a href="/doctor/precision-report/?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-warning mb-1">
+                            <i class="fas fa-file-pdf mr-1 text-warning"></i>Precision Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Allergy Alert Banner (Pillar 15: Clinical Safety Alert) -->
+            {% if patient.allergies %}
+            <div class="mt-3 p-3 rounded" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4);">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle fa-2x text-danger mr-3"></i>
+                    <div>
+                        <strong class="text-danger d-block font-weight-bold" style="font-size: 0.95rem;">
+                            ⚠️ ข้อควรระวังทางการแพทย์: ประวัติการแพ้ยา / สารอาหาร
+                        </strong>
+                        <span class="text-light text-sm">{{ patient.allergies }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Chief Complaint & Medical History Snippet -->
+            <div class="row mt-3 pt-3" style="border-top: 1px solid #1e293b;">
+                <div class="col-md-6 mb-2 mb-md-0">
+                    <small class="text-muted text-uppercase font-weight-bold d-block mb-1">อาการสำคัญแรกรับ (Chief Complaint):</small>
+                    <p class="text-sm text-light mb-0" style="white-space: pre-line;">{{ patient.chief_complaint|default:"- ไม่ได้ระบุ -" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <small class="text-muted text-uppercase font-weight-bold d-block mb-1">โรคประจำตัว / ประวัติผ่าตัด (Medical History):</small>
+                    <p class="text-sm text-light mb-0" style="white-space: pre-line;">{{ patient.medical_history|default:"- ไม่ได้ระบุ -" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area: Collapsible New SOAP Form & Timeline -->
+    <div class="row">
+        <!-- Left/Main Column: SOAP Visits Timeline -->
+        <div class="col-lg-8">
+            <!-- Collapsible New SOAP Form -->
+            <div class="collapse mb-4" id="newSoapCollapse">
+                <div class="card shadow" style="background: #0f172a; border: 1px solid #0284c7; border-radius: 12px; box-shadow: 0 8px 24px rgba(2, 132, 199, 0.2) !important;">
+                    <div class="card-header py-3" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                        <h4 class="card-title text-white font-weight-bold mb-0" style="font-size: 1.1rem;">
+                            <i class="fas fa-notes-medical mr-2"></i>บันทึกการตรวจรักษาใหม่ (SOAP Note Recording)
+                        </h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post" 
+                              action="{% url 'patients:patient_add_soap' patient.pk %}"
+                              hx-post="{% url 'patients:patient_add_soap' patient.pk %}"
+                              hx-target="#soap-timeline"
+                              hx-swap="afterbegin"
+                              hx-indicator="#soap-spinner"
+                              hx-on::after-request="if(event.detail.successful){ this.reset(); $('#newSoapCollapse').collapse('hide'); $('#empty-soap-notice').hide(); }">
+                            {% csrf_token %}
+
+                            <!-- Vitals Entry Row -->
+                            <div class="p-3 mb-3 rounded" style="background: #090d16; border: 1px solid #1e293b;">
+                                <h6 class="text-cyan font-weight-bold mb-2 text-sm">
+                                    <i class="fas fa-heartbeat mr-1"></i>บันทึกสัญญาณชีพ (Vital Signs)
+                                </h6>
+                                <div class="form-row">
+                                    <div class="col-6 col-md-3 mb-2">
+                                        <label class="text-xs text-muted">ความดันบน (Systolic)</label>
+                                        {{ soap_form.bp_systolic }}
+                                    </div>
+                                    <div class="col-6 col-md-3 mb-2">
+                                        <label class="text-xs text-muted">ความดันล่าง (Diastolic)</label>
+                                        {{ soap_form.bp_diastolic }}
+                                    </div>
+                                    <div class="col-6 col-md-3 mb-2">
+                                        <label class="text-xs text-muted">ชีพจร (Pulse bpm)</label>
+                                        {{ soap_form.pulse }}
+                                    </div>
+                                    <div class="col-6 col-md-3 mb-2">
+                                        <label class="text-xs text-muted">อุณหภูมิ (°C)</label>
+                                        {{ soap_form.temperature }}
+                                    </div>
+                                    <div class="col-6 col-md-4 mb-2">
+                                        <label class="text-xs text-muted">น้ำหนัก (กก.)</label>
+                                        {{ soap_form.weight_kg }}
+                                    </div>
+                                    <div class="col-6 col-md-4 mb-2">
+                                        <label class="text-xs text-muted">ส่วนสูง (ซม.)</label>
+                                        {{ soap_form.height_cm }}
+                                    </div>
+                                    <div class="col-12 col-md-4 mb-2">
+                                        <label class="text-xs text-muted">ออกซิเจนปลายนิ้ว (% SpO2)</label>
+                                        {{ soap_form.spo2 }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SOAP Framework Textareas -->
+                            <div class="form-group mb-3">
+                                <label class="text-info font-weight-bold text-sm">
+                                    <span class="badge badge-info mr-1">S</span> Subjective (อาการที่คนไข้บอกเล่า / ความรู้สึก):
+                                </label>
+                                {{ soap_form.subjective }}
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="text-warning font-weight-bold text-sm">
+                                    <span class="badge badge-warning text-dark mr-1">O</span> Objective (ผลตรวจร่างกาย / ผลแล็บที่พบ):
+                                </label>
+                                {{ soap_form.objective }}
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="text-danger font-weight-bold text-sm">
+                                    <span class="badge badge-danger mr-1">A</span> Assessment (การวินิจฉัย / แกนชีววิทยา 39 แกน):
+                                </label>
+                                {{ soap_form.assessment }}
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="text-success font-weight-bold text-sm">
+                                    <span class="badge badge-success mr-1">P</span> Plan (แผนการรักษา / อาหารบำบัด / นัดหมาย):
+                                </label>
+                                {{ soap_form.plan }}
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="button" class="btn btn-outline-secondary" data-toggle="collapse" data-target="#newSoapCollapse">
+                                    ยกเลิก
+                                </button>
+                                <button type="submit" class="btn btn-primary px-4 shadow" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: none;">
+                                    <span id="soap-spinner" style="display: none;" class="mr-1"><i class="fas fa-spinner fa-spin"></i></span>
+                                    <i class="fas fa-save mr-1"></i>บันทึก SOAP เข้าเวชระเบียน
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SOAP Timeline Header -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="text-white font-weight-bold mb-0" style="font-size: 1.15rem;">
+                    <i class="fas fa-stream text-cyan mr-2"></i>ประวัติการตรวจรักษา (SOAP Clinical Timeline)
+                </h4>
+                <span class="badge badge-secondary px-2 py-1 font-mono text-xs">
+                    {{ histories.count }} บันทึก
+                </span>
+            </div>
+
+            <!-- Timeline Container -->
+            <div id="soap-timeline">
+                {% for history in histories %}
+                    {% include 'patients/partials/history_soap_card.html' with history=history %}
+                {% empty %}
+                    <div id="empty-soap-notice" class="text-center py-5 rounded" style="background: #0f172a; border: 1px dashed #334155;">
+                        <i class="fas fa-notes-medical fa-3x text-muted mb-3 d-block"></i>
+                        <h5 class="text-light font-weight-normal">ยังไม่มีบันทึกการตรวจรักษา</h5>
+                        <p class="text-muted text-sm mb-3">คลิกปุ่มด้านล่างเพื่อเริ่มบันทึก SOAP Note แรกสำหรับคนไข้รายนี้</p>
+                        <button class="btn btn-sm btn-primary" data-toggle="collapse" data-target="#newSoapCollapse">
+                            <i class="fas fa-plus mr-1"></i>เพิ่มบันทึก SOAP แรก
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right Column: Clinical Status & Information -->
+        <div class="col-lg-4">
+            <!-- Vitals Summary Card -->
+            <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
+                <div class="card-header py-3" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+                    <h5 class="card-title text-white font-weight-bold mb-0" style="font-size: 1rem;">
+                        <i class="fas fa-chart-line text-cyan mr-2"></i>ดัชนีชีวภาพล่าสุด
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    {% with latest=histories.first %}
+                        {% if latest and latest.vitals %}
+                            <div class="row text-center mb-2">
+                                <div class="col-6 mb-3">
+                                    <div class="p-2 rounded" style="background: #090d16; border: 1px solid #1e293b;">
+                                        <small class="text-muted d-block">ความดันโลหิต</small>
+                                        <strong class="text-info font-mono" style="font-size: 1.1rem;">
+                                            {{ latest.vitals.bp_systolic|default:"-" }}/{{ latest.vitals.bp_diastolic|default:"-" }}
+                                        </strong>
+                                        <small class="text-muted d-block text-xs">mmHg</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="p-2 rounded" style="background: #090d16; border: 1px solid #1e293b;">
+                                        <small class="text-muted d-block">อัตราชีพจร</small>
+                                        <strong class="text-danger font-mono" style="font-size: 1.1rem;">
+                                            {{ latest.vitals.pulse|default:"-" }}
+                                        </strong>
+                                        <small class="text-muted d-block text-xs">bpm</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <div class="p-2 rounded" style="background: #090d16; border: 1px solid #1e293b;">
+                                        <small class="text-muted d-block">น้ำหนัก / ส่วนสูง</small>
+                                        <strong class="text-light font-mono" style="font-size: 0.95rem;">
+                                            {{ latest.vitals.weight_kg|default:"-" }} kg / {{ latest.vitals.height_cm|default:"-" }} cm
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <div class="p-2 rounded" style="background: #090d16; border: 1px solid #1e293b;">
+                                        <small class="text-muted d-block">ดัชนีมวลกาย BMI</small>
+                                        <strong class="text-emerald font-mono" style="font-size: 1.1rem; color: #34d399;">
+                                            {{ latest.vitals.bmi|default:"-" }}
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="text-muted text-xs d-block text-right">
+                                ตรวจวัดเมื่อ: {{ latest.visit_date|date:"d M Y H:i" }}
+                            </small>
+                        {% else %}
+                            <p class="text-muted text-sm text-center py-3 mb-0">
+                                ยังไม่มีข้อมูลบันทึกสัญญาณชีพล่าสุด
+                            </p>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+
+            <!-- Clinical Security & PDPA Card -->
+            <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
+                <div class="card-header py-3" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+                    <h5 class="card-title text-white font-weight-bold mb-0" style="font-size: 1rem;">
+                        <i class="fas fa-shield-alt text-success mr-2"></i>มาตรฐานความปลอดภัย EMR
+                    </h5>
+                </div>
+                <div class="card-body p-3 text-sm text-slate-400">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success mr-2"></i><strong>Pillar 2:</strong> RBAC Role-based Access จำกัดเฉพาะแพทย์และพยาบาล
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success mr-2"></i><strong>Pillar 8:</strong> บันทึก AuditLog ทุกครั้งที่มีการเปิดอ่านหรือแก้ไขแฟ้มนี้
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success mr-2"></i><strong>Pillar 5:</strong> ป้องกัน N+1 ด้วย `prefetch_related` โหลดประวัติใน 1 Query
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle text-success mr-2"></i><strong>PDPA:</strong> เลขประจำตัวประชาชนเข้ารหัส SHA-256 ป้องกันข้อมูลรั่วไหล
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

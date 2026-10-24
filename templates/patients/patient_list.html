@@ -1,0 +1,115 @@
+{% extends 'layouts/doctor_base.html' %}
+{% load static %}
+
+{% block title %}แฟ้มเวชระเบียนผู้ป่วย | Dr. Patt EMR{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3">
+    <!-- Header & Action Row -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2" style="border-bottom: 1px solid #1e293b;">
+        <div>
+            <h2 class="font-weight-bold text-white mb-1" style="font-size: 1.6rem;">
+                <i class="fas fa-user-injured text-info mr-2"></i>แฟ้มเวชระเบียนผู้ป่วย (Patient Roster)
+            </h2>
+            <p class="text-muted mb-0 font-sm">
+                ศูนย์กลางจัดการเวชระเบียน การตรวจรักษา และประวัติชีวภาพระดับโมเลกุล
+            </p>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            <a href="{% url 'patients:patient_create' %}" class="btn btn-primary shadow-sm" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: none;">
+                <i class="fas fa-user-plus mr-1"></i>ลงทะเบียนคนไข้ใหม่
+            </a>
+        </div>
+    </div>
+
+    <!-- Search & Filter Card -->
+    <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
+        <div class="card-body p-3">
+            <div class="row align-items-center">
+                <!-- Search Box with HTMX Live Search -->
+                <div class="col-md-6 col-lg-5 mb-2 mb-md-0">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-dark border-secondary text-info">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </div>
+                        <input type="text"
+                               name="q"
+                               class="form-control bg-dark text-white border-secondary"
+                               placeholder="ค้นหาด้วย HN, ชื่อ, นามสกุล หรือ เบอร์โทร..."
+                               value="{{ search_query }}"
+                               hx-get="{% url 'patients:patient_list' %}"
+                               hx-trigger="keyup changed delay:300ms, search"
+                               hx-target="#patient-table-body"
+                               hx-include="#status-filter"
+                               hx-indicator="#search-spinner"
+                               style="border-left: none;">
+                        <div class="input-group-append" id="search-spinner" style="display: none;">
+                            <span class="input-group-text bg-dark border-secondary text-warning">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="col-md-4 col-lg-3 mb-2 mb-md-0">
+                    <select id="status-filter" 
+                            name="status" 
+                            class="form-control bg-dark text-white border-secondary"
+                            hx-get="{% url 'patients:patient_list' %}"
+                            hx-trigger="change"
+                            hx-target="#patient-table-body"
+                            hx-include="[name='q']"
+                            hx-indicator="#search-spinner">
+                        <option value="all" {% if status_filter == 'all' or not status_filter %}selected{% endif %}>ทุกสถานะ (All Status)</option>
+                        <option value="urgent" {% if status_filter == 'urgent' %}selected{% endif %}>🚨 เคสด่วนเฝ้าระวัง (Urgent)</option>
+                        <option value="medicine" {% if status_filter == 'medicine' %}selected{% endif %}>💊 รับการบำบัด/ยา (Active Therapy)</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>⏳ รอดำเนินการ (Pending)</option>
+                        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>✅ สิ้นสุดการรักษา (Completed)</option>
+                    </select>
+                </div>
+
+                <!-- Stats summary badge -->
+                <div class="col-md-2 col-lg-4 text-md-right text-muted">
+                    <span class="badge badge-secondary px-3 py-2 font-mono" style="background: #1e293b; border: 1px solid #334155;">
+                        <i class="fas fa-users mr-1 text-cyan"></i>พบ <strong class="text-white" id="total-badge">{{ total_count }}</strong> รายการ
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patients Table Card -->
+    <div class="card shadow-sm" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden;">
+        <div class="card-header border-0 py-3 d-flex justify-content-between align-items-center" style="background: #131d35; border-bottom: 1px solid #1e293b !important;">
+            <h3 class="card-title font-weight-bold text-white mb-0" style="font-size: 1rem;">
+                <i class="fas fa-list-alt text-cyan mr-2"></i>รายชื่อผู้ป่วยในระบบ
+            </h3>
+            <span class="text-xs text-muted">
+                <i class="fas fa-shield-alt text-success mr-1"></i>คุ้มครองตามมาตรฐาน PDPA & Pillar 8 AuditLog
+            </span>
+        </div>
+
+        <div class="card-body p-0 table-responsive">
+            <table class="table table-hover mb-0" style="color: #cbd5e1;">
+                <thead style="background: #090d16; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <tr>
+                        <th style="width: 130px;">หมายเลข HN</th>
+                        <th>ชื่อ - นามสกุล</th>
+                        <th style="width: 110px;">เพศ / อายุ</th>
+                        <th style="width: 140px;">เบอร์โทรศัพท์</th>
+                        <th style="width: 130px;">กรุ๊ปเลือด/แพ้</th>
+                        <th style="width: 130px;">สถานะ</th>
+                        <th class="text-right" style="width: 160px;">การจัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="patient-table-body" class="divide-y divide-slate-800">
+                    {% include 'patients/partials/patient_table_rows.html' %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

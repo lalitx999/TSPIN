@@ -1,0 +1,102 @@
+<div class="card mb-3 shadow-sm soap-entry-card" style="background: #0f172a; border: 1px solid #1e293b; border-left: 4px solid #38bdf8; border-radius: 8px;">
+    <div class="card-header py-2 px-3 d-flex flex-wrap justify-content-between align-items-center" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+        <div>
+            <span class="badge badge-info px-2 py-1 mr-2 font-mono">
+                <i class="far fa-calendar-alt mr-1"></i>{{ history.visit_date|date:"d M Y H:i" }}
+            </span>
+            <span class="text-light text-sm font-weight-bold">
+                <i class="fas fa-user-md text-cyan mr-1"></i>
+                {% if history.doctor %}
+                    นพ./พญ. {{ history.doctor.get_full_name|default:history.doctor.username }}
+                {% else %}
+                    แพทย์ไม่ระบุ
+                {% endif %}
+            </span>
+        </div>
+        <div class="mt-1 mt-sm-0">
+            <span class="badge badge-secondary px-2 py-1 text-xs">
+                SOAP Note #{{ history.pk }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Vitals Badge Bar (if recorded) -->
+    {% if history.vitals %}
+    <div class="px-3 py-2 d-flex flex-wrap gap-2" style="background: #090d16; border-bottom: 1px solid #1e293b; font-size: 0.8rem;">
+        {% if history.vitals.bp_systolic and history.vitals.bp_diastolic %}
+            <span class="badge badge-dark text-info px-2 py-1" style="border: 1px solid #0369a1;">
+                <i class="fas fa-heartbeat mr-1"></i>BP: {{ history.vitals.bp_systolic }}/{{ history.vitals.bp_diastolic }} mmHg
+            </span>
+        {% endif %}
+        {% if history.vitals.pulse %}
+            <span class="badge badge-dark text-danger px-2 py-1" style="border: 1px solid #991b1b;">
+                <i class="fas fa-wave-square mr-1"></i>ชีพจร: {{ history.vitals.pulse }} bpm
+            </span>
+        {% endif %}
+        {% if history.vitals.temperature %}
+            <span class="badge badge-dark text-warning px-2 py-1" style="border: 1px solid #854d0e;">
+                <i class="fas fa-thermometer-half mr-1"></i>อุณหภูมิ: {{ history.vitals.temperature }} °C
+            </span>
+        {% endif %}
+        {% if history.vitals.weight_kg and history.vitals.height_cm %}
+            <span class="badge badge-dark text-light px-2 py-1" style="border: 1px solid #334155;">
+                <i class="fas fa-weight mr-1"></i>{{ history.vitals.weight_kg }} กก. / {{ history.vitals.height_cm }} ซม.
+            </span>
+        {% endif %}
+        {% if history.vitals.bmi %}
+            <span class="badge badge-dark text-emerald px-2 py-1" style="border: 1px solid #065f46; color: #34d399;">
+                <i class="fas fa-calculator mr-1"></i>BMI: {{ history.vitals.bmi }}
+            </span>
+        {% endif %}
+        {% if history.vitals.spo2 %}
+            <span class="badge badge-dark text-cyan px-2 py-1" style="border: 1px solid #0891b2;">
+                <i class="fas fa-lungs mr-1"></i>SpO2: {{ history.vitals.spo2 }}%
+            </span>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="card-body p-3">
+        <div class="row">
+            <!-- Subjective -->
+            <div class="col-md-6 mb-3">
+                <div class="p-2 rounded h-100" style="background: rgba(15, 23, 42, 0.7); border: 1px solid #1e293b;">
+                    <h6 class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                        <span class="badge badge-info px-1 py-0 mr-1">S</span> Subjective (อาการที่บอกเล่า)
+                    </h6>
+                    <p class="text-sm mb-0 text-light" style="white-space: pre-line;">{{ history.subjective|default:"- ไม่มีบันทึก -" }}</p>
+                </div>
+            </div>
+
+            <!-- Objective -->
+            <div class="col-md-6 mb-3">
+                <div class="p-2 rounded h-100" style="background: rgba(15, 23, 42, 0.7); border: 1px solid #1e293b;">
+                    <h6 class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                        <span class="badge badge-warning text-dark px-1 py-0 mr-1">O</span> Objective (ผลตรวจร่างกาย/แล็บ)
+                    </h6>
+                    <p class="text-sm mb-0 text-light" style="white-space: pre-line;">{{ history.objective|default:"- ไม่มีบันทึก -" }}</p>
+                </div>
+            </div>
+
+            <!-- Assessment -->
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="p-2 rounded h-100" style="background: rgba(15, 23, 42, 0.7); border: 1px solid #1e293b;">
+                    <h6 class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                        <span class="badge badge-danger px-1 py-0 mr-1">A</span> Assessment (การวินิจฉัย/39 แกน)
+                    </h6>
+                    <p class="text-sm mb-0 text-light" style="white-space: pre-line;">{{ history.assessment|default:"- ไม่มีบันทึก -" }}</p>
+                </div>
+            </div>
+
+            <!-- Plan -->
+            <div class="col-md-6">
+                <div class="p-2 rounded h-100" style="background: rgba(15, 23, 42, 0.7); border: 1px solid #1e293b;">
+                    <h6 class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                        <span class="badge badge-success px-1 py-0 mr-1">P</span> Plan (แผนการรักษา/อาหารบำบัด)
+                    </h6>
+                    <p class="text-sm mb-0 text-light" style="white-space: pre-line;">{{ history.plan|default:"- ไม่มีบันทึก -" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

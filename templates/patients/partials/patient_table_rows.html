@@ -1,0 +1,75 @@
+{% for patient in patients %}
+<tr>
+    <td class="align-middle">
+        <a href="{% url 'patients:patient_detail' patient.pk %}" class="badge badge-dark text-cyan font-mono px-2 py-1" style="font-size: 0.85rem; border: 1px solid rgba(56, 189, 248, 0.4);">
+            <i class="fas fa-id-card-alt mr-1"></i>{{ patient.hn }}
+        </a>
+    </td>
+    <td class="align-middle">
+        <a href="{% url 'patients:patient_detail' patient.pk %}" class="text-white font-weight-bold d-block">
+            {{ patient.full_name }}
+        </a>
+        {% if patient.nickname %}
+            <small class="text-muted">(ชื่อเล่น: {{ patient.nickname }})</small>
+        {% endif %}
+    </td>
+    <td class="align-middle">
+        <span class="text-light">{{ patient.get_gender_display|slice:":3" }}</span>
+        <span class="text-muted mx-1">/</span>
+        {% if patient.age %}
+            <span class="text-light">{{ patient.age }} ปี</span>
+        {% else %}
+            <span class="text-muted">-</span>
+        {% endif %}
+    </td>
+    <td class="align-middle font-mono text-light">
+        <i class="fas fa-phone-alt text-xs text-muted mr-1"></i>{{ patient.phone }}
+    </td>
+    <td class="align-middle">
+        <span class="badge badge-secondary px-2 py-1">{{ patient.blood_type }}</span>
+        {% if patient.allergies %}
+            <span class="badge badge-danger px-2 py-1 ml-1" title="ประวัติการแพ้: {{ patient.allergies }}">
+                <i class="fas fa-exclamation-triangle mr-1"></i>แพ้ยา
+            </span>
+        {% endif %}
+    </td>
+    <td class="align-middle">
+        {% if patient.status == 'urgent' %}
+            <span class="badge badge-danger px-2 py-1">
+                <i class="fas fa-fire mr-1"></i>เคสด่วน
+            </span>
+        {% elif patient.status == 'medicine' %}
+            <span class="badge badge-primary px-2 py-1">
+                <i class="fas fa-capsules mr-1"></i>รับการบำบัด
+            </span>
+        {% elif patient.status == 'completed' %}
+            <span class="badge badge-success px-2 py-1">
+                <i class="fas fa-check-circle mr-1"></i>เสร็จสิ้น
+            </span>
+        {% else %}
+            <span class="badge badge-warning text-dark px-2 py-1">
+                <i class="fas fa-clock mr-1"></i>รอดำเนินการ
+            </span>
+        {% endif %}
+    </td>
+    <td class="align-middle text-right text-nowrap">
+        <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-info mr-1" title="เปิดแฟ้มเวชระเบียน EMR">
+            <i class="fas fa-folder-open mr-1"></i>เปิด EMR
+        </a>
+        <a href="{% url 'patients:patient_edit' patient.pk %}" class="btn btn-sm btn-outline-secondary" title="แก้ไขเวชระเบียน">
+            <i class="fas fa-edit"></i>
+        </a>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="7" class="text-center py-5 text-muted">
+        <i class="fas fa-user-slash fa-3x mb-3 text-secondary d-block"></i>
+        <h5 class="font-weight-normal text-light">ไม่พบรายชื่อผู้ป่วยที่ตรงกับเงื่อนไข</h5>
+        <p class="text-sm mb-3">ลองเปลี่ยนคำค้นหา หรือเพิ่มคนไข้ใหม่เข้าสู่ระบบ</p>
+        <a href="{% url 'patients:patient_create' %}" class="btn btn-sm btn-primary">
+            <i class="fas fa-user-plus mr-1"></i>เพิ่มคนไข้ใหม่
+        </a>
+    </td>
+</tr>
+{% endfor %}

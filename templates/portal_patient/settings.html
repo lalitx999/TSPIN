@@ -1,0 +1,52 @@
+{% extends 'layouts/patient_base.html' %}
+
+{% block title %}ตั้งค่าบัญชีคนไข้ | TSPI Health{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+    <div class="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-xs flex items-center justify-between">
+        <div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 mb-1">
+                <i class="fas fa-user-cog mr-1"></i> Patient Account Profile
+            </span>
+            <h1 class="text-2xl font-bold text-gray-900">ข้อมูลส่วนตัวและการตั้งค่า</h1>
+            <p class="text-xs text-gray-500 mt-1">จัดการข้อมูลการติดต่อ การเชื่อมต่อบัญชี LINE และความยินยอมด้านข้อมูลสุขภาพ</p>
+        </div>
+    </div>
+
+    <!-- Profile Form -->
+    <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-xs space-y-6">
+        <h3 class="text-base font-semibold text-gray-900 border-b border-gray-100 pb-3">ข้อมูลผู้รับบริการ</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">ชื่อ-นามสกุล</label>
+                <input type="text" value="{{ request.user.get_full_name|default:request.user.username }}" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-800">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">เบอร์โทรศัพท์มือถือ</label>
+                <input type="text" value="081-234-5678" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-800">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">อีเมล</label>
+                <input type="email" value="{{ request.user.email|default:'patient@example.com' }}" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-800">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">สถานะ LINE Official Account</label>
+                <div class="flex items-center gap-2 pt-2">
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                        <i class="fab fa-line mr-1"></i> เชื่อมต่อแล้ว
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-gray-100">
+            <button type="button" class="px-6 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark shadow-xs transition-all">
+                บันทึกการแก้ไข
+            </button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

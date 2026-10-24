@@ -1,0 +1,1757 @@
+{
+  "title": "ทฤษฎีเวชศาสตร์รากฐาน: ฐานข้อมูลโครงสร้างสำหรับการเทรนโมเดล",
+  "version": "1.0",
+  "description": "ชุดข้อมูล structured และ training pairs จากเนื้อหาทฤษฎีเวชศาสตร์รากฐาน ประกอบด้วย บทนำ กุญแจ 3 ดอก บันได 9 ขั้น 12 Health Domains 39 Biological Axes และ 180 Living Biological Networks",
+  "data": {
+    "structured_knowledge": {
+      "introduction": {
+        "sections": [
+          {
+            "title": "บทนำ: ทฤษฎีเวชศาสตร์รากฐาน",
+            "content": "ในยุคที่เทคโนโลยีทางการแพทย์ก้าวหน้าอย่างรวดเร็ว...",
+            "key_concepts": [
+              "วิกฤตการณ์ด้านสุขภาพ",
+              "ระบบภูมิคุ้มกันอ่อนแอ",
+              "ทางตันของการแพทย์สมัยใหม่",
+              "การเพิ่มขึ้นของโรคร้าย",
+              "ผลกระทบต่อระบบภูมิคุ้มกัน"
+            ],
+            "core_problems": [
+              "แนวคิดแบบกลไก (Mechanistic Medicine)",
+              "การรักษาโรคมากกว่าการป้องกัน",
+              "การแบ่งแยกความเชี่ยวชาญทางการแพทย์",
+              "การพึ่งพายาเคมีและการผ่าตัด"
+            ]
+          },
+          {
+            "title": "บทนำ - ตอนที่ 1: รากเหง้าทางคัมภีร์และปรัชญาของการมองโรคจาก 'สมุฏฐาน'",
+            "content": "ในยุคปัจจุบัน การแพทย์สมัยใหม่ได้พัฒนาอย่างก้าวกระโดด...",
+            "core_concepts": [
+              "สมุฏฐานวินิจฉัย",
+              "พระคัมภีร์สมุฏฐานวินิจฉัย",
+              "เวชศาสตร์ฉบับหลวง รัชกาลที่ 5",
+              "กองสมุฏฐาน",
+              "กองธาตุ",
+              "กองโรค",
+              "กองอาหาร"
+            ],
+            "key_quotes": [
+              {
+                "text": "กายนี้เป็นที่ตั้งแห่งกองสมุฏฐาน สมุฏฐานเป็นที่ตั้งแห่งกองธาตุ ธาตุเป็นที่ตั้งแห่งกองโรค โรคเป็นที่ตั้งแห่งอาหาร ดั่งนี้ ถ้าจะแก้ให้แก้ที่กองสมุฏฐานเปนอาทิ ด้วยอรรถสมุฏฐานนี้เป็นรากแก้วแห่งโรคทั้งหลาย",
+                "source": "พระคัมภีร์สมุฏฐานวินิจฉัย"
+              }
+            ]
+          },
+          {
+            "title": "บทนำ - ตอนที่ 2: ตรีธาตุสมุฏฐานในฐานะสามัญลักษณะของอนุภาคเริ่มต้นแห่งสรรพสิ่ง",
+            "content": "ตลอดประวัติศาสตร์ของมนุษย์ คำถามพื้นฐานที่สุด...",
+            "core_concepts": [
+              "ตรีธาตุสมุฏฐาน",
+              "ปิตตะ - ลักษณะของพลังงาน ความร้อน และการแปรเปลี่ยน",
+              "วาตะ - ลักษณะของการเคลื่อนไหว การไหล การสั่น และความไม่หยุดนิ่ง",
+              "เสมหะ - ลักษณะของการยึดเหนี่ยว การเกาะกุม และการรวมตัวเป็นกลุ่มก้อน",
+              "รากศัพท์ของปิตตะ (√tap)",
+              "รากศัพท์ของวาตะ (√vā)",
+              "รากศัพท์ของเสมหะ/Kapha (√kap)",
+              "สามัญลักษณะของอนุภาคก่อกำเนิดพื้นฐาน"
+            ],
+            "definitions": {
+              "ปิตตะ": "ลักษณะของอนุภาคที่แสดงออกในรูปของพลังงาน ความร้อน การแปรสภาพ การแตกตัว การสังเคราะห์",
+              "วาตะ": "ลักษณะของอนุภาคที่แสดงออกเป็นการเคลื่อนไหว การสั่น การไหล การถ่ายโอนข้อมูล การสื่อสาร",
+              "เสมหะ": "ลักษณะของอนุภาคที่ทำให้เกิดโครงสร้าง การรวมตัวเป็นอะตอม โมเลกุล เซลล์ เมทริกซ์ของสิ่งมีชีวิต"
+            }
+          },
+          {
+            "title": "บทนำ - ตอนที่ 3: จากตรีธาตุสมุฏฐานสู่กุญแจ 3 ดอกแห่งการรักษาจากราก",
+            "content": "จากบทนำตอนที่ 1 และ 2 ได้แสดงให้เห็นแล้วว่า...",
+            "core_concepts": [
+              "การแปลภาษาคัมภีร์โบราณสู่ภาษาวิทยาศาสตร์ร่วมสมัย",
+              "กุญแจ 3 ดอก",
+              "Metabolic Energy - การแสดงออกของปิตตะ",
+              "Biological Dynamics - การแสดงออกของวาตะ",
+              "Biointegrity - การแสดงออกของเสมหะ"
+            ],
+            "summary": "กุญแจ 3 ดอกไม่ใช่ลำดับขั้น แต่เป็นสามมิติของระบบเดียวกันที่ต้องสมดุลพร้อมกัน"
+          }
+        ]
+      },
+      "three_keys": {
+        "description": "กุญแจ 3 ดอกคือมิติหลักที่ต้องถูกไขให้ถูกต้อง เพื่อให้การรักษาเข้าถึงรากของปัญหา",
+        "keys": [
+          {
+            "name": "Metabolic Energy",
+            "thai_name": "ระบบพลังงานชีวภาพ",
+            "ancient_equivalent": "ปิตตะ",
+            "description": "การแสดงออกของปิตตะในระดับชีวเคมี: เมตาบอลิซึม, การสร้าง ATP, mitochondrial function, การแปรรูปอาหารเป็นพลังงาน และไฟอักเสบ",
+            "scope": [
+              "การสร้างพลังงานในระดับไมโตคอนเดรีย",
+              "การแปรรูปพลังงานจากอาหาร",
+              "จังหวะการใช้พลังงานตามเวลา (circadian rhythm)",
+              "การเกิดไฟอักเสบและความเสื่อม (ชิรนัคคี)"
+            ],
+            "imbalance_consequences": [
+              "metabolic syndrome",
+              "เบาหวาน",
+              "ภาวะอักเสบ",
+              "ความเสื่อมของอวัยวะ"
+            ]
+          },
+          {
+            "name": "Biological Dynamics",
+            "thai_name": "รากฐานนิเวศของชีวิต",
+            "ancient_equivalent": "เสมหะ",
+            "description": "การแสดงออกของเสมหะในฐานะหลักการแห่งการยึดเหนี่ยว การเกาะกุม และการตั้งอยู่",
+            "scope": [
+              "ระบบนิเวศจุลชีพ (microbiome)",
+              "เยื่อบุ (epithelium)",
+              "Extracellular matrix (ECM)",
+              "โครงสร้างและสิ่งแวดล้อมภายในร่างกาย"
+            ],
+            "imbalance_consequences": [
+              "microbiome พัง",
+              "gut barrier รั่ว",
+              "เยื่อบุเสื่อม",
+              "ความทนต่อสิ่งกระตุ้นของภูมิคุ้มกันหายไป",
+              "โรคอักเสบเรื้อรัง",
+              "ภูมิแพ้",
+              "ภูมิคุ้มกันผิดปกติ"
+            ]
+          },
+          {
+            "name": "Biointegrity",
+            "thai_name": "ความสมบูรณ์พร้อมของชีวิต / ระบบประสานเครือข่าย",
+            "ancient_equivalent": "วาตะ",
+            "description": "ความสามารถของร่างกายในการดำรงอยู่เป็นองค์รวมเดียวกัน ท่ามกลางระบบย่อยจำนวนมหาศาลที่ทำงานพร้อมกันตลอดเวลา",
+            "scope": [
+              "การสื่อสารของระบบประสาทและอัตโนมัติ",
+              "การประสานภูมิคุ้มกัน (immune tolerance, resolution of inflammation)",
+              "การคงสภาพเนื้อเยื่อและพรมแดนของร่างกาย (gut barrier, blood-brain barrier)",
+              "การซ่อมแซมและกำจัดสิ่งเสียหาย (autophagy, mitophagy)",
+              "การประสานจังหวะเวลา (circadian biology)"
+            ],
+            "imbalance_consequences": [
+              "อักเสบเรื้อรัง",
+              "นอนไม่หลับ",
+              "ภูมิแพ้",
+              "autoimmune",
+              "ลำไส้รั่ว",
+              "สมองล้า",
+              "ปวดเรื้อรัง",
+              "fibrosis",
+              "metabolic syndrome",
+              "หลอดเลือดเสื่อม",
+              "มะเร็ง",
+              "ภาวะเสื่อมของอวัยวะ"
+            ]
+          }
+        ],
+        "summary": "Biological Dynamics = ฐานนิเวศที่ทำให้ชีวิตตั้งอยู่, Metabolic Energy = พลังงานที่ทำให้ชีวิตดำเนินไป, Biointegrity = ความประสานสมบูรณ์ที่ทำให้ชีวิตเป็นหนึ่งเดียวและทรงภาวะอยู่ได้"
+      },
+      "nine_steps": {
+        "description": "บันได 9 ขั้นคือลำดับตรรกะของการฟื้นฟูระบบชีวภาพจากพื้นที่สุดไปสู่ระดับยีนและสมดุลชีวิต",
+        "steps": [
+          {
+            "step": 1,
+            "name": "Detoxification",
+            "thai_name": "การล้างพิษ",
+            "goal": "ลดภาระสารพิษจากภายนอก–ภายใน (โลหะหนัก สารเคมี อาหารแปรรูป metabolite พิษ ROS ฯลฯ) เพื่อไม่ให้รบกวนธาตุและระบบพลังงาน",
+            "systems": ["ตับ (phase I/II/III)", "ไต", "ลำไส้", "น้ำเหลือง", "ผิวหนัง", "การหายใจ"],
+            "rationale": "ถ้ายังมี toxin overload จะกระตุ้น oxidative stress, inflammation, mitochondrial dysfunction ต่อเนื่อง การแก้ชั้นบน ๆ จะไม่ติด"
+          },
+          {
+            "step": 2,
+            "name": "Microbiome Ecosystem",
+            "thai_name": "ระบบนิเวศจุลชีพ",
+            "goal": "ฟื้นความหลากหลายและความยืดหยุ่นของ microbiome, ลด dysbiosis, เสริมสายพันธุ์คีย์สโตน และคืนสมดุลระหว่างเจ้าบ้าน–จุลินทรีย์",
+            "key_outcomes": ["SCFA ดีขึ้น", "immune tolerance เพิ่ม", "inflammation จากลำไส้ลด", "การดูดซึมสารอาหารดีขึ้น"],
+            "rationale": "สารพิษจำนวนมากรบกวน microbiome ถ้าไม่ลดภาระพิษก่อน การจัดจุลชีพจะไม่เสถียร"
+          },
+          {
+            "step": 3,
+            "name": "Immune–Inflammatory Regulation",
+            "thai_name": "การควบคุมภูมิคุ้มกันและการอักเสบ",
+            "goal": "ลด chronic low‑grade inflammation ที่เป็นพื้นหลังของ NCDs แทบทุกชนิด",
+            "biomarkers": ["TNF‑α", "IL‑6", "IL‑1β", "CRP", "inflammatory tone รวมระบบ"],
+            "rationale": "พอ detox + microbiome ดีขึ้น ภาระการอักเสบจะลดลงได้ง่ายขึ้น"
+          },
+          {
+            "step": 4,
+            "name": "Redox Homeostasis & Oxidative Balance",
+            "thai_name": "คุมความเครียดออกซิเดชัน",
+            "goal": "ลด ROS load และฟื้นระบบ antioxidant ภายใน (GSH, SOD, catalase ฯลฯ)",
+            "rationale": "เพื่อเตรียมเซลล์ให้สภาพแวดล้อมภายในสะอาด พร้อมเข้าสู่การซ่อมลึกระดับ autophagy และ DNA"
+          },
+          {
+            "step": 5,
+            "name": "Enhance Metabolic Function & Mitochondria",
+            "thai_name": "ฟื้นฟูระบบเมตาบอลิซึมและไมโตคอนเดรีย",
+            "goal": "ฟื้นฟูประสิทธิภาพการสร้าง ATP, ลด mitochondrial damage, เพิ่ม mitochondrial biogenesis, ปรับ substrate utilization",
+            "connection_to_keys": "Metabolic Energy – ปิตตะในระดับไมโตคอนเดรีย",
+            "rationale": "พอเคลียร์ mitochondria เสียออกไปแล้ว การเพิ่มพลังให้เครือข่ายที่เหลืออยู่จะทั้งปลอดภัยและยั่งยืนกว่ามาก"
+          },
+          {
+            "step": 6,
+            "name": "Autophagy & Cellular Clearance",
+            "thai_name": "ฟื้นพลังงานเซลล์",
+            "goal": "กระตุ้น–ปรับสมดุลกระบวนการ autophagy เพื่อกำจัดโปรตีนเสียรูป, organelle เสีย และเชื้อโรคภายในเซลล์",
+            "role": "เป็นระบบรีไซเคิล ทำให้เซลล์คืนคุณภาพ เตรียมพร้อมสำหรับ mitochondrial support และ DNA repair",
+            "rationale": "การดัน mitochondrial function โดยไม่เคลียร์ของเสีย จะเหมือนอัดพลังงานเข้าเครื่องที่ยังเต็มไปด้วยเศษเหล็ก → พังเร็ว"
+          },
+          {
+            "step": 7,
+            "name": "Genomic Stability, Integrity & Regulatory Homeostasis",
+            "thai_name": "เสถียรภาพ ความสมบูรณ์ และดุลยภาพของระบบข้อมูลชีวภาพ",
+            "goal": "รักษาเสถียรภาพของ DNA และ genome, ระบบซ่อมแซม DNA, epigenetics, การควบคุมการแสดงออกของยีน",
+            "scope": [
+              "DNA Repair System (BER, NER, Mismatch Repair, Double-Strand Break Repair)",
+              "Epigenetics (DNA methylation, Histone modification, Chromatin accessibility)",
+              "Proteostasis & Cellular Quality Control",
+              "Mitochondrial–Nuclear Communication",
+              "Circadian & Temporal Gene Regulation"
+            ]
+          },
+          {
+            "step": 8,
+            "name": "GENOMIC REGULATION HOMEOSTASIS",
+            "thai_name": "ดุลยภาพการควบคุมจีโนม",
+            "goal": "รักษาความถูกต้องของข้อมูลชีวิต ความสามารถในการซ่อมแซม ความยืดหยุ่นของระบบควบคุมยีน",
+            "details": {
+              "definition": "ความสามารถของสิ่งมีชีวิตในการรักษาความเสถียร ความสมบูรณ์ และดุลยภาพของระบบข้อมูลชีวภาพ ตั้งแต่ genome, epigenome, transcriptome, proteome ไปจนถึง regulatory signaling networks"
+            }
+          },
+          {
+            "step": 9,
+            "name": "Prakati (Bioelectrical & Physiological Coherence)",
+            "thai_name": "สมดุลชีวิต / ปกติสภาวะ",
+            "goal": "ร่างกายกลับสู่สภาวะที่ถูกรบกวนได้ยาก และถ้าถูกรบกวนก็รีบกลับ baseline ได้เร็ว (resilience)",
+            "scope": [
+              "Bioelectrical Homeostasis",
+              "Physiological Coherence",
+              "Autonomic Nervous System Balance",
+              "Neural Oscillation & Brain Coherence",
+              "Cardiorespiratory Coherence",
+              "Calcium & Ion Oscillatory Signaling",
+              "Mitochondrial Energetic Coherence",
+              "Circadian & Temporal Synchronization",
+              "Neuroimmune & Neuroendocrine Integration",
+              "Developmental & Regenerative Bioelectricity"
+            ],
+            "key_definition": "ความสามารถของสิ่งมีชีวิตในการรักษาความสอดประสานของระบบชีวไฟฟ้า จังหวะชีวภาพ และพลวัตทางสรีรวิทยาหลายระดับ เพื่อให้ทั้งระบบสามารถตอบสนอง ปรับตัว ฟื้นฟู และดำรงชีวิตได้อย่างสมดุล"
+          }
+        ]
+      },
+      "twelve_domains": {
+        "domains": [
+          "Digestive–Microbiome",
+          "Immune",
+          "Inflammatory",
+          "Redox",
+          "Metabolic",
+          "Mitochondrial",
+          "Genomic",
+          "Neuroendocrine",
+          "Cardiovascular",
+          "Regenerative",
+          "Longevity",
+          "Oncology"
+        ]
+      },
+      "biological_axes": {
+        "total": 39,
+        "axes": [
+          {
+            "number": 1,
+            "name": "Systemic Inflammatory Load"
+          },
+          {
+            "number": 2,
+            "name": "Immune Homeostasis"
+          },
+          {
+            "number": 3,
+            "name": "Pathogen Defense"
+          },
+          {
+            "number": 4,
+            "name": "Post-Infectious Persistence"
+          },
+          {
+            "number": 5,
+            "name": "Glucose–Insulin Regulation"
+          },
+          {
+            "number": 6,
+            "name": "Lipid–Lipotoxicity"
+          },
+          {
+            "number": 7,
+            "name": "Nutrient Sensing (AMPK–mTOR)"
+          },
+          {
+            "number": 8,
+            "name": "Mitochondrial Network"
+          },
+          {
+            "number": 9,
+            "name": "Oxidative Stress"
+          },
+          {
+            "number": 10,
+            "name": "Proteostasis–Autophagy–Lysosome"
+          },
+          {
+            "number": 11,
+            "name": "DNA Repair & Genomic Stability"
+          },
+          {
+            "number": 12,
+            "name": "Epigenetic-Gene Regulation"
+          },
+          {
+            "number": 13,
+            "name": "Longevity Signaling (SIRT–FOXO–IGF)"
+          },
+          {
+            "number": 14,
+            "name": "Senescence & SASP"
+          },
+          {
+            "number": 15,
+            "name": "Detoxification & Cellular Defense"
+          },
+          {
+            "number": 16,
+            "name": "Digestive–Absorptive"
+          },
+          {
+            "number": 17,
+            "name": "Microbiome Ecology"
+          },
+          {
+            "number": 18,
+            "name": "Gut Barrier & Mucosal Integrity"
+          },
+          {
+            "number": 19,
+            "name": "Colon Biofilm & Mucosal Burden"
+          },
+          {
+            "number": 20,
+            "name": "Endothelial Function"
+          },
+          {
+            "number": 21,
+            "name": "Vascular Remodeling & Microcirculation"
+          },
+          {
+            "number": 22,
+            "name": "Thrombosis–Hemostasis"
+          },
+          {
+            "number": 23,
+            "name": "Hemodynamics & Arterial Elasticity"
+          },
+          {
+            "number": 24,
+            "name": "Wound Healing (Internal + External)"
+          },
+          {
+            "number": 25,
+            "name": "Fibrosis & ECM Remodeling"
+          },
+          {
+            "number": 26,
+            "name": "Stem Cell & Hematopoiesis"
+          },
+          {
+            "number": 27,
+            "name": "Glycation / Carbonyl Stress (AGE)"
+          },
+          {
+            "number": 28,
+            "name": "Muscle Protein Turnover"
+          },
+          {
+            "number": 29,
+            "name": "Bone Remodeling"
+          },
+          {
+            "number": 30,
+            "name": "Connective Tissue Integrity"
+          },
+          {
+            "number": 31,
+            "name": "Female Hormone"
+          },
+          {
+            "number": 32,
+            "name": "Male Androgen"
+          },
+          {
+            "number": 33,
+            "name": "Thyroid–Adrenal–Growth"
+          },
+          {
+            "number": 34,
+            "name": "Neuro–Sleep–Stress–Brain Clearance"
+          },
+          {
+            "number": 35,
+            "name": "Organ Resilience & Functional Reserve"
+          },
+          {
+            "number": 36,
+            "name": "Oncology"
+          },
+          {
+            "number": 37,
+            "name": "Proteostasis Network"
+          },
+          {
+            "number": 38,
+            "name": "Protein Clearance & Cellular Integrity"
+          },
+          {
+            "number": 39,
+            "name": "Genomic Regulation Homeostasis"
+          }
+        ]
+      },
+      "living_biological_networks": {
+        "total": 180,
+        "description": "180 Human Living Biological Network Systems - เครือข่ายชีวภาพที่สำคัญของร่างกาย ตั้งแต่ระดับโมเลกุล เซลล์ เนื้อเยื่อ อวัยวะ ไปจนถึงระบบทั้งร่างกาย",
+        "networks": [
+          {
+            "number": 1,
+            "domain": "Immune",
+            "axis": "Systemic Inflammatory Load",
+            "system": "NF-κB Inflammatory Switch Network",
+            "scope": "ควบคุมการเปิดสัญญาณอักเสบหลัก"
+          },
+          {
+            "number": 2,
+            "domain": "Immune",
+            "axis": "Systemic Inflammatory Load",
+            "system": "Cytokine Burden Network",
+            "scope": "IL-6, TNF-α, IL-1β, CRP"
+          },
+          {
+            "number": 3,
+            "domain": "Immune",
+            "axis": "Acute–Chronic Inflammation",
+            "system": "Acute Inflammatory Response Network",
+            "scope": "การอักเสบเฉียบพลันเพื่อป้องกันภัย"
+          },
+          {
+            "number": 4,
+            "domain": "Immune",
+            "axis": "Acute–Chronic Inflammation",
+            "system": "Chronic Low-Grade Inflammation Network",
+            "scope": "การอักเสบเรื้อรังระดับต่ำ"
+          },
+          {
+            "number": 5,
+            "domain": "Immune",
+            "axis": "Immune Surveillance",
+            "system": "Innate Immune Surveillance Network",
+            "scope": "macrophage, neutrophil, dendritic cell"
+          },
+          {
+            "number": 6,
+            "domain": "Immune",
+            "axis": "Immune Surveillance",
+            "system": "NK Cell Tumor Surveillance Network",
+            "scope": "การกำจัดเซลล์ผิดปกติและเซลล์มะเร็ง"
+          },
+          {
+            "number": 7,
+            "domain": "Immune",
+            "axis": "Immune Balance",
+            "system": "Adaptive Immune Coordination Network",
+            "scope": "T cell, B cell, antibody response"
+          },
+          {
+            "number": 8,
+            "domain": "Immune",
+            "axis": "Immune Balance",
+            "system": "Treg–Th17 Balance Network",
+            "scope": "สมดุลภูมิคุ้มกันกับภูมิแพ้/ออโตอิมมูน"
+          },
+          {
+            "number": 9,
+            "domain": "Inflammation",
+            "axis": "Resolution",
+            "system": "Inflammation Resolution Network",
+            "scope": "การปิดการอักเสบและกลับสู่สมดุล"
+          },
+          {
+            "number": 10,
+            "domain": "Inflammation",
+            "axis": "Inflammasome",
+            "system": "NLRP3 Inflammasome Network",
+            "scope": "sterile inflammation, IL-1β, IL-18"
+          },
+          {
+            "number": 11,
+            "domain": "Inflammation",
+            "axis": "Infection Defense",
+            "system": "Antiviral Interferon Network",
+            "scope": "interferon signaling, viral defense"
+          },
+          {
+            "number": 12,
+            "domain": "Inflammation",
+            "axis": "Infection Defense",
+            "system": "Antibacterial Defense Network",
+            "scope": "phagocytosis, antimicrobial peptides"
+          },
+          {
+            "number": 13,
+            "domain": "Oxidative Stress",
+            "axis": "ROS/RNS Load",
+            "system": "ROS Regulation Network",
+            "scope": "ควบคุม ROS ไม่ให้เกินสมดุล"
+          },
+          {
+            "number": 14,
+            "domain": "Oxidative Stress",
+            "axis": "Oxidative Damage",
+            "system": "Lipid Peroxidation Network",
+            "scope": "MDA, 4-HNE, membrane damage"
+          },
+          {
+            "number": 15,
+            "domain": "Oxidative Stress",
+            "axis": "Antioxidant Defense",
+            "system": "Nrf2 Antioxidant Response Network",
+            "scope": "เปิดระบบป้องกันเซลล์"
+          },
+          {
+            "number": 16,
+            "domain": "Oxidative Stress",
+            "axis": "Antioxidant Defense",
+            "system": "Glutathione Defense Network",
+            "scope": "GSH, GPx, detox redox balance"
+          },
+          {
+            "number": 17,
+            "domain": "Energy",
+            "axis": "Glucose–Insulin Regulation",
+            "system": "Insulin Signaling Network",
+            "scope": "insulin receptor–AKT–GLUT"
+          },
+          {
+            "number": 18,
+            "domain": "Energy",
+            "axis": "Glucose–Insulin Regulation",
+            "system": "Glucose Utilization Network",
+            "scope": "การนำ glucose เข้าเซลล์และใช้พลังงาน"
+          },
+          {
+            "number": 19,
+            "domain": "Energy",
+            "axis": "Hepatic Glucose Control",
+            "system": "Hepatic Glucose Output Network",
+            "scope": "gluconeogenesis, glycogen regulation"
+          },
+          {
+            "number": 20,
+            "domain": "Energy",
+            "axis": "Glycemic Stability",
+            "system": "Glucose Variability Control Network",
+            "scope": "ควบคุมระดับน้ำตาลไม่ให้แกว่ง"
+          },
+          {
+            "number": 21,
+            "domain": "Energy",
+            "axis": "Lipid–Lipotoxicity",
+            "system": "Lipid Transport Network",
+            "scope": "LDL, HDL, TG, lipoprotein balance"
+          },
+          {
+            "number": 22,
+            "domain": "Energy",
+            "axis": "Lipid–Lipotoxicity",
+            "system": "Ectopic Fat Accumulation Network",
+            "scope": "ไขมันพอกตับ ไขมันในอวัยวะ"
+          },
+          {
+            "number": 23,
+            "domain": "Energy",
+            "axis": "Lipid–Lipotoxicity",
+            "system": "Lipotoxic Injury Network",
+            "scope": "ceramide, DAG, cellular toxicity"
+          },
+          {
+            "number": 24,
+            "domain": "Energy",
+            "axis": "Fatty Acid Oxidation",
+            "system": "Beta-Oxidation Network",
+            "scope": "เผาผลาญกรดไขมันใน mitochondria"
+          },
+          {
+            "number": 25,
+            "domain": "Energy",
+            "axis": "Nutrient Sensing",
+            "system": "AMPK Energy Sensing Network",
+            "scope": "low energy sensing, catabolic switch"
+          },
+          {
+            "number": 26,
+            "domain": "Energy",
+            "axis": "Nutrient Sensing",
+            "system": "mTOR Growth Signaling Network",
+            "scope": "growth, protein synthesis, anabolic state"
+          },
+          {
+            "number": 27,
+            "domain": "Energy",
+            "axis": "Nutrient Sensing",
+            "system": "AMPK–mTOR Balance Network",
+            "scope": "ตัดสินใจ growth vs repair"
+          },
+          {
+            "number": 28,
+            "domain": "Energy",
+            "axis": "Mitochondrial Network",
+            "system": "Mitochondrial ATP Production Network",
+            "scope": "ETC, oxidative phosphorylation"
+          },
+          {
+            "number": 29,
+            "domain": "Energy",
+            "axis": "Mitochondrial Network",
+            "system": "Mitochondrial Quality Control Network",
+            "scope": "mitophagy, fusion–fission"
+          },
+          {
+            "number": 30,
+            "domain": "Energy",
+            "axis": "Mitochondrial Network",
+            "system": "Mitochondrial Biogenesis Network",
+            "scope": "สร้าง mitochondria ใหม่"
+          },
+          {
+            "number": 31,
+            "domain": "Energy",
+            "axis": "Redox–Energy Coupling",
+            "system": "Mitochondrial ROS Signaling Network",
+            "scope": "ROS ในฐานะ signal และ damage"
+          },
+          {
+            "number": 32,
+            "domain": "Energy",
+            "axis": "Metabolic Flexibility",
+            "system": "Fuel Switching Network",
+            "scope": "glucose ↔ fat ↔ ketone"
+          },
+          {
+            "number": 33,
+            "domain": "Gut",
+            "axis": "Detoxification",
+            "system": "Phase I Detoxification Network",
+            "scope": "CYP450 biotransformation"
+          },
+          {
+            "number": 34,
+            "domain": "Gut",
+            "axis": "Detoxification",
+            "system": "Phase II Conjugation Network",
+            "scope": "glucuronidation, sulfation, methylation"
+          },
+          {
+            "number": 35,
+            "domain": "Gut",
+            "axis": "Detoxification",
+            "system": "Phase III Transport Network",
+            "scope": "efflux transport, bile/urine excretion"
+          },
+          {
+            "number": 36,
+            "domain": "Gut",
+            "axis": "Detoxification",
+            "system": "Xenobiotic Clearance Network",
+            "scope": "ยา สารเคมี โลหะหนัก สารพิษ"
+          },
+          {
+            "number": 37,
+            "domain": "Gut",
+            "axis": "Gut Ecosystem",
+            "system": "Microbiome Diversity Network",
+            "scope": "microbial richness, ecosystem balance"
+          },
+          {
+            "number": 38,
+            "domain": "Gut",
+            "axis": "Gut Ecosystem",
+            "system": "Keystone Microbe Network",
+            "scope": "Akkermansia, Bifidobacterium ฯลฯ"
+          },
+          {
+            "number": 39,
+            "domain": "Gut",
+            "axis": "Microbial Metabolites",
+            "system": "SCFA Production Network",
+            "scope": "butyrate, acetate, propionate"
+          },
+          {
+            "number": 40,
+            "domain": "Gut",
+            "axis": "Gut Barrier",
+            "system": "Intestinal Barrier Integrity Network",
+            "scope": "tight junction, leaky gut, LPS"
+          },
+          {
+            "number": 41,
+            "domain": "Gut–Microbiome",
+            "axis": "Gut Barrier",
+            "system": "Mucosal Barrier Network",
+            "scope": "เยื่อบุลำไส้ ทางเดินหายใจ ช่องปาก ผิวหนัง และเยื่อบุทั้งหมดที่ทำหน้าที่เป็นด่านป้องกัน"
+          },
+          {
+            "number": 42,
+            "domain": "Gut–Microbiome",
+            "axis": "Endotoxin Load",
+            "system": "LPS–TLR4 Activation Network",
+            "scope": "การรั่วของ LPS จากลำไส้ กระตุ้น TLR4 → NF-κB → inflammation"
+          },
+          {
+            "number": 43,
+            "domain": "Gut–Microbiome",
+            "axis": "Microbial Metabolites",
+            "system": "Bile Acid–Microbiome Network",
+            "scope": "การเปลี่ยนแปลง bile acid โดยจุลินทรีย์ ส่งผลต่อ FXR, TGR5, ตับ และเมตาบอลิซึม"
+          },
+          {
+            "number": 44,
+            "domain": "Gut–Microbiome",
+            "axis": "Gut–Organ Axis",
+            "system": "Gut–Liver Axis Network",
+            "scope": "microbiome, LPS, bile acid, portal circulation เชื่อมลำไส้กับตับ"
+          },
+          {
+            "number": 45,
+            "domain": "Gut–Microbiome",
+            "axis": "Gut–Organ Axis",
+            "system": "Gut–Brain Axis Network",
+            "scope": "microbiome กระทบสมองผ่าน vagus nerve, cytokines, tryptophan, SCFA"
+          },
+          {
+            "number": 46,
+            "domain": "Gut–Microbiome",
+            "axis": "Gut–Organ Axis",
+            "system": "Gut–Immune Axis Network",
+            "scope": "microbiome ฝึกภูมิคุ้มกัน ควบคุม Treg, Th17, tolerance และ inflammation"
+          },
+          {
+            "number": 47,
+            "domain": "Genomic",
+            "axis": "DNA Integrity",
+            "system": "DNA Damage Surveillance Network",
+            "scope": "ตรวจจับ DNA damage ผ่าน ATM, ATR, p53, checkpoint ก่อนเกิด mutation"
+          },
+          {
+            "number": 48,
+            "domain": "Genomic",
+            "axis": "DNA Repair",
+            "system": "Base Excision Repair Network",
+            "scope": "ซ่อม DNA damage จาก oxidative stress เช่น 8-OHdG และ base lesions"
+          },
+          {
+            "number": 49,
+            "domain": "Genomic",
+            "axis": "DNA Repair",
+            "system": "Nucleotide Excision Repair Network",
+            "scope": "ซ่อม bulky DNA adducts, UV damage, chemical-induced DNA lesions"
+          },
+          {
+            "number": 50,
+            "domain": "Genomic",
+            "axis": "DNA Repair",
+            "system": "Double-Strand Break Repair Network",
+            "scope": "ซ่อม DNA แตกสองสายผ่าน homologous recombination และ NHEJ"
+          },
+          {
+            "number": 51,
+            "domain": "Genomic",
+            "axis": "Genomic Stability",
+            "system": "Chromosomal Stability Network",
+            "scope": "ป้องกัน chromosomal instability, aneuploidy, mutation accumulation"
+          },
+          {
+            "number": 52,
+            "domain": "Genomic",
+            "axis": "Telomere Biology",
+            "system": "Telomere Maintenance Network",
+            "scope": "ควบคุม telomere length, shelterin complex, telomerase และ biological aging"
+          },
+          {
+            "number": 53,
+            "domain": "Genomic",
+            "axis": "Epigenetics",
+            "system": "DNA Methylation Programming Network",
+            "scope": "ควบคุมการเปิด–ปิดยีนผ่าน methylation และ epigenetic memory"
+          },
+          {
+            "number": 54,
+            "domain": "Genomic",
+            "axis": "Epigenetics",
+            "system": "Histone Modification Network",
+            "scope": "histone acetylation/methylation ควบคุม chromatin และ gene accessibility"
+          },
+          {
+            "number": 55,
+            "domain": "Genomic",
+            "axis": "Epigenetics",
+            "system": "Chromatin Remodeling Network",
+            "scope": "การจัดโครงสร้าง chromatin ให้ยีนบางชุดเปิดหรือปิดตามบริบท"
+          },
+          {
+            "number": 56,
+            "domain": "Genomic",
+            "axis": "RNA Regulation",
+            "system": "MicroRNA Regulatory Network",
+            "scope": "miRNA ควบคุม post-transcriptional gene expression และ phenotype"
+          },
+          {
+            "number": 57,
+            "domain": "Genomic",
+            "axis": "Gene Expression",
+            "system": "Transcription Factor Network",
+            "scope": "NRF2, FOXO, NF-κB, HIF-1α, MYC ควบคุมโปรแกรมชีวภาพหลัก"
+          },
+          {
+            "number": 58,
+            "domain": "Genomic",
+            "axis": "Gene Expression",
+            "system": "Gene Expression Coordination Network",
+            "scope": "การประสานยีนหลายชุดให้เกิด response เช่น detox, repair, inflammation"
+          },
+          {
+            "number": 59,
+            "domain": "Genomic",
+            "axis": "Circadian Genomics",
+            "system": "Circadian Gene Regulation Network",
+            "scope": "CLOCK, BMAL1, PER, CRY ควบคุมเวลาชีวภาพของยีนและเมตาบอลิซึม"
+          },
+          {
+            "number": 60,
+            "domain": "Genomic",
+            "axis": "Cellular Identity",
+            "system": "Cellular Identity Maintenance Network",
+            "scope": "รักษา cell fate, phenotype, differentiation state ไม่ให้หลุดสมดุล"
+          },
+          {
+            "number": 61,
+            "domain": "Longevity",
+            "axis": "Sirtuin Pathway",
+            "system": "Sirtuin–NAD⁺ Longevity Network",
+            "scope": "SIRT1–7, NAD⁺, mitochondrial function, stress resistance และ aging control"
+          },
+          {
+            "number": 62,
+            "domain": "Longevity",
+            "axis": "FOXO Pathway",
+            "system": "FOXO Adaptive Survival Network",
+            "scope": "FOXO1/3 ควบคุม stress response, antioxidant, autophagy และ longevity"
+          },
+          {
+            "number": 63,
+            "domain": "Longevity",
+            "axis": "Growth–Repair Balance",
+            "system": "IGF–Growth Regulation Network",
+            "scope": "IGF-1, mTOR, growth signaling และ trade-off ระหว่าง growth กับ longevity"
+          },
+          {
+            "number": 64,
+            "domain": "Longevity",
+            "axis": "Senescence",
+            "system": "Cellular Senescence Control Network",
+            "scope": "p16, p21, p53 ควบคุมเซลล์ชรา หยุดแบ่ง หรือเข้าสู่ repair/removal"
+          },
+          {
+            "number": 65,
+            "domain": "Longevity",
+            "axis": "SASP",
+            "system": "SASP Inflammatory Secretome Network",
+            "scope": "senescent cells หลั่ง IL-6, TNF-α, MMPs ทำให้เกิด inflammaging"
+          },
+          {
+            "number": 66,
+            "domain": "Longevity",
+            "axis": "Biological Aging",
+            "system": "Biological Age Regulation Network",
+            "scope": "รวม epigenetic age, telomere, mitochondria, inflammation, proteostasis"
+          },
+          {
+            "number": 67,
+            "domain": "Cellular Clearance",
+            "axis": "Autophagy",
+            "system": "Autophagy Initiation Network",
+            "scope": "การเริ่ม autophagy ผ่าน AMPK, mTOR, ULK1 เพื่อล้างของเสียในเซลล์"
+          },
+          {
+            "number": 68,
+            "domain": "Cellular Clearance",
+            "axis": "Autophagy",
+            "system": "Autophagy Flux Network",
+            "scope": "การไหลของ autophagy ตั้งแต่ autophagosome → lysosome → degradation"
+          },
+          {
+            "number": 69,
+            "domain": "Cellular Clearance",
+            "axis": "Mitophagy",
+            "system": "Mitophagy Network",
+            "scope": "กำจัด mitochondria เสีย ลด ROS และรักษาคุณภาพพลังงาน"
+          },
+          {
+            "number": 70,
+            "domain": "Cellular Clearance",
+            "axis": "Lysosome",
+            "system": "Lysosomal Degradation Network",
+            "scope": "ระบบย่อยสลายภายในเซลล์ กำจัด protein, organelle, waste"
+          },
+          {
+            "number": 71,
+            "domain": "Proteostasis",
+            "axis": "Protein Folding",
+            "system": "Chaperone Protein Folding Network",
+            "scope": "HSPs และ chaperones ช่วยพับโปรตีนให้ถูกต้อง ลด misfolding"
+          },
+          {
+            "number": 72,
+            "domain": "Proteostasis",
+            "axis": "ER Stress",
+            "system": "ER Stress–UPR Network",
+            "scope": "unfolded protein response, PERK, IRE1, ATF6 คุม ER stress"
+          },
+          {
+            "number": 73,
+            "domain": "Proteostasis",
+            "axis": "Proteasome",
+            "system": "Ubiquitin–Proteasome Network",
+            "scope": "ติด ubiquitin และย่อยโปรตีนเสียผ่าน proteasome"
+          },
+          {
+            "number": 74,
+            "domain": "Proteostasis",
+            "axis": "Protein Aggregation",
+            "system": "Proteotoxic Stress Network",
+            "scope": "ควบคุม protein aggregation, amyloid burden, oxidized proteins"
+          },
+          {
+            "number": 75,
+            "domain": "Repair",
+            "axis": "Wound Healing",
+            "system": "Wound Healing Transition Network",
+            "scope": "inflammatory phase → proliferation → remodeling ให้แผลหายอย่างถูกลำดับ"
+          },
+          {
+            "number": 76,
+            "domain": "Repair",
+            "axis": "Angiogenesis",
+            "system": "Angiogenesis Repair Network",
+            "scope": "VEGF, endothelial growth, new vessel formation เพื่อซ่อมเนื้อเยื่อ"
+          },
+          {
+            "number": 77,
+            "domain": "Repair",
+            "axis": "ECM Remodeling",
+            "system": "Extracellular Matrix Remodeling Network",
+            "scope": "collagen, elastin, fibronectin, MMPs, TIMPs ปรับโครงสร้างเนื้อเยื่อ"
+          },
+          {
+            "number": 78,
+            "domain": "Repair",
+            "axis": "Fibrosis",
+            "system": "Fibrosis Decision Network",
+            "scope": "ตัดสินผลลัพธ์ระหว่าง regeneration กับ fibrosis ผ่าน TGF-β, myofibroblast"
+          },
+          {
+            "number": 79,
+            "domain": "Repair",
+            "axis": "Stem Cell",
+            "system": "Stem Cell Activation Network",
+            "scope": "กระตุ้น stem/progenitor cells ให้ซ่อมเนื้อเยื่อและสร้างเซลล์ใหม่"
+          },
+          {
+            "number": 80,
+            "domain": "Repair",
+            "axis": "Regeneration",
+            "system": "Tissue Regeneration Integration Network",
+            "scope": "บูรณาการ stem cell, ECM, angiogenesis, immune resolution เพื่อสร้างเนื้อเยื่อใหม่"
+          },
+          {
+            "number": 81,
+            "domain": "Vascular",
+            "axis": "Endothelial Function",
+            "system": "Endothelial Integrity Network",
+            "scope": "ควบคุมความสมบูรณ์ของ endothelial cell, glycocalyx, vascular permeability และการป้องกันหลอดเลือดเสื่อม"
+          },
+          {
+            "number": 82,
+            "domain": "Vascular",
+            "axis": "Endothelial Function",
+            "system": "Nitric Oxide Signaling Network",
+            "scope": "eNOS, NO bioavailability, vasodilation, blood flow regulation และ endothelial protection"
+          },
+          {
+            "number": 83,
+            "domain": "Vascular",
+            "axis": "Microcirculation",
+            "system": "Capillary Perfusion Network",
+            "scope": "การส่งเลือดระดับเส้นเลือดฝอย การนำ oxygen และ nutrient เข้าสู่เซลล์"
+          },
+          {
+            "number": 84,
+            "domain": "Vascular",
+            "axis": "Oxygen Delivery",
+            "system": "Tissue Oxygenation Network",
+            "scope": "oxygen transport, diffusion gradient และ tissue oxygen utilization"
+          },
+          {
+            "number": 85,
+            "domain": "Vascular",
+            "axis": "Angiogenesis",
+            "system": "Physiological Angiogenesis Network",
+            "scope": "VEGF signaling, vessel formation และ tissue repair"
+          },
+          {
+            "number": 86,
+            "domain": "Vascular",
+            "axis": "Vascular Remodeling",
+            "system": "Vascular Adaptation Network",
+            "scope": "การปรับตัวของหลอดเลือดต่อ shear stress, BP และ metabolic demand"
+          },
+          {
+            "number": 87,
+            "domain": "Vascular",
+            "axis": "Hemostasis",
+            "system": "Platelet Activation Network",
+            "scope": "platelet adhesion, aggregation และ clot initiation"
+          },
+          {
+            "number": 88,
+            "domain": "Vascular",
+            "axis": "Hemostasis",
+            "system": "Coagulation Cascade Network",
+            "scope": "intrinsic/extrinsic pathway, thrombin generation และ fibrin formation"
+          },
+          {
+            "number": 89,
+            "domain": "Vascular",
+            "axis": "Hemostasis",
+            "system": "Fibrinolytic Network",
+            "scope": "plasmin activation, clot resolution และ vascular clearance"
+          },
+          {
+            "number": 90,
+            "domain": "Vascular",
+            "axis": "Inflammation",
+            "system": "Endothelial Inflammation Network",
+            "scope": "VCAM-1, ICAM-1, leukocyte adhesion และ atherosclerosis initiation"
+          },
+          {
+            "number": 91,
+            "domain": "Vascular",
+            "axis": "Blood Pressure",
+            "system": "RAAS Regulation Network",
+            "scope": "renin–angiotensin–aldosterone control, sodium retention และ BP homeostasis"
+          },
+          {
+            "number": 92,
+            "domain": "Vascular",
+            "axis": "Blood Pressure",
+            "system": "Vascular Tone Network",
+            "scope": "sympathetic control, NO signaling และ vascular resistance"
+          },
+          {
+            "number": 93,
+            "domain": "Vascular",
+            "axis": "Arterial Elasticity",
+            "system": "Arterial Compliance Network",
+            "scope": "vascular stiffness, pulse wave velocity และ vascular aging"
+          },
+          {
+            "number": 94,
+            "domain": "Vascular",
+            "axis": "Cardiac Function",
+            "system": "Cardiac Contractility Network",
+            "scope": "myocardial contraction, calcium handling และ cardiac output"
+          },
+          {
+            "number": 95,
+            "domain": "Vascular",
+            "axis": "Cardiac Function",
+            "system": "Cardiac Electrophysiology Network",
+            "scope": "SA node, AV node, conduction pathway และ arrhythmia biology"
+          },
+          {
+            "number": 96,
+            "domain": "Vascular",
+            "axis": "Cardiac Energy",
+            "system": "Cardiac Bioenergetics Network",
+            "scope": "ATP production, fatty acid oxidation และ myocardial energetics"
+          },
+          {
+            "number": 97,
+            "domain": "Vascular",
+            "axis": "Cardiac Remodeling",
+            "system": "Cardiac Stress Adaptation Network",
+            "scope": "hypertrophy, remodeling, fibrosis และ heart failure progression"
+          },
+          {
+            "number": 98,
+            "domain": "Vascular",
+            "axis": "Cardio–Renal Axis",
+            "system": "Cardio–Renal Integration Network",
+            "scope": "interaction ระหว่าง heart output, renal perfusion และ fluid balance"
+          },
+          {
+            "number": 99,
+            "domain": "Vascular",
+            "axis": "Cardio–Pulmonary Axis",
+            "system": "Cardio–Pulmonary Integration Network",
+            "scope": "oxygen delivery, pulmonary circulation และ systemic perfusion"
+          },
+          {
+            "number": 100,
+            "domain": "Vascular",
+            "axis": "Functional Reserve",
+            "system": "Cardiovascular Reserve Network",
+            "scope": "reserve capacity ของหัวใจและหลอดเลือดภายใต้ stress และ exercise"
+          },
+          {
+            "number": 101,
+            "domain": "Neuroendocrine",
+            "axis": "Autonomic Balance",
+            "system": "Sympathetic Regulation Network",
+            "scope": "fight-or-flight response, catecholamine release และ metabolic mobilization"
+          },
+          {
+            "number": 102,
+            "domain": "Neuroendocrine",
+            "axis": "Autonomic Balance",
+            "system": "Parasympathetic Regulation Network",
+            "scope": "vagal activity, recovery mode และ inflammatory suppression"
+          },
+          {
+            "number": 103,
+            "domain": "Neuroendocrine",
+            "axis": "Vagal Axis",
+            "system": "Cholinergic Anti-inflammatory Network",
+            "scope": "vagus nerve mediated immune regulation"
+          },
+          {
+            "number": 104,
+            "domain": "Neuroendocrine",
+            "axis": "Stress Response",
+            "system": "HPA Axis Network",
+            "scope": "hypothalamus–pituitary–adrenal axis และ cortisol regulation"
+          },
+          {
+            "number": 105,
+            "domain": "Neuroendocrine",
+            "axis": "Stress Response",
+            "system": "Catecholamine Response Network",
+            "scope": "adrenaline, noradrenaline และ acute stress adaptation"
+          },
+          {
+            "number": 106,
+            "domain": "Neuroendocrine",
+            "axis": "Thyroid Function",
+            "system": "Thyroid Hormone Regulation Network",
+            "scope": "TSH, T3, T4 และ metabolic rate control"
+          },
+          {
+            "number": 107,
+            "domain": "Neuroendocrine",
+            "axis": "Growth Axis",
+            "system": "Growth Hormone–IGF Network",
+            "scope": "growth, regeneration และ anabolic signaling"
+          },
+          {
+            "number": 108,
+            "domain": "Neuroendocrine",
+            "axis": "Reproductive Axis",
+            "system": "HPG Axis Network",
+            "scope": "gonadal hormones, fertility และ reproductive physiology"
+          },
+          {
+            "number": 109,
+            "domain": "Neuroendocrine",
+            "axis": "Circadian Biology",
+            "system": "Circadian Synchronization Network",
+            "scope": "CLOCK–BMAL1 regulation และ systemic biological timing"
+          },
+          {
+            "number": 110,
+            "domain": "Neuroendocrine",
+            "axis": "Sleep Biology",
+            "system": "Sleep Architecture Network",
+            "scope": "REM, NREM, sleep cycles และ recovery physiology"
+          },
+          {
+            "number": 111,
+            "domain": "Neurocognitive",
+            "axis": "Brain Energy",
+            "system": "Brain Energy Metabolism Network",
+            "scope": "neuronal glucose utilization, ketone metabolism และ ATP production"
+          },
+          {
+            "number": 112,
+            "domain": "Neurocognitive",
+            "axis": "Brain Clearance",
+            "system": "Glymphatic Clearance Network",
+            "scope": "beta-amyloid clearance, metabolic waste removal ระหว่างการนอน"
+          },
+          {
+            "number": 113,
+            "domain": "Neurocognitive",
+            "axis": "Neuroimmune",
+            "system": "Neuroimmune Communication Network",
+            "scope": "cytokine–brain interaction และ sickness behavior"
+          },
+          {
+            "number": 114,
+            "domain": "Neurocognitive",
+            "axis": "Neuroinflammation",
+            "system": "Microglial Regulation Network",
+            "scope": "neuroinflammatory tone และ neurodegeneration risk"
+          },
+          {
+            "number": 115,
+            "domain": "Neurocognitive",
+            "axis": "Synaptic Function",
+            "system": "Synaptic Plasticity Network",
+            "scope": "learning, memory และ adaptive rewiring"
+          },
+          {
+            "number": 116,
+            "domain": "Neurocognitive",
+            "axis": "Memory",
+            "system": "Memory Consolidation Network",
+            "scope": "hippocampal function และ long-term memory storage"
+          },
+          {
+            "number": 117,
+            "domain": "Neurocognitive",
+            "axis": "Executive Function",
+            "system": "Cognitive Control Network",
+            "scope": "planning, attention, inhibition และ decision making"
+          },
+          {
+            "number": 118,
+            "domain": "Neurocognitive",
+            "axis": "Emotional Regulation",
+            "system": "Limbic Balance Network",
+            "scope": "amygdala, hippocampus, emotional adaptation"
+          },
+          {
+            "number": 119,
+            "domain": "Neurocognitive",
+            "axis": "Reward System",
+            "system": "Dopaminergic Reward Network",
+            "scope": "motivation, addiction biology และ behavioral drive"
+          },
+          {
+            "number": 120,
+            "domain": "Neurocognitive",
+            "axis": "CELA",
+            "system": "Cognitive–Emotional Loop Architecture (CELA) Network",
+            "scope": "thought loops, rumination, stress amplification, HPA activation, microbiome interaction และ chronic disease propagation"
+          },
+          {
+            "number": 121,
+            "domain": "Organ Resilience",
+            "axis": "Liver Functional Reserve",
+            "system": "Hepatic Detoxification Network",
+            "scope": "ระบบตับในการเปลี่ยนสารพิษ ยา สารเคมี แอมโมเนีย และ metabolic waste ให้ขับออกได้ผ่าน Phase I/II/III และ bile excretion"
+          },
+          {
+            "number": 122,
+            "domain": "Organ Resilience",
+            "axis": "Liver Metabolic Reserve",
+            "system": "Hepatic Metabolic Network",
+            "scope": "ควบคุม glucose, lipid, amino acid, cholesterol และ bile acid metabolism เป็นศูนย์กลางของไขมันพอกตับ เบาหวาน และ metabolic syndrome"
+          },
+          {
+            "number": 123,
+            "domain": "Organ Resilience",
+            "axis": "Liver Repair",
+            "system": "Hepatic Regeneration Network",
+            "scope": "การฟื้นฟู hepatocyte หลัง inflammation, toxic injury, viral injury หรือ ischemic injury ผ่าน growth factors, stem/progenitor signals และ immune resolution"
+          },
+          {
+            "number": 124,
+            "domain": "Organ Resilience",
+            "axis": "Liver Fibrosis",
+            "system": "Hepatic Fibrosis Regulation Network",
+            "scope": "ควบคุม hepatic stellate cell, collagen deposition, ECM remodeling, cirrhosis progression และความสามารถกลับจาก fibrosis สู่ regeneration"
+          },
+          {
+            "number": 125,
+            "domain": "Organ Resilience",
+            "axis": "Bile Dynamics",
+            "system": "Bile Flow Regulation Network",
+            "scope": "ระบบสร้าง ระบาย และหมุนเวียนน้ำดี ครอบคลุม bile acid pool, gallbladder contraction, cholestasis, gallstone และ enterohepatic circulation"
+          },
+          {
+            "number": 126,
+            "domain": "Organ Resilience",
+            "axis": "Kidney Filtration",
+            "system": "Renal Filtration Network",
+            "scope": "ระบบกรองของเสียผ่าน glomerulus, eGFR, albuminuria, uremic toxin และ renal microcirculation"
+          },
+          {
+            "number": 127,
+            "domain": "Organ Resilience",
+            "axis": "Tubular Function",
+            "system": "Renal Tubular Transport Network",
+            "scope": "การดูดกลับ sodium, potassium, glucose, amino acid, bicarbonate และการขับกรด/สารพิษผ่าน proximal/distal tubule"
+          },
+          {
+            "number": 128,
+            "domain": "Organ Resilience",
+            "axis": "Acid–Base Balance",
+            "system": "Acid–Base Homeostasis Network",
+            "scope": "รักษา pH เลือดผ่าน bicarbonate buffer, renal acid excretion, respiratory compensation และ metabolic acidosis"
+          },
+          {
+            "number": 129,
+            "domain": "Organ Resilience",
+            "axis": "Fluid–Electrolyte Balance",
+            "system": "Fluid–Electrolyte Regulation Network",
+            "scope": "ควบคุมน้ำ เกลือแร่ sodium, potassium, magnesium, calcium และ volume status เชื่อมกับไต หัวใจ adrenal และ RAAS"
+          },
+          {
+            "number": 130,
+            "domain": "Organ Resilience",
+            "axis": "Cardio–Renal Axis",
+            "system": "Cardio–Renal Integration Network",
+            "scope": "ความสัมพันธ์ระหว่างหัวใจ ไต ความดัน น้ำคั่ง renal perfusion และ heart failure–kidney failure loop"
+          },
+          {
+            "number": 131,
+            "domain": "Digestive–Organ Function",
+            "axis": "GI Motility",
+            "system": "Gastrointestinal Motility Network",
+            "scope": "ควบคุม gastric emptying, intestinal peristalsis, colon transit, constipation, IBS และ autonomic–enteric nervous system"
+          },
+          {
+            "number": 132,
+            "domain": "Digestive–Organ Function",
+            "axis": "Nutrient Absorption",
+            "system": "Nutrient Absorption Network",
+            "scope": "ดูดซึม glucose, amino acids, fatty acids, bile-soluble vitamins, minerals และความผิดปกติแบบ malabsorption"
+          },
+          {
+            "number": 133,
+            "domain": "Digestive–Organ Function",
+            "axis": "Enteric Nervous System",
+            "system": "Enteric Nervous System Network",
+            "scope": "ระบบประสาทลำไส้ ควบคุม motility, secretion, visceral pain, gut–brain signaling และ stress-related gut disorder"
+          },
+          {
+            "number": 134,
+            "domain": "Digestive–Organ Function",
+            "axis": "Pancreatic Endocrine",
+            "system": "Pancreatic Endocrine Network",
+            "scope": "beta-cell insulin, alpha-cell glucagon, incretin response, insulin reserve และ beta-cell exhaustion"
+          },
+          {
+            "number": 135,
+            "domain": "Digestive–Organ Function",
+            "axis": "Pancreatic Exocrine",
+            "system": "Pancreatic Exocrine Network",
+            "scope": "การหลั่ง amylase, lipase, protease, bicarbonate เพื่อย่อยอาหาร เชื่อมกับ pancreatic insufficiency และ dyspepsia"
+          },
+          {
+            "number": 136,
+            "domain": "Digestive–Organ Function",
+            "axis": "Gallbladder Function",
+            "system": "Gallbladder Motility Network",
+            "scope": "การบีบตัวของถุงน้ำดี การปล่อยน้ำดีหลังอาหาร ไขมัน digestion, bile stasis และ gallstone formation"
+          },
+          {
+            "number": 137,
+            "domain": "Respiratory",
+            "axis": "Gas Exchange",
+            "system": "Pulmonary Gas Exchange Network",
+            "scope": "การแลกเปลี่ยน O₂/CO₂ ผ่าน alveoli, diffusion capacity, ventilation–perfusion matching และ hypoxia"
+          },
+          {
+            "number": 138,
+            "domain": "Respiratory",
+            "axis": "Pulmonary Defense",
+            "system": "Pulmonary Immune Defense Network",
+            "scope": "macrophage, mucociliary clearance, antimicrobial peptide, antiviral defense และ airway inflammation"
+          },
+          {
+            "number": 139,
+            "domain": "Respiratory",
+            "axis": "Pulmonary Repair",
+            "system": "Pulmonary Epithelial Repair Network",
+            "scope": "การซ่อมเยื่อบุหลอดลมและถุงลมหลัง infection, pollution, inflammation หรือ fibrosis"
+          },
+          {
+            "number": 140,
+            "domain": "Respiratory–Circulation",
+            "axis": "Cardio–Pulmonary Integration",
+            "system": "Cardio–Pulmonary Oxygen Delivery Network",
+            "scope": "การบูรณาการปอด หัวใจ เลือด และหลอดเลือดเพื่อส่ง oxygen ไปยัง tissue และ mitochondria"
+          },
+          {
+            "number": 141,
+            "domain": "Structural Biology",
+            "axis": "Muscle Integrity",
+            "system": "Muscle Protein Turnover Network",
+            "scope": "สมดุล muscle protein synthesis/breakdown, mTOR, ubiquitin-proteasome, sarcopenia และ muscle wasting"
+          },
+          {
+            "number": 142,
+            "domain": "Structural Biology",
+            "axis": "Muscle Regeneration",
+            "system": "Myogenesis Network",
+            "scope": "satellite cell activation, myoblast differentiation, muscle repair หลัง injury, aging หรือ inflammation"
+          },
+          {
+            "number": 143,
+            "domain": "Structural Biology",
+            "axis": "Bone Remodeling",
+            "system": "Bone Remodeling Network",
+            "scope": "สมดุล osteoblast–osteoclast, bone formation/resorption, osteoporosis และ bone–immune interaction"
+          },
+          {
+            "number": 144,
+            "domain": "Structural Biology",
+            "axis": "Mineral Homeostasis",
+            "system": "Bone Mineral Homeostasis Network",
+            "scope": "ควบคุม calcium, phosphate, vitamin D, PTH, magnesium และ mineralization ของกระดูก"
+          },
+          {
+            "number": 145,
+            "domain": "Structural Biology",
+            "axis": "Cartilage Matrix",
+            "system": "Cartilage Matrix Network",
+            "scope": "chondrocyte, collagen II, aggrecan, MMPs, cartilage degradation และ osteoarthritis progression"
+          },
+          {
+            "number": 146,
+            "domain": "Structural Biology",
+            "axis": "Joint Homeostasis",
+            "system": "Synovial Joint Homeostasis Network",
+            "scope": "synovial fluid, joint lubrication, synovial inflammation, pain mediator และข้อเสื่อม"
+          },
+          {
+            "number": 147,
+            "domain": "Structural Biology",
+            "axis": "Tendon–Ligament Integrity",
+            "system": "Tendon–Ligament Integrity Network",
+            "scope": "collagen alignment, tendon ECM, ligament resilience, stiffness, injury repair และ chronic tendinopathy"
+          },
+          {
+            "number": 148,
+            "domain": "Structural Biology",
+            "axis": "Fascia–Mechanics",
+            "system": "Fascial Communication Network",
+            "scope": "fascia sliding, mechanotransduction, force transmission, myofascial pain และ structural connectivity"
+          },
+          {
+            "number": 149,
+            "domain": "Barrier–Structural",
+            "axis": "Skin Integrity",
+            "system": "Skin Barrier & Repair Network",
+            "scope": "epidermal barrier, antimicrobial defense, wound healing, collagen remodeling และ inflammatory skin disorders"
+          },
+          {
+            "number": 150,
+            "domain": "Fluid–Immune Transport",
+            "axis": "Lymphatic Drainage",
+            "system": "Lymphatic Clearance Network",
+            "scope": "lymph flow, interstitial fluid drainage, immune trafficking, edema resolution และ toxin clearance"
+          },
+          {
+            "number": 151,
+            "domain": "Oncology",
+            "axis": "Cell Cycle Control",
+            "system": "Cell Cycle Control Network",
+            "scope": "cyclin, CDK, checkpoint G1/S/G2/M, uncontrolled proliferation และ cancer initiation"
+          },
+          {
+            "number": 152,
+            "domain": "Oncology",
+            "axis": "Tumor Suppression",
+            "system": "Tumor Suppressor Network",
+            "scope": "p53, RB, PTEN, APC, DNA checkpoint และการหยุดเซลล์ผิดปกติก่อนเกิด malignancy"
+          },
+          {
+            "number": 153,
+            "domain": "Oncology",
+            "axis": "Apoptosis",
+            "system": "Apoptosis Execution Network",
+            "scope": "intrinsic/extrinsic apoptosis, caspase cascade, mitochondrial apoptosis และ cancer cell clearance"
+          },
+          {
+            "number": 154,
+            "domain": "Oncology",
+            "axis": "Cancer Stemness",
+            "system": "Cancer Stem Cell Network",
+            "scope": "self-renewal, tumor initiation, recurrence, drug resistance และ stem-like phenotype"
+          },
+          {
+            "number": 155,
+            "domain": "Oncology",
+            "axis": "Tumor Microenvironment",
+            "system": "Tumor Microenvironment Network",
+            "scope": "CAF, stromal cells, ECM, hypoxia, inflammatory niche และ immune suppression รอบก้อนมะเร็ง"
+          },
+          {
+            "number": 156,
+            "domain": "Oncology",
+            "axis": "Immune Surveillance",
+            "system": "Anti-Cancer Immune Surveillance Network",
+            "scope": "NK cell, CD8 T cell, dendritic cell, antigen presentation และ tumor elimination"
+          },
+          {
+            "number": 157,
+            "domain": "Oncology",
+            "axis": "Immune Escape",
+            "system": "Immune Escape Network",
+            "scope": "PD-1/PD-L1, CTLA-4, Treg, MDSC, immune exhaustion และ tumor immune evasion"
+          },
+          {
+            "number": 158,
+            "domain": "Oncology",
+            "axis": "Cancer Metabolism",
+            "system": "Cancer Metabolic Reprogramming Network",
+            "scope": "Warburg effect, glutamine addiction, lipid metabolism, mitochondrial rewiring และ tumor survival"
+          },
+          {
+            "number": 159,
+            "domain": "Oncology",
+            "axis": "EMT–Metastasis",
+            "system": "EMT & Metastatic Dissemination Network",
+            "scope": "epithelial–mesenchymal transition, invasion, migration, CTC survival และ organ colonization"
+          },
+          {
+            "number": 160,
+            "domain": "Oncology",
+            "axis": "Evolution–Resistance",
+            "system": "Cancer Evolution & Resistance Network",
+            "scope": "clonal selection, mutation pressure, adaptive resistance, relapse และ treatment escape"
+          },
+          {
+            "number": 161,
+            "domain": "Glycation & Aging",
+            "axis": "AGE Biology",
+            "system": "AGE Formation Network",
+            "scope": "การเกิด Advanced Glycation End Products จากน้ำตาลเกินสะสมในโปรตีน ไขมัน และ DNA ส่งผลต่อหลอดเลือด ไต สมอง และ aging"
+          },
+          {
+            "number": 162,
+            "domain": "Glycation & Aging",
+            "axis": "Carbonyl Stress",
+            "system": "Carbonyl Stress Network",
+            "scope": "การสะสม reactive carbonyl compounds ที่ทำให้เกิด protein dysfunction และ chronic degeneration"
+          },
+          {
+            "number": 163,
+            "domain": "Glycation & Aging",
+            "axis": "Protein Damage",
+            "system": "Protein Crosslinking Network",
+            "scope": "การเชื่อมข้ามของ collagen และ protein ทำให้เนื้อเยื่อแข็ง เสื่อม และสูญเสีย elasticity"
+          },
+          {
+            "number": 164,
+            "domain": "Hematology",
+            "axis": "Hematopoiesis",
+            "system": "Bone Marrow Hematopoietic Network",
+            "scope": "การสร้างเม็ดเลือดแดง เม็ดเลือดขาว และเกล็ดเลือดจาก stem cell"
+          },
+          {
+            "number": 165,
+            "domain": "Hematology",
+            "axis": "Erythropoiesis",
+            "system": "Red Blood Cell Production Network",
+            "scope": "การสร้าง RBC, oxygen carrying capacity และ anemia biology"
+          },
+          {
+            "number": 166,
+            "domain": "Hematology",
+            "axis": "Leukopoiesis",
+            "system": "White Blood Cell Renewal Network",
+            "scope": "การสร้าง immune cells และ immune competence"
+          },
+          {
+            "number": 167,
+            "domain": "Hematology",
+            "axis": "Platelet Biology",
+            "system": "Platelet Renewal Network",
+            "scope": "megakaryocyte biology และ platelet turnover"
+          },
+          {
+            "number": 168,
+            "domain": "Sensory Biology",
+            "axis": "Visual System",
+            "system": "Retinal–Visual Network",
+            "scope": "retina, photoreceptor, optic nerve, visual processing และ retinal degeneration"
+          },
+          {
+            "number": 169,
+            "domain": "Sensory Biology",
+            "axis": "Auditory System",
+            "system": "Auditory Processing Network",
+            "scope": "cochlea, hearing transduction และ auditory neural pathways"
+          },
+          {
+            "number": 170,
+            "domain": "Sensory Biology",
+            "axis": "Olfactory System",
+            "system": "Olfactory Signaling Network",
+            "scope": "กลิ่น การรับรู้สารเคมี และ neuroimmune interaction ใน nasal mucosa"
+          },
+          {
+            "number": 171,
+            "domain": "Sensory Biology",
+            "axis": "Gustatory System",
+            "system": "Taste Perception Network",
+            "scope": "taste receptor biology และ nutrient sensing"
+          },
+          {
+            "number": 172,
+            "domain": "Reproductive Biology",
+            "axis": "Female Reproductive Function",
+            "system": "Ovarian Function Network",
+            "scope": "folliculogenesis, ovulation, reproductive hormone production"
+          },
+          {
+            "number": 173,
+            "domain": "Reproductive Biology",
+            "axis": "Female Reproductive Function",
+            "system": "Endometrial Cycling Network",
+            "scope": "menstrual cycle, implantation biology และ uterine receptivity"
+          },
+          {
+            "number": 174,
+            "domain": "Reproductive Biology",
+            "axis": "Male Reproductive Function",
+            "system": "Testicular Function Network",
+            "scope": "spermatogenesis, testosterone production และ fertility biology"
+          },
+          {
+            "number": 175,
+            "domain": "Reproductive Biology",
+            "axis": "Male Reproductive Function",
+            "system": "Prostate Homeostasis Network",
+            "scope": "prostate physiology, inflammation และ androgen response"
+          },
+          {
+            "number": 176,
+            "domain": "Barrier Systems",
+            "axis": "Oral–Mucosal Defense",
+            "system": "Oral Mucosal Defense Network",
+            "scope": "oral microbiome, salivary immunity, mucosal protection"
+          },
+          {
+            "number": 177,
+            "domain": "Barrier Systems",
+            "axis": "Upper Airway Defense",
+            "system": "Nasal–Sinus Defense Network",
+            "scope": "mucociliary clearance, pathogen trapping และ airway immunity"
+          },
+          {
+            "number": 178,
+            "domain": "Host Defense",
+            "axis": "Specialized Antiviral Defense",
+            "system": "Viral Restriction Network",
+            "scope": "interferon-stimulated genes, viral entry inhibition และ intracellular antiviral defense"
+          },
+          {
+            "number": 179,
+            "domain": "Host Defense",
+            "axis": "Specialized Anticancer Defense",
+            "system": "Tumor Elimination Network",
+            "scope": "NK cell, macrophage, cytotoxic T cell coordination ต่อเซลล์มะเร็ง"
+          },
+          {
+            "number": 180,
+            "domain": "System Integration",
+            "axis": "Whole-Life Integration",
+            "system": "Human Biological Integration Network",
+            "scope": "การบูรณาการทุก biological networks ให้เกิด physiological performance, adaptation และ health maintenance"
+          }
+        ]
+      }
+    },
+    "training_pairs": [
+      {
+        "id": "TP_001",
+        "question": "ทฤษฎีเวชศาสตร์รากฐานคืออะไร",
+        "answer": "ทฤษฎีเวชศาสตร์รากฐานคือการปฏิวัติแนวคิดเพื่ออนาคตสุขภาพมนุษยชาติ โดยมีรากฐานมาจากพระคัมภีร์สมุฏฐานวินิจฉัยของแพทย์แผนไทย และผสานกับความก้าวหน้าทางชีววิทยา ชีวะเคมี และการแพทย์สมัยใหม่ เพื่ออธิบายกลไกเดิมด้วยภาษาวิทยาศาสตร์ร่วมสมัย"
+      },
+      {
+        "id": "TP_002",
+        "question": "อะไรคือปัญหาหลักของการแพทย์สมัยใหม่ตามทฤษฎีเวชศาสตร์รากฐาน",
+        "answer": "การแพทย์สมัยใหม่มีรากฐานจากแนวคิดแบบกลไกที่มองร่างกายเสมือนเครื่องจักร ทำให้การรักษาเน้นไปที่การกำจัดอาการและการแก้ไขปัญหาเฉพาะหน้า โดยใช้ยาเคมีและการผ่าตัดเป็นหลัก ส่งผลให้เกิดวัฏจักรของความเจ็บป่วยที่ไม่มีที่สิ้นสุด และสูญเสียมุมมององค์รวมของสุขภาพ"
+      },
+      {
+        "id": "TP_003",
+        "question": "กุญแจ 3 ดอกของทฤษฎีเวชศาสตร์รากฐานคืออะไรบ้าง",
+        "answer": "กุญแจ 3 ดอกของทฤษฎีเวชศาสตร์รากฐานประกอบด้วย: 1) Metabolic Energy - การแสดงออกของปิตตะในระดับชีวเคมี 2) Biological Dynamics - การแสดงออกของเสมหะในฐานะหลักการแห่งการยึดเหนี่ยวและการตั้งอยู่ และ 3) Biointegrity - การแสดงออกของวาตะในฐานะหลักการของการเคลื่อนไหว การสื่อสาร และการประสานระบบ"
+      },
+      {
+        "id": "TP_004",
+        "question": "บันได 9 ขั้นของสุขภาวะคืออะไร",
+        "answer": "บันได 9 ขั้นคือลำดับตรรกะของการฟื้นฟูระบบชีวภาพจากพื้นที่สุดไปสู่ระดับยีนและสมดุลชีวิต ประกอบด้วย: 1) Detoxification, 2) Microbiome Ecosystem, 3) Immune–Inflammatory Regulation, 4) Redox Homeostasis & Oxidative Balance, 5) Enhance Metabolic Function & Mitochondria, 6) Autophagy & Cellular Clearance, 7) Genomic Stability & Proteostasis, 8) GENOMIC REGULATION HOMEOSTASIS, และ 9) PRAKATI (Bioelectrical & Physiological Coherence)"
+      },
+      {
+        "id": "TP_005",
+        "question": "ตรีธาตุสมุฏฐานคืออะไรและมีความสำคัญอย่างไร",
+        "answer": "ตรีธาตุสมุฏฐานคือการอธิบายองค์ประกอบพื้นฐานเริ่มแรกสุดของร่างกาย ผ่านสามัญลักษณะพื้นฐาน 3 ประการ ได้แก่ ปิตตะ (พลังงาน ความร้อน และการแปรเปลี่ยน), วาตะ (การเคลื่อนไหว การไหล การสั่น และความไม่หยุดนิ่ง), และเสมหะ (การยึดเหนี่ยว การเกาะกุม และการรวมตัวเป็นกลุ่มก้อน) ซึ่งเป็นรากฐานของสรรพสิ่งทั้งหมด และเป็นหัวใจของทฤษฎีเวชศาสตร์รากฐาน"
+      },
+      {
+        "id": "TP_006",
+        "question": "ทำไมการทำ Detoxification ต้องเป็นขั้นตอนแรกในบันได 9 ขั้น",
+        "answer": "การทำ Detoxification ต้องเป็นขั้นตอนแรกเพราะถ้ายังมี toxin overload อยู่ จะกระตุ้น oxidative stress, inflammation, และ mitochondrial dysfunction ต่อเนื่อง ทำให้การแก้ไขในชั้นบน ๆ ไม่ได้ผล สารพิษจำนวนมากยังรบกวน microbiome ทำให้การจัดจุลชีพจะไม่เสถียร"
+      },
+      {
+        "id": "TP_007",
+        "question": "Biointegrity คืออะไรและมีความสำคัญอย่างไร",
+        "answer": "Biointegrity คือความสามารถของร่างกายในการดำรงอยู่เป็นองค์รวมเดียวกัน ท่ามกลางระบบย่อยจำนวนมหาศาลที่ทำงานพร้อมกันตลอดเวลา เป็นการแสดงออกของวาตะในรูปแบบชีววิทยาเครือข่าย คือพลังของการประสานและควบรวมระบบต่าง ๆ ให้กลายเป็นชีวิตหนึ่งเดียว ครอบคลุมระบบประสาท ภูมิคุ้มกัน ต่อมไร้ท่อ ระบบไหลเวียนเลือด และระบบอื่น ๆ"
+      },
+      {
+        "id": "TP_008",
+        "question": "ความสัมพันธ์ระหว่างกุญแจ 3 ดอกและบันได 9 ขั้นเป็นอย่างไร",
+        "answer": "กุญแจ 3 ดอกคือมิติที่ต้องมอง (ฐาน–ไฟ–จังหวะ) ส่วนบันได 9 ขั้นคือลำดับในการฟื้นฟูระบบชีวภาพจากล่างขึ้นบน เมื่อเอาสองชั้นนี้มาซ้อนกันจึงกลายเป็น framework เวชศาสตร์รากฐานเต็มรูปแบบ โดยกุญแจ 3 ดอกเป็นกรอบการอธิบายและบันได 9 ขั้นเป็นแนวทางการปฏิบัติ"
+      },
+      {
+        "id": "TP_009",
+        "question": "12 Health Domains ของทฤษฎีเวชศาสตร์รากฐานคืออะไรบ้าง",
+        "answer": "12 Health Domains ประกอบด้วย: Digestive–Microbiome, Immune, Inflammatory, Redox, Metabolic, Mitochondrial, Genomic, Neuroendocrine, Cardiovascular, Regenerative, Longevity, และ Oncology"
+      },
+      {
+        "id": "TP_010",
+        "question": "อะไรคือความหมายของคำว่า 'สมุฏฐาน' ในบริบทของแพทย์แผนไทย",
+        "answer": "คำว่า 'สมุฏฐาน' ในบริบทของแพทย์แผนไทยมิได้หมายถึงสาเหตุเชิงเส้นตรงแบบเดียวกับคำว่า 'etiology' ในการแพทย์ตะวันตก แต่หมายถึงชุดของเงื่อนไขพื้นฐาน ที่ทำให้ร่างกายสามารถตั้งอยู่ ดำรงอยู่ และแปรเปลี่ยนได้ สมุฏฐานจึงเป็นทั้งเหตุแห่งการเกิดกาย เงื่อนไขแห่งการดำรงอยู่ และรากฐานของการแปรปรวนไปสู่โรค"
+      }
+    ],
+    "architecture_summary": {
+      "overall_framework": "ทฤษฎีเวชศาสตร์รากฐานเป็นระบบองค์ความรู้แบบองค์รวมที่พัฒนาจากการแพทย์แผนไทยดั้งเดิม ผนวกกับความก้าวหน้าทางชีวเคมีและการแพทย์สมัยใหม่",
+      "hierarchical_structure": {
+        "level_1": "3 Keys - มิติหลักของการมองสุขภาพ",
+        "level_2": "9 Steps - ลำดับการฟื้นฟูระบบชีวภาพ",
+        "level_3": "12 Domains - อาณาเขตหน้าที่ของชีวิต",
+        "level_4": "39 Biological Axes - แกนชีววิทยาหลัก",
+        "level_5": "180 Living Biological Networks - ระบบเครือข่ายชีวภาพที่ปฏิบัติการได้",
+        "level_6": "200 Phytochemical Modules - ชั้นการแทรกแซง"
+      },
+      "key_principles": [
+        "การมองโรคจากรากฐาน (root-based medicine) ไม่ใช่จากปลายเหตุ",
+        "การรักษาที่แท้จริงต้องแก้ที่สมุฏฐาน ไม่ใช่เพียงอาการ",
+        "สุขภาพคือภาวะที่เครือข่ายชีวภาพทั้ง 180 ระบบทำงานร่วมกันอย่างสมดุล",
+        "โรคคือการแสดงออกของความเสียหายหรือความเสียสมดุลของเครือข่ายชีวภาพ"
+      ]
+    }
+  }
+}

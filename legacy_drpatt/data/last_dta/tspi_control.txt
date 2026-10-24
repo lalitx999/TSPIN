@@ -1,0 +1,102 @@
+
+TSPI Official Module Registry – Domain Expert Responses
+1a. Module ↔ Product Definition
+For the TSPI system, a Module is equivalent to a Product.
+A module is not a protocol, bundle, or collection of multiple products.
+Each module represents one unique TSPI product.
+Therefore:
+1 Module = 1 Product
+If two records have the same product name, they refer to the same module/product, not different modules.
+There are no sub-modules or nested modules.
+1b. Duplicate Product Records
+If the same product appears under multiple module codes, it should be treated as the same product/module, not different modules.
+These duplicate records most likely resulted from different exports, legacy databases, or historical versions.
+The final registry should contain only one canonical record for each product/module.
+1c. Authoritative Module ID
+For the current development phase, please use the H-Code as the primary module identifier because it is simpler and is already widely used throughout the TSPI system.
+The official PhytoCore code will later become the permanent scientific identifier, but during development the H-Code should remain the primary key.
+1d. Position of Modules in the TSPI Framework
+Modules are the lowest layer of the TSPI biological architecture.
+The official hierarchy is:
+3 Keys → 9 Steps → 12 Domains → 39 Axes → 180 Biological Networks → 200 Phytochemical Modules
+Modules are independent entities but are connected to both:
+the 39 Axes, and
+the 180 Biological Networks.
+Each module should explicitly specify which biological axes it influences.
+1e. Number of Active Modules and Products
+I am currently updating the official registry.
+Once the latest version is completed, I will provide the final master file, which will contain:
+the official number of active products,
+the official number of active modules,
+archived/deprecated products,
+and the final authoritative registry.
+Please wait for the updated master file before finalizing these counts.
+2a. Axis A37 Has No Module
+Currently, Axis A37 does not yet have a dedicated module.
+I will assign the following existing modules to support A37:
+KS
+Kerra
+Vitalplus
+In the future, the system must support continuous expansion.
+As new scientific evidence becomes available, additional modules should be able to be added without requiring changes to the system architecture.
+The TSPI platform is designed to evolve continuously with future research.
+2b. Modules Without Axis Mapping
+These will be reviewed during the latest registry update.
+The final master file will resolve all missing mappings.
+2c. Conflicting Axis Mapping
+The conflicting mappings will also be corrected in the latest registry.
+Please use the updated master registry once it is released.
+2d. Primary vs Secondary Axis
+Each module contains its own list of associated 39 biological axes.
+During patient analysis, the AI identifies:
+Primary Axes
+Secondary Axes
+The AI may recommend modules associated with either the primary or secondary axes.
+However, the AI should function as a clinical decision support system, not an autonomous prescribing system.
+The treating physician will ultimately decide whether to prescribe:
+modules targeting only the primary axes,
+or modules targeting both primary and secondary axes,
+depending on the patient's overall biological condition.
+Over time, the AI should continuously learn from physician prescribing patterns.
+For example:
+Some physicians may prescribe only modules related to the primary axes.
+Others may combine primary and secondary axis modules.
+This learning process should improve future recommendations while preserving physician authority.
+3a. Axis vs Sub-Axis
+Modules should map directly to the 39 Axes.
+Sub-axis mapping is not required in the official module registry.
+3b. Dosing Source of Truth
+In general, dosing should follow the Severity Level (Level 0–3).
+However, several bowel regulation modules are exceptions because they require individualized dosing.
+These include:
+KS
+Be Lax
+Cathartic
+Lypholax
+Venta
+These modules should follow their own module-specific dosage:
+1–4 capsules before bedtime and again upon waking, depending on the patient's bowel condition.
+All other modules should use the standard Severity Level dosing.
+3c. Contraindications / Safety
+Contraindications and safety information should be stored within each module registry entry.
+Each module should maintain its own:
+contraindications,
+precautions,
+drug-herb interactions,
+warnings,
+and safety notes.
+This information should not be maintained as a completely separate database.
+3d. Canonical Module Identifier
+The official canonical scientific identifier should be the PhytoCore Code.
+Example:
+TSPI-CURCUMA-01
+This should become the long-term standardized identifier for all modules.
+3e. Canonical Language
+English should be the official canonical language for module names.
+Thai names can remain as localized display names but should not be used as the primary identifier.
+3f. Relationship Between Modules and the 180 Biological Networks
+Modules should map directly to the 39 Axes.
+The 180 Biological Networks serve as the biological knowledge layer within the TSPI framework, but the official module registry does not need to attach modules directly to individual biological networks.
+Each module should define its associated 39 Axes, while the Biological Networks remain an intermediate scientific layer that supports those axes.
+Overall Design Principle
+The TSPI platform is intended to be a living scientific system rather than a static database. The module registry should therefore be designed for continuous expansion as new phytochemical modules, biological mechanisms, and clinical evidence emerge. The AI architecture should support versioning, future module additions, and ongoing refinement without requiring changes to the core TSPI framework.

@@ -1,0 +1,89 @@
+{% extends 'layouts/doctor_base.html' %}
+
+{% block title %}สืบค้นงานวิจัยทางคลินิก (Knowledge RAG) - TSPI CLINIC{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6" x-data="{
+    query: '',
+    isSearching: false,
+    results: [
+        {
+            title: 'บทบาทของ NF-κB และ Inflammasome ในพยาธิกำเนิดของโรคสะเก็ดเงิน (Psoriasis Pathogenesis)',
+            source: 'TSPI Clinical Research Archive (38_tspi.txt & System Biology Vol. 4)',
+            excerpt: 'การกระตุ้นที่มากเกินไปของ NF-κB นำไปสู่การหลั่ง IL-6, TNF-α และ IL-17A อย่างต่อเนื่อง การใช้โมดูล KERRA ร่วมกับ MINOZA ช่วยลด Transcriptional Activity ของ NF-κB ได้อย่างมีนัยสำคัญ',
+            tags: ['A01: Systemic Inflammatory Load', 'A02: Immune Homeostasis', 'KERRA', 'MINOZA']
+        },
+        {
+            title: 'กลไกเยื่อบุผนังลำไส้รั่ว (Leaky Gut) กับการกระตุ้นการอักเสบเรื้อรังทั้งระบบ',
+            source: 'Clinical Protocol Phase 1: Gut Restoration & Tight Junction Repair',
+            excerpt: 'ระดับ Zonulin ที่สูงเกิน 38 ng/mL สะท้อนการคลายตัวของ Tight Junctions ในลำไส้ ส่งผลให้ Endotoxin (LPS) หลุดรอดเข้าสู่กระแสเลือด การใช้ CINNARA ร่วมกับ Probiotic Modules ฟื้นฟูสมดุลจุลินทรีย์ได้ภายใน 6-8 สัปดาห์',
+            tags: ['A19: Gut Barrier Integrity', 'Zonulin', 'CINNARA', 'Phase 1']
+        },
+        {
+            title: 'การฟื้นฟูความไวต่ออินซูลินและพลังงานไมโตคอนเดรียผ่าน AMPK Signaling',
+            source: 'Endocrine & Metabolic Core Integration Paper',
+            excerpt: 'โมดูล DB-1 ผสานสารสกัด Momordica charantia และสารสกัดมาตรฐาน มีฤทธิ์กระตุ้น AMPK Phosphorylation ปรับสมดุลกลูโคสในตับและลด Lipotoxicity ในเนื้อเยื่อตับ',
+            tags: ['A05: Glucose-Insulin Regulation', 'A08: Mitochondrial Network', 'DB1']
+        }
+    ]
+}">
+
+    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                    <i class="fas fa-book-medical mr-1"></i> Retrieval-Augmented Generation (RAG)
+                </span>
+                <span class="text-xs text-gray-400">ระบบสืบค้นเอกสารและงานวิจัยทางการแพทย์</span>
+            </div>
+            <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
+                สืบค้นองค์ความรู้และหลักฐานทางคลินิก (Knowledge RAG)
+            </h1>
+            <p class="text-sm text-gray-500 mt-0.5">
+                ค้นหาข้อมูลกลไกชีวเคมี เอกสารกำกับสูตรยา 200 โมดูล และผลการทดสอบทางคลินิก
+            </p>
+        </div>
+    </div>
+
+    <!-- Search Input Box -->
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
+        <div class="relative">
+            <input type="text" x-model="query" placeholder="พิมพ์คำค้นหา เช่น 'กลไกสะเก็ดเงิน', 'Kerra ข้อห้ามใช้', 'Zonulin', 'Insulin Resistance'..." class="w-full text-base bg-gray-50 border border-gray-200 rounded-xl pl-12 pr-28 py-3.5 text-gray-900 focus:ring-primary focus:border-primary">
+            <div class="absolute left-4 top-4 text-gray-400 text-lg">
+                <i class="fas fa-search"></i>
+            </div>
+            <button type="button" class="absolute right-2.5 top-2.5 px-5 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-all">
+                ค้นหา RAG
+            </button>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="font-medium">คำค้นยอดนิยม:</span>
+            <button @click="query = 'KERRA'" class="px-2.5 py-1 bg-gray-100 rounded-lg hover:bg-gray-200">KERRA</button>
+            <button @click="query = 'Zonulin Leaky Gut'" class="px-2.5 py-1 bg-gray-100 rounded-lg hover:bg-gray-200">Zonulin Leaky Gut</button>
+            <button @click="query = 'Phase 1 Detox'" class="px-2.5 py-1 bg-gray-100 rounded-lg hover:bg-gray-200">Phase 1 Detox</button>
+            <button @click="query = 'Mitochondrial Renewal'" class="px-2.5 py-1 bg-gray-100 rounded-lg hover:bg-gray-200">Mitochondrial Renewal</button>
+        </div>
+    </div>
+
+    <!-- Search Results List -->
+    <div class="space-y-4">
+        <template x-for="item in results" :key="item.title">
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
+                <div class="flex items-start justify-between gap-4">
+                    <h3 class="text-base font-semibold text-gray-900 leading-snug" x-text="item.title"></h3>
+                    <span class="text-xs px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 whitespace-nowrap font-medium">Verified Evidence</span>
+                </div>
+                <p class="text-xs text-gray-400 font-mono" x-text="item.source"></p>
+                <p class="text-sm text-gray-700 leading-relaxed bg-gray-50 p-3 rounded-xl border border-gray-100" x-text="item.excerpt"></p>
+                <div class="flex flex-wrap gap-1.5 pt-1">
+                    <template x-for="tag in item.tags" :key="tag">
+                        <span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-primary/10 text-primary border border-primary/20" x-text="tag"></span>
+                    </template>
+                </div>
+            </div>
+        </template>
+    </div>
+
+</div>
+{% endblock %}

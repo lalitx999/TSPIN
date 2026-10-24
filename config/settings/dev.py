@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv(
     'django-insecure-dev-key-never-use-this-in-production-min-50-characters-long'
 )
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'testserver']
 
 # Database: PostgreSQL with SQLite fallback for offline development
 DB_NAME = os.getenv('DB_NAME', 'drpatrcl_sys')

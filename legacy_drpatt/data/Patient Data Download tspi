@@ -1,0 +1,359 @@
+โครงสร้างสโคประบบสำหรับส่งให้วิศวกร AI / backend / product team เพื่อออกแบบฟีเจอร์ Patient Data Download & Export Layer ของแพลตฟอร์ม TSPI โดยกำหนดชัดว่า
+ผู้ป่วยดาวน์โหลดอะไรได้
+ดาวน์โหลดอะไรไม่ได้
+อะไรต้องขออนุมัติ
+อะไรเป็น raw data
+อะไรเป็น interpreted data
+อะไรเป็น IP ของระบบ
+ผมจะเขียนในรูปแบบ product + engineering scope ให้ใช้ต่อได้ทันที
+TSPI Patient Data Download System
+Product & Engineering Scope Document
+1. วัตถุประสงค์ของระบบ
+ระบบนี้มีเป้าหมายเพื่อให้ผู้ป่วยสามารถเข้าถึง ดาวน์โหลด และนำข้อมูลสุขภาพของตนเองออกไปใช้ต่อได้อย่างเป็นระบบ โดยข้อมูลที่เปิดให้ดาวน์โหลดต้องจำกัดเฉพาะข้อมูลที่เกี่ยวข้องกับตัวผู้ป่วยเอง และต้องอยู่ภายใต้กรอบ
+ความเป็นส่วนตัวของข้อมูล
+ความปลอดภัยทางคลินิก
+สิทธิของเจ้าของข้อมูล
+การคุ้มครองทรัพย์สินทางปัญญาของแพลตฟอร์ม TSPI
+ระบบนี้ต้องไม่เป็นเพียงปุ่ม “ดาวน์โหลด PDF” แต่ต้องเป็น layered data access architecture ที่แยกชัดระหว่าง
+patient-owned clinical data
+interpreted health report
+omics-derived personal results
+TSPI proprietary intelligence layers
+2. แนวคิดหลักของระบบ
+ให้มองข้อมูลใน TSPI เป็น 5 ชั้น
+Layer A — Patient Raw Clinical Record
+ข้อมูลดิบที่เป็นของผู้ป่วยโดยตรง
+Layer B — Patient Interpreted Clinical Summary
+ข้อมูลสรุปที่แปลผลจากข้อมูลดิบเพื่อให้ผู้ป่วยอ่านเข้าใจได้
+Layer C — Personal Omics Result Layer
+ผลการตรวจ microbiome / proteomics / genomics / metabolomics ที่เป็นของผู้ป่วย
+Layer D — AI-Derived Clinical Intelligence
+ผลวิเคราะห์ของ AI ที่เชื่อมโยงข้อมูลหลายมิติแล้วสร้าง risk mapping / module recommendation
+Layer E — TSPI Proprietary System Layer
+โครงตรรกะภายในของแพลตฟอร์ม เช่น scoring engine, ranking weights, model reasoning graph, internal confidence logic
+3. หลักการกำหนดสิทธิ์การดาวน์โหลด
+3.1 ดาวน์โหลดได้ทันที
+ข้อมูลที่เป็น patient-owned data และไม่มีความเสี่ยงต่อการเปิดเผย proprietary logic
+3.2 ดาวน์โหลดได้แบบแปลผล
+ข้อมูลที่เป็นผลเฉพาะบุคคล แต่ต้องถูกจัดรูปแบบและอธิบายก่อน
+3.3 ดาวน์โหลดได้เฉพาะบางส่วน
+ข้อมูลที่เป็นของผู้ป่วย แต่มีความเสี่ยงต่อการตีความผิดหรือเชื่อมโยงกับ intellectual property ของระบบ
+3.4 ดาวน์โหลดไม่ได้
+ข้อมูลที่เป็น internal AI reasoning, system scoring logic, model weights, ranking engine และข้อมูลที่อาจกระทบความปลอดภัยหรือทรัพย์สินทางปัญญาของ TSPI
+4. Layer-by-Layer Access Policy
+LAYER A
+Patient Raw Clinical Record
+สถานะ: ดาวน์โหลดได้
+นี่คือข้อมูลดิบทางคลินิกที่เป็นของผู้ป่วยโดยตรง
+ข้อมูลใน layer นี้
+demographic profile ของผู้ป่วย
+visit history
+diagnosis list
+medication history
+allergy history
+procedure history
+physician notes ที่เป็นส่วนของผู้ป่วย
+lab result values
+pathology reports
+radiology reports
+imaging metadata
+uploaded files ของผู้ป่วย
+voice transcript ที่เกี่ยวกับตัวผู้ป่วย
+consent history ของผู้ป่วย
+appointment history
+รูปแบบไฟล์ที่ควรดาวน์โหลดได้
+PDF
+CSV
+JSON
+FHIR-compatible export ในอนาคต
+หมายเหตุ
+ข้อมูลนี้ถือเป็น core patient-accessible layer และควรดาวน์โหลดได้ตลอดเวลา
+LAYER B
+Patient Interpreted Clinical Summary
+สถานะ: ดาวน์โหลดได้
+เป็นข้อมูลสรุปที่แพลตฟอร์มสร้างขึ้นจากข้อมูลดิบ เพื่อให้ผู้ป่วยอ่านเข้าใจง่ายขึ้น
+ข้อมูลใน layer นี้
+summary ผลเลือด
+summary แนวโน้มอาการ
+timeline การรักษา
+summary ผลการตรวจ imaging
+summary การใช้ยา
+summary clinical risk overview
+quality-of-life summary
+symptom trend report
+lifestyle adherence summary
+รูปแบบ
+PDF report
+dashboard snapshot
+text summary
+machine-readable summary JSON
+หมายเหตุ
+เลเยอร์นี้ควรเป็น patient-facing language ไม่ใช้ภาษาวิชาการเกินไป
+LAYER C
+Personal Omics Result Layer
+สถานะ: ดาวน์โหลดได้ “บางระดับ”
+ผล omics เป็นข้อมูลเฉพาะตัวผู้ป่วย แต่มีความละเอียดอ่อนสูง จึงต้องแบ่งย่อย
+C1. Microbiome Result
+สถานะ: ดาวน์โหลดได้
+ดาวน์โหลดได้
+microbiome composition summary
+relative abundance report
+diversity score
+dysbiosis summary
+beneficial vs harmful taxa summary
+personalized explanation report
+ดาวน์โหลดได้แบบ advanced
+OTU/ASV summary table
+abundance matrix
+annotated taxa list
+ควรซ่อน
+internal scoring model
+TSPI microbiome recommendation engine logic
+C2. Proteomics Result
+สถานะ: ดาวน์โหลดได้แบบแปลผล + partial raw export
+ดาวน์โหลดได้
+proteomic interpretation summary
+dysregulated pathway summary
+protein marker list ที่เกี่ยวกับผู้ป่วย
+response interpretation
+report PDF
+ดาวน์โหลดได้แบบ advanced
+normalized protein table
+selected marker intensity table
+ไม่ควรให้ดาวน์โหลดโดยตรง
+internal pathway scoring matrix
+system-level proteomic ranking algorithm
+proprietary panel weighting logic
+C3. Genomics / Exome / NGS Result
+สถานะ: ดาวน์โหลดได้แบบควบคุมสิทธิ์
+ดาวน์โหลดได้
+clinical genomic summary report
+actionable variants report
+carrier screening summary
+pharmacogenomic summary
+hereditary risk summary
+secondary findings report ตาม consent
+ดาวน์โหลดได้แบบ advanced เฉพาะเมื่อยืนยันตัวตนเพิ่ม
+VCF subset เฉพาะของผู้ป่วย
+clinically curated variant list
+pharmacogenomics alert card
+ไม่ควรให้ดาวน์โหลดตรงจากระบบผู้ใช้ทั่วไป
+raw FASTQ
+BAM/CRAM
+unfiltered variant universe
+internal annotation pipeline output เต็ม
+model-specific pathogenicity ranking
+เหตุผล
+ข้อมูลดิบระดับนี้มีความไวสูงมากและผู้ป่วยตีความเองผิดได้ง่าย
+C4. Metabolomics / Other Omics
+สถานะ: ดาวน์โหลดได้แบบคล้าย proteomics
+ดาวน์โหลดได้
+summary report
+biomarker profile
+pathway interpretation
+personalized lifestyle implication
+จำกัด
+raw machine output เต็ม
+internal classifier output
+cross-patient reference model
+LAYER D
+AI-Derived Clinical Intelligence
+สถานะ: ดาวน์โหลดได้เฉพาะ “ผลลัพธ์” แต่ไม่ใช่ “ตรรกะภายใน”
+นี่คือผลวิเคราะห์ที่เกิดจาก AI รวมข้อมูลหลายชั้นเข้าด้วยกัน
+ผู้ป่วยควรดาวน์โหลดได้
+AI-generated health summary
+personalized risk overview
+preventive recommendation summary
+module recommendation summary
+9-step ladder position summary
+selected 36-axis personal imbalance overview
+lifestyle blueprint summary
+follow-up recommendation summary
+ผู้ป่วยไม่ควรดาวน์โหลดได้
+internal chain of reasoning
+confidence weighting
+model prompt structure
+cross-feature importance matrix
+clinician override logic
+intervention ranking engine
+recommendation priority graph
+hidden disease-probability engine
+internal confidence thresholds
+หมายเหตุ
+ผู้ป่วยควรเห็น “ผลที่เป็นประโยชน์ต่อเขา” แต่ไม่ควรเห็น “AI brain internals”
+LAYER E
+TSPI Proprietary System Layer
+สถานะ: ดาวน์โหลดไม่ได้
+นี่คือทรัพย์สินทางปัญญาของ TSPI
+ห้าม export ออกให้ผู้ป่วย
+scoring engine
+36-axis internal weighting model
+module matching algorithm
+rule-based reasoning tree
+proprietary prompt architecture
+clinician-AI orchestration logic
+ranking engine
+model ensemble outputs
+internal disease-node graph
+TSPI mechanistic knowledge graph
+hidden mapping tables
+training features
+recommendation confidence model
+internal QC flags ระดับระบบ
+เหตุผล
+ข้อมูลชั้นนี้เป็น core IP ของแพลตฟอร์ม
+5. Download Product Types
+ระบบควรมีเมนูดาวน์โหลดแยกเป็น 6 แบบ
+5.1 My Medical Record Export
+สำหรับเวชระเบียนและผลตรวจทั่วไป
+5.2 My Lab & Imaging Export
+สำหรับผลเลือด ผลปัสสาวะ pathology radiology imaging
+5.3 My Omics Report
+สำหรับ microbiome / proteomics / genomics แบบ report
+5.4 My Advanced Omics Data
+สำหรับผู้ใช้ที่ต้องการข้อมูลเชิงเทคนิคมากขึ้น โดยต้องผ่าน consent เพิ่ม
+5.5 My Medication & Safety Card
+สำหรับสรุปยา ประวัติแพ้ยา pharmacogenomics และข้อควรระวัง
+5.6 My TSPI Health Summary
+สำหรับ AI summary, risk summary, module summary, lifestyle plan
+6. Access Levels สำหรับผู้ใช้
+ควรมี permission 4 ระดับ
+Level 1 — Standard Patient Access
+ดาวน์โหลด Layer A + Layer B + omics summary
+Level 2 — Advanced Patient Access
+ดาวน์โหลด structured omics subset เพิ่มได้หลังยืนยันตัวตน
+Level 3 — Physician-Authorized Access
+ดาวน์โหลดข้อมูลเชิงลึกมากขึ้นเมื่อมี physician release
+Level 4 — Internal Clinical / Research Access
+สำหรับแพทย์ ผู้ดูแลระบบ หรือ research workflow เท่านั้น
+7. Identity & Security Requirements
+ก่อนดาวน์โหลดทุกครั้ง ต้องมี
+login session validation
+re-authentication
+OTP verification
+audit logging
+download timestamp
+IP/device logging
+consent check
+data scope validation
+สำหรับ genomics / exome / omics ขั้นสูง ให้เพิ่ม
+explicit consent reconfirmation
+warning screen
+terms of interpretation limitation
+8. Export Formats ที่ควรรองรับ
+Human-readable
+PDF
+HTML report
+printable summary card
+Data-readable
+CSV
+JSON
+FHIR bundle ในอนาคต
+VCF subset สำหรับ genomics advanced export
+9. UX Flow ที่ควรเป็น
+9.1 Download Center
+เมนูหลักชื่อเช่น
+My Health Data หรือ Download My Records
+9.2 เลือกหมวด
+Medical Records
+Lab & Imaging
+Omics
+Medication & Safety
+TSPI Summary
+9.3 เลือกช่วงเวลา
+all time
+last 3 months
+last 12 months
+custom range
+9.4 เลือกรูปแบบไฟล์
+PDF
+CSV
+JSON
+9.5 ยืนยันตัวตน
+OTP / biometric / password reconfirm
+9.6 Consent check
+โดยเฉพาะ omics / genomics
+9.7 Generate export package
+zip หรือ file bundle
+10. Audit Trail ที่ต้องเก็บ
+ทุกครั้งที่ดาวน์โหลด ต้องเก็บ
+patient_id
+export_type
+layer_requested
+file_type
+date_time
+device
+ip_address
+consent_version
+data_scope
+generated_by
+status
+11. Suggested Data Export Matrix
+เปิดให้ดาวน์โหลด
+lab raw values
+imaging report
+medication list
+visit summary
+patient-uploaded files
+microbiome summary
+proteomics interpreted summary
+genomics actionable report
+pharmacogenomics summary
+lifestyle summary
+AI health summary
+เปิดให้ดาวน์โหลดแบบจำกัด
+structured microbiome table
+selected proteomics matrix
+clinically filtered variant list
+advanced omics export
+ไม่เปิดให้ดาวน์โหลด
+raw FASTQ/BAM by default
+model prompts
+AI reasoning chain
+proprietary scoring weights
+internal ranking engine
+TSPI knowledge graph
+rule engine internals
+12. ข้อความกำกับทางคลินิกที่ต้องแสดง
+ทุกไฟล์ที่เป็น AI-generated หรือ omics-interpreted ต้องมีข้อความกำกับว่า
+ข้อมูลนี้ใช้เพื่อสนับสนุนการดูแลสุขภาพ
+ไม่ใช่การวินิจฉัยสุดท้ายด้วยตัวเอง
+ควรปรึกษาแพทย์เมื่อผลมีความเสี่ยงสูง
+ผลบางส่วนต้องยืนยันด้วยห้องปฏิบัติการมาตรฐานหรือแพทย์เฉพาะทาง
+ข้อมูลบางประเภทอาจไม่ครอบคลุมทุกโรคหรือทุกความเสี่ยง
+13. Deliverables ที่ต้องการจากทีมวิศวกร
+Backend
+data access policy engine
+export generation service
+file packaging service
+permission & consent layer
+audit trail service
+secure download link service
+retention & expiry control
+Frontend
+download center UI
+export scope selector
+omics consent modal
+re-authentication flow
+advanced export warning flow
+export history page
+AI / Data Team
+classify data by export layer
+define patient-safe summary layer
+define restricted proprietary layer
+create interpretable omics summary outputs
+create physician-grade export outputs
+14. สรุปเชิงนโยบาย
+TSPI ควรออกแบบระบบดาวน์โหลดข้อมูลโดยยึดหลักว่า
+ผู้ป่วยมีสิทธิ์เข้าถึงข้อมูลสุขภาพของตนเอง
+แต่ ไม่มีสิทธิ์เข้าถึง proprietary reasoning layer ของระบบ
+ดังนั้นระบบต้องแยกอย่างชัดเจนระหว่าง
+personal clinical data
+interpreted personal omics data
+AI-generated patient summary
+proprietary TSPI intelligence layer
+เพื่อให้เกิดทั้ง
+patient empowerment
+interoperability
+legal defensibility
+IP protection

@@ -1,0 +1,2010 @@
+[
+  {
+    "domain_id": "DOMAIN_1",
+    "name": "Immune–Infection Governance",
+    "axes": [
+      {
+        "axis_id": "AXIS_1",
+        "name": "Systemic Inflammatory Load",
+        "sub_axes": {
+          "A": "NF‑κB / Cytokine Burden – ภาระ IL‑6, TNF‑α, CRP และโปรแกรมยีนอักเสบรวมของทั้งระบบ​",
+          "B": "Inflammasome Output – การทำงานของ NLRP3, IL‑1β, IL‑18 และ danger‑signaling (DAMP)​",
+          "C": "Metabolic Inflammation – การอักเสบจากความอ้วน, lipotoxicity, insulin resistance, inflammaging​"
+        },
+        "suggested_modules": [
+          "Module",
+          ":",
+          "kerra",
+          "Minoza",
+          "KS",
+          "MERDANA",
+          "Im1",
+          "Im5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "Beta",
+          "G",
+          "Beta",
+          "L",
+          "XM2",
+          "beta",
+          "x",
+          "Merdana",
+          "RESHIMUNO"
+        ]
+      },
+      {
+        "axis_id": "AXIS_2",
+        "name": "Immune Homeostasis",
+        "sub_axes": {
+          "A": "Innate–Adaptive Coordination – การประสานกันของภูมิเดิม (innate) และภูมิจำเพาะ (adaptive)​",
+          "B": "Immune Polarity – สมดุล Th1/Th2, macrophage M1/M2 และแนวโน้ม autoimmune/ allergy​",
+          "C": "Tolerance–Resolution–Recovery – Treg, pro‑resolving mediators และความสามารถปิดการอักเสบกลับสู่ baseline​"
+        },
+        "suggested_modules": [
+          "VARIZ",
+          "Sinaza",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "Im5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "beta",
+          "x",
+          "Merdana",
+          "RESHIMUNO",
+          "Plumax"
+        ]
+      },
+      {
+        "axis_id": "AXIS_3",
+        "name": "Pathogen Defense (Host Defense)",
+        "sub_axes": {
+          "A": "Antiviral Defense – IFN tone และ interferon‑stimulated genes สำหรับต้านไวรัส​",
+          "B": "Antibacterial / Antifungal Defense – antimicrobial peptides, phagocytosis และการฆ่าเชื้อแบคทีเรีย/เชื้อรา​",
+          "C": "Mucosal Defense – ภูมิคุ้มกันด่าน mucosa (ลำไส้, ทางเดินหายใจ ฯลฯ)​"
+        },
+        "suggested_modules": [
+          "Plumax",
+          "Sinaza",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "CINNARA",
+          "STOMMA",
+          "KURMA",
+          "BENJAKUL",
+          "VITALPLUA",
+          "VITALCELL",
+          "FEVA",
+          "YA",
+          "TEEN",
+          "NOK",
+          "beta",
+          "x",
+          "Merdana"
+        ]
+      },
+      {
+        "axis_id": "AXIS_4",
+        "name": "Post‑Infectious Persistence",
+        "sub_axes": {
+          "A": "Immune Scar / Chronic Low‑Grade Activation – immune tone ไม่ยอมกลับ baseline หลังติดเชื้อ​",
+          "B": "Latent Reactivation Tendency – แนวโน้มเชื้อแฝง เช่น TB/HSV/EBV กลับมากระตุ้น​",
+          "C": "Post‑Viral Syndrome / Dysregulated Recovery – long‑covid‑like, fatigue, autonomic dysregulation หลังไวรัส​"
+        },
+        "suggested_modules": [
+          "Plumax",
+          "Sinaza",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "VARIZ",
+          "VITALPLUS",
+          "VITALIS",
+          "beta",
+          "x",
+          "Merdanam",
+          "RESHIMUNO"
+        ]
+      }
+    ]
+  },
+  {
+    "domain_id": "DOMAIN_2",
+    "name": "Metabolic–Energy Core",
+    "axes": [
+      {
+        "axis_id": "AXIS_5",
+        "name": "Glucose–Insulin Regulation",
+        "sub_axes": {
+          "A": "Insulin Signaling – IR/AKT/GLUT dynamics และความไวต่ออินซูลินของเนื้อเยื่อต่าง ๆ​",
+          "B": "Hepatic Glucose Output – gluconeogenesis, glycogen flux และบทบาทตับในการปล่อยกลูโคส​",
+          "C": "Glycemic Variability Stress – ความผันผวนของน้ำตาล (glucose swings) และผลเสียสะสม​"
+        },
+        "suggested_modules": [
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "VATTHANOTHAI",
+          "BOVA",
+          "BENJAKUL",
+          "MORMORDICA",
+          "YA",
+          "TEEN",
+          "NOK",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2"
+        ]
+      },
+      {
+        "axis_id": "AXIS_6",
+        "name": "Lipid–Lipotoxicity",
+        "sub_axes": {
+          "A": "Lipoprotein Balance – โปรไฟล์ atherogenic ของ LDL, HDL, TG ฯลฯ​",
+          "B": "Lipotoxic Overload / Ectopic Fat – ไขมันพอกตับ (NAFLD), ไขมันเกาะอวัยวะ (ectopic fat)​",
+          "C": "Fatty Acid Oxidation Programs – PPAR/CPT‑driven fat oxidation และ metabolic flexibility​"
+        },
+        "suggested_modules": [
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "Stream",
+          "Plus",
+          "BOVA",
+          "BENJAKUL",
+          "MORMORDICA",
+          "VATTHANOTHAI",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "XS",
+          "VITALPLUS",
+          "TARANA",
+          "Benjakul"
+        ]
+      },
+      {
+        "axis_id": "AXIS_7",
+        "name": "Nutrient Sensing (AMPK–mTOR)",
+        "sub_axes": {
+          "A": "AMPK Energy Sensing – การรับรู้พลังงานต่ำและการเข้าสู่โหมดประหยัด/ซ่อมแซม​",
+          "B": "mTORC1 Growth / Anabolism Tone – โหมดสร้าง (growth, anabolism) ที่สัมพันธ์กับการแก่และมะเร็ง​",
+          "C": "Switch Control – ความสามารถสลับ growth ↔ repair อย่างยืดหยุ่น​"
+        },
+        "suggested_modules": [
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "Stream",
+          "Plus",
+          "BOVA",
+          "BENJAKUL",
+          "MORMORDICA",
+          "VITAL",
+          "PLUS",
+          "VITALCELL",
+          "VATTHANOTHAI",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "TARANA",
+          "CINNARA",
+          "Benjakul"
+        ]
+      },
+      {
+        "axis_id": "AXIS_8",
+        "name": "Mitochondrial Network",
+        "sub_axes": {
+          "A": "Bioenergetics – ATP, electron transport chain, membrane potential​",
+          "B": "Quality Control – mitophagy, fusion–fission, การเคลียร์ไมโทคอนเดรียเสีย​",
+          "C": "Biogenesis / Renewal – PGC‑1, mtDNA stability, การสร้างไมโทคอนเดรียใหม่​"
+        },
+        "suggested_modules": [
+          "AMPUR",
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "BENJAKUL",
+          "MORMORDICA",
+          "VITAL",
+          "PLUS",
+          "VITALIS",
+          "VATTHANOTHAI",
+          "YA",
+          "TEEN",
+          "NOK",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "LIVOXY",
+          "Benjakul"
+        ]
+      },
+      {
+        "axis_id": "AXIS_9",
+        "name": "Oxidative Stress",
+        "sub_axes": {
+          "A": "ROS Load / Oxidative Damage – ภาระ ROS และความเสียหายต่อ DNA/โปรตีน/เยื่อหุ้ม​",
+          "B": "Antioxidant Depletion – สถานะ SOD, GPx, catalase, glutathione​",
+          "C": "Redox Signaling Imbalance – ความเพี้ยนของสัญญาณ redox เช่น NADPH oxidase, peroxiredoxin​"
+        },
+        "suggested_modules": [
+          "RADICA",
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "LIVOXY"
+        ]
+      },
+      {
+        "axis_id": "AXIS_10",
+        "name": "Proteostasis–Autophagy–Lysosome",
+        "sub_axes": {
+          "A": "ER Stress / UPR – ความเครียดจากโปรตีนพับผิด (BiP/CHOP, UPR)​",
+          "B": "Autophagy Flux – initiation → flux ของ autophagy เคลียร์ของเสียในเซลล์​",
+          "C": "Lysosomal Degradation Capacity – ศักยภาพไลโซโซมในการย่อยสลาย/รีไซเคิล​"
+        },
+        "suggested_modules": [
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "YA",
+          "TEEN",
+          "NOK",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "Benjakul"
+        ]
+      }
+    ]
+  },
+  {
+    "domain_id": "DOMAIN_3",
+    "name": "Genomic–Longevity Programming",
+    "axes": [
+      {
+        "axis_id": "AXIS_11",
+        "name": "DNA Repair & Genomic Stability",
+        "sub_axes": {
+          "A": "DNA Damage Response / Repair Pathways – ระบบตรวจและซ่อมแซมความเสียหาย DNA​",
+          "B": "Mutation Buffering / Genomic Integrity – ความสามารถกันผลเสียจาก mutation สะสม​",
+          "C": "Telomere Stability – ความมั่นคงของ telomere ที่สัมพันธ์กับอายุชีวภาพ​"
+        },
+        "suggested_modules": [
+          "RADICA",
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "VitalPLUS",
+          "AMPUR",
+          "VATTHANOTHAI",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "SANCHI",
+          "Benjakul"
+        ]
+      },
+      {
+        "axis_id": "AXIS_12",
+        "name": "Epigenetic Regulation",
+        "sub_axes": {
+          "A": "DNA Methylation Programs – pattern เมทิลเลชันที่กำหนดการเปิด–ปิดยีน​",
+          "B": "Histone / Chromatin Remodeling – สภาพโครมาตินและการเข้าถึงยีน​",
+          "C": "miRNA / Transcriptional Balance – การควบคุมระดับpost‑transcription ผ่าน miRNA ฯลฯ​"
+        },
+        "suggested_modules": [
+          "Modules",
+          "for",
+          "12",
+          "D.",
+          "Sitthajorn",
+          "RIZZO"
+        ]
+      },
+      {
+        "axis_id": "AXIS_13",
+        "name": "Longevity Signaling (SIRT–FOXO–IGF)",
+        "sub_axes": {
+          "A": "Sirtuin Programs – โปรตีน sirtuin ที่เกี่ยวกับอายุยืนและ stress resistance​",
+          "B": "FOXO Stress Adaptation – การตอบสนองต่อ stress ผ่าน FOXO transcription factors​",
+          "C": "IGF / Anabolic–Longevity Balance – สมดุล IGF‑1 ระหว่างโหมดโตกับโหมดอายุยืน​"
+        },
+        "suggested_modules": [
+          "AMPUR",
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "VitalPLUS",
+          "SANGVICHAI",
+          "VITALIS",
+          "Benjakul",
+          "VATTHANOTHAI",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "RESHIMUNO"
+        ]
+      },
+      {
+        "axis_id": "AXIS_14",
+        "name": "Senescence & SASP",
+        "sub_axes": {
+          "A": "Senescent Cell Burden – ปริมาณเซลล์ชราที่หยุดแบ่งตัว​",
+          "B": "SASP Inflammatory Output – สารอักเสบ/โปร‑เสื่อมที่เซลล์ชราหลั่ง (senescence‑associated secretome)​",
+          "C": "Senescence Clearance Potential – ความสามารถกำจัด/รีไซเคิลเซลล์ชรา​"
+        },
+        "suggested_modules": [
+          "AMPUR",
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "VitalPLUS",
+          "SANGVICHAI",
+          "VITALIS",
+          "VATTHANOTHAI",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "SANCHI",
+          "RESHIMUNO",
+          "Benjakul"
+        ]
+      }
+    ]
+  },
+  {
+    "domain_id": "DOMAIN_4",
+    "name": "Detox–Digestive–Gut Ecosystem",
+    "axes": [
+      {
+        "axis_id": "AXIS_15",
+        "name": "Detoxification & Cellular Defense",
+        "sub_axes": {
+          "A": "Phase I/II Biotransformation – CYP450, glucuronidation, sulfation ฯลฯ​",
+          "B": "Nrf2–GSH Defense Programming – การกระตุ้น Nrf2, glutathione, antioxidant defense​",
+          "C": "Xenobiotic / Metabolite Clearance Capacity – ความสามารถขับ xenobiotics และเมแทบอไลต์พิษ​"
+        },
+        "suggested_modules": [
+          "สารพิษ",
+          "ยาเสพติด",
+          "สารกัมมันตภาพสะสม",
+          "โลหะหนัก",
+          "พิษสุรา",
+          "LIVITA",
+          "KERRA",
+          "KS",
+          "IM6"
+        ]
+      },
+      {
+        "axis_id": "AXIS_16",
+        "name": "Digestive–Absorptive",
+        "sub_axes": {
+          "A": "Gastric Digestion – กรดและการย่อยในกระเพาะ​",
+          "B": "Pancreatic–Bile Function – เอนไซม์ตับอ่อนและน้ำดี​ นิ่วถุงน้ำดี",
+          "C": "Small Intestine Absorption – การดูดซึมสารอาหารในลำไส้เล็ก​"
+        },
+        "suggested_modules": [
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "IM9",
+          "VENTA",
+          "KURMA",
+          "STOMMA",
+          "CINNARA",
+          "VATTHANOTHAI",
+          "VITALPLUS",
+          "TARANA",
+          "Benjakul",
+          "Stream",
+          "Plus"
+        ]
+      },
+      {
+        "axis_id": "AXIS_17",
+        "name": "Microbiome Ecology",
+        "sub_axes": {
+          "A": "Diversity / Resilience – ความหลากหลายและความยืดหยุ่นของ microbiome​",
+          "B": "SCFA / Metabolite Profile – butyrate, propionate, acetate ฯลฯ​",
+          "C": "Dysbiosis Patterns – รูปแบบเสียสมดุล เช่น overgrowth, loss of keystone species​"
+        },
+        "suggested_modules": [
+          "ท้องเสีย",
+          "ลำใส้แปรปรวน",
+          "IBS",
+          "ลำใส้อักเสบ",
+          "-SITTHAJORN",
+          "CINNARA",
+          "KS",
+          "KERRA",
+          "MINOZA",
+          "STOMMA",
+          "KURMA"
+        ]
+      },
+      {
+        "axis_id": "AXIS_18",
+        "name": "Gut Barrier & Mucosal Integrity",
+        "sub_axes": {
+          "A": "Tight Junction Integrity – โครงสร้าง tight junction เช่น occludin, claudin​",
+          "B": "Endotoxin Translocation – การรั่วของ LPS/endotoxin เข้ากระแสเลือด​",
+          "C": "Mucosal Immune Interface – การสื่อสารภูมิคุ้มกันที่เยื่อบุลำไส้​"
+        },
+        "suggested_modules": [
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "IM9",
+          "VENTA",
+          "KURMA",
+          "STOMMA",
+          "CINNARA",
+          "BELAX",
+          "RICEZOZYME",
+          "ZAMINZYME",
+          "FLAXPRO",
+          "VENTA",
+          "IM9",
+          "IM6",
+          "VATTHANOTHAI",
+          "SITTHIJORN",
+          "TARANA"
+        ]
+      },
+      {
+        "axis_id": "AXIS_19",
+        "name": "Colon Biofilm & Mucosal Burden",
+        "sub_axes": {
+          "A": "Biofilm Persistence – biofilm เรื้อรังในลำไส้ใหญ่​",
+          "B": "Colon Plaque / Toxin Burden – คราบ, ของเสีย, toxin ที่เกาะผนังลำไส้​",
+          "C": "Clearance Kinetics – อัตราการผลัดเยื่อบุและเคลียร์คราบ/ของเสีย​"
+        },
+        "suggested_modules": [
+          "KS",
+          "VENTA",
+          "CHATHARIC",
+          "LYPHOLAX",
+          "LAXORIM",
+          "BELAX",
+          "RICEZOZYME",
+          "ZAMINZYME",
+          "FLAXPRO",
+          "VATTHANOTHAI",
+          "TARANA",
+          "Benjakul"
+        ]
+      }
+    ]
+  },
+  {
+    "domain_id": "DOMAIN_5",
+    "name": "Vascular–Circulation–Stroke Prevention",
+    "axes": [
+      {
+        "axis_id": "AXIS_20",
+        "name": "Endothelial Function",
+        "sub_axes": {
+          "A": "NO/eNOS Tone – การสร้าง nitric oxide จาก endothelial NOS​",
+          "B": "Endothelial Inflammation / Adhesion – การอักเสบที่ผนังหลอดเลือดและการเกาะของเม็ดเลือดขาว​",
+          "C": "Glycocalyx Integrity – ชั้นไกลโคคาลิกซ์ปกป้องผนังเส้นเลือด​"
+        },
+        "suggested_modules": [
+          "HP1",
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM6",
+          "VitalPLUS",
+          "Stream",
+          "Plus",
+          "BOVA",
+          "VATTHANOTHAI",
+          "AMPUR",
+          "ANAX",
+          "TARANA",
+          "BUTEA",
+          "SUPERBA",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "SANCHI",
+          "Benjakul"
+        ]
+      },
+      {
+        "axis_id": "AXIS_21",
+        "name": "Vascular Remodeling & Microcirculation",
+        "sub_axes": {
+          "A": "Angiogenesis Signaling – การสร้างเส้นเลือดใหม่​",
+          "B": "Capillary Density / Microvascular Structure – ความหนาแน่นโครงสร้างเส้นเลือดฝอย​",
+          "C": "Tissue Perfusion & Oxygen Delivery – การส่งเลือดและออกซิเจนถึงเนื้อเยื่อ​"
+        },
+        "suggested_modules": [
+          "HP1",
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM6",
+          "AMPUR",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "BUTEA",
+          "SUPERBA",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "Stream",
+          "Plus"
+        ]
+      },
+      {
+        "axis_id": "AXIS_22",
+        "name": "Thrombosis–Hemostasis",
+        "sub_axes": {
+          "A": "Platelet Activation – การเกาะกลุ่มของเกล็ดเลือด​",
+          "B": "Coagulation Cascade Tone – การทำงานของระบบการแข็งตัวของเลือด​",
+          "C": "Fibrinolysis Balance – การสลายลิ่มเลือดและสมดุลกับการแข็งตัว​"
+        },
+        "suggested_modules": [
+          "เพิ่มความไวการแข็งตัวของเลือด",
+          "KS",
+          "SITTHAJORN"
+        ]
+      },
+      {
+        "axis_id": "AXIS_23",
+        "name": "Hemodynamics & Arterial Elasticity",
+        "sub_axes": {
+          "A": "RAAS Regulation – ระบบ renin–angiotensin–aldosterone​",
+          "B": "Vascular Stiffness / Compliance – ความแข็งหรือลดหยุ่นของผนังหลอดเลือด​",
+          "C": "Blood Pressure Set‑Point – จุดตั้งค่าความดันเลือดของระบบ​"
+        },
+        "suggested_modules": [
+          "HP1",
+          "BOVA",
+          "VATTHANOTHAI",
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM6",
+          "AMPUR",
+          "VitalPLUS",
+          "SANGVICHAI",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "BUTEA",
+          "SUPERBA",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "Benjakul",
+          "Stream",
+          "Plus"
+        ]
+      }
+    ]
+  },
+  {
+    "domain_id": "DOMAIN_6",
+    "name": "Repair–Fibrosis–Regeneration",
+    "axes": [
+      {
+        "axis_id": "AXIS_24",
+        "name": "Wound Healing (Internal + External)",
+        "sub_axes": {
+          "A": "Inflammation → Proliferation Transition – การเปลี่ยนเฟสจากอักเสบไปสู่การสร้างเนื้อเยื่อ​",
+          "B": "Epithelialization / Closure Kinetics – ความเร็วในการปิดแผล/สร้างเยื่อบุใหม่​",
+          "C": "Remodeling Quality – คุณภาพของแผลหลังซ่อม รวมถึงแผลเป็น​"
+        },
+        "suggested_modules": [
+          "AMPUR",
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM6",
+          "RICEZOZYME",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "Plumax"
+        ]
+      },
+      {
+        "axis_id": "AXIS_25",
+        "name": "Fibrosis & ECM Remodeling",
+        "sub_axes": {
+          "A": "TGF‑β Fibrotic Signaling – สัญญาณ fibrotic หลักนำโดย TGF‑β​",
+          "B": "Collagen Deposition / Turnover – การสะสมและการสลายคอลลาเจนในอวัยวะ​",
+          "C": "Organ Stiffness Progression – การแข็งของอวัยวะ (ตับแข็ง, พังผืดปอด ฯลฯ)​"
+        },
+        "suggested_modules": [
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM6",
+          "RICEZOZYME",
+          "IM9",
+          "BetaG",
+          "IMO",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "NARIS",
+          "TARANA",
+          "LIVOXY",
+          "Plumax"
+        ]
+      },
+      {
+        "axis_id": "AXIS_26",
+        "name": "Stem Cell & Hematopoiesis",
+        "sub_axes": {
+          "A": "Stem Niche / Regenerative Reserve – สำรองเซลล์ต้นกำเนิดในร่างกาย​",
+          "B": "Hematopoiesis – การสร้างเม็ดเลือดในไขกระดูก​",
+          "C": "Recovery Capacity after Stress / Injury – ความสามารถฟื้นตัวหลังเจ็บป่วยหรือบาดเจ็บหนัก​"
+        },
+        "suggested_modules": [
+          "AMPUR",
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "BUMINMAX",
+          "BLOOD",
+          "NOURISHING",
+          "RENAX",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "BUTEA",
+          "SUPERBA",
+          "LIVOXY",
+          "Plumax"
+        ]
+      },
+      {
+        "axis_id": "AXIS_27",
+        "name": "Glycation / Carbonyl Stress (AGE)",
+        "sub_axes": {
+          "A": "AGE Formation / Carbonyl Load – การก่อตัว advanced glycation end products​",
+          "B": "Protein Crosslinking / Stiffness – การเชื่อมขวางโปรตีน ทำให้เนื้อเยื่อแข็ง/กรอบ​",
+          "C": "Tissue Vulnerability Amplification – ทำให้เนื้อเยื่อเปราะ เสี่ยงต่อโรคหลอดเลือด ไต ฯลฯ​"
+        },
+        "suggested_modules": [
+          "DB1",
+          "kerra",
+          "Minoza",
+          "KS",
+          "Im1",
+          "IM5",
+          "IM6",
+          "IM9",
+          "BetaG",
+          "IM7",
+          "Beta",
+          "M",
+          "Beta",
+          "V",
+          "BUMINMAX",
+          "RADICA",
+          "BENJAKUL",
+          "BLOOD",
+          "NOURISHING",
+          "RENAX",
+          "MORMORDICA",
+          "VATTHANOTHAI",
+          "BUTEA",
+          "SUPERBA",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "SANCHI",
+          "LIVOXY",
+          "Plumax"
+        ]
+      }
+    ]
+  },
+  {
+    "domain_id": "DOMAIN_7",
+    "name": "Musculoskeletal & Structural Integrity",
+    "axes": [
+      {
+        "axis_id": "AXIS_28",
+        "name": "Muscle Protein Turnover",
+        "sub_axes": {
+          "A": "Anabolism – การสร้างโปรตีนกล้ามเนื้อ​",
+          "B": "Catabolism – การสลายกล้ามเนื้อ​",
+          "C": "Myogenesis / Recovery – การสร้างเส้นใยกล้ามเนื้อใหม่และการฟื้นตัว​"
+        },
+        "suggested_modules": [
+          "BUMINMAX",
+          "AMPUR",
+          "ZAMINZYME",
+          "VITALPLUS",
+          "DERRIS",
+          "SCANDANS",
+          "NARIS",
+          "TARANA",
+          "ANAX"
+        ]
+      },
+      {
+        "axis_id": "AXIS_29",
+        "name": "Bone Remodeling",
+        "sub_axes": {
+          "A": "Osteoblast Formation – การสร้างกระดูกโดย osteoblast​",
+          "B": "Osteoclast Resorption – การสลายกระดูกโดย osteoclast​",
+          "C": "Mineral Density Stability – ความหนาแน่นกระดูกและสมดุลแร่ธาตุ​"
+        },
+        "suggested_modules": [
+          "BUMINMAX",
+          "AMPUR",
+          "ANAX",
+          "ZAMINZYME",
+          "VITALPLUS",
+          "DERRIS",
+          "SCANDANS",
+          "NARIS",
+          "TARANA",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "SANCHI",
+          "REDCAL",
+          "BONAX"
+        ]
+      },
+      {
+        "axis_id": "AXIS_30",
+        "name": "Connective Tissue Integrity",
+        "sub_axes": {
+          "A": "Tendon / Ligament ECM Resilience – ความยืดหยุ่นของเอ็น/เส้นเอ็น​",
+          "B": "Joint Matrix Stability – ความสมบูรณ์ของกระดูกอ่อนและข้อต่อ​",
+          "C": "Structural Crosslink Burden – การเชื่อมขวางโครงสร้างที่ทำให้แข็ง/ติด​"
+        },
+        "suggested_modules": [
+          "ใช้ภายนอก",
+          "KIMLUI",
+          "YELLOW",
+          "OIL"
+        ]
+      }
+    ]
+  },
+  {
+    "domain_id": "DOMAIN_8",
+    "name": "Endocrine Network",
+    "axes": [
+      {
+        "axis_id": "AXIS_31",
+        "name": "Female Hormone",
+        "sub_axes": {
+          "A": "Estrogen Signaling – การทำงานของ estrogen และ receptor​",
+          "B": "Progesterone Signaling – สมดุล progesterone และ estrogen​",
+          "C": "Menopause Physiology & Receptor Balance – ชีววิทยาวัยหมดประจำเดือนและความไวตัวรับ​"
+        },
+        "suggested_modules": [
+          "LANA",
+          "ANGERA",
+          "ZAMINZYME",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "2",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "SANCHI"
+        ]
+      },
+      {
+        "axis_id": "AXIS_32",
+        "name": "Male Androgen",
+        "sub_axes": {
+          "A": "Testosterone Tone – ระดับและ rhythmicity ของ testosterone​",
+          "B": "DHT / AR Sensitivity – การเปลี่ยนเป็น DHT และความไว androgen receptor​",
+          "C": "Prostate–Hair–Anabolic Linkage – ความเชื่อมโยงระหว่างต่อมลูกหมาก, ผม, มวลกล้ามเนื้อ​"
+        },
+        "suggested_modules": [
+          "TOPAZ",
+          "BUTEA",
+          "SUPERBA",
+          "VITALPLUS",
+          "BUMINMAX",
+          "PLUS",
+          "AMPUR",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1"
+        ]
+      },
+      {
+        "axis_id": "AXIS_33",
+        "name": "Thyroid–Adrenal–Growth",
+        "sub_axes": {
+          "A": "Thyroid Metabolic Control – TSH, T3/T4 และอัตราเมตาบอลิซึม​",
+          "B": "Adrenal / HPA Rhythm – แกน HPA, คอร์ติซอล, จังหวะความเครียด​",
+          "C": "GH–IGF Anabolic Repair Signaling – ฮอร์โมน growth และ IGF‑1 ในการซ่อมแซมและเติบโต​"
+        },
+        "suggested_modules": [
+          "Hyperthyroid",
+          "-",
+          "Radica",
+          "BOVA",
+          "KERRA",
+          "IM6",
+          "BETA",
+          "V",
+          "MINOZA",
+          "LIVITA",
+          "YA",
+          "TEEN",
+          "NOK"
+        ]
+      }
+    ]
+  },
+  {
+    "domain_id": "DOMAIN_9",
+    "name": "Neuro–Sleep–Stress",
+    "axes": [
+      {
+        "axis_id": "AXIS_34",
+        "name": "Neuro–Sleep–Stress–Brain Clearance (Meta‑Axis)",
+        "sub_axes": {
+          "A": "Neuroinflammation – การอักเสบในสมองและระบบประสาท​",
+          "B": "Sleep–Circadian–Melatonin Repair Programming – คุณภาพการนอน วงจร circadian และเมลาโทนิน​",
+          "C": "HPA–Autonomic–Catecholamine Regulation + Glymphatic Clearance – การคุมเครียด, ระบบประสาทอัตโนมัติ และการระบายของเสียในสมอง (glymphatic)​"
+        },
+        "suggested_modules": [
+          "BOVA",
+          "VETCHAKORN",
+          "No.6",
+          "SANGVICHAI",
+          "PSYLAZA",
+          "KERRA",
+          "KS",
+          "YA",
+          "TEEN",
+          "NOK",
+          "BRANARA",
+          "Benjakul"
+        ]
+      }
+    ]
+  },
+  {
+    "domain_id": "DOMAIN_10",
+    "name": "Organ Axis + Oncology",
+    "axes": [
+      {
+        "axis_id": "AXIS_35",
+        "name": "Organ Resilience & Functional Reserve (Organ Meta‑Axis)",
+        "sub_axes": {
+          "A": "Visceral Organs – ตับ ไต หัวใจ ปอด ม้าม ตับอ่อน ถุงน้ำดี กระเพาะ ลำไส้ กระเพาะปัสสาวะ ฯลฯ​",
+          "B": "Sensory & ENT / Local Inflammatory Organs – ตา จอประสาทตา กระจกตา optic nerve, ต่อมน้ำตา, จมูก ไซนัส คอ หู กล่องเสียง ฯลฯ​",
+          "C": "Reproductive & Pelvic / Anorectal Organs – มดลูก รังไข่ อัณฑะ ต่อมลูกหมาก ช่องคลอด ทวารหนัก ริดสีดวง และเยื่อบุทวาร"
+        },
+        "suggested_modules": [
+          "สมรรถภาพทางเพศชาย",
+          "TOPAZ",
+          "VITALPLUS",
+          "TUNG",
+          "CHAO",
+          "PLUS",
+          "1",
+          "BUTEA",
+          "SUPERBA",
+          "AMPUR"
+        ]
+      },
+      {
+        "axis_id": "AXIS_36",
+        "name": "Oncology",
+        "sub_axes": {
+          "A": "Oncologic Cell Fate – apoptosis, cell‑cycle checkpoints, การควบคุมการแบ่งตัวของเซลล์มะเร็ง​",
+          "B": "Tumor Microenvironment (TME Ecology) – จุลสิ่งแวดล้อมของก้อนมะเร็งและ immune evasion niche​",
+          "C": "Anti‑Metastatic Dynamics – EMT/MET, circulating tumor cells, invasion และ metastasis control​"
+        },
+        "suggested_modules": [
+          "🔴"
+        ]
+      },
+      {
+        "axis_id": "AXIS_1",
+        "name": "Systemic Inflammatory Load",
+        "sub_axes": {},
+        "suggested_modules": [
+          "และเป็น",
+          "“common",
+          "upstream",
+          "mechanism”",
+          "ของโรค",
+          "NCD",
+          "ทั้งระบบ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_2",
+        "name": "Immune Homeostasis แบบ “ลึกกว่า Axis 1” โดยลงรายละเอียดระดับ",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🔵"
+        ]
+      },
+      {
+        "axis_id": "AXIS_2",
+        "name": "Immune Homeostasis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_3",
+        "name": "Pathogen Defense (Host Defense) แบบ “เชิงลึกระดับสูงกว่า Axis 1–2” โดยจะลงลึกถึง",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟢"
+        ]
+      },
+      {
+        "axis_id": "AXIS_3",
+        "name": "Pathogen Defense (Host Defense)",
+        "sub_axes": {},
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_4",
+        "name": "Post-Infectious Persistence แบบ “เชิงลึกสูงสุด” (ลึกกว่า Axis 1–3) โดยจะเน้น",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟣"
+        ]
+      },
+      {
+        "axis_id": "AXIS_4",
+        "name": "Post-Infectious Persistence",
+        "sub_axes": {
+          "A": "Chronic inflammation",
+          "B": "Latent infection",
+          "C": "Neuro dysfunction"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_5",
+        "name": "Glucose–Insulin Regulation Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟠"
+        ]
+      },
+      {
+        "axis_id": "AXIS_5",
+        "name": "Glucose–Insulin Regulation",
+        "sub_axes": {
+          "A": "Early insulin resistance",
+          "B": "Advanced IR",
+          "C": "Glycemic fluctuation"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_7",
+        "name": "Nutrient Sensing (AMPK–mTOR Axis)",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟠"
+        ]
+      },
+      {
+        "axis_id": "AXIS_7",
+        "name": "Nutrient Sensing Axis (AMPK–mTOR)",
+        "sub_axes": {
+          "A": "mTOR dominance",
+          "B": "AMPK deficiency",
+          "C": "Switching failure"
+        },
+        "suggested_modules": [
+          "👉"
+        ]
+      },
+      {
+        "axis_id": "AXIS_8",
+        "name": "Mitochondrial Network (ลึกที่สุดในระบบพลังงาน)",
+        "sub_axes": {},
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_8",
+        "name": "Mitochondrial Network Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🔴"
+        ]
+      },
+      {
+        "axis_id": "AXIS_8",
+        "name": "Mitochondrial Network Axis",
+        "sub_axes": {
+          "A": "Energy deficit",
+          "B": "Brain dysfunction",
+          "C": "Exercise intolerance"
+        },
+        "suggested_modules": [
+          "👉"
+        ]
+      },
+      {
+        "axis_id": "AXIS_9",
+        "name": "Oxidative Stress (จะเชื่อม ROS → damage → inflammation → aging)",
+        "sub_axes": {},
+        "suggested_modules": [
+          "Metabolic–Energy",
+          "Intelligence",
+          "Model",
+          "สำหรับ",
+          "AI",
+          "ได้เลย",
+          "ซึ่งจะเป็น",
+          "core",
+          "engine",
+          "ของ",
+          "TSPI",
+          "จริง",
+          "ๆได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_9",
+        "name": "Oxidative Stress Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🔴"
+        ]
+      },
+      {
+        "axis_id": "AXIS_9",
+        "name": "Oxidative Stress Axis",
+        "sub_axes": {
+          "A": "Oxidative damage",
+          "B": "Detox failure",
+          "C": "Redox dysregulation"
+        },
+        "suggested_modules": [
+          "ผมจะเขียน"
+        ]
+      },
+      {
+        "axis_id": "AXIS_10",
+        "name": "Proteostasis–Autophagy–Lysosome ซึ่งจะเป็นแกนที่ “กำจัดของเสียทั้งหมดในระบบ” และเชื่อมกับ cancer / aging / neurodegeneration ได้ลึกที่สุด",
+        "sub_axes": {},
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_10",
+        "name": "Proteostasis–Autophagy–Lysosome Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟣"
+        ]
+      },
+      {
+        "axis_id": "AXIS_10",
+        "name": "Proteostasis–Autophagy–Lysosome Axis",
+        "sub_axes": {
+          "A": "Proteotoxic state",
+          "B": "Cellular garbage overload",
+          "C": "Autophagy deficiency"
+        },
+        "suggested_modules": [
+          "👉"
+        ]
+      },
+      {
+        "axis_id": "AXIS_11",
+        "name": "DNA Repair & Genomic Stability (จะเข้าสู่ longevity จริง ๆ)",
+        "sub_axes": {},
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_11",
+        "name": "DNA Repair & Genomic Stability Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🧬"
+        ]
+      },
+      {
+        "axis_id": "AXIS_11",
+        "name": "DNA Repair & Genomic Stability",
+        "sub_axes": {
+          "A": "Aging phenotype",
+          "B": "Cancer risk phenotype",
+          "C": "Repair failure"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_12",
+        "name": "Epigenetic Regulation Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟣"
+        ]
+      },
+      {
+        "axis_id": "AXIS_12",
+        "name": "Epigenetic Regulation Axis",
+        "sub_axes": {
+          "A": "Cancer phenotype",
+          "B": "Metabolic phenotype",
+          "C": "Neuro phenotype"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_13",
+        "name": "Longevity Signaling Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟣"
+        ]
+      },
+      {
+        "axis_id": "AXIS_13",
+        "name": "Longevity Signaling Axis",
+        "sub_axes": {
+          "A": "Aging phenotype",
+          "B": "Growth excess",
+          "C": "Repair deficiency"
+        },
+        "suggested_modules": [
+          "Longevity",
+          "Biology",
+          "Engine",
+          "ของ",
+          "TSPI",
+          "ได้ทันทีได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_14",
+        "name": "Cellular Senescence & SASP Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟣"
+        ]
+      },
+      {
+        "axis_id": "AXIS_14",
+        "name": "Cellular Senescence & SASP Axis",
+        "sub_axes": {
+          "A": "Aging phenotype",
+          "B": "Inflammatory aging",
+          "C": "Degenerative"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_15",
+        "name": "Detoxification & Xenobiotic Processing Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟤"
+        ]
+      },
+      {
+        "axis_id": "AXIS_15",
+        "name": "Detoxification & Xenobiotic Processing Axis",
+        "sub_axes": {
+          "A": "Chemical sensitivity",
+          "B": "Liver overload",
+          "C": "Hormone-related"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_16",
+        "name": "Digestive–Absorptive Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟡"
+        ]
+      },
+      {
+        "axis_id": "AXIS_16",
+        "name": "Digestive–Absorptive Axis",
+        "sub_axes": {
+          "A": "Dyspepsia",
+          "B": "Fat intolerance",
+          "C": "Malabsorption"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_17",
+        "name": "Microbiome Ecology Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟢"
+        ]
+      },
+      {
+        "axis_id": "AXIS_17",
+        "name": "Microbiome Ecology",
+        "sub_axes": {
+          "A": "IBS type",
+          "B": "Dysbiosis type",
+          "C": "Brain-gut type"
+        },
+        "suggested_modules": [
+          "Gut–Microbiome",
+          "Master",
+          "Engine",
+          "ของ",
+          "TSPI",
+          "ได้เลย",
+          "ซึ่งเป็นแกนที่สำคัญที่สุดในการรักษาคนไข้จริงได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_18",
+        "name": "Gut Barrier Integrity Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟢"
+        ]
+      },
+      {
+        "axis_id": "AXIS_18",
+        "name": "Gut Barrier Integrity",
+        "sub_axes": {
+          "A": "Leaky gut type",
+          "B": "Immune type",
+          "C": "Metabolic type"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_19",
+        "name": "Intestinal Biofilm & Toxin Load Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟤"
+        ]
+      },
+      {
+        "axis_id": "AXIS_19",
+        "name": "Intestinal Biofilm & Toxin Load",
+        "sub_axes": {
+          "A": "Biofilm type",
+          "B": "Dysbiosis type",
+          "C": "Toxin type"
+        },
+        "suggested_modules": [
+          "Gut",
+          "Pathophysiology",
+          "Engine",
+          "ของ",
+          "TSPI",
+          "(ระดับใช้งานจริงคลินิก)",
+          "ให้เลยได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_20",
+        "name": "Endothelial Function Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🔵"
+        ]
+      },
+      {
+        "axis_id": "AXIS_20",
+        "name": "Endothelial Function Axis",
+        "sub_axes": {
+          "A": "Vascular constriction",
+          "B": "Inflammatory vascular",
+          "C": "Microcirculation failure"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_21",
+        "name": "Microcirculation Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🔵"
+        ]
+      },
+      {
+        "axis_id": "AXIS_21",
+        "name": "Microcirculation Axis",
+        "sub_axes": {
+          "A": "Microcirculation failure",
+          "B": "Brain perfusion",
+          "C": "Muscle fatigue"
+        },
+        "suggested_modules": [
+          "Vascular",
+          "Intelligence",
+          "Engine",
+          "ของ",
+          "TSPI",
+          "(ระดับ",
+          "clinical",
+          "AI)ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_22",
+        "name": "Hemostasis & Thrombosis Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🔴"
+        ]
+      },
+      {
+        "axis_id": "AXIS_22",
+        "name": "Hemostasis & Thrombosis",
+        "sub_axes": {
+          "A": "Thrombotic",
+          "B": "Circulation failure",
+          "C": "Stroke risk"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_23",
+        "name": "Hemodynamic Regulation Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🔵"
+        ]
+      },
+      {
+        "axis_id": "AXIS_23",
+        "name": "Hemodynamic Regulation Axis",
+        "sub_axes": {
+          "A": "Hypertensive hemodynamic type",
+          "B": "Hypoperfusion type",
+          "C": "Volume overload / retention type"
+        },
+        "suggested_modules": [
+          "👉"
+        ]
+      },
+      {
+        "axis_id": "AXIS_24",
+        "name": "Wound Healing Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_24",
+        "name": "Wound Healing Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟣"
+        ]
+      },
+      {
+        "axis_id": "AXIS_24",
+        "name": "Wound Healing Axis",
+        "sub_axes": {
+          "A": "Acute inflammatory wound",
+          "B": "Chronic non-healing wound",
+          "C": "Ischemic / low-perfusion repair"
+        },
+        "suggested_modules": [
+          "👉"
+        ]
+      },
+      {
+        "axis_id": "AXIS_25",
+        "name": "Fibrosis Regulation Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_25",
+        "name": "Fibrosis Regulation Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟤"
+        ]
+      },
+      {
+        "axis_id": "AXIS_25",
+        "name": "Fibrosis Regulation Axis",
+        "sub_axes": {
+          "A": "Organ stiffness",
+          "B": "Movement restriction",
+          "C": "Chronic pain"
+        },
+        "suggested_modules": [
+          "👉"
+        ]
+      },
+      {
+        "axis_id": "AXIS_26",
+        "name": "Stem Cell & Regeneration",
+        "sub_axes": {},
+        "suggested_modules": [
+          "Repair",
+          "vs",
+          "Fibrosis",
+          "vs",
+          "Regeneration",
+          "Engine",
+          "ของ",
+          "TSPI",
+          "ได้ทันทีได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_26",
+        "name": "Stem Cell & Regeneration Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟢"
+        ]
+      },
+      {
+        "axis_id": "AXIS_26",
+        "name": "Stem Cell & Regeneration",
+        "sub_axes": {
+          "A": "Regeneration deficiency",
+          "B": "Degenerative",
+          "C": "Neurological recovery failure"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_27",
+        "name": "Glycation & Protein Damage Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟤"
+        ]
+      },
+      {
+        "axis_id": "AXIS_27",
+        "name": "Glycation & Protein Damage",
+        "sub_axes": {
+          "A": "Metabolic",
+          "B": "Vascular",
+          "C": "Aging"
+        },
+        "suggested_modules": [
+          "Repair–Fibrosis–Glycation",
+          "Engine",
+          "ของ",
+          "TSPI",
+          "ให้เลย",
+          "ซึ่งจะเป็นแกนของ",
+          "aging",
+          "และ",
+          "chronic",
+          "disease",
+          "จริง",
+          "ๆได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_28",
+        "name": "Muscle Metabolism Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🔴"
+        ]
+      },
+      {
+        "axis_id": "AXIS_28",
+        "name": "Muscle Metabolism Axis",
+        "sub_axes": {
+          "A": "Muscle loss",
+          "B": "Fatigue",
+          "C": "Metabolic"
+        },
+        "suggested_modules": [
+          "Musculoskeletal",
+          "Engine",
+          "ของ",
+          "TSPI",
+          "ได้เลยได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_29",
+        "name": "Bone Remodeling Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟤"
+        ]
+      },
+      {
+        "axis_id": "AXIS_29",
+        "name": "Bone Remodeling Axis",
+        "sub_axes": {
+          "A": "Bone loss",
+          "B": "Pain",
+          "C": "Weakness"
+        },
+        "suggested_modules": [
+          "Musculoskeletal",
+          "Engine",
+          "ของ",
+          "TSPI",
+          "(ระดับ",
+          "clinical",
+          "AI)",
+          "ให้ครบระบบได้ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_30",
+        "name": "Connective Tissue & Fascia Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟤"
+        ]
+      },
+      {
+        "axis_id": "AXIS_30",
+        "name": "Connective Tissue & Fascia",
+        "sub_axes": {
+          "A": "Stiffness",
+          "B": "Pain",
+          "C": "Mobility loss"
+        },
+        "suggested_modules": [
+          "Musculoskeletal–Fascia",
+          "Engine",
+          "ของ",
+          "TSPI",
+          "(เชื่อมโครงสร้าง–พลังงาน–การเคลื่อนไหว)",
+          "ให้ครบระบบได้เลยได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_31",
+        "name": "Female Hormonal System Axis (แกนที่ 31)",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🟣"
+        ]
+      },
+      {
+        "axis_id": "AXIS_31",
+        "name": "Female Hormonal System",
+        "sub_axes": {
+          "A": "Hormonal imbalance",
+          "B": "Metabolic-hormonal",
+          "C": "Reproductive"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_32",
+        "name": "Male Hormonal System Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🔵"
+        ]
+      },
+      {
+        "axis_id": "AXIS_32",
+        "name": "Male Hormonal System",
+        "sub_axes": {
+          "A": "Vitality loss",
+          "B": "Sexual dysfunction",
+          "C": "Metabolic"
+        },
+        "suggested_modules": [
+          "ได้ครับ",
+          "ต่อไปคือ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_33",
+        "name": "Thyroid–Adrenal Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🔴"
+        ]
+      },
+      {
+        "axis_id": "AXIS_33",
+        "name": "Thyroid–Adrenal Axis",
+        "sub_axes": {
+          "A": "Low energy",
+          "B": "Stress overload",
+          "C": "Metabolic imbalance"
+        },
+        "suggested_modules": [
+          "Endocrine",
+          "Master",
+          "Control",
+          "Engine",
+          "ของ",
+          "TSPI",
+          "ให้เป็นโมเดล",
+          "AI",
+          "ได้ทันที"
+        ]
+      },
+      {
+        "axis_id": "AXIS_34",
+        "name": "Neuro–Sleep–Stress–Brain Clearance Meta-Axis",
+        "sub_axes": {},
+        "suggested_modules": [
+          "Axis",
+          "34",
+          "เป็น",
+          "meta-axis",
+          "ของสมอง",
+          "การนอน",
+          "ความเครียด",
+          "และการระบายของเสียในระบบประสาท",
+          "ซึ่งเป็นแกนซ่อมแซมกลางของร่างกาย",
+          "หากแกนนี้บกพร่องจะเร่งการอักเสบ",
+          "ระบบประสาทอัตโนมัติผิดสมดุล",
+          "การเสื่อมของสมอง",
+          "โรคเมตาบอลิก",
+          "และความชราโดยรวม"
+        ]
+      },
+      {
+        "axis_id": "AXIS_35",
+        "name": "Organ Resilience & Functional Reserve",
+        "sub_axes": {
+          "A": "Visceral Organs",
+          "B": "Sensory & ENT / Local Inflammatory Organs",
+          "C": "Reproductive & Pelvic / Anorectal Organs"
+        },
+        "suggested_modules": [
+          "🧠"
+        ]
+      },
+      {
+        "axis_id": "AXIS_39",
+        "name": "Cognitive-Emotional Loop Axis (CELA)",
+        "sub_axes": {},
+        "suggested_modules": [
+          "🧠",
+          "รายการโรคที่เกี่ยวข้องกับ"
+        ]
+      },
+      {
+        "axis_id": "AXIS_39",
+        "name": "Cognitive-Emotional Loop Axis (CELA)",
+        "sub_axes": {},
+        "suggested_modules": [
+          "นี่คือ",
+          "framework",
+          "ที่สามารถ",
+          "“นิยามการแพทย์ใหม่”",
+          "ได้จริง",
+          "🔥"
+        ]
+      }
+    ]
+  }
+]

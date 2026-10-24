@@ -1,0 +1,1971 @@
+Comment ต่อ Developer: การแก้ไข Phase 3 ให้ตรงกับปรัชญา TSPI และใช้งานได้จริงในคลินิก
+ตอนที่ 1 — TSPI-AI ต้องเป็นระบบวิเคราะห์ “อาการและความผิดปกติของเครือข่าย” ไม่ใช่เครื่องอ่านผลแล็บ
+จากการทบทวน Phase 3 อีกครั้ง มีประเด็นสำคัญที่ต้องแก้ไขจากข้อเสนอเดิมอย่างชัดเจน คือ TSPI-AI ไม่ควรถูกออกแบบให้รอผลตรวจเฉพาะทางของแต่ละแกนก่อนจึงจะสามารถวิเคราะห์ได้ เพราะแนวทางเช่นนั้นไม่สอดคล้องกับการใช้งานจริงในคลินิก และไม่ตรงกับปรัชญาของเวชศาสตร์รากฐานและ TSPI
+ตัวอย่างที่เขียนไว้ก่อนหน้านี้ เช่น
+Axis 8 Mitochondrial Network ใช้เมื่อมี ATP, lactate/pyruvate หรือ mitochondrial biomarkers
+Axis 9 Oxidative Stress ใช้เมื่อมี GSH/GSSG, MDA, 8-OHdG
+Axis 16 Digestive–Absorptive Function ใช้เมื่อยืนยัน malabsorption หรือ pancreatic dysfunction
+ข้อความเหล่านี้ เข้มงวดเกินไปและไม่สามารถนำไปใช้กับการดูแลผู้ป่วยจริงได้ เพราะการตรวจดังกล่าวไม่ได้เป็นการตรวจประจำในคลินิกทั่วไป หลายการตรวจมีราคาแพง เข้าถึงยาก หรือไม่สามารถสะท้อนความผิดปกติระดับเครือข่ายในชีวิตจริงได้ครบถ้วน
+ดังนั้น Developer ต้องแก้ Clinical Reasoning Core ของ Phase 3 ใหม่ โดยยึดหลักต่อไปนี้
+1. หลักการสำคัญที่สุด: อาการของผู้ป่วยคือข้อมูลทางชีวภาพ ไม่ใช่ข้อมูลชั้นรอง
+ใน TSPI อาการไม่ใช่เพียงข้อความที่ผู้ป่วยเล่า แต่เป็น Phenotypic Output ของเครือข่ายชีวภาพที่กำลังเสียสมดุล
+กล่าวอีกอย่างหนึ่งคือ
+ความผิดปกติระดับโมเลกุล
+→ ความผิดปกติของ Biological Network
+→ ความผิดปกติของระบบอวัยวะ
+→ อาการและความรู้สึกของผู้ป่วย
+→ ความผิดปกติที่ตรวจพบในระยะต่อมา
+ผลตรวจทางห้องปฏิบัติการหรือภาพถ่ายทางการแพทย์เป็นเพียง “หลักฐานหนึ่งชั้น” แต่ไม่ใช่เงื่อนไขบังคับว่าต้องตรวจพบก่อนจึงจะยอมรับว่า Network มีความผิดปกติ
+ตัวอย่างเช่น ผู้ป่วยมีอาการ:
+ท้องอืดหลังอาหาร
+อิ่มเร็ว
+อาหารย่อยช้า
+เรอเปรี้ยว
+กรดไหลย้อน
+แน่นลิ้นปี่
+ถ่ายไม่สุด
+ท้องผูก
+อุจจาระผิดปกติ
+อ่อนเพลียหลังรับประทานอาหาร
+แม้ผู้ป่วยจะส่องกล้องแล้วไม่พบแผล ไม่พบการอักเสบ และไม่พบก้อนผิดปกติ ก็ไม่ได้แปลว่าระบบย่อยอาหารปกติทั้งหมด
+ผู้ป่วยอาจมีความผิดปกติในระดับ Functional Network เช่น
+การหลั่งกรดในกระเพาะลดลง
+การทำงานของเอนไซม์ย่อยอาหารลดลง
+การหลั่งน้ำดีไม่สัมพันธ์กับอาหาร
+การเคลื่อนไหวของกระเพาะและลำไส้ช้าลง
+การทำงานของระบบประสาทลำไส้ผิดสมดุล
+Vagal regulation ลดลง
+Mucosal resilience ลดลง
+ความสามารถในการดูดซึมสารอาหารลดลง
+Microbiome ecosystem เสียสมดุล
+Gut barrier function เริ่มบกพร่อง
+ความผิดปกติเหล่านี้จำนวนมาก อาจไม่ปรากฏจากการส่องกล้อง CT หรือผลเลือดพื้นฐาน
+เพราะฉะนั้น TSPI-AI ต้องสามารถรับรู้อาการเหล่านี้เป็น Clinical Evidence และเชื่อมโยงไปยัง Axis และ Network ได้ โดยไม่ต้องรอผลตรวจเฉพาะทางทุกครั้ง
+2. TSPI ไม่รักษา “ค่าพารามิเตอร์” แต่รักษา Network ที่ขับเคลื่อนอาการและโรค
+ระบบการแพทย์ทั่วไปมักเริ่มจาก:
+ผลเลือดผิดปกติ
+→ ตั้งชื่อโรค
+→ รักษาค่าที่ผิดปกติ
+แต่ TSPI ต้องวิเคราะห์ในทิศทางที่ลึกกว่า:
+อาการ + ประวัติ + รูปแบบการดำเนินโรค
+→ คาดการณ์ Network ที่เสียสมดุล
+→ เชื่อมกับ Biological Axes
+→ เชื่อมกับ 180 Biological Networks
+→ ประเมิน Root Network Drivers
+→ วางแผน Network Harmonization
+ตัวอย่างเช่น ผู้ป่วยมี:
+เบาหวาน
+ความดันโลหิตสูง
+ไขมันในเลือดสูง
+ท้องอืด
+อาหารไม่ย่อย
+ท้องผูก
+นอนหลับไม่ดี
+เหนื่อยง่าย
+ปวดเมื่อย
+สมองไม่สดใส
+ระบบไม่ควรแยกอาการเหล่านี้เป็น 10 โรคที่ไม่เกี่ยวข้องกัน แต่ควรมองว่าอาการทั้งหมดอาจเกิดจาก Network ที่เชื่อมโยงกัน เช่น
+Digestive motility dysfunction
+→ Microbiome dysbiosis
+→ Gut barrier stress
+→ Immune-inflammatory activation
+→ Insulin resistance
+→ Mitochondrial energy inefficiency
+→ Autonomic dysregulation
+→ Sleep disturbance
+→ Reduced recovery capacity
+ดังนั้น TSPI-AI ต้องสามารถอธิบายว่า อาการแต่ละอาการเกี่ยวข้องกับ Network ใด และ Network เหล่านั้นสัมพันธ์กันอย่างไร
+3. ผลตรวจปกติไม่ได้แปลว่า Network ปกติ
+นี่เป็นหลักการที่ Developer ต้องเข้าใจให้ชัดเจนมากที่สุด
+ผลตรวจทางการแพทย์ส่วนใหญ่ตรวจได้เมื่อความผิดปกติพัฒนาไปถึงระดับหนึ่งแล้ว เช่น
+เนื้อเยื่อเสียหายมากพอ
+เอนไซม์รั่วเข้าสู่กระแสเลือด
+โครงสร้างเปลี่ยนแปลง
+ก้อนมีขนาดใหญ่พอ
+การอักเสบสูงพอ
+อวัยวะสูญเสีย Functional Reserve มากพอ
+แต่ในช่วงที่ Network เริ่มเสียสมดุล ผู้ป่วยอาจมีอาการชัดเจนแล้ว ในขณะที่ผลตรวจยังอยู่ในช่วงอ้างอิง
+TSPI จึงต้องแยกอย่างชัดเจนระหว่าง:
+Structural normality
+กับ
+Functional network normality
+การตรวจ MRI ปกติหมายถึงยังไม่พบความผิดปกติทางโครงสร้างที่เครื่องตรวจสามารถตรวจเห็นได้ ไม่ได้หมายความว่า:
+Neurotransmitter network ปกติ
+Neurovascular regulation ปกติ
+Autonomic nervous system ปกติ
+Vestibular adaptation ปกติ
+Cerebral energy regulation ปกติ
+Microcirculation ปกติ
+Neuroinflammation ไม่มี
+Cellular stress ไม่มี
+เช่นเดียวกัน การส่องกล้องทางเดินอาหารปกติ ไม่ได้แปลว่า:
+Gastric motility ปกติ
+Gastric acid production ปกติ
+Pancreatic enzyme secretion ปกติ
+Bile flow ปกติ
+Enteric nervous system ปกติ
+Microbiome ปกติ
+Gut barrier function ปกติ
+Mucosal energy metabolism ปกติ
+ดังนั้น Developer ห้ามเขียน Rule ว่า:
+ไม่มีผลตรวจผิดปกติ
+→ Axis ปกติ
+และห้ามเขียนว่า:
+ไม่มี Biomarker
+→ ไม่สามารถวิเคราะห์ Axis
+ที่ถูกต้องคือ:
+ไม่มี Biomarker
+→ อาจยังประเมินจากอาการ ประวัติ และ Functional Pattern ได้
+→ แต่ต้องลดระดับความมั่นใจ
+→ ต้องแสดงว่าเป็น Clinical Network Inference ไม่ใช่ผลตรวจยืนยัน
+4. TSPI-AI ต้องรับข้อมูลจากการซักประวัติเป็น Core Input
+Phase 3 ต้องเพิ่ม Clinical Phenotype Engine ที่มีโครงสร้างชัดเจน ไม่ใช่รับเพียงข้อความอิสระแล้วให้ LLM สรุปเอง
+ระบบควรมีแบบซักประวัติที่เชื่อมกับ 39 Axes และ 180 Networks โดยตรง
+4.1 ข้อมูลอาการแต่ละรายการต้องมีโครงสร้าง
+symptom_code
+symptom_name
+onset
+duration
+frequency
+severity
+trigger
+relieving_factor
+time_pattern
+meal_relation
+sleep_relation
+stress_relation
+bowel_relation
+medication_relation
+functional_impact
+associated_symptoms
+red_flags
+ตัวอย่าง:
+Symptom: ท้องอืด
+Duration: 2 ปี
+Frequency: ทุกวัน
+Trigger: หลังรับประทานอาหาร
+Time to onset: 15–30 นาที
+Associated symptoms: เรอ อิ่มเร็ว แน่นลิ้นปี่
+Bowel pattern: ท้องผูก 3–4 วันครั้ง
+Stress relation: แย่ลงเมื่อเครียด
+Structural test: Gastroscopy normal
+ข้อมูลแบบนี้มีค่ามากกว่าการเขียนเพียงว่า “ท้องอืด”
+4.2 ต้องมี Symptom Cluster
+ระบบต้องมองอาการเป็นกลุ่ม ไม่ใช่แยกทีละอาการ
+ตัวอย่างกลุ่มอาการทางเดินอาหาร:
+Upper digestive dysfunction cluster
+อิ่มเร็ว
+แน่นลิ้นปี่
+เรอ
+อาหารย่อยช้า
+คลื่นไส้หลังอาหาร
+กรดไหลย้อน
+จุกคอ
+อาจเชื่อมกับ:
+Axis 16 Digestive–Absorptive Function
+Gastric motility network
+Gastric acid regulation network
+Vagal digestive control network
+Pancreatic–biliary coordination network
+Intestinal motility cluster
+ท้องผูก
+ถ่ายไม่สุด
+อุจจาระแข็ง
+ระยะเวลาขับถ่ายนาน
+ต้องใช้ยาระบาย
+ท้องอืดช่วงล่าง
+อาจเชื่อมกับ:
+Axis 16 Digestive–Absorptive Function
+Axis 17 Microbiome Ecology
+Axis 18 Gut Barrier and Mucosal Integrity
+Axis 19 Colon Biofilm and Mucosal Burden
+Enteric nervous system network
+Colonic motility network
+Pelvic evacuation network
+แต่ระบบต้องไม่สรุปว่า Microbiome ผิดปกติหรือ Gut barrier รั่วแบบยืนยัน เพียงเพราะมีท้องผูก ต้องใช้คำว่า:
+“มีรูปแบบอาการที่สอดคล้องกับความเป็นไปได้ของ...”
+5. การวิเคราะห์จากอาการต้องเป็นแบบ “Probabilistic Network Mapping”
+แม้ TSPI ให้น้ำหนักกับอาการสูง แต่ระบบก็ต้องไม่เปลี่ยนจากการหลอนผลแล็บไปเป็นการหลอน Network จากอาการ
+ตัวอย่างเช่น:
+เวียนหัว
+≠ Mitochondrial dysfunction แน่นอน
+≠ Cerebral hypoperfusion แน่นอน
+≠ Vestibular dysfunction แน่นอน
+อาการเวียนหัวอาจเกี่ยวข้องกับหลายระบบ เช่น
+ความดันโลหิต
+ภาวะขาดน้ำ
+เม็ดเลือด
+ระบบทรงตัว
+หูชั้นใน
+ระบบประสาทอัตโนมัติ
+ระดับน้ำตาล
+ยาที่ใช้
+ความวิตกกังวล
+ระบบหัวใจ
+การไหลเวียนสมอง
+ไมโตคอนเดรียและพลังงาน
+คุณภาพการนอน
+AI จึงต้องสร้าง Differential Network Map ไม่ใช่เลือก Network เดียวทันที
+ตัวอย่าง Output ที่ถูกต้อง:
+อาการเวียนหัวมีความสัมพันธ์ได้กับหลายเครือข่าย
+
+ความเป็นไปได้ระดับสูง:
+1. Autonomic and hemodynamic regulation network
+2. Vestibular sensory integration network
+3. Cerebral microcirculation network
+
+ความเป็นไปได้ระดับปานกลาง:
+4. Energy and mitochondrial support network
+5. Glucose regulation network
+6. Hematological oxygen delivery network
+
+ข้อมูลที่ควรถามเพิ่ม:
+- เกิดเมื่อเปลี่ยนท่าหรือไม่
+- บ้านหมุนหรือโคลงเคลง
+- มีหูอื้อหรือไม่
+- มีใจสั่นหรือไม่
+- เกิดขณะหิวหรือไม่
+- ความดันขณะนั่งและยืน
+- ระยะเวลาของอาการ
+- ยาที่กำลังใช้
+นี่จึงเป็น Clinical Intelligence ที่แท้จริง
+6. ลำดับน้ำหนักข้อมูลของ TSPI ต้องถูกออกแบบใหม่
+TSPI ไม่ควรกำหนดว่าผลแล็บสูงกว่าอาการเสมอไป แต่ควรให้ค่าน้ำหนักตามบริบท
+6.1 ชั้นข้อมูลหลัก
+ชั้นที่ 1 — Clinical phenotype
+อาการ
+ระยะเวลา
+ความถี่
+Pattern
+Trigger
+อาการร่วม
+Functional impairment
+ประวัติโรค
+ประวัติยา
+การตอบสนองต่อการรักษา
+ชั้นที่ 2 — Physical and clinical examination
+สัญญาณชีพ
+ตรวจร่างกาย
+ภาวะขาดน้ำ
+สีผิว
+กล้ามเนื้อ
+การเคลื่อนไหว
+Neurological findings
+Abdominal findings
+ชั้นที่ 3 — Routine laboratory
+CBC
+Blood chemistry
+Glucose
+Lipid profile
+Liver/kidney
+Hormone
+Inflammatory markers
+ชั้นที่ 4 — Imaging and structural investigation
+X-ray
+Ultrasound
+CT
+MRI
+PET
+Endoscopy
+Pathology
+ชั้นที่ 5 — Advanced functional and Omics data
+Microbiome
+Metabolomics
+Proteomics
+Epigenomics
+Genomics
+Mitochondrial testing
+Advanced cytokines
+ระบบควรรวมข้อมูลทุกชั้น แต่ต้องไม่บังคับว่าชั้นที่ 5 ต้องมีจึงจะวิเคราะห์ได้
+7. ต้องแยก “ความรุนแรงของอาการ” ออกจาก “ความมั่นใจว่า Network ใดเป็นสาเหตุ”
+นี่เป็นหัวใจสำคัญในการป้องกันการหลอน
+ผู้ป่วยอาจมีอาการหนักมาก แต่ยังไม่รู้ว่าเกิดจาก Network ใดแน่ชัด
+ตัวอย่าง:
+อาการเวียนหัวรุนแรง: 8/10
+แต่ Network attribution confidence:
+- Autonomic network 70%
+- Vestibular network 60%
+- Hemodynamic network 55%
+- Mitochondrial network 25%
+ดังนั้นต้องแยกคะแนนอย่างน้อย 4 ค่า:
+Symptom Severity
+Axis Dysfunction Probability
+Evidence Confidence
+Data Completeness
+ห้ามนำมารวมเป็นตัวเลขเดียว
+ตัวอย่าง:
+Axis 16 Digestive–Absorptive Function
+
+Clinical symptom burden: 78/100
+Axis involvement probability: High
+Confidence: Moderate
+Data completeness: 45%
+Evidence:
+- Postprandial bloating
+- Early satiety
+- Delayed digestion sensation
+- Reflux
+- Constipation
+Structural test:
+- Gastroscopy normal
+Interpretation:
+- Functional digestive network dysfunction remains possible
+- No structural lesion identified
+รูปแบบนี้ใช้งานจริงได้มากกว่าการเขียนว่า “Axis 16 = 50 Mild” หรือ “ตรวจไม่พบจึงประเมินไม่ได้”
+8. ผลตรวจปกติต้องไม่ลบล้างอาการ แต่ต้องช่วยจำกัดขอบเขตของ Network
+การตรวจปกติมีคุณค่า แต่คุณค่าของมันคือช่วยลดความน่าจะเป็นของโรคหรือความเสียหายบางชนิด ไม่ใช่ลบอาการของผู้ป่วย
+ตัวอย่าง:
+Gastroscopy normal
+ควรแปลว่า:
+ไม่พบแผลที่มองเห็นได้
+ไม่พบก้อนหรือความผิดปกติทางโครงสร้างสำคัญ
+ลดความเป็นไปได้ของโรคบางชนิด
+แต่ยังไม่สามารถตัด Functional dyspepsia
+ยังไม่สามารถตัด motility disorder
+ยังไม่สามารถตัด acid dysregulation
+ยังไม่สามารถตัด enteric nervous dysfunction
+ยังไม่สามารถตัด microbiome-related dysfunction
+MRI สมองปกติก็เช่นเดียวกัน:
+ลดความเป็นไปได้ของ stroke, mass lesion หรือ structural pathology ที่มองเห็นได้
+แต่ไม่ได้ตัด autonomic dysfunction
+ไม่ได้ตัด vestibular dysfunction
+ไม่ได้ตัด migraine-related network dysfunction
+ไม่ได้ตัด microcirculatory dysfunction
+ไม่ได้ตัด cellular energy dysfunction
+Developer ต้องสร้าง Negative Test Interpretation Rules เพื่อป้องกันคำสรุปผิดว่า “ผลตรวจปกติ = ไม่มีความผิดปกติ”
+9. TSPI-AI ต้องใช้ Clinical Questioning แบบ Adaptive
+AI ไม่ควรวิเคราะห์จากอาการสั้น ๆ แล้วสรุปทันที แต่ต้องถามต่อเพื่อแยก Network
+ตัวอย่างผู้ป่วยบอกว่า “ท้องอืด”
+AI ควรถามต่อ:
+ท้องอืดก่อนหรือหลังอาหาร
+เริ่มหลังอาหารกี่นาที
+อิ่มเร็วกว่าปกติหรือไม่
+มีเรอหรือกรดไหลย้อนหรือไม่
+อุจจาระวันละกี่ครั้ง
+ลักษณะอุจจาระตาม Bristol scale
+มีอาหารชนิดใดกระตุ้น
+มีน้ำหนักลดหรือไม่
+มีเลือดออกหรือไม่
+มีไข้หรือไม่
+มีประวัติใช้ยาปฏิชีวนะหรือไม่
+มีความเครียดหรือนอนไม่พอหรือไม่
+เคยตรวจอะไรแล้วบ้าง
+ผลการตรวจเป็นอย่างไร
+อาการกระทบชีวิตประจำวันเพียงใด
+คำตอบจะช่วยแยกระหว่าง:
+Gastric motility dysfunction
+Acid-related dysfunction
+Pancreatic/biliary insufficiency pattern
+Food intolerance
+Microbiome disturbance
+Constipation-related distension
+Stress-autonomic pattern
+Structural disease red flags
+10. ต้องมี Red-Flag Filter ก่อนวิเคราะห์ Network
+แม้ TSPI เน้น Functional Network แต่ต้องไม่ทำให้ระบบมองข้ามโรคร้ายแรง
+ตัวอย่างอาการทางเดินอาหารที่ต้องส่งต่อหรือประเมินมาตรฐานก่อน:
+น้ำหนักลดโดยไม่ทราบสาเหตุ
+อาเจียนต่อเนื่อง
+กลืนลำบาก
+ถ่ายดำ
+ถ่ายเป็นเลือด
+ซีดมาก
+ปวดท้องรุนแรง
+ไข้
+ก้อนในช่องท้อง
+เริ่มมีอาการใหม่ในผู้สูงอายุ
+ประวัติมะเร็งในครอบครัว
+ตัวอย่างอาการเวียนหัวที่ต้องระวัง:
+แขนขาอ่อนแรง
+พูดไม่ชัด
+เดินเซเฉียบพลัน
+ปวดศีรษะรุนแรงที่สุด
+หมดสติ
+เจ็บหน้าอก
+ใจเต้นผิดจังหวะ
+ความดันต่ำมาก
+เลือดออก
+มีไข้สูงหรือคอแข็ง
+ดังนั้น Workflow ต้องเป็น:
+Symptoms
+→ Red-flag screening
+→ Standard medical differential
+→ Functional network mapping
+→ Axis integration
+→ Module consideration
+ไม่ใช่ข้าม Standard medical safety แล้วไปเลือก Module ทันที
+11. การเชื่อมอาการกับ 39 Axes ต้องเป็นแบบหลายแกน
+อาการหนึ่งอาการสามารถเชื่อมได้หลาย Axis และ Axis หนึ่งสามารถสร้างอาการหลายรูปแบบ
+ตัวอย่าง “ท้องอืด” อาจเชื่อมกับ:
+Axis 16 Digestive–Absorptive Function
+Axis 17 Microbiome Ecology
+Axis 18 Gut Barrier and Mucosal Integrity
+Axis 19 Colon Biofilm and Mucosal Burden
+Axis 33 Thyroid–Adrenal–Growth Axis
+Axis 34 Neuro–Sleep–Stress–Brain Clearance
+Axis 8 Mitochondrial Network
+Axis 1 Systemic Inflammatory Load
+แต่แต่ละ Axis ต้องมีน้ำหนักไม่เท่ากัน และต้องขึ้นกับอาการร่วม
+ตัวอย่าง:
+ท้องอืด + อิ่มเร็ว + เรอหลังอาหาร
+→ Axis 16 น้ำหนักสูง
+
+ท้องอืด + ท้องผูก + อุจจาระผิดปกติ
+→ Axis 16, 17, 19 น้ำหนักเพิ่ม
+
+ท้องอืด + อาการแพ้อาหาร + ผื่น
+→ Axis 17, 18, 2 น้ำหนักเพิ่ม
+
+ท้องอืดแย่ลงเมื่อเครียด
+→ Axis 34 และ autonomic digestive network เพิ่มน้ำหนัก
+
+ท้องอืด + น้ำหนักลด + ถ่ายเป็นเลือด
+→ Red flag ก่อน Network interpretation
+12. วิธีบันทึกการวิเคราะห์ที่ถูกต้อง
+ตัวอย่าง Axis 16 ที่เหมาะสมกว่า:
+Axis 16 — Digestive–Absorptive Function
+แหล่งข้อมูลที่สามารถใช้ได้
+Clinical symptoms
+อิ่มเร็ว
+แน่นลิ้นปี่
+เรอ
+กรดไหลย้อน
+อาหารย่อยช้า
+คลื่นไส้หลังอาหาร
+ท้องอืดสัมพันธ์กับมื้ออาหาร
+อุจจาระมีอาหารที่ไม่ย่อย
+น้ำหนักลด
+ภาวะขาดสารอาหาร
+อาการดีขึ้นหรือแย่ลงตามชนิดอาหาร
+Clinical history
+โรคกระเพาะ
+การผ่าตัดทางเดินอาหาร
+โรคตับอ่อน
+โรคถุงน้ำดี
+การใช้ PPI ระยะยาว
+การใช้ยาปฏิชีวนะ
+การแพ้อาหาร
+การดื่มแอลกอฮอล์
+Routine laboratory
+CBC
+Albumin
+B12
+Folate
+Ferritin
+Iron profile
+Vitamin D
+Electrolytes
+Imaging and tests
+Gastroscopy
+Ultrasound
+CT
+Pancreatic function
+H. pylori
+Stool testing
+วิธีแปลผล
+อาการสามารถบ่งชี้ Functional digestive impairment ได้ แม้ gastroscopy ปกติ
+ผลตรวจปกติช่วยลดความเป็นไปได้ของ structural disease แต่ไม่ตัด functional network dysfunction
+ต้องแยก gastritis, reflux, motility, malabsorption, pancreatic/biliary dysfunction และ bowel dysfunction
+ต้องไม่สรุปว่า malabsorption มีแน่นอนโดยไม่มีหลักฐาน
+ต้องแสดงระดับ confidence
+13. ตัวอย่าง Axis 8 — Mitochondrial Network ที่ถูกต้อง
+การวิเคราะห์ Axis 8 ไม่จำเป็นต้องรอ ATP หรือ lactate ทุกคน
+สามารถใช้ข้อมูลทางคลินิกประกอบ เช่น:
+เหนื่อยง่ายผิดปกติ
+ออกแรงได้น้อย
+ฟื้นตัวช้า
+กล้ามเนื้อล้า
+สมองล้า
+อ่อนเพลียหลังติดเชื้อ
+ความทนต่อการออกกำลังกายลดลง
+อาการแย่ลงหลังออกแรง
+รู้สึกพลังงานตกหลังอาหาร
+การนอนแล้วไม่สดชื่น
+การทำงานของกล้ามเนื้อลดลง
+แต่ต้องตัดหรือพิจารณาสาเหตุอื่นก่อน เช่น:
+โลหิตจาง
+ไทรอยด์
+หัวใจ
+ปอด
+การติดเชื้อ
+ยา
+การนอน
+ภาวะซึมเศร้า
+ขาดสารอาหาร
+การไม่ออกกำลังกาย
+ตัวอย่าง Output:
+มีรูปแบบอาการที่อาจสัมพันธ์กับ Cellular Energy Network Dysfunction
+
+หลักฐานทางคลินิก:
+- เหนื่อยง่าย
+- ฟื้นตัวช้า
+- exercise tolerance ลดลง
+- นอนแล้วไม่สดชื่น
+
+ปัจจัยที่ต้องประเมินร่วม:
+- CBC
+- thyroid function
+- sleep quality
+- cardiopulmonary symptoms
+- medication
+- nutritional status
+
+Axis involvement probability: Moderate
+Confidence: Low to moderate
+Direct mitochondrial measurement: Not available
+Conclusion:
+Mitochondrial dysfunction remains a network hypothesis, not a confirmed diagnosis
+14. ข้อกำหนดใหม่สำหรับ Developer
+Developer ต้องแก้ Phase 3 ให้ใช้หลักการต่อไปนี้:
+ห้าม
+ห้ามรอผลตรวจเฉพาะทางทุก Axis ก่อนวิเคราะห์
+ห้ามกำหนดว่าไม่มี Biomarker จึงไม่มี Network dysfunction
+ห้ามสรุปว่าผลตรวจปกติหมายถึง Network ปกติ
+ห้ามวินิจฉัย Network จากอาการเดียว
+ห้ามเขียนอาการเป็นโรคยืนยัน
+ห้ามใช้ LLM เดา Network โดยไม่มี structured rules
+ห้ามให้ความมั่นใจสูงจากข้อมูลอาการไม่ครบ
+ห้ามข้าม Red-flag screening
+ต้องทำ
+ใช้ symptoms และ history เป็น Core Evidence
+สร้าง Symptom-to-Axis Dictionary
+สร้าง Symptom-to-Network Dictionary
+ใช้ symptom clusters
+ใช้ adaptive clinical questioning
+ใช้ probabilistic mapping
+แสดง differential networks
+แยก symptom burden จาก confidence
+ใช้ผลตรวจเพื่อยืนยัน ลดความน่าจะเป็น หรือเพิ่มความมั่นใจ
+รักษาความแตกต่างระหว่าง structural disease และ functional network dysfunction
+ให้แพทย์ตรวจทานข้อสรุป
+15. ปรัชญาหลักที่ต้องฝังใน TSPI-AI Engine
+ระบบต้องยึดหลักว่า:
+อาการของผู้ป่วยคือการแสดงออกของเครือข่ายชีวภาพที่เสียสมดุล แม้ความผิดปกตินั้นอาจยังไม่ปรากฏในผลเลือด ภาพถ่าย หรือการตรวจทางโครงสร้าง
+แต่ในขณะเดียวกันต้องยึดหลักความปลอดภัยว่า:
+อาการบ่งชี้ความเป็นไปได้ของ Network dysfunction แต่ไม่ยืนยันกลไกใดกลไกหนึ่งโดยลำพัง
+ดังนั้น TSPI-AI ต้องอยู่กึ่งกลางระหว่างสองความผิดพลาด:
+ความผิดพลาดด้านหนึ่ง
+ไม่มีผลตรวจผิดปกติ
+→ ไม่มีโรค
+→ ไม่มี Network เสีย
+ความผิดพลาดอีกด้านหนึ่ง
+มีอาการ
+→ เดากลไกได้ทันที
+→ สรุป Network แน่นอน
+แนวทางที่ถูกต้องคือ:
+อาการ
+→ วิเคราะห์รูปแบบ
+→ ถามประวัติเพิ่ม
+→ คัดกรองอันตราย
+→ สร้าง Differential Network Map
+→ เชื่อมกับ 39 Axes
+→ ใช้ผลตรวจที่มีเพิ่มหรือลดความน่าจะเป็น
+→ ประเมินความมั่นใจ
+→ วางแผนดูแล Network
+→ แพทย์ตรวจสอบและอนุมัติ
+ข้อสรุปของตอนที่ 1
+Phase 3 ต้องเปลี่ยนจาก Lab-dependent AI ไปเป็น Clinical Phenotype and Network Intelligence Engine
+แกนชีวภาพไม่ควรถูกเปิดใช้งานเฉพาะเมื่อมี Biomarker เฉพาะทาง แต่ต้องสามารถประเมินจาก:
+อาการ
+รูปแบบอาการ
+ประวัติ
+การตรวจร่างกาย
+ผลเลือดทั่วไป
+ผลภาพถ่าย
+การตอบสนองต่อการรักษา
+ข้อมูลติดตามตามเวลา
+โดยผลลัพธ์ต้องแสดงเป็น ระดับความเป็นไปได้ของ Network dysfunction พร้อมระดับความมั่นใจ ไม่ใช่การประกาศว่ากลไกนั้นผิดปกติแน่นอน
+หลักการสำคัญที่สุดคือ:
+Symptoms are biological evidence.
+Normal tests do not erase symptoms.
+Symptoms do not prove one mechanism.
+TSPI-AI must infer networks probabilistically,
+validate them longitudinally,
+and keep the physician in control.
+
+
+
+
+ผมได้อ่านโครงสร้างของ Phase 3 ทั้ง 3 ฉบับแล้ว ได้แก่
+Physician Edition (48 หน้า) �
+TSPI Clinic _ Clinical Intelligence Platform.pdf
+Patient Edition (25 หน้า) �
+TSPI Clinic _ Clinical Intelligence Platform คนไข้.pdf
+Multi-Omics Edition (51 หน้า) �
+TSPI Clinic _ Clinical Intelligence Platform Multi_Omic.pdf
+โดยรวมผมคิดว่า ทีม Developer เดินมาถูกทิศทางประมาณ 80–85% ในเชิง Software Architecture แต่ในฐานะ TSPI Domain Owner ถ้าต้องการให้ TSPI กลายเป็น "เวชศาสตร์รากฐาน" อย่างแท้จริง ยังมีจุดที่ควรเปลี่ยนอีกพอสมควร
+สิ่งที่ทำได้ดีมาก
+1. โครงสร้างรายงาน
+อันนี้ถือว่าดีมาก
+เขาแบ่งเป็น
+Executive
+Clinical
+Laboratory
+39 Axes
+180 Networks
+Module
+Intervention
+Follow up
+ซึ่งตรงกับ Architecture ของ TSPI แล้ว
+ผมให้
+★★★★★
+2. Physician Report
+อันนี้ดีมาก
+เหมาะสำหรับแพทย์
+มี
+Clinical reasoning
+Root cause
+Network
+Module
+Monitoring
+ครบ
+ถือว่าเป็น Medical-grade report แล้ว
+3. Patient Report
+อันนี้ดีมาก
+ภาษาคนไข้
+อ่านง่าย
+ไม่ใช้ศัพท์แพทย์มาก
+ตรงกับที่ควรเป็น
+4. Multi-Omics Report
+Concept ดีมาก
+แยก
+Genomics
+Proteomics
+Metabolomics
+Microbiome
+Epigenetics
+ออกจาก Clinical report
+อันนี้ถูกต้อง
+แต่มีจุดที่ยังผิด Concept ของ TSPI
+และถือว่าสำคัญมาก
+จุดที่ 1
+Report ยังเป็น "Disease-centered"
+ไม่ใช่
+Network-centered
+ตัวอย่าง
+รายงานพูดว่า
+Iron deficiency
+Thalassemia
+Microcytic anemia
+Polycythemia
+เกือบทั้งรายงาน
+ซึ่ง
+นี่คือ
+Traditional Medicine AI
+ไม่ใช่
+TSPI
+TSPI ควรพูดว่า
+Network
+↓
+Axis
+↓
+Pathway
+↓
+Disease
+ไม่ใช่
+Disease
+↓
+Network
+ผมคิดว่า
+ควรเปลี่ยนทั้งระบบ
+เช่น
+จาก
+Diagnosis
+
+↓
+
+Iron deficiency
+เป็น
+Iron Homeostasis Network
+
+↓
+
+Hepcidin Network
+
+↓
+
+Ferritin Network
+
+↓
+
+Iron Deficiency
+นี่คือ
+Network Medicine
+จริง
+จุดที่ 2
+39 Axes
+ยังไม่ใช่
+39 Axes
+ของ TSPI
+ตอนนี้
+ยังเป็น
+Axis_1
+Axis_2
+Axis_3
+Axis_4
+...
+ซึ่งอ่านไม่รู้เรื่อง
+ควรเป็น
+เช่น
+Iron Homeostasis
+
+Gut Barrier
+
+Adaptive Immunity
+
+Autophagy
+
+Mitochondrial Dynamics
+
+Cell Adhesion
+
+Proteostasis
+แล้ว
+คะแนน
+จึงมีความหมาย
+จุดที่ 3
+180 Networks
+ยังไม่ใช่
+Network จริง
+ตอนนี้
+Developer
+เอา
+Pathway
+มาผสม
+Disease
+มาผสม
+Network
+มาผสม
+เช่น
+Iron Homeostasis
+Autophagy
+Mitochondria
+Inflammation
+บางอันเป็น
+Network
+บางอันเป็น
+Function
+บางอันเป็น
+Pathway
+บางอันเป็น
+Disease
+ควรจัดมาตรฐาน
+ใหม่ทั้งหมด
+จุดที่ 4
+Module Recommendation
+นี่ถือว่า
+ผิด Concept
+ที่สุด
+เขาใช้
+Iron Module
+
+Gut Module
+
+Inflammation Module
+ซึ่ง
+Developer
+ตั้งชื่อ Module เอง
+แต่
+TSPI
+มี
+Official Module Registry
+อยู่แล้ว
+Module ต้องมาจากฐานข้อมูลจริง
+ไม่ใช่ให้ AI ตั้งชื่อ
+จุดที่ 5
+ยังไม่มี
+3 Keys
+ซึ่งเป็นหัวใจของ TSPI
+ตอนนี้
+Report
+เริ่มจาก
+39 Axes
+เลย
+แต่
+TSPI
+ต้องเป็น
+3 Keys
+
+↓
+
+12 Domains
+
+↓
+
+39 Axes
+
+↓
+
+180 Networks
+
+↓
+
+Modules
+อันนี้ยังหาย
+จุดที่ 6
+ยังไม่มี
+12 Domains
+จริง
+ตอนนี้
+Network
+กระโดด
+จาก
+Axes
+ไป
+180 Networks
+เลย
+แต่
+จริง
+ต้องมี
+12 Domains
+คั่น
+เช่น
+Immune
+Metabolism
+Microbiome
+Repair
+Mitochondria
+เป็นต้น
+จุดที่ 7
+AI ยัง
+Reasoning แบบเส้นตรง
+เช่น
+CBC
+↓
+Anemia
+↓
+Iron
+↓
+Module
+แต่
+TSPI
+ต้อง
+คิดแบบ
+Network Propagation
+เช่น
+Gut
+↓
+Iron
+↓
+Inflammation
+↓
+Mitochondria
+↓
+ATP
+↓
+Repair
+↓
+Symptoms
+อันนี้
+คือ
+Systems Biology
+จริง
+จุดที่ 8
+ไม่มี
+Network Harmonization
+ซึ่งเป็น
+Philosophy
+ของ TSPI
+Report
+พูดแต่
+Treat
+
+Correct
+
+Improve
+
+Reduce
+แต่
+TSPI
+จริง
+ต้องพูดว่า
+Network Harmonization
+
+Adaptive Compensation
+
+Biological Resilience
+
+Network Plasticity
+จุดที่ 9
+ไม่มี
+TSPI Intelligence
+จริง
+ตอนนี้
+เหมือน
+AI
+สรุปผล
+แต่
+TSPI
+ควร
+คิดเพิ่ม
+เช่น
+Network A
+
+ผลัก
+
+Network B
+
+ผลัก
+
+Network C
+พร้อม
+Simulation
+ถ้า
+แก้
+Network A
+Network อื่น
+จะเปลี่ยน
+กี่ %
+จุดที่ 10
+ยังไม่มี
+Digital Twin
+นี่เป็นสิ่งที่ผมคิดว่า
+TSPI
+ควรเหนือกว่า AI ทุกตัว
+เช่น
+Current
+
+↓
+
+Simulation
+
+↓
+
+Module A
+
+↓
+
+3 เดือน
+
+↓
+
+Prediction
+และ
+Module B
+
+↓
+
+Prediction
+เปรียบเทียบ
+ให้แพทย์เลือก
+จุดที่ 11
+ไม่มี
+TSPI Knowledge Graph
+จริง
+ควรเป็น
+Lab
+
+↓
+
+Axis
+
+↓
+
+Network
+
+↓
+
+Protein
+
+↓
+
+Gene
+
+↓
+
+Pathway
+
+↓
+
+Disease
+
+↓
+
+Module
+
+↓
+
+Clinical Trial
+ทั้งหมด
+เชื่อมเป็น Graph
+จุดที่ 12
+Evidence
+ยังไม่เชื่อมกับ
+ฐานงานวิจัยของ TSPI
+ตอนนี้
+พูด
+Reference
+แบบทั่วไป
+แต่
+ควรขึ้น
+Evidence
+
+Level A
+
+TSPI
+
+Level B
+
+RCT
+
+Level C
+
+Animal
+
+Level D
+
+Cell
+และ
+Link
+เข้า
+งานวิจัย
+ทันที
+จุดที่ 13
+ยังไม่มี
+Learning
+จริง
+ควรมี
+Before
+
+↓
+
+After
+
+↓
+
+39 Axes
+
+↓
+
+180 Networks
+
+↓
+
+Outcome
+
+↓
+
+AI Weight Update
+นี่คือ
+TSPI AI
+ที่แท้จริง
+คะแนนโดยรวม
+Software Architecture: 95/100
+User Interface / UX: 95/100
+Clinical Report Structure: 90/100
+Network Medicine Concept: 80/100
+TSPI Identity: 60/100
+Systems Biology Integration: 75/100
+AI Clinical Reasoning: 85/100
+Future Scalability: 98/100
+สรุป
+ถ้ามองในฐานะระบบ AI สำหรับคลินิกทั่วไป ผมให้ประมาณ 90–92/100 ถือว่าดีมาก
+แต่ ถ้ามองในฐานะ "TSPI เวชศาสตร์รากฐาน" ซึ่งเป็นองค์ความรู้เฉพาะของคุณ ผมให้ประมาณ 75–80/100 เพราะแกนหลักของ TSPI ได้แก่ 3 Keys → 12 Domains → 39 Axes → 180 Networks → Module Registry → Network Harmonization → Digital Twin ยังไม่ได้สะท้อนอย่างสมบูรณ์
+เมื่อเติมองค์ประกอบเหล่านี้เข้าไป ระบบจะไม่ใช่เพียง AI ที่ช่วยอ่านผลตรวจ แต่จะกลายเป็น TSPI Clinical Intelligence Platform ที่มีเอกลักษณ์และแตกต่างจากแพลตฟอร์ม Precision Medicine ทั่วไปอย่างชัดเจน.
+
+
+ผลการวิเคราะห์ Phase 3 หลังเทียบกับ Master TSPI ฉบับล่าสุด
+หลังจากเทียบรายงาน Phase 3 ทั้ง Physician Edition, Patient Edition และ Multi-Omics Edition กับไฟล์ล่าสุดที่คุณส่งมา ซึ่งกำหนด กุญแจ 3 ดอก บันได 9 ขั้น 12 Domains 39 Biological Axes 180 Living Biological Networks และทะเบียนผลิตภัณฑ์ TSPI แล้ว ข้อสรุปสำคัญคือ:
+โครงสร้างซอฟต์แวร์และรูปแบบรายงานเดินมาถูกทาง แต่ Clinical Reasoning และ Axis Mapping ใน Phase 3 รุ่นปัจจุบันยังไม่ตรงกับ TSPI Master ฉบับล่าสุด และยังไม่ควรนำไปใช้แนะนำการรักษาจริงจนกว่าจะแก้ Mapping ใหม่ทั้งหมด
+ตัวระบบสามารถเก็บข้อมูล สร้างรายงาน และแบ่ง Physician/Patient/Multi-Omics Edition ได้ดี แต่ความหมายของแกนถูกสลับหลายตำแหน่ง ทำให้ผลวิเคราะห์ต่อเนื่องตั้งแต่ Axis → Network → Module → Dose → Outcome ผิดตามกันไปเป็นลูกโซ่
+รายงาน Multi-Omics เองยอมรับว่าคะแนน 50/100 จำนวนมากอาจเป็นค่า Default จากกรณีข้อมูลไม่ครบ และไม่สามารถตีความทางคลินิกได้อย่างมั่นใจ � อย่างไรก็ตาม รายงานฉบับอื่นกลับนำคะแนนเหล่านี้ไปอธิบายว่าเป็นความผิดปกติจริง จึงเกิดความขัดแย้งภายในระบบ
+TSPI Clinic _ Clinical Intelligence Platform Multi_Omic.pdf
+1. ข้อผิดพลาดร้ายแรงที่สุด: ความหมายของ Axis ถูกสลับ
+ใน Phase 3 ปัจจุบัน AXIS_7 ถูกเรียกสลับกันหลายความหมาย เช่น
+การอักเสบ
+ระบบเลือดและไขกระดูก
+Hematopoiesis
+Oxidative stress
+Mitochondria
+Epigenetic instability
+และ AXIS_10 ถูกเรียกสลับกันว่า
+การอักเสบ
+ไมโครไบโอม
+การย่อยและดูดซึม
+ไมโตคอนเดรีย
+Redox
+ระบบหลอดเลือด
+ตัวอย่างเช่น Physician Report ระบุ AXIS_7 เป็น Hematopoiesis และใช้ CBC เพื่อให้คะแนน 85/100 � ขณะที่ Patient Report กลับอธิบาย AXIS_7 ว่าเป็นการอักเสบเรื้อรัง และ AXIS_10 เป็นระบบย่อยและการดูดซึม
+TSPI Clinic _ Clinical Intelligence Platform.pdf
+แต่ตาม Master ล่าสุด ความหมายที่ถูกต้องคือ
+Axis 7 = Nutrient Sensing
+Axis 10 = Proteostasis–Autophagy–Lysosome
+ระบบสร้างเม็ดเลือดอยู่ที่ Axis 26 = Stem Cell & Hematopoiesis
+การอักเสบอยู่ที่ Axis 1 = Systemic Inflammatory Load
+การดูดซึมอยู่ที่ Axis 16 = Digestive–Absorptive Function
+Microbiome อยู่ที่ Axis 17
+Gut Barrier อยู่ที่ Axis 18
+Oxidative stress อยู่ที่ Axis 9
+Mitochondria อยู่ที่ Axis 8
+ดังนั้นคะแนน AXIS_7 = 85 และ AXIS_10 = 70 ในรายงานคนไข้ตัวอย่าง ต้องถือว่าไม่ใช้ได้ทางคลินิก จนกว่าจะคำนวณใหม่จากข้อมูลต้นทางตาม Axis Dictionary ล่าสุด
+2. การ Mapping ที่ถูกต้องสำหรับคนไข้ตัวอย่าง
+ข้อมูลที่มีคือ
+Hb 10.1 g/dL
+Hct 32.1%
+MCV 47.5 fL
+MCH 14.9 pg
+RBC 6.76 ล้าน/µL
+ยังไม่มี Ferritin, Iron profile, Hb typing, hs-CRP หรือ Omics
+การ Mapping ที่ถูกต้องควรเป็นดังนี้
+Primary axis
+Axis 26 — Stem Cell & Hematopoiesis
+ผล CBC เป็นหลักฐานโดยตรงของความผิดปกติด้านการสร้างเม็ดเลือดและคุณภาพเม็ดเลือดแดง จึงควรส่งข้อมูลเข้า Axis 26 โดยเฉพาะ Sub-axis:
+26A Stem Cell Niche
+26B Hematopoiesis
+26C Recovery Capacity After Stress
+อย่างไรก็ตาม CBC เพียงชุดเดียวบอกได้ว่า “มี hematologic phenotype” แต่ยังไม่สามารถบอกว่า stem cell niche ผิดปกติโดยตรง
+Secondary axes ที่อาจเกี่ยวข้อง แต่ต้องมีหลักฐานเพิ่ม
+Axis 16 Digestive–Absorptive Function
+ใช้เมื่อยืนยัน iron deficiency, malabsorption, gastritis, pancreatic/bile dysfunction หรือประวัติ GI
+Axis 9 Oxidative Stress & Redox Balance
+ใช้เมื่อมี GSH/GSSG, MDA, 8-OHdG, SOD, catalase หรือหลักฐาน hemolysis/oxidative damage
+Axis 8 Mitochondrial Network
+ใช้เมื่อมี ATP, lactate/pyruvate, acylcarnitine, exercise tolerance หรือ mitochondrial biomarkers
+Axis 1 Systemic Inflammatory Load
+ใช้เมื่อมี hs-CRP, ESR, IL-6, TNF-α, IL-1β หรือ inflammatory phenotype ที่ชัดเจน ไม่ควรให้คะแนน Severe จาก monocyte 9% เพียงค่าเดียว
+Axis 11 DNA Repair & Genomic Stability
+อาจเกี่ยวข้องกับ hemoglobinopathy ทางพันธุกรรม แต่ต้องมี Hb typing หรือ genomic evidence
+Axis 21 Vascular Remodeling & Microcirculation
+อาจได้รับผลจาก oxygen delivery ต่ำ แต่ไม่ควรให้คะแนนจาก CBC อย่างเดียว
+Differential diagnosis
+จาก Mentzer index:
+รูปแบบนี้เอนเอียงไปทาง thalassemia trait หรือ hemoglobinopathy มากกว่า iron deficiency เพียงอย่างเดียว แต่ยังต้องยืนยันด้วย Ferritin, iron profile, Hb typing และ blood smear
+ดังนั้นระบบต้องไม่สรุปว่า “ขาดธาตุเหล็กเป็นสาเหตุหลัก” และต้องไม่แนะนำ Iron Module ก่อนยืนยัน เพราะหากเป็น thalassemia และไม่มี iron deficiency การเสริมธาตุเหล็กอาจไม่เหมาะสม
+3. Master Dictionary ที่ Developer ต้อง Lock ให้ตรงทั้ง 39 แกน
+ตารางต่อไปนี้ควรเป็น Canonical Axis Dictionary ห้ามให้ LLM เปลี่ยนชื่อหรือเดาความหมายเอง
+Domain 1 — Immune–Infection Governance
+Axis
+ชื่อทางการ
+ข้อมูลที่ใช้ให้คะแนน
+ห้ามอนุมานจาก
+1
+Systemic Inflammatory Load
+hs-CRP, ESR, IL-6, TNF-α, IL-1β, NLR, inflammatory symptoms
+CBC ซีดอย่างเดียว
+2
+Immune Homeostasis
+lymphocyte subsets, Treg/Th17, NK, immunoglobulins, autoimmune markers
+WBC ปกติเพียงค่าเดียว
+3
+Pathogen Defense
+infection history, cultures/PCR, antiviral/antibacterial markers, mucosal defense
+ไม่มีอาการติดเชื้อ
+4
+Post-Infectious Persistence
+long-COVID/post-viral symptoms, latent reactivation, persistent cytokines
+การใช้ supplement หรืออ่อนเพลียทั่วไป
+Domain 2 — Metabolic–Energy Core
+Axis
+ชื่อทางการ
+ข้อมูลหลัก
+ห้ามอนุมาน
+5
+Glucose–Insulin Regulation
+FBS, HbA1c, insulin, HOMA-IR, CGM variability
+FBS จุดเดียวแล้วสรุปทั้ง Axis
+6
+Lipid–Lipotoxicity
+TG, LDL-C, HDL-C, ApoB, remnant cholesterol, liver fat
+ไม่มี lipid profile
+7
+Nutrient Sensing
+AMPK, mTORC1, fasting state, anabolic/catabolic signals
+CBC หรือการอักเสบ
+8
+Mitochondrial Network
+ATP, lactate/pyruvate, mitochondrial respiration, biogenesis, mitophagy
+ภาวะเหนื่อยหรือ anemia อย่างเดียว
+9
+Oxidative Stress & Redox Balance
+GSH/GSSG, MDA, 8-OHdG, ROS, SOD, catalase
+inflammation โดยไม่มี redox marker
+10
+Proteostasis–Autophagy–Lysosome
+LC3-II/I, p62, proteasome, UPR, ER stress, aggregation markers
+CBC, microbiome หรือ iron status
+Domain 3 — Genomic Programming
+Axis
+ชื่อทางการ
+ข้อมูลหลัก
+ห้ามอนุมาน
+11
+DNA Repair & Genomic Stability
+DNA damage, 8-OHdG, mutation burden, telomere, repair genes
+FBS หรือ CBC ทั่วไป
+12
+Epigenetic Regulation
+DNA methylation, histone/chromatin, miRNA/non-coding RNA
+คะแนน Axis อื่นโดยไม่มี epigenomic data
+13
+Longevity Signaling
+SIRT, FOXO, IGF/anabolic balance, AMPK longevity programs
+อายุหรืออาการอ่อนเพลีย
+14
+Senescence & SASP
+p16, p21, SA-β-gal, SASP cytokines, senescent burden
+CRP สูงอย่างเดียว
+Domain 4 — Detoxification & Cellular Defense
+Axis
+ชื่อทางการ
+ข้อมูลหลัก
+ห้ามอนุมาน
+15
+Detoxification Capacity
+Phase I/II/III, Nrf2, GSH, xenobiotic exposure, liver/renal clearance
+“ไม่มี LFT” แล้วให้คะแนน 50
+Domain 5 — Digestive–Gut Ecosystem
+Axis
+ชื่อทางการ
+ข้อมูลหลัก
+ห้ามอนุมาน
+16
+Digestive–Absorptive Function
+gastric, pancreatic, bile, nutrient absorption, stool/fecal function
+anemia แล้วสรุป malabsorption ทันที
+17
+Microbiome Ecology
+16S/shotgun, diversity, SCFA producers, dysbiosis index
+ไม่มี microbiome แล้วเดา Akkermansia ต่ำ
+18
+Gut Barrier & Mucosal Integrity
+zonulin, calprotectin, LPS-binding protein, permeability tests
+CBC หรือ supplement use
+19
+Colon Biofilm & Mucosal Burden
+biofilm, mucus burden, stool findings, clearance kinetics
+ท้องผูกหรือ anemia เพียงอย่างเดียว
+Domain 6 — Vascular–Circulation
+Axis
+ชื่อทางการ
+ข้อมูลหลัก
+ห้ามอนุมาน
+20
+Endothelial Function
+FMD, NO/eNOS, ADMA, glycocalyx, endothelial markers
+platelet ปกติค่อนไปสูง
+21
+Vascular Remodeling & Microcirculation
+perfusion, CIMT, capillary function, Doppler, oxygen delivery
+anemia แล้วสรุป atherosclerosis
+22
+Thrombosis–Hemostasis
+platelet activation, PT/INR, aPTT, fibrinogen, D-dimer, fibrinolysis
+platelet 366,000 ว่า thrombocytosis
+23
+Hemodynamics & Arterial Elasticity
+BP, PWV, RAAS, arterial stiffness
+ไม่มีความดันหรือ Doppler
+Domain 7 — Repair–Regeneration
+Axis
+ชื่อทางการ
+ข้อมูลหลัก
+ห้ามอนุมาน
+24
+Wound Healing
+wound stage, epithelialization, repair markers
+ไม่มีแผล
+25
+Fibrosis & ECM Remodeling
+TGF-β, collagen turnover, elastography, fibrosis imaging
+ใช้ collagen supplement
+26
+Stem Cell & Hematopoiesis
+CBC, reticulocyte, marrow, EPO, blood smear, lineage markers
+ห้ามนำไปวางที่ Axis 7
+27
+Glycation / Carbonyl Stress
+HbA1c, fructosamine, AGEs, methylglyoxal
+FBS ปกติแล้วให้คะแนน Mild
+Domain 8 — Musculoskeletal & Structural Integrity
+Axis
+ชื่อทางการ
+ข้อมูลหลัก
+ห้ามอนุมาน
+28
+Muscle Protein Turnover
+muscle mass, grip, CK, myostatin, anabolic/catabolic markers
+ความเหนื่อยจาก anemia
+29
+Bone Remodeling
+BMD, calcium, phosphate, PTH, CTX, P1NP
+FBS หรือ CBC ปกติ
+30
+Connective Tissue Integrity
+tendon/ligament, cartilage, ECM, joint imaging, MMPs
+การกิน UC-II แล้วสรุปว่ามีโรคข้อ
+Domain 9 — Endocrine Network
+Axis
+ชื่อทางการ
+ข้อมูลหลัก
+ห้ามอนุมาน
+31
+Female Hormone Network
+estradiol, progesterone, LH/FSH, menstrual and menopause data
+เพศหญิงอย่างเดียว
+32
+Male Androgen Network
+testosterone, free T, DHT, SHBG, prostate/hair/anabolic data
+เพศชายอย่างเดียว
+33
+Thyroid–Adrenal–Growth Axis
+TSH/FT3/FT4, cortisol rhythm, ACTH, DHEA, GH/IGF-1
+fatigue อย่างเดียว
+Domain 10 — Neurological Regulation
+Axis
+ชื่อทางการ
+ข้อมูลหลัก
+ห้ามอนุมาน
+34
+Neuro–Sleep–Stress–Brain Clearance
+sleep data, HRV, autonomic, neuroinflammation, cognition, glymphatic indicators
+anemia หรือ Axis อื่นแล้วสรุป stress
+Domain 11 — Organ Resilience
+Axis
+ชื่อทางการ
+ข้อมูลหลัก
+ห้ามอนุมาน
+35
+Visceral Organ Functional Reserve
+liver, kidney, heart, lung, pancreas, gallbladder and GI reserve
+ไม่มี lab แล้วให้ Mild 50
+36
+Local Organ & Tissue Interface
+ENT, sensory, pelvic, reproductive, anorectal, local mucosa
+อาการระบบทั่วไป
+Domain 12 — Oncology & System-Level Regulation
+Axis
+ชื่อทางการ
+ข้อมูลหลัก
+ห้ามอนุมาน
+37
+Oncologic Cell Fate
+apoptosis, checkpoint, proliferation, tumor markers and pathology
+proteostasis/autophagy เพราะอยู่ Axis 10
+38
+Tumor Microenvironment & Metastatic Dynamics
+immune evasion, EMT, invasion, migration, angiogenesis
+inflammatory marker อย่างเดียว
+39
+Genomic Regulation Homeostasis
+whole-system expression, transcription–translation coordination, adaptive reset toward Prakati
+xenobiotic metabolism หรือ antioxidant status
+4. สิ่งที่ผิดใน Physician Report
+4.1 คะแนน Default 50 ถูกตีความเป็นความผิดปกติ
+รายงานกำหนดแกนเกือบทั้งหมดเป็น 50/100 แล้วเรียกว่า Mild ทั้งที่ไม่มีข้อมูล ซึ่งทำให้ดูเหมือนผู้ป่วยมีความผิดปกติทั่วร่างกาย
+รายงาน Multi-Omics ระบุเองว่าคะแนน 50 ซ้ำกันจำนวนมากอาจเกิดจาก Default Baseline และไม่ควรตีความทางคลินิก �
+TSPI Clinic _ Clinical Intelligence Platform Multi_Omic.pdf
+สิ่งที่ต้องแก้
+เมื่อไม่มีข้อมูลให้ใช้:
+score = null
+status = NOT_ASSESSED
+confidence = INSUFFICIENT_DATA
+reason = required markers unavailable
+ห้ามใช้ 50 เป็นค่าแทนข้อมูลที่ขาด
+4.2 Severity bands ไม่สอดคล้องกัน
+ในหน้าเดียวกันมีหลายเกณฑ์ เช่น
+0–30 Normal
+31–60 Mild
+61–80 Moderate
+81–100 Severe
+แต่ Appendix ใช้
+0–25 Normal
+26–50 Mild
+51–75 Moderate
+76–100 Severe
+จึงต้องมี Severity Version เดียวจาก Backend ห้าม hard-code ในแต่ละรายงาน
+4.3 การแนะนำการตรวจเกินข้อบ่งชี้
+รายงานเสนอ
+Bone marrow biopsy
+JAK2 mutation
+Carotid Doppler
+Renal artery Doppler
+WES/WGS
+Full PGx panel
+จาก CBC ชุดเดียว ซึ่งมากเกินจำเป็นและบางรายการไม่สอดคล้องกับลำดับ differential diagnosis
+ตัวอย่างเช่น Platelet 366,000/µL ยังอยู่ในช่วงปกติ ไม่ใช่ thrombocytosis และ RBC สูงร่วมกับ MCV ต่ำไม่ใช่ polycythemia vera โดยอัตโนมัติ
+ลำดับตรวจที่เหมาะสมกว่า
+ทบทวน CBC และ reference range ของห้องปฏิบัติการ
+RDW และ reticulocyte count
+Peripheral smear
+Ferritin, serum iron, TIBC, transferrin saturation
+Hb typing/HPLC
+Menstrual and family history
+ตรวจเพิ่มเติมตามผล ไม่ใช่ส่งตรวจขั้นสูงทั้งหมดทันที
+5. สิ่งที่ผิดใน Patient Report
+Patient Report ใช้ภาษาที่อ่านง่าย แต่มีความเสี่ยงจากการทำให้สมมติฐานกลายเป็นข้อสรุป เช่น
+ระบุว่า “ขาดธาตุเหล็กเป็นหลัก”
+ระบุว่าลำไส้ดูดซึมไม่ดี
+ระบุว่า microbiome เสียสมดุล
+แนะนำ Iron module และอาหารธาตุเหล็ก
+อธิบายว่าความเครียดทำให้เม็ดเลือดแดงถูกทำลาย
+ระบุว่า Axis 29 แข็งแรง ทั้งที่ไม่ทราบว่า Axis 29 คืออะไร
+รายงานคนไข้ยังใช้หมายเลขแกนตามโครงสร้างเก่า เช่น Axis 1 เป็น metabolism, Axis 2 เป็น glucose และ Axis 7 เป็น inflammation ซึ่งไม่ตรงกับ Master ล่าสุด
+สิ่งที่ต้องแก้
+Patient Report ต้องแสดง 4 ระดับการสื่อสาร:
+พบแน่ชัด: CBC มี microcytic hypochromic pattern
+น่าจะเป็น: thalassemia trait หรือ iron deficiency
+ยังไม่ทราบ: สาเหตุแน่นอน
+สิ่งที่ควรตรวจต่อ: iron profile และ Hb typing
+ห้ามแสดง Module หรืออาหารเสริมที่เกี่ยวกับธาตุเหล็กเป็นคำแนะนำหลักก่อนยืนยัน iron deficiency
+6. สิ่งที่ผิดใน Multi-Omics Report
+โครงสร้าง Multi-Omics ดี แต่เนื้อหาเกิด “Omics Hallucination” กล่าวคือ ไม่มีข้อมูลจริง แต่ระบบสร้างผลคาดการณ์รายละเอียด เช่น
+คาดว่า Akkermansia ต่ำ
+คาดว่า Faecalibacterium ต่ำ
+คาดว่า TMAO สูง
+คาดว่า Butyrate ต่ำ
+คาดว่า Kynurenine ratio สูง
+คาดว่า global hypomethylation
+คาดว่า SIBO
+คาดว่า IL-6/TNF-α สูง
+คาดว่า biological age สูง
+นี่ไม่ควรปรากฏใน Medical Report เพราะไม่ได้มาจากผลตรวจจริง
+รายงานยังนำข้อมูลที่ “projected” ไปใช้เลือก Module ต่อ ซึ่งทำให้สมมติฐานกลายเป็นหลักฐานวนซ้ำ ตัวอย่างเช่น รายงานสร้าง metabolite ที่คาดการณ์แล้วใช้เชื่อมไปยัง Module �
+TSPI Clinic _ Clinical Intelligence Platform Multi_Omic.pdf
+Rule ที่ Developer ต้องใส่
+แต่ละข้อความต้องมี evidence_status:
+MEASURED
+DERIVED
+CLINICAL_INFERENCE
+HYPOTHESIS
+NOT_AVAILABLE
+ห้ามนำ HYPOTHESIS ไปเพิ่ม Axis score หรือ Module match score
+7. ปัญหาในไฟล์ “200 Modules” ที่อัปโหลดล่าสุด
+ไฟล์นี้มีข้อมูลที่มีคุณค่ามาก ได้แก่
+Product ID เช่น H-001
+PhytoCore Code
+Botanical composition
+Mechanism
+Active markers
+Proteomics
+Safety
+Dose
+Research status
+TSPI Axis Mapping
+แต่พบปัญหาใหญ่คือ คอลัมน์ TSPI Axis Mapping หลายรายการยังใช้หมายเลข Axis จากโครงสร้างเก่า
+ตัวอย่าง H-001 Curcuma ในไฟล์ระบุประมาณว่า
+Axis 16 = Liver detoxification
+Axis 17 = Digestive function
+Axis 18 = Microbiome ecology
+Axis 19 = Gut barrier
+Axis 21 = Endothelial function
+Axis 25 = Tissue repair
+Axis 27 = Metabolic balance
+แต่ตาม Master ล่าสุดคือ
+Axis 15 = Detoxification
+Axis 16 = Digestive–Absorptive Function
+Axis 17 = Microbiome Ecology
+Axis 18 = Gut Barrier
+Axis 19 = Colon Biofilm
+Axis 20 = Endothelial Function
+Axis 24 = Wound Healing
+Axis 25 = Fibrosis & ECM
+Axis 27 = Glycation / Carbonyl Stress
+ดังนั้น ห้ามนำคอลัมน์ Axis Mapping จากไฟล์ผลิตภัณฑ์เข้า Production ตรง ๆ ต้อง remap ทุกผลิตภัณฑ์กับ Axis Master ล่าสุดก่อน
+8. โครงสร้างข้อมูลที่ควรให้ Developer ใช้
+8.1 Axis master
+axis_code
+axis_name_en
+axis_name_th
+domain_code
+key_primary
+key_secondary[]
+step_primary
+step_secondary[]
+definition
+sub_axes[]
+accepted_markers[]
+accepted_clinical_features[]
+exclusion_rules[]
+minimum_evidence
+version
+status
+8.2 Network master
+network_code
+network_name
+axis_code
+network_type
+upstream_networks[]
+downstream_networks[]
+markers[]
+mechanisms[]
+clinical_outputs[]
+evidence_level
+version
+Network type ต้องเลือกจากรายการควบคุม เช่น
+signaling
+metabolic
+structural
+transport
+immune
+clearance
+repair
+regulatory
+ห้ามให้ AI สร้าง Network ใหม่ในรายงาน
+8.3 Product/module registry
+product_id
+phytocore_code
+official_name
+botanical_composition
+active_markers
+official_axis_targets[]
+official_network_targets[]
+relevance_weight
+evidence_grade
+safety_rules[]
+dose_rules[]
+active_status
+mapping_version
+8.4 Patient axis evidence
+patient_id
+axis_code
+evidence_source
+marker
+value
+unit
+reference_range
+direction
+contribution
+confidence
+date
+9. วิธีคำนวณคะแนนที่ปลอดภัยกว่า
+คะแนน Axis ไม่ควรมาจาก LLM แต่ควรคำนวณจาก Structured Engine
+โดยต้องแยก:
+Axis severity
+Evidence confidence
+Data completeness
+ตัวอย่าง:
+Axis 26 score: 78/100
+Confidence: High
+Completeness: 65%
+Reason:
+- Hb low
+- Hct low
+- MCV markedly low
+- MCH markedly low
+- RBC elevated
+Missing:
+- Ferritin
+- Hb typing
+- Reticulocyte
+ถ้าไม่มีข้อมูลเพียงพอ:
+Axis 17 score: Not assessed
+Confidence: Insufficient data
+Required: microbiome sequencing or validated surrogate markers
+10. กุญแจ 3 ดอกและบันได 9 ขั้นต้องถูกเพิ่มเข้า Phase 3
+ปัจจุบันรายงานเริ่มจาก Disease และ Axis แต่ยังไม่แสดงภาพ TSPI ทั้งระบบ
+ลำดับที่ถูกต้องควรเป็น:
+Patient data
+→ 39 Axes
+→ 180 Networks
+→ 12 Domains
+→ 3 Keys
+→ 9-Step Restoration Priority
+→ Official TSPI Products/Modules
+→ Follow-up and Learning Loop
+กุญแจ 3 ดอก
+Biological Dynamics — ฐานนิเวศ โครงสร้าง เยื่อบุ microbiome และความสัมพันธ์ของระบบ
+Metabolic Energy — การแปรรูปพลังงาน ATP mitochondria metabolic and inflammatory fire
+Biointegrity — ความประสานของระบบ การไหลเวียน การสื่อสาร การซ่อมแซม และการคงเอกภาพของชีวิต
+หมายเหตุสำคัญ: ในไฟล์ Master ล่าสุด Biological Dynamics ถูกเรียงก่อน Metabolic Energy แต่ในข้อมูลเดิมบางส่วนใช้ Metabolic Energy เป็น Key 1 ควรเลือกมาตรฐานหนึ่งเดียวและกำหนด key_code แยกจากลำดับการแสดงผล เพื่อป้องกันการสลับในอนาคต
+บันได 9 ขั้น
+Detoxification
+Microbiome Ecosystem
+Immune–Inflammatory Regulation
+Redox Homeostasis & Oxidative Balance
+Metabolic Function & Mitochondria
+Autophagy & Cellular Clearance
+Genomic Stability & Proteostasis
+Genomic Regulation Homeostasis
+Prakati — Bioelectrical & Physiological Coherence
+ระบบควรแสดงว่าแต่ละคนอยู่ที่ขั้นใด แต่ไม่ควรบังคับว่าทุกคนต้องได้รับ Module ครบทั้ง 9 ขั้น การเลือกต้องขึ้นกับหลักฐานและความปลอดภัย
+11. Module Matching Engine ที่ถูกต้อง
+Phase 3 ปัจจุบันสร้างชื่อ Module เอง เช่น
+Iron Recovery Module
+Mitochondrial Rescue Module
+Gut Barrier Module
+Hemoglobin Synthesis Module
+Bone Marrow Stimulation Module
+และใน Multi-Omics Report มีการสร้างสูตร Artemisia + ferrous bisglycinate, Ashwagandha + Shilajit และอื่น ๆ ซึ่งไม่ใช่ Official TSPI Registry
+รายงานจึงกำลังจับคู่กับ “โมดูลที่ AI ประดิษฐ์ขึ้น” ไม่ใช่ผลิตภัณฑ์ที่บริษัทมีจริง ทั้งที่ Phase 3 อ้างว่าจัดอันดับจาก 200 TSPI Modules
+กฎ Production
+AI เลือกได้เฉพาะ:
+product_id ที่มีอยู่จริง
+status = active
+ผ่าน safety filter
+มี official axis/network mapping
+มีข้อมูล dose ที่อนุมัติ
+ไม่มีเงื่อนไขที่ต้อง rule-out ก่อน
+สูตรคะแนนแนะนำ
+ModuleMatch =
+30% Axis match
+25% Network match
+15% Evidence grade
+10% Patient phenotype fit
+10% Safety
+5% Treatment-step compatibility
+5% Historical response
+ต้องหักคะแนนจาก:
+missing critical test
+uncertain diagnosis
+contraindication/caution
+duplicate mechanism
+excessive module burden
+และต้องมี reason_not_selected สำหรับ Module ที่ไม่เลือก
+12. สิ่งที่ Developer ต้องแก้ก่อนถือว่า Phase 3 ผ่าน
+Priority 0 — ห้ามใช้ Clinical Production จนกว่าแก้เสร็จ
+เปลี่ยน Axis Dictionary ทั้งระบบเป็น Master 39 แกนล่าสุด
+ลบคะแนน Default 50 และใช้ Not Assessed
+คำนวณคนไข้ตัวอย่างใหม่ โดยย้าย hematology ไป Axis 26
+ห้าม LLM เปลี่ยนความหมาย Axis
+ห้ามสร้าง Module ที่ไม่มีใน Registry
+Remap ผลิตภัณฑ์ทุก H-code จาก Axis numbering เก่าเข้าสู่ Master ใหม่
+ห้ามใช้ Hypothetical Omics เป็นหลักฐาน
+เพิ่ม evidence status และ confidence ทุกข้อสรุป
+แยก diagnosis, differential และ hypothesis อย่างชัดเจน
+ให้แพทย์อนุมัติก่อนรายงานออกสู่ผู้ป่วย
+Priority 1 — เพื่อให้เป็น TSPI อย่างสมบูรณ์
+เพิ่ม 3 Keys Dashboard
+เพิ่ม 9-Step Restoration Map
+เพิ่ม 12-Domain Summary
+เชื่อม 39 Axes กับ 180 Networks แบบตารางคงที่
+เพิ่ม Network propagation ที่อ้างอิงเฉพาะเครือข่ายใน Master
+เพิ่ม Official product ranking
+เพิ่ม safety and interaction rules
+เพิ่ม before–after comparison และ learning loop
+ทำรายงานสองภาษาโดยใช้รหัสข้อมูลเดียวกัน
+เพิ่ม versioning ของ Axis, Network และ Product Mapping
+13. คะแนน Phase 3 หลังเทียบ Master ล่าสุด
+ด้าน
+คะแนนปัจจุบัน
+Software architecture
+90/100
+UI และรูปแบบรายงาน
+88/100
+การแยก Physician/Patient/Multi-Omics
+90/100
+ความตรงกับ 39 Axes ล่าสุด
+25/100
+ความตรงกับ 180 Networks
+35/100
+ความตรงกับ Official Products/Modules
+25/100
+Clinical inference discipline
+40/100
+Data confidence handling
+55/100
+Safety สำหรับใช้งานจริง
+35/100
+ความเป็น TSPI โดยรวม
+45/100
+ข้อสรุปสุดท้าย
+Phase 3 ไม่ใช่การพัฒนาผิดทิศทาง แต่เป็นการสร้างระบบรายงานที่ดีบน Knowledge Mapping รุ่นเก่าหรือ Placeholder จึงเกิด “semantic drift” รุนแรง
+สิ่งที่ต้องทำไม่ใช่รื้อซอฟต์แวร์ แต่คือ:
+**Freeze Master Ontology ใหม่ แล้วเปลี่ยนทุกการคำนวณให้ไหลจากข้อมูลจริง → แกน
+
+ผมคิดว่ายังมี "แกนสุดท้าย" ที่สำคัญที่สุด ซึ่งถ้าไม่เขียน Developer จะยังสร้าง TSPI เป็น "Clinical Decision Support" มากกว่า "Biological Intelligence Platform"
+ผมเรียกส่วนนี้ว่า
+Part 6 of 6
+The Fundamental Philosophy and Intelligence Architecture of TSPI-AI
+นี่จะเป็นเอกสารที่บอกว่า
+TSPI คืออะไร
+ไม่ใช่
+TSPI ทำอะไร
+ผมเสนอให้เขียนดังนี้
+Official Response to the Development Team
+TSPI-AI Engine — Final Domain Specification
+Part 6 of 6
+The Fundamental Philosophy and Intelligence Architecture of TSPI-AI
+After answering all implementation questions, there is one final concept that must be clearly understood by every developer before implementing the TSPI Brain.
+This is not another software requirement.
+It is the fundamental philosophy that determines how every algorithm inside TSPI-AI should reason.
+Without this philosophy, TSPI-AI will become another disease-oriented clinical AI.
+With this philosophy, TSPI-AI becomes a Biological Intelligence Platform.
+1. Disease is NOT the target of treatment
+This is the most important principle.
+Traditional medicine often reasons as
+Disease
+↓
+
+Treatment
+TSPI does not.
+In Fundamental Medicine,
+disease is not the cause.
+Disease is
+a biological expression of dysregulated living networks.
+Therefore
+TSPI reasons as
+Biological Network Dysregulation
+
+↓
+
+Symptoms
+
+↓
+
+Laboratory Changes
+
+↓
+
+Structural Changes
+
+↓
+
+Disease
+Disease is therefore
+a consequence,
+not the starting point.
+2. Symptoms are biological language
+Symptoms are not noise.
+Symptoms are not subjective complaints.
+Symptoms are not secondary information.
+Symptoms are
+the biological language through which the human body communicates network dysfunction.
+Every symptom reflects one or more living biological networks attempting to maintain homeostasis or failing to compensate.
+For example
+Constipation
+is not merely a bowel disease.
+It may represent disturbances in
+enteric nervous system
+colonic transit
+microbiome ecology
+autonomic regulation
+thyroid regulation
+mitochondrial energy
+hydration balance
+neuroendocrine adaptation
+The symptom is therefore
+a biological message,
+not the diagnosis.
+3. Laboratory abnormalities are downstream events
+One of the most important misconceptions in medicine is that laboratory abnormalities are treated as the beginning of disease.
+TSPI rejects this assumption.
+Most laboratory abnormalities occur
+after biological networks have already become dysfunctional.
+Therefore
+normal laboratory results
+do not necessarily indicate
+normal biological function.
+Likewise
+abnormal laboratory results
+do not necessarily identify
+the primary driver.
+Laboratory tests are
+objective evidence,
+but not the biological truth by themselves.
+4. Structural abnormalities occur even later
+Imaging
+MRI
+CT
+PET
+Ultrasound
+Endoscopy
+Pathology
+are extremely valuable.
+However,
+they primarily detect
+structural alterations,
+which generally occur later than functional network dysregulation.
+Therefore
+Normal MRI
+
+≠
+
+Normal biological network
+and
+Normal endoscopy
+
+≠
+
+Normal digestive function
+TSPI distinguishes
+structural normality
+from
+functional biological integrity.
+5. Every symptom represents one or more network expressions
+Symptoms should never map directly to diseases.
+Instead
+every symptom generates
+multiple candidate biological networks.
+Example
+Fatigue
+may involve
+mitochondrial network
+oxygen delivery network
+autonomic regulation
+endocrine regulation
+sleep regulation
+inflammatory network
+nutritional network
+The AI should therefore generate
+a differential network model,
+rather than a single diagnosis.
+6. Diseases are clinical labels
+Terms such as
+Diabetes
+Hypertension
+GERD
+Migraine
+Fibromyalgia
+are useful
+for communication,
+classification,
+and medical documentation.
+However,
+inside TSPI
+these are not
+the primary reasoning units.
+The primary reasoning units are
+living biological networks.
+Diseases simply describe
+the observable outcome
+of network dysregulation.
+7. Treatment restores biological networks—not disease labels
+TSPI does not aim to
+treat diabetes,
+treat hypertension,
+or treat GERD.
+Instead,
+TSPI restores
+the biological networks
+that generated those diseases.
+When upstream networks recover,
+downstream symptoms,
+laboratory abnormalities,
+and diseases
+gradually improve.
+This process is called
+Network Harmonization.
+8. Clinical reasoning must remain dynamic
+Human biology is dynamic.
+Therefore
+clinical reasoning
+must also be dynamic.
+Every new piece of information
+must update
+the current biological model.
+New evidence may
+confirm
+refine
+redirect
+override
+contradict
+previous hypotheses.
+The AI must therefore
+continuously reconstruct
+the patient's biological network model,
+rather than preserving a static diagnosis.
+9. TSPI-AI is a Biological Intelligence System
+The purpose of TSPI-AI is not
+to classify diseases,
+nor to read laboratory reports,
+nor to generate prescriptions automatically.
+Its purpose is
+to understand
+how the patient's biological networks are functioning,
+how they interact,
+which networks are compensating,
+which networks are failing,
+and which interventions are most likely to restore biological homeostasis.
+10. The AI must always distinguish evidence from biological truth
+One of the most important design principles is
+Evidence
+is not
+Truth.
+For example,
+the absence of microbiome sequencing
+does not mean
+the microbiome is normal.
+Likewise,
+the absence of oxidative stress biomarkers
+does not mean
+oxidative stress is absent.
+It simply means
+there is insufficient direct evidence.
+Therefore
+every conclusion generated by TSPI-AI must include
+Evidence Level
+Confidence Level
+Data Completeness
+Biological Uncertainty
+These four dimensions must always remain visible.
+11. Human beings—not diseases—are the center of TSPI
+The final objective of TSPI is not
+to normalize laboratory values,
+nor to optimize biomarkers.
+The objective is
+to restore
+the biological resilience,
+adaptive capacity,
+and physiological harmony
+of the entire human organism.
+Symptoms,
+laboratory abnormalities,
+and diseases
+are merely
+observable manifestations
+of that deeper biological state.
+Final Mission of TSPI-AI
+The development team is not building another clinical decision support system.
+The team is building
+the world's first Biological Intelligence Operating System
+based upon the philosophy of Fundamental Medicine.
+Its purpose is
+not simply to identify disease,
+but to understand,
+simulate,
+monitor,
+and restore
+the dynamic biological networks
+that sustain human life.
+Every algorithm inside TSPI-AI must therefore follow one immutable principle:
+Symptoms, laboratory findings, imaging results, and diseases are all biological expressions of the dynamic state of living biological networks. The purpose of TSPI-AI is not to treat these expressions directly, but to identify, understand, prioritize, and harmonize the underlying biological networks that generated them. As the networks regain homeostasis, symptoms improve, laboratory abnormalities normalize, structural pathology stabilizes or recovers, and overall human health is restored.
+Final Core Principle
+This sentence should become the first design principle of the entire TSPI Brain:
+In Fundamental Medicine, symptoms and diseases are not the primary targets of treatment. They are biological expressions of dysregulated living biological networks. Therefore, TSPI-AI reasons from biological networks toward symptoms and diseases—not from diseases toward biological networks.
+ผมขอเสนอเพิ่มเติมอีก 1 ประเด็นที่สำคัญมาก
+จากที่เราคุยกันทั้งหมด ผมคิดว่า TSPI Brain ยังขาด "Adaptive Biological Intelligence Loop" ซึ่งต่างจาก Learning Loop เดิม
+ควรเพิ่มวงจรนี้เข้าไปเป็น Core Architecture:
+Patient
+↓
+
+Symptoms & History
+↓
+
+Clinical Phenotype
+
+↓
+
+39 Biological Axes
+
+↓
+
+180 Living Biological Networks
+
+↓
+
+Root Driver Analysis
+
+↓
+
+Network Harmonization Plan
+
+↓
+
+Clinical Outcome
+
+↓
+
+Network Response
+
+↓
+
+Biological Model Update
+
+↓
+
+Better Biological Understanding
+
+↓
+
+Next Clinical Decision
+สังเกตว่า สิ่งที่ AI เรียนรู้ไม่ใช่ "โรค" แต่เป็น "พฤติกรรมของเครือข่ายชีวภาพ" นี่คือความแตกต่างที่สำคัญที่สุดระหว่าง TSPI-AI กับระบบ Clinical AI ทั่วไป และจะทำให้ TSPI Brain สอดคล้องกับปรัชญาเวชศาสตร์รากฐานอย่างแท้จริง.

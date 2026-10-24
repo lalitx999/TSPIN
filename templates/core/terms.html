@@ -3,25 +3,28 @@
 {% block title %}เงื่อนไขและข้อตกลงการใช้บริการ | TSPI Clinic{% endblock %}
 
 {% block content %}
-<div class="container" style="padding: 4rem 1.5rem; max-width: 900px;">
-    <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid #1e293b; border-radius: 20px; padding: 3rem;">
-        <h1 style="font-size: 2.25rem; font-weight: 800; color: #f8fafc; margin-bottom: 1.5rem;">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white border border-gray-200 rounded-3xl p-8 sm:p-12 shadow-sm space-y-6">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+            Terms of Service
+        </span>
+        <h1 class="text-3xl font-bold text-gray-900 leading-tight">
             ข้อตกลงและเงื่อนไขการใช้บริการ
         </h1>
 
-        <div style="color: #cbd5e1; font-size: 1rem; line-height: 1.8;">
+        <div class="text-sm text-gray-700 leading-relaxed space-y-4">
             <p>
                 ยินดีต้อนรับสู่ระบบ TSPI Clinic EMR &amp; Clinical Intelligence Platform การเข้าใช้งานระบบนี้ถือว่าท่านได้รับทราบและยอมรับข้อตกลงและเงื่อนไขดังต่อไปนี้:
             </p>
 
-            <h3 style="color: #38bdf8; font-size: 1.25rem; margin-top: 1.75rem; margin-bottom: 0.5rem;">
+            <h3 class="text-lg font-bold text-gray-900 pt-3">
                 1. ขอบเขตการให้บริการของระบบปัญญาประดิษฐ์
             </h3>
             <p>
                 รายงานผลและการวิเคราะห์ทางชีววิทยาที่เกิดจากระบบปัญญาประดิษฐ์ มีวัตถุประสงค์เพื่อเป็นข้อมูลสนับสนุนการตัดสินใจของแพทย์ผู้รักษา (Clinical Decision Support) เท่านั้น ไม่ถือเป็นการวินิจฉัยโรคขั้นสุดท้ายโดยปราศจากการตรวจสอบและลงนามจากแพทย์ผู้เชี่ยวชาญ
             </p>
 
-            <h3 style="color: #38bdf8; font-size: 1.25rem; margin-top: 1.75rem; margin-bottom: 0.5rem;">
+            <h3 class="text-lg font-bold text-gray-900 pt-3">
                 2. การรักษาความปลอดภัยบัญชีผู้ใช้งาน
             </h3>
             <p>
@@ -29,10 +32,11 @@
             </p>
         </div>
 
-        <div style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #1e293b;">
-            <a href="{% url 'core:home' %}" style="color: #38bdf8; text-decoration: none; font-weight: 600;">
+        <div class="pt-6 border-t border-gray-100 flex items-center justify-between">
+            <a href="{% url 'core:home' %}" class="text-xs font-medium text-primary hover:underline flex items-center gap-1">
                 &larr; กลับสู่หน้าแรก
             </a>
+            <span class="text-xs text-gray-400">TSPI Clinical OS</span>
         </div>
     </div>
 </div>

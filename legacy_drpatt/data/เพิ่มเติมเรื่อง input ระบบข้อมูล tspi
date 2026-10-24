@@ -1,0 +1,1132 @@
+โครงสร้างสโคประบบสำหรับส่งให้วิศวกร AI / backend / product team เพื่อออกแบบฟีเจอร์ Patient Data Download & Export Layer ของแพลตฟอร์ม TSPI โดยกำหนดชัดว่า
+ผู้ป่วยดาวน์โหลดอะไรได้
+ดาวน์โหลดอะไรไม่ได้
+อะไรต้องขออนุมัติ
+อะไรเป็น raw data
+อะไรเป็น interpreted data
+อะไรเป็น IP ของระบบ
+ผมจะเขียนในรูปแบบ product + engineering scope ให้ใช้ต่อได้ทันที
+TSPI Patient Data Download System
+Product & Engineering Scope Document
+1. วัตถุประสงค์ของระบบ
+ระบบนี้มีเป้าหมายเพื่อให้ผู้ป่วยสามารถเข้าถึง ดาวน์โหลด และนำข้อมูลสุขภาพของตนเองออกไปใช้ต่อได้อย่างเป็นระบบ โดยข้อมูลที่เปิดให้ดาวน์โหลดต้องจำกัดเฉพาะข้อมูลที่เกี่ยวข้องกับตัวผู้ป่วยเอง และต้องอยู่ภายใต้กรอบ
+ความเป็นส่วนตัวของข้อมูล
+ความปลอดภัยทางคลินิก
+สิทธิของเจ้าของข้อมูล
+การคุ้มครองทรัพย์สินทางปัญญาของแพลตฟอร์ม TSPI
+ระบบนี้ต้องไม่เป็นเพียงปุ่ม “ดาวน์โหลด PDF” แต่ต้องเป็น layered data access architecture ที่แยกชัดระหว่าง
+patient-owned clinical data
+interpreted health report
+omics-derived personal results
+TSPI proprietary intelligence layers
+2. แนวคิดหลักของระบบ
+ให้มองข้อมูลใน TSPI เป็น 5 ชั้น
+Layer A — Patient Raw Clinical Record
+ข้อมูลดิบที่เป็นของผู้ป่วยโดยตรง
+Layer B — Patient Interpreted Clinical Summary
+ข้อมูลสรุปที่แปลผลจากข้อมูลดิบเพื่อให้ผู้ป่วยอ่านเข้าใจได้
+Layer C — Personal Omics Result Layer
+ผลการตรวจ microbiome / proteomics / genomics / metabolomics ที่เป็นของผู้ป่วย
+Layer D — AI-Derived Clinical Intelligence
+ผลวิเคราะห์ของ AI ที่เชื่อมโยงข้อมูลหลายมิติแล้วสร้าง risk mapping / module recommendation
+Layer E — TSPI Proprietary System Layer
+โครงตรรกะภายในของแพลตฟอร์ม เช่น scoring engine, ranking weights, model reasoning graph, internal confidence logic
+3. หลักการกำหนดสิทธิ์การดาวน์โหลด
+3.1 ดาวน์โหลดได้ทันที
+ข้อมูลที่เป็น patient-owned data และไม่มีความเสี่ยงต่อการเปิดเผย proprietary logic
+3.2 ดาวน์โหลดได้แบบแปลผล
+ข้อมูลที่เป็นผลเฉพาะบุคคล แต่ต้องถูกจัดรูปแบบและอธิบายก่อน
+3.3 ดาวน์โหลดได้เฉพาะบางส่วน
+ข้อมูลที่เป็นของผู้ป่วย แต่มีความเสี่ยงต่อการตีความผิดหรือเชื่อมโยงกับ intellectual property ของระบบ
+3.4 ดาวน์โหลดไม่ได้
+ข้อมูลที่เป็น internal AI reasoning, system scoring logic, model weights, ranking engine และข้อมูลที่อาจกระทบความปลอดภัยหรือทรัพย์สินทางปัญญาของ TSPI
+4. Layer-by-Layer Access Policy
+LAYER A
+Patient Raw Clinical Record
+สถานะ: ดาวน์โหลดได้
+นี่คือข้อมูลดิบทางคลินิกที่เป็นของผู้ป่วยโดยตรง
+ข้อมูลใน layer นี้
+demographic profile ของผู้ป่วย
+visit history
+diagnosis list
+medication history
+allergy history
+procedure history
+physician notes ที่เป็นส่วนของผู้ป่วย
+lab result values
+pathology reports
+radiology reports
+imaging metadata
+uploaded files ของผู้ป่วย
+voice transcript ที่เกี่ยวกับตัวผู้ป่วย
+consent history ของผู้ป่วย
+appointment history
+รูปแบบไฟล์ที่ควรดาวน์โหลดได้
+PDF
+CSV
+JSON
+FHIR-compatible export ในอนาคต
+หมายเหตุ
+ข้อมูลนี้ถือเป็น core patient-accessible layer และควรดาวน์โหลดได้ตลอดเวลา
+LAYER B
+Patient Interpreted Clinical Summary
+สถานะ: ดาวน์โหลดได้
+เป็นข้อมูลสรุปที่แพลตฟอร์มสร้างขึ้นจากข้อมูลดิบ เพื่อให้ผู้ป่วยอ่านเข้าใจง่ายขึ้น
+ข้อมูลใน layer นี้
+summary ผลเลือด
+summary แนวโน้มอาการ
+timeline การรักษา
+summary ผลการตรวจ imaging
+summary การใช้ยา
+summary clinical risk overview
+quality-of-life summary
+symptom trend report
+lifestyle adherence summary
+รูปแบบ
+PDF report
+dashboard snapshot
+text summary
+machine-readable summary JSON
+หมายเหตุ
+เลเยอร์นี้ควรเป็น patient-facing language ไม่ใช้ภาษาวิชาการเกินไป
+LAYER C
+Personal Omics Result Layer
+สถานะ: ดาวน์โหลดได้ “บางระดับ”
+ผล omics เป็นข้อมูลเฉพาะตัวผู้ป่วย แต่มีความละเอียดอ่อนสูง จึงต้องแบ่งย่อย
+C1. Microbiome Result
+สถานะ: ดาวน์โหลดได้
+ดาวน์โหลดได้
+microbiome composition summary
+relative abundance report
+diversity score
+dysbiosis summary
+beneficial vs harmful taxa summary
+personalized explanation report
+ดาวน์โหลดได้แบบ advanced
+OTU/ASV summary table
+abundance matrix
+annotated taxa list
+ควรซ่อน
+internal scoring model
+TSPI microbiome recommendation engine logic
+C2. Proteomics Result
+สถานะ: ดาวน์โหลดได้แบบแปลผล + partial raw export
+ดาวน์โหลดได้
+proteomic interpretation summary
+dysregulated pathway summary
+protein marker list ที่เกี่ยวกับผู้ป่วย
+response interpretation
+report PDF
+ดาวน์โหลดได้แบบ advanced
+normalized protein table
+selected marker intensity table
+ไม่ควรให้ดาวน์โหลดโดยตรง
+internal pathway scoring matrix
+system-level proteomic ranking algorithm
+proprietary panel weighting logic
+C3. Genomics / Exome / NGS Result
+สถานะ: ดาวน์โหลดได้แบบควบคุมสิทธิ์
+ดาวน์โหลดได้
+clinical genomic summary report
+actionable variants report
+carrier screening summary
+pharmacogenomic summary
+hereditary risk summary
+secondary findings report ตาม consent
+ดาวน์โหลดได้แบบ advanced เฉพาะเมื่อยืนยันตัวตนเพิ่ม
+VCF subset เฉพาะของผู้ป่วย
+clinically curated variant list
+pharmacogenomics alert card
+ไม่ควรให้ดาวน์โหลดตรงจากระบบผู้ใช้ทั่วไป
+raw FASTQ
+BAM/CRAM
+unfiltered variant universe
+internal annotation pipeline output เต็ม
+model-specific pathogenicity ranking
+เหตุผล
+ข้อมูลดิบระดับนี้มีความไวสูงมากและผู้ป่วยตีความเองผิดได้ง่าย
+C4. Metabolomics / Other Omics
+สถานะ: ดาวน์โหลดได้แบบคล้าย proteomics
+ดาวน์โหลดได้
+summary report
+biomarker profile
+pathway interpretation
+personalized lifestyle implication
+จำกัด
+raw machine output เต็ม
+internal classifier output
+cross-patient reference model
+LAYER D
+AI-Derived Clinical Intelligence
+สถานะ: ดาวน์โหลดได้เฉพาะ “ผลลัพธ์” แต่ไม่ใช่ “ตรรกะภายใน”
+นี่คือผลวิเคราะห์ที่เกิดจาก AI รวมข้อมูลหลายชั้นเข้าด้วยกัน
+ผู้ป่วยควรดาวน์โหลดได้
+AI-generated health summary
+personalized risk overview
+preventive recommendation summary
+module recommendation summary
+9-step ladder position summary
+selected 36-axis personal imbalance overview
+lifestyle blueprint summary
+follow-up recommendation summary
+ผู้ป่วยไม่ควรดาวน์โหลดได้
+internal chain of reasoning
+confidence weighting
+model prompt structure
+cross-feature importance matrix
+clinician override logic
+intervention ranking engine
+recommendation priority graph
+hidden disease-probability engine
+internal confidence thresholds
+หมายเหตุ
+ผู้ป่วยควรเห็น “ผลที่เป็นประโยชน์ต่อเขา” แต่ไม่ควรเห็น “AI brain internals”
+LAYER E
+TSPI Proprietary System Layer
+สถานะ: ดาวน์โหลดไม่ได้
+นี่คือทรัพย์สินทางปัญญาของ TSPI
+ห้าม export ออกให้ผู้ป่วย
+scoring engine
+36-axis internal weighting model
+module matching algorithm
+rule-based reasoning tree
+proprietary prompt architecture
+clinician-AI orchestration logic
+ranking engine
+model ensemble outputs
+internal disease-node graph
+TSPI mechanistic knowledge graph
+hidden mapping tables
+training features
+recommendation confidence model
+internal QC flags ระดับระบบ
+เหตุผล
+ข้อมูลชั้นนี้เป็น core IP ของแพลตฟอร์ม
+5. Download Product Types
+ระบบควรมีเมนูดาวน์โหลดแยกเป็น 6 แบบ
+5.1 My Medical Record Export
+สำหรับเวชระเบียนและผลตรวจทั่วไป
+5.2 My Lab & Imaging Export
+สำหรับผลเลือด ผลปัสสาวะ pathology radiology imaging
+5.3 My Omics Report
+สำหรับ microbiome / proteomics / genomics แบบ report
+5.4 My Advanced Omics Data
+สำหรับผู้ใช้ที่ต้องการข้อมูลเชิงเทคนิคมากขึ้น โดยต้องผ่าน consent เพิ่ม
+5.5 My Medication & Safety Card
+สำหรับสรุปยา ประวัติแพ้ยา pharmacogenomics และข้อควรระวัง
+5.6 My TSPI Health Summary
+สำหรับ AI summary, risk summary, module summary, lifestyle plan
+6. Access Levels สำหรับผู้ใช้
+ควรมี permission 4 ระดับ
+Level 1 — Standard Patient Access
+ดาวน์โหลด Layer A + Layer B + omics summary
+Level 2 — Advanced Patient Access
+ดาวน์โหลด structured omics subset เพิ่มได้หลังยืนยันตัวตน
+Level 3 — Physician-Authorized Access
+ดาวน์โหลดข้อมูลเชิงลึกมากขึ้นเมื่อมี physician release
+Level 4 — Internal Clinical / Research Access
+สำหรับแพทย์ ผู้ดูแลระบบ หรือ research workflow เท่านั้น
+7. Identity & Security Requirements
+ก่อนดาวน์โหลดทุกครั้ง ต้องมี
+login session validation
+re-authentication
+OTP verification
+audit logging
+download timestamp
+IP/device logging
+consent check
+data scope validation
+สำหรับ genomics / exome / omics ขั้นสูง ให้เพิ่ม
+explicit consent reconfirmation
+warning screen
+terms of interpretation limitation
+8. Export Formats ที่ควรรองรับ
+Human-readable
+PDF
+HTML report
+printable summary card
+Data-readable
+CSV
+JSON
+FHIR bundle ในอนาคต
+VCF subset สำหรับ genomics advanced export
+9. UX Flow ที่ควรเป็น
+9.1 Download Center
+เมนูหลักชื่อเช่น
+My Health Data หรือ Download My Records
+9.2 เลือกหมวด
+Medical Records
+Lab & Imaging
+Omics
+Medication & Safety
+TSPI Summary
+9.3 เลือกช่วงเวลา
+all time
+last 3 months
+last 12 months
+custom range
+9.4 เลือกรูปแบบไฟล์
+PDF
+CSV
+JSON
+9.5 ยืนยันตัวตน
+OTP / biometric / password reconfirm
+9.6 Consent check
+โดยเฉพาะ omics / genomics
+9.7 Generate export package
+zip หรือ file bundle
+10. Audit Trail ที่ต้องเก็บ
+ทุกครั้งที่ดาวน์โหลด ต้องเก็บ
+patient_id
+export_type
+layer_requested
+file_type
+date_time
+device
+ip_address
+consent_version
+data_scope
+generated_by
+status
+11. Suggested Data Export Matrix
+เปิดให้ดาวน์โหลด
+lab raw values
+imaging report
+medication list
+visit summary
+patient-uploaded files
+microbiome summary
+proteomics interpreted summary
+genomics actionable report
+pharmacogenomics summary
+lifestyle summary
+AI health summary
+เปิดให้ดาวน์โหลดแบบจำกัด
+structured microbiome table
+selected proteomics matrix
+clinically filtered variant list
+advanced omics export
+ไม่เปิดให้ดาวน์โหลด
+raw FASTQ/BAM by default
+model prompts
+AI reasoning chain
+proprietary scoring weights
+internal ranking engine
+TSPI knowledge graph
+rule engine internals
+12. ข้อความกำกับทางคลินิกที่ต้องแสดง
+ทุกไฟล์ที่เป็น AI-generated หรือ omics-interpreted ต้องมีข้อความกำกับว่า
+ข้อมูลนี้ใช้เพื่อสนับสนุนการดูแลสุขภาพ
+ไม่ใช่การวินิจฉัยสุดท้ายด้วยตัวเอง
+ควรปรึกษาแพทย์เมื่อผลมีความเสี่ยงสูง
+ผลบางส่วนต้องยืนยันด้วยห้องปฏิบัติการมาตรฐานหรือแพทย์เฉพาะทาง
+ข้อมูลบางประเภทอาจไม่ครอบคลุมทุกโรคหรือทุกความเสี่ยง
+13. Deliverables ที่ต้องการจากทีมวิศวกร
+Backend
+data access policy engine
+export generation service
+file packaging service
+permission & consent layer
+audit trail service
+secure download link service
+retention & expiry control
+Frontend
+download center UI
+export scope selector
+omics consent modal
+re-authentication flow
+advanced export warning flow
+export history page
+AI / Data Team
+classify data by export layer
+define patient-safe summary layer
+define restricted proprietary layer
+create interpretable omics summary outputs
+create physician-grade export outputs
+14. สรุปเชิงนโยบาย
+TSPI ควรออกแบบระบบดาวน์โหลดข้อมูลโดยยึดหลักว่า
+ผู้ป่วยมีสิทธิ์เข้าถึงข้อมูลสุขภาพของตนเอง
+แต่ ไม่มีสิทธิ์เข้าถึง proprietary reasoning layer ของระบบ
+ดังนั้นระบบต้องแยกอย่างชัดเจนระหว่าง
+personal clinical data
+interpreted personal omics data
+AI-generated patient summary
+proprietary TSPI intelligence layer
+เพื่อให้เกิดทั้ง
+patient empowerment
+interoperability
+legal defensibility
+IP protection
+-------------------------------------------
+เพิ่มเติม open chat ของผู้ป่วยใน tspi
+
+
+พี่ต้องการจะเพิ่มระบบ open chat ใน platform ของเราที่ผู้ป่วยหรือคนไข้สามารถที่จะคุยกับ AI ผ่าน LINE application telegram WhatsApp หรือ chatbox ของแพลตฟอร์มได้แบบอิสระเหมือนกับที่เราคุยกับแชท gpt
+
+ แต่ควรทำในรูปแบบ “grounded clinical copilot” ไม่ใช่ open chat แบบปล่อยอิสระเต็มรูปแบบ
+แนวทางที่เหมาะกับ TSPI คือให้ผู้ป่วยคุยกับ AI ได้อย่างเป็นธรรมชาติผ่านในแอปหรือผ่าน LINE OA แต่คำตอบทุกครั้งต้องถูกบังคับให้อ้างอิงจาก 4 แหล่งเท่านั้น: ข้อมูลสุขภาพของผู้ป่วยคนนั้น, ฐานความรู้ของ TSPI, งานวิจัย/ผลทดลองภายในที่ผ่านการอนุมัติให้ใช้อ้างอิง, และ PubMed/เอกสารอ้างอิงที่คัดกรองแล้ว ระบบลักษณะนี้ทำได้ด้วยการใช้โมเดลร่วมกับ retrieval/file search และ function calling ใน OpenAI API โดยให้โมเดลเรียกเครื่องมือไปค้นข้อมูลที่เกี่ยวข้องก่อนตอบ แทนการตอบจากความจำของโมเดลล้วน ๆ �
+
+แต่สิ่งที่สำคัญคือฐานข้อมูลที่เราให้ AI เรียนรู้นั้นจะไม่สามารถดาวน์โหลดไปได้เลยด้วยประการใดๆแต่ AI จะสามารถเข้าถึงและนำมาวิเคราะห์ให้เหมาะสมสำหรับผู้ป่วยคนนั้นๆเท่านั้น
+
+
+
+
+OpenAI Developers +3
+แกนสำคัญคือ ไม่ใช่ “AI รู้ทุกอย่าง” แต่เป็น “AI ตอบได้เฉพาะสิ่งที่อยู่ในขอบเขตที่อนุญาต” ซึ่งจะเหมาะมากกับแพลตฟอร์มของคุณ เพราะ TSPI มีทั้งประวัติคนไข้, ผลเลือด, imaging, microbiome, omics, module library, 36 axes, และองค์ความรู้ภายในอยู่แล้ว หากออกแบบถูก ระบบนี้จะเป็นทั้ง patient assistant, adherence coach, education layer, และ triage layer ในตัวเดียวกัน โดย OpenAI API รองรับทั้ง stateful multi-turn interaction, tools, retrieval และ function calling ซึ่งเหมาะกับงานแบบนี้โดยตรง �
+OpenAI Developers +2
+ควรทำไหม
+ควรทำมาก ถ้าเป้าหมายของ TSPI คือเป็น AI medical platform ไม่ใช่แค่ dashboard อ่านผลตรวจ เพราะฟีเจอร์นี้จะเปลี่ยนข้อมูลนิ่ง ๆ ให้กลายเป็น “ระบบสนทนาเชิงคลินิก” ผู้ป่วยจะถามได้ เช่น
+“ทำไมค่า CRP ของฉันยังสูง”
+“microbiome ฉันแปลว่าอะไร”
+“ผล proteomics นี้สัมพันธ์กับอาการอ่อนเพลียอย่างไร”
+“โมดูลที่แนะนำทำงานกับ 36 แกนไหน”
+“ควรติดตามผลอีกเมื่อไร”
+และระบบจะตอบโดยยึดกับข้อมูลจริงของเขา ไม่ใช่คำตอบกว้าง ๆ แบบ chatbot สุขภาพทั่วไป
+ประโยชน์เชิง product มีอย่างน้อย 6 ด้าน
+หนึ่ง ลดภาระทีมแพทย์และ case manager สำหรับคำถามซ้ำ ๆ
+สอง เพิ่ม engagement และ retention ของผู้ป่วย
+สาม เพิ่ม adherence ต่อแผนการรักษาและการ follow-up
+สี่ ทำให้ข้อมูลเชิงลึกอย่าง microbiome/proteomics ถูกใช้งานจริง ไม่ใช่แค่เก็บไว้ในรายงาน
+ห้า ทำให้ TSPI กลายเป็น longitudinal health companion
+หก เป็นฐานข้อมูล feedback เพื่อปรับปรุง AI และ care pathway ในอนาคต
+แต่ไม่ควรทำเป็น open chat แบบอิสระ 100%
+จุดที่ต้องระวังคือ ถ้าคุณเปิดเป็น open chat แบบกว้างเกินไป AI จะเริ่มตอบนอกฐานข้อมูล, ตอบเรื่องที่ไม่มีหลักฐานในระบบ, หรือข้ามไปสู่การวินิจฉัย/สั่งการที่เสี่ยง ดังนั้นสิ่งที่ควรทำคือ
+โมเดลการทำงานที่ถูกต้อง
+Open chat UX แต่ closed knowledge boundary
+พูดง่าย ๆ คือ
+ผู้ป่วยพิมพ์ได้อิสระ
+แต่ AI ตอบได้เฉพาะในขอบเขตที่กำหนด
+ทุกคำตอบต้อง trace ได้ว่ามาจากข้อมูลอะไร
+ถ้าไม่มีข้อมูลพอ ต้องตอบว่า “ยังไม่มีข้อมูลเพียงพอ”
+ถ้าเป็นเรื่องเสี่ยงสูง ต้อง escalate ไปแพทย์หรือทีมคนจริง
+นี่เป็น use case ที่ตรงกับการใช้ function calling + retrieval มากที่สุด เพราะโมเดลสามารถถูกบังคับให้เรียก tool ก่อนตอบ เช่น
+ดึง patient profile
+ดึงผลเลือดล่าสุด
+ดึง microbiome report
+ดึง TSPI module knowledge
+ดึง PubMed evidence เฉพาะเรื่อง
+สรุปคำตอบในภาษาที่ผู้ป่วยเข้าใจ
+OpenAI รองรับ pattern นี้โดยตรงผ่าน Responses API, tools, file search/retrieval, และ function calling �
+OpenAI Developers +3
+โครงสร้างระบบที่ควรเป็น
+ผมแนะนำให้สร้างเป็น 5 ชั้น
+1) Conversation Layer
+ช่องทางสนทนา
+in-app chat
+LINE OA
+web widget
+อนาคตอาจรวม Telegram / WhatsApp
+ชั้นนี้มีหน้าที่รับข้อความและแปลงเป็น query มาตรฐาน
+2) Identity + Consent Layer
+ก่อนตอบ ต้องรู้ว่าเป็นใครและมีสิทธิ์เข้าถึงข้อมูลอะไร
+patient identity
+consent version
+role check
+data scope
+audit log
+3) Retrieval Layer
+ชั้นนี้สำคัญที่สุด ต้องค้นเฉพาะข้อมูลที่เกี่ยวข้อง
+patient-specific clinical data
+patient omics data
+TSPI internal knowledge base
+approved internal studies
+curated PubMed index
+4) Safety + Policy Layer
+บังคับกรอบคำตอบ
+ไม่วินิจฉัยเกินหลักฐาน
+ไม่สั่งหยุดยาเอง
+ไม่ตอบนอกฐานข้อมูล
+กรณี red flag ต้องส่งต่อ
+คำถามฉุกเฉินให้ขึ้น emergency instruction
+5) Response Synthesis Layer
+ชั้นสุดท้ายเอาข้อมูลทั้งหมดมาสรุปเป็นคำตอบ
+patient version
+doctor version
+citation / source trace
+next action recommendation
+AI จะตอบอะไรได้บ้าง
+ระบบควรแบ่งคำถามออกเป็น 8 หมวดหลัก
+หมวด 1: อธิบายข้อมูลของผู้ป่วยเอง
+เช่น
+ผลเลือดของฉันแปลว่าอะไร
+ค่าไหนผิดปกติ
+ค่าไหนดีขึ้น/แย่ลง
+microbiome ฉันเสียสมดุลตรงไหน
+proteomics ของฉันชี้ไปที่ pathway ไหน
+หมวด 2: เชื่อมผลตรวจกับอาการ
+เช่น
+ทำไมฉันยังอ่อนเพลีย
+ทำไมยังท้องอืด
+อาการนอนไม่หลับสัมพันธ์กับแกนไหน
+อาการกับ 36 axes ของฉันเชื่อมกันอย่างไร
+หมวด 3: อธิบายแผนที่ระบบแนะนำ
+เช่น
+ทำไมระบบถึงแนะนำโมดูลนี้
+โมดูลนี้ทำงานกับแกนไหน
+โมดูลนี้เกี่ยวกับบันได 9 ขั้นอย่างไร
+ทำไมฉันต้องเริ่มจาก detox ก่อน
+หมวด 4: คำถามเชิงการติดตาม
+เช่น
+ควรตรวจซ้ำเมื่อไร
+ค่าตัวไหนควรเฝ้าดูต่อ
+เป้าหมาย 30 วันถัดไปคืออะไร
+ถ้าอาการแบบนี้ควรแจ้งแพทย์ไหม
+หมวด 5: คำถามด้านการใช้ยาและความปลอดภัย
+เช่น
+ยาที่ฉันใช้อยู่มีความเสี่ยง interaction กับโมดูลไหน
+pharmacogenomics ของฉันมีอะไรต้องระวัง
+ก่อนผ่าตัดฉันควรแจ้งอะไรกับแพทย์
+หมวด 6: คำถามด้าน lifestyle แบบ personalized
+เช่น
+อาหารแบบไหนเหมาะกับ microbiome ของฉัน
+ควรออกกำลังกายแบบไหน
+ทำไมการนอนของฉันจึงสำคัญกับแกนนี้
+ฉันควรลดอะไรและเพิ่มอะไร
+หมวด 7: อธิบายงานวิจัยที่เกี่ยวกับ “ฉัน”
+เช่น
+มีงานวิจัยอะไรสนับสนุนโมดูลนี้
+microbiome pattern แบบฉันสัมพันธ์กับอะไร
+marker นี้มีข้อมูลใน PubMed อย่างไร
+ตรงนี้ AI ควรดึงเฉพาะงานที่เกี่ยวข้องจริง ไม่ใช่ค้นกว้างแบบ search engine
+หมวด 8: สรุปรายงานให้เข้าใจง่าย
+เช่น
+ช่วยสรุปรายงานทั้งหมดของฉันใน 1 หน้า
+ช่วยอธิบายให้ครอบครัวฟัง
+ช่วยทำ checklist การดูแล 30 วัน
+AI ไม่ควรตอบอะไรบ้าง
+ส่วนนี้สำคัญมาก และควรใส่ใน scope ให้ชัด
+AI ไม่ควร
+วินิจฉัยโรคใหม่โดยไม่มีการยืนยันจากแพทย์
+สั่งหยุดยา ปรับยา เริ่มยาแรง ๆ เอง
+ตอบเรื่องฉุกเฉินแทนการไปโรงพยาบาล
+เปิดเผย internal reasoning, model weights, หรือ proprietary TSPI scoring
+เปิดเผยข้อมูลผู้ป่วยคนอื่นหรือข้อมูล benchmark ที่ย้อนกลับไปหาใครได้
+ตอบคำถามนอกฐานข้อมูลแบบมั่ว ๆ
+สรุป genomics/omics ที่มีความเสี่ยงสูงโดยไม่มี disclaimer หรือ escalation path
+คำตอบควรอยู่ในรูปแบบไหน
+ผมแนะนำ format มาตรฐานทุกครั้ง
+สิ่งที่พบจากข้อมูลของคุณ
+ความหมายในภาษาง่าย
+เชื่อมกับ 36 แกน / 9 ขั้น / โมดูล
+หลักฐานที่ใช้อ้างอิง
+สิ่งที่ควรทำต่อ
+เมื่อใดควรคุยกับแพทย์
+เช่นคำตอบหนึ่งอาจออกมาแบบนี้
+จากผล microbiome ล่าสุด คุณมี pattern ของ dysbiosis และ gut barrier stress
+สิ่งนี้เชื่อมกับ Axis 17, 18, 19 และ Axis 1
+จึงอธิบายได้ว่าทำไมยังมีอาการท้องอืดและอักเสบต่ำเรื้อรัง
+โมดูลที่แนะนำจึงเน้น digestive system + microbiome + detox support
+หากมีอาการปวดท้องมากขึ้น ถ่ายดำ หรือไข้สูง ควรติดต่อแพทย์ทันที
+สถาปัตยกรรมที่ควรส่งให้วิศวกร
+ให้ทีมวิศวกรเข้าใจ scope แบบนี้
+Input tools
+get_patient_profile()
+get_recent_labs()
+get_imaging_reports()
+get_medication_history()
+get_microbiome_report()
+get_proteomics_report()
+get_genomics_summary()
+get_tspi_module_knowledge()
+get_axis_mapping()
+search_internal_research()
+search_pubmed_curated()
+raise_clinical_escalation()
+Core policy
+answer only from retrieved evidence
+if evidence missing, say so
+no hidden diagnosis
+no medication changes without clinician review
+emergency keyword routing
+log every source used
+Output modes
+patient-readable
+clinician-readable
+concise answer
+detailed explanation
+downloadable summary
+ควรเชื่อมกับ PubMed อย่างไร
+ควรเชื่อมแบบ curated retrieval ไม่ใช่ปล่อยให้ AI ไป search PubMed ตรง ๆ แล้วตอบเองทุกครั้ง
+วิธีที่ดีกว่าคือ
+สร้างดัชนี PubMed เฉพาะหัวข้อที่เกี่ยวกับระบบของคุณ
+คัดเฉพาะหัวข้อที่เกี่ยวกับ microbiome, inflammation, detox, mitochondrial function, pharmacogenomics, hereditary risk, proteomics pathways ฯลฯ
+ทำ tagging ให้เชื่อมกับ 36 axes และโมดูล
+เวลาผู้ป่วยถาม ระบบค่อยหยิบเฉพาะ paper ที่สัมพันธ์กับคำถามและข้อมูลของเขา
+แบบนี้คำตอบจะไม่หลุดและไม่ noisy
+ควรเชื่อมกับ LINE OA ไหม
+ควรเชื่อม แต่ LINE OA ควรเป็นแค่ channel ไม่ใช่สมองหลัก
+สมองหลักต้องอยู่ใน TSPI backend
+โครงสร้างที่ถูกต้องคือ
+LINE OA / app / web chat
+→ message gateway
+→ identity + consent
+→ retrieval tools
+→ AI orchestration
+→ response policy
+→ answer
+ดังนั้นผู้ป่วยจะคุยทาง LINE ก็ได้ แต่ AI ต้องตอบจาก TSPI core เสมอ
+ควรมีระดับผู้ใช้ไหม
+ควรมีอย่างน้อย 3 ระดับ
+ระดับ 1 ผู้ป่วยทั่วไป
+ถามได้เฉพาะข้อมูลของตัวเอง + คำอธิบาย + plan
+ระดับ 2 แพทย์ / case manager
+เห็นข้อมูลลึกกว่า เช่น detailed axis mapping, module rationale, interaction flags
+ระดับ 3 internal medical admin / research
+เห็น dataset มากกว่าและใช้ review ปรับระบบได้
+ข้อดีเชิงธุรกิจ
+ถ้าคุณทำฟีเจอร์นี้สำเร็จ TSPI จะไม่ใช่แค่ระบบอ่านผลตรวจ แต่จะกลายเป็น
+AI personal health companion
+medical interpretation engine
+precision prevention platform
+data moat ที่แข็งแรงมาก
+คนไข้จะกลับเข้าระบบบ่อยขึ้นเพราะ “อยากถามต่อ”
+ไม่ใช่เข้ามาเฉพาะวันที่มาตรวจ
+ข้อสรุป
+สรุปตรง ๆ คือ
+ควรทำ และจริง ๆ ควรเป็นหนึ่งในฟีเจอร์หลักของ TSPI
+แต่เงื่อนไขคือ
+ต้อง grounded กับข้อมูลจริง
+ต้องใช้ retrieval/function tools
+ต้องจำกัดขอบเขตคำตอบ
+ต้องแยก patient-safe layer กับ internal IP layer
+ต้องมี escalation ไปคนจริง
+ต้องมี audit และ consent
+ถ้าทำแบบนี้ คุณจะได้ระบบที่ “คุยแบบ open chat” แต่ “ไม่หลุดกรอบ” และมีคุณค่าทางคลินิกจริง �
+OpenAI Developers +4
+ถ้าต้องการ ผมจะเขียนต่อให้เป็น เอกสาร scope สำหรับวิศวกร AI/Backend แบบเป็นข้อกำหนดระบบจริง เช่น
+architecture diagram
+API/tools list
+permission matrix
+prompt policy
+response template
+red flag escalation rules
+--------------
+TSPI AI System Architecture
+TSPI AI System Architecture
+Clinical Intelligence Platform for 36 Axes and 200 Modules
+1. เป้าหมายของระบบ
+TSPI AI ไม่ได้ถูกออกแบบมาเพื่อ “วินิจฉัยโรคแทนแพทย์” แต่เพื่อทำ 5 อย่างพร้อมกัน
+หนึ่ง รวบรวมข้อมูลผู้ป่วยจากหลายแหล่งให้อยู่ในโครงสร้างเดียว
+สอง แปลข้อมูลเหล่านั้นเป็น 36 Axis Biological Profile
+สาม จับคู่โปรไฟล์กับ 200 Therapeutic Modules
+สี่ สร้าง personalized protocol recommendation
+ห้า เรียนรู้จากผลลัพธ์จริงของผู้ป่วยเพื่อปรับปรุงระบบอย่างต่อเนื่อง
+ดังนั้นระบบนี้คือ
+Clinical Decision Intelligence + Systems Biology Mapping Engine
+2. สถาปัตยกรรมระดับบน
+ให้มองระบบเป็น 8 ชั้นต่อเนื่องกัน
+Layer A: Data Acquisition Layer
+รับข้อมูลจากทุกแหล่ง
+Layer B: Data Normalization Layer
+แปลงข้อมูลให้อยู่ในโครงเดียวกัน
+Layer C: Clinical Knowledge Layer
+เก็บ ontology ของ 36 axes, 200 modules, biomarkers, symptoms
+Layer D: Biological Scoring Engine
+คำนวณคะแนนแต่ละแกน
+Layer E: Module Matching Engine
+จับคู่แกนกับโมดูล
+Layer F: Recommendation Engine
+สร้าง protocol รายบุคคล
+Layer G: Monitoring & Feedback Layer
+ติดตามผลลัพธ์และปรับคำแนะนำ
+Layer H: Learning System Layer
+เรียนรู้จากข้อมูลจริงและอัปเดต model
+3. Data Acquisition Layer
+ชั้นนี้คือชั้นรับข้อมูลเข้าระบบทั้งหมด
+3.1 ประเภทข้อมูลที่ระบบต้องรับ
+ข้อมูลประวัติผู้ป่วย
+อายุ
+เพศ
+อาการสำคัญ
+ระยะเวลา
+โรคร่วม
+ยาที่ใช้อยู่
+พฤติกรรมการกิน การนอน การขับถ่าย
+ข้อมูลตรวจร่างกาย
+น้ำหนัก ส่วนสูง BMI
+ความดัน
+ชีพจร
+temperature
+oxygen saturation
+body composition
+ข้อมูลห้องปฏิบัติการ
+CBC
+LFT
+KFT
+lipid profile
+glucose / HbA1c
+inflammatory markers
+thyroid / hormone panel
+tumor markers
+ข้อมูลภาพ
+CT
+MRI
+X-ray
+Ultrasound
+pathology reports
+ข้อมูล omics
+microbiome
+metabolomics
+proteomics
+genomics / SNP panels
+transcriptomics ถ้ามี
+ข้อมูลของ module
+LC-MS fingerprint
+marker compounds
+peak ratio
+functional assay
+safety profile
+proteomic signature
+ข้อมูลผลลัพธ์จริง
+case
+case series
+retrospective
+RWE
+physician notes
+patient-reported outcomes
+follow-up labs
+side effects
+3.2 วิธีรับข้อมูล
+ระบบควรรับข้อมูลได้ 4 รูปแบบ
+manual entry
+file upload
+API integration
+device / lab connector
+3.3 ช่องทางข้อมูล
+Hospital Information System
+LIS
+PACS
+spreadsheet upload
+PDF parser
+clinician form
+patient app
+lab partner API
+omics partner API
+4. Data Normalization Layer
+นี่คือชั้นที่สำคัญมาก เพราะข้อมูลจากโลกจริงกระจัดกระจายและ format ไม่เหมือนกัน
+4.1 งานหลักของชั้นนี้
+แปลงหน่วย
+mg/dL
+mmol/L
+IU/L
+copies/mL
+ทำ standard terminology
+ALT = SGPT
+WBC = white blood cell
+fasting glucose = FBS
+แปลงข้อความเป็น structured data
+ดึง diagnosis จากแพทย์เขียน
+ดึง symptom จาก note
+ดึง lesion size จาก report CT
+จัดการ missing data
+mark unknown
+confidence score
+request repeat lab
+จัดเวลา
+baseline
+week 2
+week 4
+month 3
+longitudinal sequence
+4.2 Canonical Data Model
+ควรมี patient-centered schema เช่น
+Plain text
+Patient
+ ├── Demographics
+ ├── Visits
+ ├── Symptoms
+ ├── Vitals
+ ├── Labs
+ ├── Imaging
+ ├── Omics
+ ├── Current Medications
+ ├── TSPI Axis Scores
+ ├── Recommended Modules
+ ├── Outcomes
+ └── Safety Events
+4.3 Master Data Dictionary
+ต้องมี dictionary กลางของระบบ
+biomarker dictionary
+symptom ontology
+disease ontology
+module ontology
+axis ontology
+assay ontology
+5. Clinical Knowledge Layer
+นี่คือ “สมองเชิงโครงสร้าง” ของ TSPI
+5.1 Knowledge Graph หลัก
+ระบบควรสร้าง TSPI Knowledge Graph ที่เชื่อม 6 entity หลัก
+Plain text
+Biomarker ↔ Pathway ↔ Axis ↔ Module ↔ Disease Pattern ↔ Outcome
+ตัวอย่าง
+Plain text
+IL-6 ↑ → NF-kB activation → Axis 1 high
+Axis 1 high → Match Kerra-like module
+Kerra-like module → Anti-inflammatory proteomic signature
+Proteomic signature → cytokine reduction
+Cytokine reduction → fever/pain/inflammation improvement
+5.2 องค์ประกอบใน knowledge layer
+หนึ่ง 36 Axes definition
+สอง 200 Module profiles
+สาม disease-to-axis mapping
+สี่ biomarker-to-axis rules
+ห้า omics-to-axis mapping
+หก module-to-axis weights
+เจ็ด contraindication rules
+แปด escalation rules
+เก้า outcome interpretation rules
+5.3 ตัวอย่าง Axis Ontology
+เช่น Axis 1: Systemic Inflammatory Load
+Input ที่เกี่ยวข้อง
+CRP
+ESR
+IL-6
+TNF-a
+ferritin
+symptoms: fever, pain, swelling
+microbiome inflammatory pattern
+proteomic NF-kB signal
+Output
+axis score 0–100
+severity level
+dominant mechanism
+recommended module categories
+6. Biological Scoring Engine
+นี่คือหัวใจเชิงคณิตศาสตร์ของระบบ
+6.1 หน้าที่หลัก
+แปลงข้อมูลทั้งหมดของผู้ป่วยให้เป็น
+36 axis scores
+confidence score
+dominant biological pattern
+priority map
+6.2 รูปแบบคะแนน
+แต่ละแกนมีคะแนน 0–100
+0–19 = stable
+20–39 = mild imbalance
+40–59 = moderate imbalance
+60–79 = high imbalance
+80–100 = critical imbalance
+6.3 โครงสร้างสมการ
+คะแนนแต่ละแกนไม่ควรใช้ตัวแปรเดียว แต่เป็น weighted composite model
+ตัวอย่าง Axis 1
+Plain text
+Axis1 Score =
+0.20(CRP normalized)
++ 0.15(IL6 normalized)
++ 0.10(TNF normalized)
++ 0.10(ferritin normalized)
++ 0.15(symptom inflammation score)
++ 0.10(microbiome inflammatory index)
++ 0.10(proteomic NF-kB signature)
++ 0.10(clinician override modifier)
+6.4 ชนิดของ scoring model
+ควรมี 3 ชั้น
+ชั้นที่หนึ่ง rule-based scoring
+ชั้นที่สอง weighted probabilistic scoring
+ชั้นที่สาม machine learning refinement
+ช่วงเริ่มต้นแพลตฟอร์มควรใช้
+Rule-based + weighted model ก่อน แล้วค่อยเพิ่ม ML เมื่อ data มากพอ
+6.5 Confidence Score
+ทุก axis score ต้องมีความเชื่อมั่นกำกับ เช่น
+High confidence
+Medium confidence
+Low confidence
+โดยพิจารณาจาก
+จำนวน input ที่ครบ
+ความใหม่ของข้อมูล
+ความสอดคล้องข้ามแหล่ง
+data quality score
+7. Module Matching Engine
+เมื่อได้ 36-axis profile แล้ว ต้องจับคู่กับ 200 modules
+7.1 หลักการ
+แต่ละ module จะมี profile ของตัวเอง เช่น
+primary axes
+secondary axes
+supportive axes
+potency score
+safety profile
+contraindications
+synergy map
+7.2 Module Vector Model
+ให้แต่ละ module เป็น vector ใน 36 มิติ
+Plain text
+Module Kerra:
+Axis1 = 0.95
+Axis2 = 0.88
+Axis3 = 0.82
+Axis17 = 0.70
+Axis36 = 0.84
+...
+และผู้ป่วยก็มี vector ของตัวเอง
+Plain text
+Patient X:
+Axis1 = 72
+Axis2 = 61
+Axis3 = 45
+Axis17 = 58
+Axis36 = 40
+...
+ระบบจึงคำนวณ match score ได้
+7.3 Matching Logic
+ใช้ 4 ขั้น
+หนึ่ง filter by contraindication
+สอง rank by axis overlap
+สาม optimize by synergy
+สี่ adjust by safety and burden
+7.4 ตัวอย่างผลลัพธ์
+ผู้ป่วยมี
+inflammation สูง
+microbiome imbalance ปานกลาง
+oncology risk สูง
+ระบบอาจเสนอ
+Base module: Kerra
+Supportive module: microbiome repair module
+Adjunct module: detox or mitochondrial module
+8. Recommendation Engine
+นี่คือส่วนที่เปลี่ยนคะแนนกับโมดูลให้เป็น protocol ใช้งานจริง
+8.1 องค์ประกอบ recommendation
+หนึ่ง base module
+สอง secondary modules
+สาม supportive modules
+สี่ dosing pattern
+ห้ monitoring plan
+หก warning notes
+8.2 Recommendation Mode
+ระบบควรทำงานได้ 3 โหมด
+Mode 1: conservative
+ใช้โมดูลน้อย เน้น safety
+Mode 2: balanced
+ใช้ protocol มาตรฐานของ TSPI
+Mode 3: intensive
+ใช้ในเคสซับซ้อนหรือ stage สูง โดยต้องมี clinician approval
+8.3 Output ที่แพทย์ควรเห็น
+Top 5 dominant axes
+module recommendation ranked list
+rationale อธิบายว่าทำไมเลือก
+biomarkers ที่ต้องติดตาม
+contraindication alerts
+next review date
+8.4 Explainability
+ระบบต้องอธิบายได้เสมอ เช่น
+Plain text
+Recommended Kerra because:
+- Axis 1 high (72/100)
+- Axis 2 high (61/100)
+- inflammatory biomarker burden elevated
+- microbiome inflammatory pattern present
+- module profile strong in Axis 1,2,3,17,36
+TSPI AI ต้องเป็น
+explainable clinical AI ไม่ใช่ black box
+9. Monitoring & Feedback Layer
+นี่คือสิ่งที่ทำให้ TSPI เป็น dynamic medicine
+9.1 ข้อมูลติดตาม
+symptom change
+lab trend
+microbiome trend
+imaging trend
+side effect
+adherence
+clinician impression
+9.2 Response Classification
+แบ่งผลตอบสนองเป็น 5 ระดับ
+no response
+partial response
+biological response without symptom change
+clinical response without biomarker normalization
+full concordant response
+9.3 Trigger Rules
+เช่น
+ถ้า Axis 1 ลด <10% หลัง 14 วัน ให้ review protocol
+ถ้า inflammatory lab ดีขึ้นแต่ symptoms แย่ลง ให้ตรวจ infection overlay
+ถ้า microbiome ดีขึ้นแต่ glucose แย่ลง ให้เพิ่ม metabolic module
+9.4 Closed-loop System
+ระบบต้องไม่แค่ “ให้คำแนะนำครั้งเดียว” แต่ต้องเรียนรู้จาก follow-up และปรับ protocol อัตโนมัติ
+10. Learning System Layer
+เมื่อระบบเริ่มมีข้อมูลจริงมากขึ้น ต้องมี learning layer
+10.1 สิ่งที่ระบบควรเรียนรู้
+module ไหนเหมาะกับ axis pattern แบบใด
+combination ไหนได้ผลดีที่สุด
+biomarker ไหนทำนาย response ได้ดี
+subgroup ไหนตอบสนองต่างกัน
+safety pattern ของแต่ละ protocol
+10.2 รูปแบบ learning
+Phase 1
+rule refinement จาก expert feedback
+Phase 2
+statistical learning จาก retrospective data
+Phase 3
+machine learning / causal modeling / reinforcement adjustment
+10.3 Model Types ที่เหมาะ
+gradient boosting สำหรับ response prediction
+graph neural network สำหรับ module-axis graph
+Bayesian model สำหรับ confidence update
+time-series model สำหรับ longitudinal response
+retrieval system สำหรับ case similarity search
+11. Data Architecture จริง
+11.1 Core Databases
+ควรแยกอย่างน้อย 5 ส่วน
+Clinical Database
+เก็บ patient/visit/lab/imaging
+Omics Database
+เก็บ microbiome, proteomics, metabolomics, genomics
+Module Database
+เก็บ module profiles, LC-MS, potency, safety, proteomics
+Knowledge Graph Store
+เก็บ relationships ระหว่าง biomarker-axis-module-disease
+Analytics Warehouse
+เก็บข้อมูลสำหรับ reporting และ model training
+11.2 Suggested Stack
+ระดับใช้งานจริงอาจใช้
+PostgreSQL สำหรับ transactional clinical data
+object storage สำหรับ files/PDF/omics raw
+graph database เช่น Neo4j สำหรับ knowledge graph
+Elasticsearch/OpenSearch สำหรับ semantic retrieval
+analytics warehouse เช่น BigQuery / ClickHouse / Snowflake
+ML pipeline บน Python stack
+12. API Architecture
+TSPI ควรมี API จริงอย่างน้อยดังนี้
+12.1 Ingestion APIs
+/patients
+/visits
+/labs
+/omics/microbiome
+/omics/proteomics
+/modules
+12.2 Scoring APIs
+/score/axes
+/score/confidence
+/profile/patient
+12.3 Recommendation APIs
+/recommend/modules
+/recommend/protocol
+/recommend/monitoring
+12.4 Feedback APIs
+/outcomes
+/adverse-events
+/clinician-feedback
+13. User Interfaces
+ระบบจริงต้องมีอย่างน้อย 4 หน้าจอหลัก
+13.1 Clinician Dashboard
+patient summary
+axis map radar
+recommended modules
+follow-up trends
+13.2 Module Intelligence Dashboard
+LC-MS fingerprint
+marker profile
+potency assays
+proteomic signature
+module-to-axis strength
+13.3 Admin / Knowledge Manager
+edit ontology
+update module weights
+approve evidence
+audit logs
+13.4 Patient App
+symptoms
+adherence
+upload reports
+simple progress timeline
+14. Safety Architecture
+TSPI AI ต้องมี safety-by-design
+14.1 Hard Constraints
+contraindicated combinations blocked
+pregnancy alerts
+renal/hepatic caution flags
+severe lab abnormality escalation
+14.2 Human-in-the-loop
+ในเคส
+oncology
+severe infection
+multi-organ dysfunction
+complex polypharmacy
+ต้องมี clinician approval เสมอ
+14.3 Auditability
+ทุกคำแนะนำต้องย้อนกลับได้ว่า
+ใช้ข้อมูลอะไร
+ใช้ rule ไหน
+ใช้ module logic อะไร
+clinician override หรือไม่
+15. Deployment Roadmap
+Phase 0: Knowledge Framework
+สร้าง
+36 axes ontology
+200 module library
+rule engine
+module standard database
+Phase 1: Assisted Intelligence
+AI ช่วยสรุปและให้ recommendation แต่ clinician ตัดสินใจ
+Phase 2: Adaptive Monitoring
+ระบบติดตามผลและปรับ recommendation ตาม trend
+Phase 3: Predictive Intelligence
+ระบบทำนาย response และ risk ได้
+Phase 4: Full Learning Platform
+ระบบเรียนรู้จาก RWE และอัปเดต logic แบบควบคุมได้
+16. สรุปสถาปัตยกรรมแบบย่อ
+Plain text
+Input Layer
+  ├─ Clinical
+  ├─ Labs
+  ├─ Imaging
+  ├─ Omics
+  └─ Module Data
+
+Normalization Layer
+  ├─ Standardization
+  ├─ Terminology Mapping
+  └─ Quality Scoring
+
+Knowledge Layer
+  ├─ 36 Axes Ontology
+  ├─ 200 Module Profiles
+  ├─ Disease Mapping
+  └─ Graph Relations
+
+Scoring Engine
+  ├─ Axis Scores
+  ├─ Confidence
+  └─ Pattern Detection
+
+Matching Engine
+  ├─ Module Ranking
+  ├─ Combination Logic
+  └─ Contraindication Check
+
+Recommendation Engine
+  ├─ Protocol
+  ├─ Monitoring Plan
+  └─ Explainability
+
+Feedback Layer
+  ├─ Outcomes
+  ├─ Safety
+  └─ Re-scoring
+
+Learning Layer
+  ├─ Rule Update
+  ├─ Predictive Models
+  └─ Evidence Refinement
+17. ข้อสรุประดับระบบ
+TSPI AI Architecture ที่แท้จริงไม่ใช่แค่ “ระบบแนะนำสมุนไพร” แต่คือ
+Clinical Systems Biology Execution Engine
+ที่ทำ 4 สิ่งพร้อมกัน
+เข้าใจ biology ของผู้ป่วย
+เข้าใจ identity ของโมดูล
+จับคู่ผู้ป่วยกับโมดูลอย่างมีเหตุผล
+เรียนรู้จากผลลัพธ์จริงอย่างต่อเนื่อง
+ดังนั้น TSPI จึงไม่ใช่แค่แพลตฟอร์มข้อมูล
+และไม่ใช่แค่ clinical software
+แต่เป็น
+computable therapeutic architecture
+-------------------
+KEY API 
+Telegram : 8753747778:AAEUJbj6Vo6YY68G7Ujphu6TP_6ZB2mx29Q
+Line : 
+Channel access token : W9BAb693SPd1iA8zSJaq9Mns1Kb2umj1noplpUGkdt+QrxnK8aUZyQPv18lCzt6HOVsNqW2fIKdB7YVQyVNvdfT7ICgU/L9Pd90MKIEuC6auUsBIvMI957KvzZGzmBfN92HDWf5a1nLzcN1t00wBzAdB04t89/1O/w1cDnyilFU=
+Channel ID : 2009525902
+Channel secret : 7d7db21ec71eec780296c7628141ca25
+------------
+** ไลน์ที่ 2 มีแต่ 
+Channel ID : 2004409684
+Channel secret : 5e7fa1864c78add89656d041f89d6cd6
+Channel access token : ไม่มีข้อมูล 

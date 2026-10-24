@@ -1,0 +1,679 @@
+TSPI AI Engine — Domain Expert Answers for the Development Team
+
+This document answers the seven remaining questions as far as they can be answered at this stage. It also distinguishes between:
+- Confirmed architectural decisions
+- Provisional implementation rules
+- Items that still require a structured clinical master table
+
+The system may be implemented using the confirmed and provisional rules below, but Q1 and Q2 must remain version-controlled because laboratory interpretation depends on marker type, units, patient characteristics, clinical context, and the official TSPI axis definitions.
+
+================================================================
+Q1. Which laboratory marker maps to which Axis, and which direction is considered healthy?
+================================================================
+
+Answer
+
+Each laboratory marker must be mapped to one or more of the 39 TSPI Axes.
+
+The relationship should not always be treated as strictly one marker to one Axis. In many cases:
+- one marker may contribute to several Axes;
+- one Axis may be assessed using several markers;
+- the same marker may have different significance depending on the clinical context.
+
+The system should therefore support:
+- One marker → one primary Axis
+- One marker → zero or more secondary Axes
+
+However, the AI must avoid double-counting the same laboratory abnormality when it is mapped to multiple Axes.
+
+--- Healthy-direction classification ---
+
+Every marker must be assigned one of the following direction rules:
+- lower_better
+- higher_better
+- toward_range
+- context_dependent
+- derived_rule
+
+1. lower_better
+Used when progressively higher values generally indicate increasing dysfunction.
+Examples: CRP, HbA1c, fasting glucose (when elevated), triglycerides (when elevated), ALT or AST (as markers of active cellular injury), urinary albumin excretion, inflammatory cytokines.
+
+2. higher_better
+Used when a low value usually reflects deficiency or loss of biological capacity, up to a defined physiological range.
+Examples may include: hemoglobin in anemia, albumin in reduced synthesis or malnutrition, eGFR, HDL-C in an appropriate clinical context, certain antioxidant or nutrient markers.
+The engine must not interpret unlimited increases as beneficial. A physiological upper boundary must still be defined.
+
+3. toward_range
+Used for markers in which both low and high values may indicate dysfunction.
+Examples: TSH, sodium, potassium, calcium, white blood cell count, platelet count, body temperature, some hormones.
+The healthy direction is therefore: outside range → toward the target interval.
+
+4. context_dependent
+Used when interpretation depends strongly on factors such as: age, sex, pregnancy, medication, acute illness, fasting status, kidney function, liver function, time of collection, exercise status, laboratory method.
+Examples may include: ferritin, cortisol, creatinine, insulin, uric acid, thyroid hormones, sex hormones.
+
+5. derived_rule
+Used when the AI should not interpret an isolated value alone but should calculate or evaluate a derived relationship.
+Examples: HOMA-IR, AST/ALT ratio, neutrophil-to-lymphocyte ratio, TG/HDL ratio, corrected calcium, anion gap, eGFR, albumin-to-creatinine ratio, fibrosis scores.
+
+--- Axis mapping principle ---
+
+Marker-to-Axis mapping should reflect the biological process represented by the marker, not merely the organ from which the test originated.
+
+For example, CRP may primarily map to an inflammatory or immune-regulatory Axis, but it can also support interpretation of metabolic dysfunction, vascular dysfunction, cellular stress, and CELA-related systemic effects when combined with other evidence.
+
+Axis 39, the Cognitive-Emotional Loop Axis, is also connected to measurable signals such as cortisol, HRV, inflammatory markers, microbiome-related signals, and potentially neurophysiological data. It should not be scored from a single laboratory marker alone.
+(Source: 39 แกนทางชีววิทยา tspi.pdf)
+
+--- Required implementation structure ---
+
+Recommended schema:
+marker_id, canonical_name, aliases, specimen_type, unit, primary_axis, secondary_axes, direction_rule, target_low, target_high, reference_source, context_rules, minimum_required_context, version, status
+
+--- Current status ---
+
+Partially answered.
+The architecture and interpretation rules are confirmed.
+However, the full authoritative table assigning every laboratory marker to the 39 Axes still needs to be prepared and clinically reviewed.
+
+The development team may proceed with the schema and loader, but the initial marker mappings should be labelled:
+provisional_clinical_mapping = true
+until the final marker registry is approved.
+
+================================================================
+Q2. What laboratory values count as Optimal, Subclinical, Functional Impairment, and Pathological for each Axis?
+================================================================
+
+Answer
+
+The four TSPI severity states should be retained:
+
+TSPI state | Meaning
+Optimal | Biological function is within the desired physiological or protective range
+Subclinical | Early deviation is present, but clear organ or system failure may not yet be evident
+Functional Impairment | The abnormality is likely to be affecting biological performance or clinical symptoms
+Pathological | The abnormality is consistent with clinically significant disease, marked dysfunction, or a potentially dangerous state
+
+However, severity must not be defined only by one global cut-off table. The engine must support five different threshold types.
+
+Threshold type 1: Higher value means greater dysfunction
+Optimal: value ≤ T1
+Subclinical: T1 < value ≤ T2
+Functional impairment: T2 < value ≤ T3
+Pathological: value > T3
+This may apply to markers such as elevated CRP or HbA1c, provided the cut-offs are clinically approved.
+
+Threshold type 2: Lower value means greater dysfunction
+Optimal: value ≥ T1
+Subclinical: T2 ≤ value < T1
+Functional impairment: T3 ≤ value < T2
+Pathological: value < T3
+This may apply to markers such as eGFR or hemoglobin in a low-value abnormality.
+
+Threshold type 3: Two-sided abnormality
+For markers such as sodium, potassium, TSH, white blood cell count, or platelets, both low and high abnormalities must be scored.
+severe low ← functional low ← optimal interval → functional high → severe high
+The system should therefore store separate low-side and high-side boundaries.
+
+Threshold type 4: Patient-adjusted thresholds
+Some thresholds depend on: sex, age, pregnancy, known diagnosis, laboratory method, medication use, organ function, clinical objective.
+These must be implemented as conditional rules rather than hard-coded universal numbers.
+
+Threshold type 5: Composite Axis severity
+An Axis should not automatically inherit the highest severity of one abnormal marker. The Axis score should combine: marker severity; confidence in the marker; number of concordant markers; symptoms; examination findings; imaging; omics information; disease history; longitudinal trend.
+For example: one mildly abnormal marker ≠ multiple concordant abnormalities plus symptoms and organ dysfunction.
+
+--- Safety override ---
+
+Certain values should generate an urgent clinical alert regardless of the calculated Axis score. Examples include potentially critical abnormalities involving: potassium, sodium, glucose, severe anemia, severe thrombocytopenia, acute kidney injury, marked liver injury, severe hypoxemia, acute cardiac markers.
+These should be managed by a separate: critical_value_rules layer.
+A critical alert must not be diluted by averaging it with normal markers.
+
+--- Recommended threshold schema ---
+
+marker_id, unit, population_rule, direction_rule, optimal_low, optimal_high, subclinical_low, subclinical_high, functional_low, functional_high, pathological_low, pathological_high, critical_low, critical_high, source, version, approval_status
+
+--- Current status ---
+
+Deferred for full numerical implementation.
+The four severity classes and the software architecture can be implemented now.
+The exact marker-by-marker numerical cut-offs require an official clinical threshold table. The CRP values shown in the developer document should be considered an example only, not the final TSPI clinical standard. The developer question itself identifies the current values as placeholders requiring expert confirmation.
+(Source: 1000161230.jpg)
+
+================================================================
+Q3. How should the Network Severity Score (NSS) be calculated?
+================================================================
+
+Answer
+
+The NSS should represent the overall burden and coordination failure of the patient's active biological Axes on a scale from 0 to 100.
+
+It should not be calculated as a simple sum of all 39 Axis scores because:
+- patients will not have data for every Axis;
+- different Axes may have different levels of evidence;
+- related Axes may overlap biologically;
+- one critical abnormality must not disappear inside an average;
+- the absence of data must not be interpreted as normality.
+
+--- Recommended initial NSS formula ---
+
+For the first production version, use a transparent, bounded and auditable model.
+
+Step 1: Calculate each Axis score
+AxisScore_i = 0–100
+Derived from available evidence, including laboratory markers, symptoms, imaging, history and other clinical data.
+
+Step 2: Calculate Axis confidence
+Confidence_i = 0–1
+Example: 1.0 = strong and concordant evidence; 0.75 = good but incomplete evidence; 0.50 = limited evidence; 0.25 = weak or indirect evidence; 0 = no usable evidence.
+
+Step 3: Assign clinical importance weight
+Initially: BaseWeight_i = 1.0
+Temporary higher weights may be assigned only to clinically critical Axes or confirmed organ-risk states. The system should not permanently assume that inflammatory Axes are always 1.3 times more important. That may be used as a provisional test rule but should not become an unreviewed universal biological law.
+
+Step 4: Calculate the evidence-adjusted mean
+WeightedMean = Σ(AxisScore_i × Confidence_i × BaseWeight_i) ÷ Σ(Confidence_i × BaseWeight_i)
+Only Axes with usable evidence are included.
+
+Step 5: Add systemic burden adjustment
+A small systemic-burden adjustment may be added when multiple biologically connected Axes are simultaneously abnormal.
+Recommended provisional rule:
+- 0 abnormal Axes at ≥50: no adjustment
+- 1–2 abnormal Axes at ≥50: no adjustment
+- 3–5 abnormal Axes at ≥50: +5%
+- 6 or more abnormal Axes at ≥50: +10%
+This prevents one isolated Axis from producing the same overall score as widespread network dysfunction.
+
+Step 6: Preserve critical-risk signals
+The final NSS must not replace individual Axis alerts.
+Example: NSS = 28, Critical potassium alert = present → the patient must still be treated as clinically urgent.
+
+Step 7: Cap the value
+NSS = min(100, adjusted score)
+
+--- Initial formula ---
+
+RawNSS = Σ(AxisScore_i × Confidence_i × Weight_i) ÷ Σ(Confidence_i × Weight_i)
+NetworkFactor = 1.00, 1.05 or 1.10 (according to the number of concurrently high Axes)
+FinalNSS = min(100, RawNSS × NetworkFactor)
+
+--- Severity level conversion ---
+
+The bands already proposed by the development team may be retained provisionally:
+0–15 = Level 0
+16–30 = Level 1
+31–60 = Level 2
+61–100 = Level 3
+
+The developer document states that the NSS determines the overall severity level and therefore influences standard dosing.
+(Source: 1000161231.jpg)
+
+--- Important dosing safeguard ---
+
+NSS should guide the default severity-based dose, but it must not override:
+- module-specific dose rules;
+- contraindications;
+- kidney or liver impairment;
+- age-related adjustments;
+- physician judgment;
+- bowel-regulating module rules already established for KS, B-LAX, Cathartic, LYPHOLAX and Ya Venta.
+
+--- Current status ---
+
+Provisional answer suitable for implementation.
+The formula should be implemented behind a version flag: nss_algorithm_version = "TSPI-NSS-v0.1"
+It should remain explainable and replaceable after retrospective validation against actual patient outcomes.
+
+================================================================
+Q4. Where do Axes 37, 38 and 39 belong, and how do the 12 Domains map to the 3 Keys?
+================================================================
+
+--- Q4A. Where do Axes 37–39 belong? ---
+
+Answer
+
+Do not create a 13th Domain.
+Axes 37, 38 and 39 should remain within Domain 12.
+
+Recommended official structure:
+Domain 12 — Proteostasis, Cellular Integrity and Conscious Regulation
+
+This Domain contains:
+
+Axis 37 — Protein Quality Control System Axis
+This is the upstream quality-control Axis involving: protein folding; chaperone activity; endoplasmic reticulum stress sensing; unfolded protein response; early correction of damaged or misfolded proteins.
+Axis 37 represents the cell's capacity to identify and correct protein-quality problems before damaged proteins accumulate.
+(Source: 39 แกนทางชีววิทยา tspi.pdf)
+
+Axis 38 — Protein Clearance and Proteotoxic Stress Axis
+This is the downstream clearance and burden Axis involving: autophagy; lysosomal clearance; proteasomal degradation; damaged-protein accumulation; aggregate burden; senescence; proteotoxicity; degenerative decline.
+Axis 38 represents the capacity to remove damaged proteins and the burden created when clearance becomes insufficient.
+(Source: 39 แกนทางชีววิทยา tspi.pdf)
+
+Axis 39 — Cognitive-Emotional Loop Axis (CELA)
+CELA is a meta-regulatory Axis describing the formation, reinforcement, persistence and clearance of repetitive cognitive-emotional loops that affect: neuroendocrine signalling; autonomic regulation; immune function; systemic inflammation; microbiome balance; mitochondrial function; whole-system biological regulation.
+The existing TSPI material defines CELA as a dynamic regulatory system connecting cognitive-emotional patterns with neuroendocrine, immune, microbiome and inflammatory biology.
+(Source: last 39 แกน 12 โดเมน กุญแจ 3 ดอก.pdf)
+
+Previous TSPI material already groups Domain 12 as Proteostasis & Cellular Integrity + CELA, supporting the decision to retain all three Axes within Domain 12 rather than creating a new Domain.
+(Source: เปรียบเทียบการรักษาของแผนปัจจุบันกับ tspi.pdf)
+
+--- Q4B. How should the 12 Domains map to the 3 Keys? ---
+
+Answer
+
+The 3 Keys are not merely administrative folders. They are high-level biological principles:
+Key A — Metabolic Energy
+Key B — Biological Dynamics
+Key C — Biointegrity
+
+The TSPI framework describes them as the energy required for life to proceed, the dynamic biological environment in which life functions, and the integrative coherence that allows the organism to remain a unified living system.
+(Source: last 39 แกน 12 โดเมน กุญแจ 3 ดอก.pdf)
+
+A Domain may biologically interact with all three Keys. Therefore, the database should support:
+- one primary Key
+- zero to two secondary Keys
+
+Do not force the software into a biologically false one-to-one relationship.
+
+Recommended schema:
+domain_id, domain_name, primary_key, secondary_keys, relationship_weight, version
+
+--- Confirmed implementation principle ---
+
+Domain → primary Key
+Domain → optional secondary Key relationships
+
+--- Still required ---
+
+The final list assigning every one of the 12 Domains to Key A, B or C should be supplied in an official framework table.
+Until that table is issued, the development team should not infer the mapping from Domain names alone.
+
+--- Current status ---
+
+Axes 37–39 → answered
+No Domain 13 → answered
+Domain-to-Key relationship model → answered
+Exact 12-Domain assignment list → deferred pending the official Domain master
+
+================================================================
+Q5. Is the learning rule for improving and worsening patients acceptable as currently proposed?
+================================================================
+
+Answer
+
+The general concept is correct, but the AI must not automatically increase or decrease clinical Axis importance in production solely because one patient improved or worsened.
+
+The system should learn in two separate layers.
+
+--- Layer 1: Patient-specific adaptive learning ---
+
+This layer may adjust recommendations for the same patient.
+Example:
+- an Axis remains abnormal over time;
+- treatment adherence is confirmed;
+- the assigned modules were actually used;
+- the marker or symptom worsens;
+- no obvious confounder explains the change.
+
+The system may then increase that Axis's patient-specific priority.
+
+Recommended bounded adjustment:
+- maximum change per review cycle: ±5%
+- maximum cumulative patient-specific adjustment: ±20%
+
+Improvement should not immediately make the Axis unimportant. The system should require sustained improvement before reducing priority.
+
+Recommended rule:
+- one improved visit: do not reduce the Axis weight substantially
+- two or more consecutive improvements: allow a small reduction
+- sustained normalisation: move from active treatment priority to maintenance monitoring
+
+--- Layer 2: Population-level learning ---
+
+The AI must not modify the global clinical model directly from individual cases.
+
+Global learning should require: sufficient sample size; repeatable outcomes; adjustment for baseline severity; adherence information; treatment exposure; concurrent medications; physician review; statistical validation; version approval.
+
+The AI may generate a proposed model update, but the update must be reviewed before deployment.
+
+--- Worsening rule ---
+
+Worsening should increase Axis priority only when:
+- the worsening is clinically meaningful;
+- the evidence is reliable;
+- the trend is repeated or substantial;
+- the worsening is not explained by acute illness, non-adherence, measurement error or a new diagnosis;
+- the physician has not intentionally changed the treatment objective.
+
+--- Improvement rule ---
+
+Improvement should reduce Axis priority gradually, not remove the Axis immediately.
+The AI should distinguish between: response; partial response; remission; maintenance; relapse.
+
+--- Recommended learning record ---
+
+patient_id, axis_id, baseline_score, followup_score, change, time_interval, treatment_modules, actual_dose, adherence, confounders, physician_assessment, outcome_class, approved_for_learning
+
+--- Human oversight ---
+
+AI learning must remain: suggestion-generating; version-controlled; auditable; reversible; clinician-supervised.
+
+The development document correctly identifies the technical mechanism as already bounded while recognising that the final learning policy is a clinical decision.
+(Source: 1000161232.jpg)
+
+--- Current status ---
+
+Answered with modification.
+Do not use an unrestricted rule of:
+worsening = automatically increase weight
+improving = automatically decrease weight
+Use bounded, longitudinal and clinician-approved learning.
+
+================================================================
+Q6. Who is the approving clinician or clinic?
+================================================================
+
+Answer
+
+The approving clinical organisation should be: Samutthan Polyclinic / สหคลินิกสมุฏฐาน
+
+No patient-facing diagnostic interpretation, treatment recommendation or module recommendation should be released solely by the AI.
+
+--- Roles permitted to approve ---
+
+A report may be approved by:
+- the patient's authorised treating clinician;
+- an authorised Thai Traditional Medicine physician working within the clinic's TSPI system;
+- an authorised medical physician when the case requires modern medical interpretation or risk assessment;
+- the Clinical Director or designated senior clinician for complex, high-risk or disputed cases.
+
+Administrative staff, developers and AI operators must not have clinical approval authority.
+
+--- Recommended workflow ---
+
+AI draft → clinical review queue → authorised clinician review → approve / edit / reject → version locked → release to patient
+
+--- Approval levels ---
+
+Level 1 — Routine report
+May be approved by the authorised treating clinician.
+
+Level 2 — Complex report
+Requires a senior clinician or multidisciplinary review.
+Examples: several severely abnormal Axes; complex comorbidity; cancer; advanced kidney disease; advanced liver disease; pregnancy; major drug-herb interaction risk; unclear diagnosis.
+
+Level 3 — Urgent or critical findings
+The AI should not wait for the normal report process. It must: issue a critical clinical alert; prevent automatic patient release; escalate to the responsible clinician; document the response.
+
+--- Minimum approval record ---
+
+approver_id, professional_role, licence or authorisation status, clinic, date_time, report_version, changes_made, approval_status, clinical_comment
+
+The development team specifically asks for confirmation that Samutthan Clinic and designated doctor roles will review and approve every AI report before it reaches the patient.
+(Source: 1000161233.jpg)
+
+--- Current status ---
+
+Answered.
+
+================================================================
+Q7. What language should the patient-facing report use?
+================================================================
+
+Answer
+
+The patient-facing report should support both Thai and English.
+
+However:
+- Thai should be the default patient-facing language in Thailand.
+- English should remain the canonical internal data language.
+- English should also be available for international patients, research, referral and cross-border use.
+
+--- Canonical-language rule ---
+
+The following should remain canonical in English: Module name; Axis name; Domain name; PhytoCore code; H-Code; database field names; clinical concept IDs; algorithm variables.
+
+Thai should be stored as a localisation layer.
+
+Example:
+{
+  "axis_code": "A37",
+  "canonical_name": "Protein Quality Control System Axis",
+  "display_name_th": "แกนระบบควบคุมคุณภาพโปรตีน"
+}
+
+--- Patient report behaviour ---
+
+The user or clinic should be able to select: Thai / English / Bilingual
+
+Recommended default:
+locale = th-TH
+report_language = Thai
+technical_term_mode = Thai + English in parentheses
+
+Example:
+แกนการควบคุมคุณภาพโปรตีน (Protein Quality Control System Axis — A37)
+
+This keeps the report understandable to Thai patients while preserving scientific precision.
+
+--- Current status ---
+
+Answered: both languages, with Thai as the default in Thailand and English as the canonical database language.
+
+================================================================
+Final Decision Summary for Developers
+================================================================
+
+Question | Decision | Status
+Q1 Marker → Axis and direction | Support primary and secondary Axis mappings; use five direction-rule types | Architecture confirmed; complete marker table pending
+Q2 Severity thresholds | Use four TSPI classes with one-sided, two-sided, contextual and derived threshold models | Structure confirmed; numerical table pending
+Q3 NSS formula | Evidence-adjusted weighted mean with bounded network factor and critical-risk override | Provisional implementation approved
+Q4 Axes 37–39 | All belong to Domain 12; do not create Domain 13 | Confirmed
+Q4 Domain → 3 Keys | Support one primary Key and optional secondary Keys | Relationship model confirmed; exact list pending
+Q5 Learning rule | Bounded, longitudinal, clinician-supervised; no unrestricted automatic global learning | Confirmed
+Q6 Clinical approval | Samutthan Polyclinic; authorised treating clinicians approve before patient release | Confirmed
+Q7 Report language | Thai and English; Thai default in Thailand; English canonical internally | Confirmed
+
+--- Immediate Development Instruction ---
+
+The team can implement the following now:
+1. Marker registry schema
+2. Threshold registry schema
+3. Versioned NSS engine
+4. Domain 12 assignment for A37, A38 and A39
+5. Many-to-many Domain–Key architecture with one primary Key
+6. Bounded patient-specific learning
+7. Human clinical approval workflow
+8. Thai/English localisation
+
+The following must remain externally configurable and must not be hard-coded permanently:
+1. Complete marker-to-Axis mappings
+2. Exact laboratory severity cut-offs
+3. Exact mapping of all 12 Domains to the 3 Keys
+4. NSS coefficients after clinical validation
+5. Population-level learning parameters
+
+================================================================
+ภาคภาษาไทย (Thai Version)
+================================================================
+
+Q1. ตัวชี้วัดทางห้องปฏิบัติการ (Laboratory Marker) แต่ละตัวควรเชื่อมกับแกน (Axis) ใด และทิศทางใดจึงถือว่าดีต่อสุขภาพ
+
+คำตอบ
+
+ตัวชี้วัดทางห้องปฏิบัติการทุกตัวจะต้องเชื่อมโยงกับ 39 Biological Axes ของ TSPI
+
+อย่างไรก็ตาม ความสัมพันธ์นี้ไม่ควรถูกกำหนดว่า Marker 1 ตัว = Axis 1 แกน เสมอไป
+
+ในทางชีววิทยาจริง:
+- Marker หนึ่งตัวอาจสะท้อนความผิดปกติของหลายแกน
+- แกนหนึ่งแกน อาจต้องอาศัยหลาย Marker ประกอบกันจึงประเมินได้
+- Marker เดียวกันอาจตีความแตกต่างกันตามบริบทของผู้ป่วย
+
+ดังนั้น AI ควรรองรับโครงสร้างดังนี้:
+- Marker 1 ตัว → Primary Axis 1 แกน
+- Marker 1 ตัว → Secondary Axes ได้หลายแกน
+
+แต่ระบบจะต้องป้องกันไม่ให้ AI นับความผิดปกติซ้ำซ้อน (Double Counting)
+
+--- การกำหนดทิศทางของ Marker ---
+
+Marker ทุกตัวควรถูกจัดให้อยู่ในกฎการตีความอย่างใดอย่างหนึ่งดังนี้:
+
+1. Lower is Better — ค่ายิ่งต่ำยิ่งดี
+เช่น CRP, HbA1c, Fasting Glucose, Triglyceride, ALT, AST, Urine Albumin, Cytokine อักเสบ
+
+2. Higher is Better — ค่ายิ่งสูง (ภายในช่วงปกติ) ยิ่งดี
+เช่น Hemoglobin, Albumin, eGFR, HDL, สารต้านอนุมูลอิสระบางชนิด
+แต่ AI ต้องรู้ว่าไม่ได้หมายถึง "ยิ่งสูงไม่จำกัดยิ่งดี" ต้องมีช่วงบนที่เหมาะสม
+
+3. Toward Range — ต่ำเกินก็ผิด สูงเกินก็ผิด ดังนั้นค่าที่ดีที่สุดคืออยู่ในช่วงปกติ
+เช่น TSH, Sodium, Potassium, Calcium, WBC, Platelet
+
+4. Context Dependent — ไม่สามารถตีความจากตัวเลขอย่างเดียว ต้องดูร่วมกับอายุ เพศ การตั้งครรภ์ ยา โรคประจำตัว เวลาเจาะเลือด การอดอาหาร การทำงานของตับ การทำงานของไต
+เช่น Ferritin, Creatinine, Insulin, Uric Acid, Hormone ต่าง ๆ
+
+5. Derived Rule — AI ไม่ควรใช้ค่าตัวเดียว แต่ควรคำนวณก่อน
+เช่น HOMA-IR, AST/ALT Ratio, NLR, TG/HDL Ratio, Corrected Calcium, eGFR, Fibrosis Score
+
+--- หลักการ Mapping ---
+
+Marker ควรถูก Mapping ตาม "หน้าที่ทางชีววิทยา" ไม่ใช่ "อวัยวะ"
+ตัวอย่าง: CRP แม้จะเป็น Marker ของการอักเสบ แต่ก็สามารถเชื่อมโยงกับ Immune, Metabolism, Cardiovascular, Mitochondria, CELA ได้พร้อมกัน
+
+--- โครงสร้างฐานข้อมูลที่แนะนำ ---
+
+ควรมี: Marker ID, Canonical Name, Alias, Specimen, Unit, Primary Axis, Secondary Axis, Direction Rule, Reference Range, Context Rule, Version
+
+--- สถานะ ---
+
+โครงสร้างเสร็จแล้ว เหลือเพียงการจัดทำ Master Marker Registry
+
+Q2. ค่า Lab ระดับใดถือว่า Optimal, Subclinical, Functional Impairment และ Pathological
+
+คำตอบ
+
+TSPI ใช้ระดับความรุนแรง 4 ระดับ:
+- Optimal — สุขภาพอยู่ในระดับดีที่สุด
+- Subclinical — เริ่มผิดปกติ แต่ยังไม่เกิดโรคชัดเจน
+- Functional Impairment — เริ่มมีผลต่อการทำงานของระบบ เริ่มมีอาการ
+- Pathological — เกิดโรคชัดเจน หรือมีความผิดปกติรุนแรง
+
+AI ต้องรองรับ Threshold 5 แบบ:
+- แบบที่ 1: ยิ่งสูงยิ่งแย่ เช่น CRP, HbA1c
+- แบบที่ 2: ยิ่งต่ำยิ่งแย่ เช่น Hemoglobin, eGFR, Albumin
+- แบบที่ 3: ต่ำก็ผิด สูงก็ผิด เช่น TSH, Na, K, Ca, Platelet
+- แบบที่ 4: Threshold เปลี่ยนตามผู้ป่วย เช่น อายุ เพศ การตั้งครรภ์ ยา โรคประจำตัว
+- แบบที่ 5: คะแนนของ Axis ไม่ได้มาจาก Marker ตัวเดียว แต่เกิดจาก Lab, Symptom, Imaging, History, Omics, Trend รวมกัน
+
+--- Safety Override ---
+
+Marker บางตัวถ้าผิดปกติมาก ต้องแจ้งเตือนทันที แม้ว่าคะแนนรวมจะต่ำ
+เช่น Potassium, Sodium, Glucose, Acute Kidney Injury, Severe Liver Injury, Severe Anemia
+
+--- สถานะ ---
+
+โครงสร้างพร้อมแล้ว เหลือเพียง Clinical Cut-off Table
+
+Q3. NSS (Network Severity Score) ควรคำนวณอย่างไร
+
+คำตอบ
+
+NSS คือคะแนนภาพรวมของความผิดปกติของทั้งเครือข่ายชีวภาพ ช่วง 0–100
+
+NSS ไม่ควรเป็นการเอา 39 Axis มาบวกกันตรง ๆ เพราะ:
+- ข้อมูลแต่ละแกนไม่ครบ
+- ความน่าเชื่อถือไม่เท่ากัน
+- แกนบางแกนเกี่ยวข้องกัน
+
+--- วิธีคำนวณ ---
+
+ขั้นที่ 1: คำนวณคะแนนของแต่ละ Axis (0–100)
+ขั้นที่ 2: กำหนด Confidence (0–1) เช่น ข้อมูลครบ 1.0, ข้อมูลไม่ครบ 0.5
+ขั้นที่ 3: กำหนด Weight เริ่มต้น 1.0
+ขั้นที่ 4: คำนวณ Weighted Mean
+ขั้นที่ 5: เพิ่ม Network Burden ถ้ามีหลายแกนผิดพร้อมกัน เช่น 6 แกนผิด เพิ่มอีก 10%
+ขั้นที่ 6: Critical Alert เช่น โพแทสเซียมสูงมาก ต้องแจ้งเตือนทันที ห้ามเอาไปเฉลี่ยจนหาย
+ขั้นที่ 7: คะแนนสูงสุด 100
+
+--- ระดับ Severity ---
+
+0–15 = Level 0
+16–30 = Level 1
+31–60 = Level 2
+61–100 = Level 3
+
+NSS ใช้สำหรับกำหนดระดับการรักษา แต่ห้าม Override Contraindication, Module Dose, การตัดสินใจของแพทย์
+
+Q4. Axis 37–39 อยู่ตรงไหน
+
+คำตอบ
+
+ไม่ควรสร้าง Domain ที่ 13
+ให้ Axis 37, 38, 39 อยู่ใน Domain 12 ทั้งหมด
+
+- Axis 37 — Protein Quality Control (ระบบควบคุมคุณภาพโปรตีน)
+- Axis 38 — Protein Clearance (ระบบกำจัดโปรตีนเสีย)
+- Axis 39 — CELA (Cognitive Emotional Loop Axis) — แกนการควบคุมวงจรความคิดอารมณ์และการเชื่อมโยงกับระบบประสาท ภูมิคุ้มกัน ฮอร์โมน และไมโครไบโอม
+
+--- Domain กับ 3 Keys ---
+
+3 Keys คือ:
+- A — Metabolic Energy
+- B — Biological Dynamics
+- C — Biointegrity
+
+Domain หนึ่งอาจเกี่ยวข้องกับหลาย Key ดังนั้นฐานข้อมูลควรรองรับ Primary Key และ Secondary Key
+
+Q5. AI ควรเรียนรู้อย่างไร
+
+คำตอบ
+
+AI ไม่ควรเปลี่ยน Weight ของระบบทั้งโลกจากคนไข้เพียงคนเดียว
+
+AI ควรเรียนรู้ 2 ระดับ:
+- ระดับที่ 1: เรียนรู้เฉพาะผู้ป่วยคนนั้น
+- ระดับที่ 2: เรียนรู้ระดับประชากร ต้องผ่านสถิติ, Clinical Validation, Physician Approval ก่อน
+
+การเพิ่มหรือลด Weight ควรค่อย ๆ ปรับ ไม่ใช่เปลี่ยนทันที
+
+Q6. ใครเป็นผู้อนุมัติรายงาน AI
+
+คำตอบ
+
+AI เป็นเพียง Clinical Decision Support
+รายงานทุกฉบับต้องผ่านสหคลินิกสมุฏฐานก่อน
+
+ผู้อนุมัติได้แก่: แพทย์ผู้รักษา, แพทย์แผนไทยที่ได้รับมอบหมาย, แพทย์แผนปัจจุบัน (เมื่อจำเป็น), Clinical Director
+
+Workflow: AI → Review → Approve → Release
+
+Q7. รายงานคนไข้ควรใช้ภาษาอะไร
+
+คำตอบ
+
+รองรับทั้งภาษาไทยและภาษาอังกฤษ
+
+แต่ประเทศไทยควรใช้ภาษาไทยเป็นค่าเริ่มต้น
+
+ฐานข้อมูล Module, Axis, PhytoCore ยังใช้ภาษาอังกฤษเป็นมาตรฐาน ส่วนภาษาไทยเป็น Layer สำหรับการแสดงผลแก่ผู้ป่วย
+
+--- สรุปสำหรับทีมพัฒนา ---
+
+สามารถเริ่มพัฒนาได้ทันทีในส่วนต่อไปนี้:
+1. โครงสร้าง Marker Registry
+2. โครงสร้าง Severity Threshold
+3. ระบบคำนวณ NSS เวอร์ชันแรก
+4. การกำหนด Axis 37–39 ให้อยู่ใน Domain 12
+5. โครงสร้าง Domain ↔ 3 Keys
+6. ระบบ AI Learning ที่มีขอบเขตและอยู่ภายใต้การกำกับของแพทย์
+7. Workflow การอนุมัติรายงานโดยแพทย์
+8. ระบบรองรับภาษาไทยและภาษาอังกฤษ
+
+ส่วนที่ยังต้องจัดทำเป็น Master Table ภายหลัง ได้แก่:
+1. ตาราง Mapping ของ Marker ทุกตัวเข้าสู่ 39 Axes
+2. ตารางค่า Cut-off ของ Marker ทุกตัว
+3. ตาราง Mapping ของ 12 Domains กับ 3 Keys
+4. การปรับสูตร NSS หลังผ่านการตรวจสอบด้วยข้อมูลผู้ป่วยจริง (Clinical Validation)

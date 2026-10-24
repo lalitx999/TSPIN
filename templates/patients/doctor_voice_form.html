@@ -1,0 +1,114 @@
+{% extends 'layouts/doctor_base.html' %}
+
+{% block title %}บันทึกเสียงแพทย์ (Voice SOAP) - TSPI CLINIC{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-6" x-data="{
+    isRecording: false,
+    transcript: '',
+    recognition: null,
+    selectedPatient: '',
+    init() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            this.recognition = new SpeechRecognition();
+            this.recognition.continuous = true;
+            this.recognition.interimResults = true;
+            this.recognition.lang = 'th-TH';
+
+            this.recognition.onresult = (event) => {
+                let current = '';
+                for (let i = 0; i < event.results.length; i++) {
+                    current += event.results[i][0].transcript + ' ';
+                }
+                this.transcript = current;
+            };
+
+            this.recognition.onerror = (event) => {
+                console.error('Speech error:', event.error);
+                this.isRecording = false;
+            };
+
+            this.recognition.onend = () => {
+                this.isRecording = false;
+            };
+        }
+    },
+    toggleRecording() {
+        if (!this.recognition) {
+            alert('เบราว์เซอร์ของท่านยังไม่รองรับระบบสั่งการด้วยเสียง กรุณาใช้ Google Chrome หรือ Safari');
+            return;
+        }
+        if (this.isRecording) {
+            this.recognition.stop();
+            this.isRecording = false;
+        } else {
+            this.recognition.start();
+            this.isRecording = true;
+        }
+    }
+}">
+
+    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                    <i class="fas fa-microphone mr-1"></i> Voice-to-SOAP AI
+                </span>
+                <span class="text-xs text-gray-400">ระบบถอดเสียงและจำแนกข้อมูลอัตโนมัติ</span>
+            </div>
+            <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
+                บันทึกการตรวจด้วยเสียง (Voice Dictation)
+            </h1>
+            <p class="text-sm text-gray-500 mt-0.5">
+                พูดบรรยายอาการและผลการตรวจภาษาไทย ระบบจะแปลงเป็นข้อความและช่วยแยกหมวดหมู่ SOAP อัตโนมัติ
+            </p>
+        </div>
+    </div>
+
+    <!-- Voice Recording Studio Card -->
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-6">
+        
+        <!-- Patient Selector -->
+        <div>
+            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">เลือกคนไข้ที่จะบันทึกผล</label>
+            <select x-model="selectedPatient" class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-800">
+                <option value="">-- กรุณาเลือกคนไข้ --</option>
+                {% for p in patients %}
+                    <option value="{{ p.id }}">{{ p.full_name }} (HN: {{ p.hn }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Recording Central Hub -->
+        <div class="text-center py-8 bg-gray-50/60 rounded-2xl border border-dashed border-gray-200">
+            <button @click="toggleRecording()" type="button" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto text-2xl transition-all shadow-md"
+                    :class="isRecording ? 'bg-red-500 text-white animate-pulse ring-8 ring-red-100' : 'bg-primary text-white hover:bg-primary-dark'">
+                <i class="fas" :class="isRecording ? 'fa-stop' : 'fa-microphone'"></i>
+            </button>
+            <span class="block mt-4 text-sm font-semibold text-gray-800" x-text="isRecording ? 'กำลังบันทึกเสียงและถอดความสด... (กดอีกครั้งเพื่อหยุด)' : 'กดปุ่มไมโครโฟนเพื่อเริ่มพูด'"></span>
+            <span class="block text-xs text-gray-400 mt-0.5">รองรับภาษาไทย สำเนียงการแพทย์ และชื่อยา</span>
+        </div>
+
+        <!-- Live Transcribed Text -->
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <label class="text-xs font-semibold text-gray-700 uppercase tracking-wider">ข้อความที่ถอดได้ (Transcribed Text)</label>
+                <button type="button" @click="transcript = ''" class="text-xs text-red-500 hover:underline">ล้างข้อความ</button>
+            </div>
+            <textarea x-model="transcript" rows="6" placeholder="ข้อความเสียงจะปรากฏที่นี่แบบเรียลไทม์... หรือท่านสามารถพิมพ์แก้ไขเพิ่มเติมได้โดยตรง" class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl p-4 text-gray-800 focus:ring-primary focus:border-primary"></textarea>
+        </div>
+
+        <!-- Action Submit -->
+        <div class="flex justify-end gap-3 pt-3 border-t border-gray-100">
+            <button type="button" class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200">
+                คัดลอกข้อความ
+            </button>
+            <button type="button" class="px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-dark shadow-xs">
+                <i class="fas fa-magic mr-1"></i> ให้ AI แปลงเป็นบันทึก SOAP
+            </button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

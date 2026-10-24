@@ -1,0 +1,255 @@
+{% extends 'layouts/doctor_base.html' %}
+
+{% block title %}ซักประวัติล่วงหน้า (Pre-Visit Briefing) - TSPI CLINIC{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- Header & Patient Selector Bar -->
+    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                    <i class="fas fa-stethoscope mr-1"></i> Pre-Visit Briefing
+                </span>
+                <span class="text-xs text-gray-400">ระบบคัดกรองอัจฉริยะ 38 แกนชีววิทยา</span>
+            </div>
+            <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
+                สรุปข้อมูลคนไข้ก่อนเข้าพบแพทย์ (Pre-Visit Anamnesis)
+            </h1>
+            <p class="text-sm text-gray-500 mt-0.5">
+                ประมวลผลข้อมูลอาการล่วงหน้า ผลแล็บ และการประเมินความเสี่ยงทางกลไกชีวภาพเพื่อเตรียมความพร้อมในการตรวจรักษา
+            </p>
+        </div>
+
+        <!-- Patient Quick Switcher -->
+        <div class="flex items-center gap-3">
+            <label class="text-xs font-medium text-gray-500 whitespace-nowrap">เลือกคนไข้:</label>
+            <form method="GET" action="{% url 'patients:doctor_pre_visit' %}" class="flex items-center gap-2">
+                <select name="patient_id" onchange="this.form.submit()" class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl px-3 py-2 focus:ring-primary focus:border-primary">
+                    {% for p in waiting_patients %}
+                        <option value="{{ p.id }}" {% if patient and patient.id == p.id %}selected{% endif %}>
+                            {{ p.full_name }} (HN: {{ p.hn }})
+                        </option>
+                    {% empty %}
+                        <option value="">ไม่มีข้อมูลคนไข้</option>
+                    {% endfor %}
+                </select>
+                <noscript><button type="submit" class="px-3 py-2 bg-primary text-white rounded-xl text-xs">เลือก</button></noscript>
+            </form>
+        </div>
+    </div>
+
+    {% if patient %}
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Column: Patient Profile & Intake Summary (5 cols) -->
+        <div class="lg:col-span-5 space-y-6">
+
+            <!-- Profile Summary Card -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs">
+                <div class="flex items-start justify-between pb-4 border-b border-gray-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-2xl font-bold">
+                            {{ patient.first_name|slice:":1" }}
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-900 leading-tight">{{ patient.full_name }}</h2>
+                            <p class="text-xs text-gray-500 mt-0.5">HN: <span class="font-mono text-gray-700 font-semibold">{{ patient.hn }}</span></p>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
+                                    {{ patient.get_gender_display }}
+                                </span>
+                                <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
+                                    กรุ๊ป {{ patient.blood_type }}
+                                </span>
+                                {% if patient.birth_date %}
+                                    <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
+                                        เกิด {{ patient.birth_date|date:"d/m/Y" }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        {% if patient.status == 'urgent' %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
+                                <i class="fas fa-exclamation-triangle mr-1"></i> เคสด่วนเฝ้าระวัง
+                            </span>
+                        {% elif patient.status == 'medicine' %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                                <i class="fas fa-pills mr-1"></i> รับการบำบัด/ยา
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">
+                                <i class="fas fa-check-circle mr-1"></i> ปกติ/รอนัด
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Intake Highlights -->
+                <div class="mt-5 space-y-4">
+                    <div>
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">อาการสำคัญ (Chief Complaint)</h4>
+                        <p class="text-sm text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            {{ patient.chief_complaint|default:"มีอาการผื่นคันเรื้อรังตามลำตัวและข้อศอก อ่อนเพลียเรื้อรังหลังอาหาร และนอนหลับไม่สนิท มีประวัติท้องอืดร่วมด้วย" }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">ประวัติการแพ้และยาที่ใช้อยู่</h4>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="p-3 bg-red-50/50 rounded-xl border border-red-100">
+                                <span class="font-medium text-red-700 block mb-0.5"><i class="fas fa-ban mr-1"></i> ประวัติแพ้ยา/อาหาร</span>
+                                <span class="text-gray-700">{{ patient.allergies|default:"ปฏิเสธการแพ้ยาและอาหาร" }}</span>
+                            </div>
+                            <div class="p-3 bg-blue-50/50 rounded-xl border border-blue-100">
+                                <span class="font-medium text-blue-700 block mb-0.5"><i class="fas fa-capsules mr-1"></i> ยาประจำตัว</span>
+                                <span class="text-gray-700">{{ patient.current_medications|default:"ไม่มีการใช้ยาปฏิชีวนะประจำ" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact & LINE Connection -->
+                    <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+                        <span><i class="fas fa-phone mr-1"></i> {{ patient.phone|default:"-" }}</span>
+                        {% if patient.line_id %}
+                            <span class="text-green-600 font-medium"><i class="fab fa-line mr-1"></i> ผูก LINE OA แล้ว</span>
+                        {% else %}
+                            <span class="text-gray-400"><i class="fab fa-line mr-1"></i> ยังไม่ได้ผูก LINE</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pre-Visit Action Buttons -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-3">
+                <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">การดำเนินการของแพทย์</h4>
+                <a href="{% url 'patients:patient_detail' patient.id %}" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-dark transition-all shadow-xs">
+                    <i class="fas fa-stethoscope"></i> เริ่มการตรวจ / เข้าสู่แฟ้มเวชระเบียน
+                </a>
+                <a href="{% url 'clinical:report_create' patient.id %}" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gray-100 text-gray-800 font-medium text-sm hover:bg-gray-200 transition-all">
+                    <i class="fas fa-file-medical-alt text-primary"></i> ออกรายงานแพทย์ Precision Report
+                </a>
+                <a href="{% url 'intelligence:lab_ocr' %}" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-all">
+                    <i class="fas fa-file-upload text-gray-500"></i> สแกนผลแล็บใหม่ (Lab OCR)
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Right Column: 38-Axes & Biomarker Triaging Intelligence (7 cols) -->
+        <div class="lg:col-span-7 space-y-6">
+
+            <!-- Biological Focus Axes Card -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-900 leading-tight">แกนชีววิทยาที่พบความผิดปกติ (Biological Axes Triaging)</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">ประเมินจากผลตรวจแล็บ อาการทางคลินิก และประวัติสุขภาพแบบองค์รวม</p>
+                    </div>
+                    <a href="{% url 'clinical:axes_explorer' %}" class="text-xs text-primary font-medium hover:underline flex items-center gap-1">
+                        ดูทั้ง 38 แกน <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="space-y-3">
+                    {% for ax in focus_axes %}
+                        <div class="p-4 rounded-xl border {% if ax.status == 'critical' %}border-red-200 bg-red-50/30{% elif ax.status == 'warning' %}border-amber-200 bg-amber-50/30{% else %}border-gray-200 bg-gray-50/30{% endif %} flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded text-xs font-mono font-semibold {% if ax.status == 'critical' %}bg-red-100 text-red-700{% elif ax.status == 'warning' %}bg-amber-100 text-amber-700{% else %}bg-green-100 text-green-700{% endif %}">
+                                        {{ ax.code }}
+                                    </span>
+                                    <h4 class="text-sm font-semibold text-gray-900">{{ ax.name }}</h4>
+                                </div>
+                                <p class="text-xs text-gray-600">
+                                    <span class="font-medium text-gray-700">ตัวชี้วัด:</span> {{ ax.biomarker }}
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    <span class="font-medium text-primary">โมดูลที่แนะนำ:</span> {{ ax.target_module }}
+                                </p>
+                            </div>
+                            <div class="flex items-center md:flex-col items-end justify-between md:justify-center">
+                                <span class="text-xs text-gray-400">Severity Score</span>
+                                <span class="text-lg font-bold {% if ax.score >= 80 %}text-red-600{% elif ax.score >= 60 %}text-amber-600{% else %}text-green-600{% endif %}">
+                                    {{ ax.score }}/100
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Recommended Clinical Protocol (9-Step Ladder) -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-900 leading-tight">โปรโตคอลการฟื้นฟูที่แนะนำ (9-Step Recovery Plan)</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">แผนลำดับขั้นการรักษาเชิงกลไกสำหรับเคสนี้</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                        Phase 1 Active
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="p-3 rounded-xl border border-primary/30 bg-primary/5">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-bold text-primary">STEP 01</span>
+                            <i class="fas fa-check-circle text-primary text-xs"></i>
+                        </div>
+                        <h5 class="text-xs font-semibold text-gray-800">Deep Assessment</h5>
+                        <p class="text-[11px] text-gray-500 mt-1">วิเคราะห์เชิงลึก 38 แกนและผลแล็บเสร็จสิ้น</p>
+                    </div>
+
+                    <div class="p-3 rounded-xl border border-gray-200 bg-white">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-bold text-gray-700">STEP 02</span>
+                            <span class="text-[10px] text-amber-600 font-medium">รอเริ่มบำบัด</span>
+                        </div>
+                        <h5 class="text-xs font-semibold text-gray-800">Detoxification</h5>
+                        <p class="text-[11px] text-gray-500 mt-1">เคลียร์ภาระสารพิษตับ Phase 1/2</p>
+                    </div>
+
+                    <div class="p-3 rounded-xl border border-gray-200 bg-white">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-bold text-gray-700">STEP 03</span>
+                            <span class="text-[10px] text-gray-400">ลำดับถัดไป</span>
+                        </div>
+                        <h5 class="text-xs font-semibold text-gray-800">Gut Restoration</h5>
+                        <p class="text-[11px] text-gray-500 mt-1">ฟื้นฟูเยื่อบุลำไส้และสมดุลจุลินทรีย์</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctor Pre-visit Notes / Scratchpad -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs">
+                <h3 class="text-base font-semibold text-gray-900 mb-2">บันทึกเตือนความจำแพทย์ (Physician Quick Note)</h3>
+                <textarea rows="3" placeholder="พิมพ์ข้อสังเกตหรือจุดที่ต้องการซักถามเพิ่มเติมกับคนไข้รายนี้..." class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-800 focus:ring-primary focus:border-primary"></textarea>
+                <div class="flex justify-end mt-2">
+                    <button type="button" class="px-4 py-1.5 text-xs font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-all">
+                        บันทึกชั่วคราว
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    {% else %}
+    <div class="bg-white border border-gray-200 rounded-2xl p-12 text-center shadow-xs">
+        <div class="w-16 h-16 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mx-auto mb-4 text-2xl">
+            <i class="fas fa-user-slash"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-1">ไม่พบข้อมูลคนไข้ในระบบ</h3>
+        <p class="text-sm text-gray-500 mb-6 max-w-md mx-auto">กรุณาเพิ่มคนไข้ใหม่เข้าสู่เวชระเบียน หรือสร้างนัดหมายเพื่อเริ่มการซักประวัติล่วงหน้า</p>
+        <a href="{% url 'patients:patient_create' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-all">
+            <i class="fas fa-user-plus"></i> เพิ่มคนไข้ใหม่
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

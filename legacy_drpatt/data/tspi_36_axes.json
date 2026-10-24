@@ -1,0 +1,1459 @@
+{
+  "framework": "TSPI™ 36 Mechanistic Axes Framework",
+  "full_name": "Systems Therapeutic Programming Interface",
+  "description": "36 แกนเป็นระบบอธิบายกลไกโรคเชิงระบบ (systems biology) สำหรับ AI วิเคราะห์โรค, Mapping โมดูลสมุนไพร, สร้าง Clinical protocol",
+  "total_domains": 10,
+  "total_axes": 36,
+  "total_sub_axes": 108,
+  "domains": [
+    {
+      "domain_id": 1,
+      "title": "Immune–Infection Governance (แกนที่ 1–4)",
+      "axes": [
+        {
+          "axis_id": 1,
+          "name": "Systemic Inflammatory Load",
+          "sub_axes": {
+            "A": {
+              "description": "NF‑κB / Cytokine Burden – ภาระ IL‑6, TNF‑α, CRP และโปรแกรมยีนอักเสบรวมของทั้งระบบ​",
+              "details": []
+            },
+            "B": {
+              "description": "Inflammasome Output – การทำงานของ NLRP3, IL‑1β, IL‑18 และ danger‑signaling (DAMP)​",
+              "details": []
+            },
+            "C": {
+              "description": "Metabolic Inflammation – การอักเสบจากความอ้วน, lipotoxicity, insulin resistance, inflammaging​",
+              "details": []
+            }
+          },
+          "modules": [
+            "kerra",
+            "Minoza",
+            "KS",
+            "MERDANA",
+            "Im1",
+            "Im5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "G",
+            "L",
+            "XM2",
+            "beta",
+            "x",
+            "Merdana",
+            "RESHIMUNO"
+          ]
+        },
+        {
+          "axis_id": 2,
+          "name": "Immune Homeostasis",
+          "sub_axes": {
+            "A": {
+              "description": "Innate–Adaptive Coordination – การประสานกันของภูมิเดิม (innate) และภูมิจำเพาะ (adaptive)​",
+              "details": []
+            },
+            "B": {
+              "description": "Immune Polarity – สมดุล Th1/Th2, macrophage M1/M2 และแนวโน้ม autoimmune/ allergy​",
+              "details": []
+            },
+            "C": {
+              "description": "Tolerance–Resolution–Recovery – Treg, pro‑resolving mediators และความสามารถปิดการอักเสบกลับสู่ baseline​",
+              "details": []
+            }
+          },
+          "modules": [
+            "VARIZ",
+            "Sinaza",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "Im5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "beta",
+            "x",
+            "Merdana",
+            "RESHIMUNO",
+            "Plumax"
+          ]
+        },
+        {
+          "axis_id": 3,
+          "name": "Pathogen Defense (Host Defense)",
+          "sub_axes": {
+            "A": {
+              "description": "Antiviral Defense – IFN tone และ interferon‑stimulated genes สำหรับต้านไวรัส​",
+              "details": []
+            },
+            "B": {
+              "description": "Antibacterial / Antifungal Defense – antimicrobial peptides, phagocytosis และการฆ่าเชื้อแบคทีเรีย/เชื้อรา​",
+              "details": []
+            },
+            "C": {
+              "description": "Mucosal Defense – ภูมิคุ้มกันด่าน mucosa (ลำไส้, ทางเดินหายใจ ฯลฯ)​",
+              "details": [
+                "Plumax, Sinaza, kerra Minoza KS Im1  IM5 IM6 IM9 BetaG, IMO,IM7,  Beta M, Beta V, CINNARA, STOMMA, KURMA, BENJAKUL, VITALPLUA, VITALCELL, FEVA, YA TEEN NOK , beta x , Merdana"
+              ]
+            }
+          },
+          "modules": [
+            "KS",
+            "KERRA",
+            "MINOZA",
+            "FEVA",
+            "DB1",
+            "CINNARA",
+            "IM6"
+          ]
+        },
+        {
+          "axis_id": 4,
+          "name": "Post‑Infectious Persistence",
+          "sub_axes": {
+            "A": {
+              "description": "Immune Scar / Chronic Low‑Grade Activation – immune tone ไม่ยอมกลับ baseline หลังติดเชื้อ​",
+              "details": []
+            },
+            "B": {
+              "description": "Latent Reactivation Tendency – แนวโน้มเชื้อแฝง เช่น TB/HSV/EBV กลับมากระตุ้น​",
+              "details": []
+            },
+            "C": {
+              "description": "Post‑Viral Syndrome / Dysregulated Recovery – long‑covid‑like, fatigue, autonomic dysregulation หลังไวรัส​",
+              "details": [
+                "Plumax, Sinaza, kerra Minoza KS Im1  IM5 IM6  IM9 BetaG, IMO,IM7,  Beta M, Beta V, VARIZ, VITALPLUS, VITALIS, beta x , Merdanam RESHIMUNO"
+              ]
+            }
+          },
+          "modules": []
+        }
+      ]
+    },
+    {
+      "domain_id": 2,
+      "title": "Metabolic–Energy Core (แกนที่ 5–10)",
+      "axes": [
+        {
+          "axis_id": 5,
+          "name": "Glucose–Insulin Regulation",
+          "sub_axes": {
+            "A": {
+              "description": "Insulin Signaling – IR/AKT/GLUT dynamics และความไวต่ออินซูลินของเนื้อเยื่อต่าง ๆ​",
+              "details": []
+            },
+            "B": {
+              "description": "Hepatic Glucose Output – gluconeogenesis, glycogen flux และบทบาทตับในการปล่อยกลูโคส​",
+              "details": []
+            },
+            "C": {
+              "description": "Glycemic Variability Stress – ความผันผวนของน้ำตาล (glucose swings) และผลเสียสะสม​",
+              "details": []
+            }
+          },
+          "modules": [
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "VATTHANOTHAI",
+            "BOVA",
+            "BENJAKUL",
+            "MORMORDICA",
+            "YA",
+            "TEEN",
+            "NOK",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "2"
+          ]
+        },
+        {
+          "axis_id": 6,
+          "name": "Lipid–Lipotoxicity",
+          "sub_axes": {
+            "A": {
+              "description": "Lipoprotein Balance – โปรไฟล์ atherogenic ของ LDL, HDL, TG ฯลฯ​",
+              "details": []
+            },
+            "B": {
+              "description": "Lipotoxic Overload / Ectopic Fat – ไขมันพอกตับ (NAFLD), ไขมันเกาะอวัยวะ (ectopic fat)​",
+              "details": []
+            },
+            "C": {
+              "description": "Fatty Acid Oxidation Programs – PPAR/CPT‑driven fat oxidation และ metabolic flexibility​",
+              "details": []
+            }
+          },
+          "modules": [
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "Stream",
+            "Plus",
+            "BOVA",
+            "BENJAKUL",
+            "MORMORDICA",
+            "VATTHANOTHAI",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "2",
+            "XS",
+            "VITALPLUS",
+            "TARANA"
+          ]
+        },
+        {
+          "axis_id": 7,
+          "name": "Nutrient Sensing (AMPK–mTOR)",
+          "sub_axes": {
+            "A": {
+              "description": "AMPK Energy Sensing – การรับรู้พลังงานต่ำและการเข้าสู่โหมดประหยัด/ซ่อมแซม​",
+              "details": []
+            },
+            "B": {
+              "description": "mTORC1 Growth / Anabolism Tone – โหมดสร้าง (growth, anabolism) ที่สัมพันธ์กับการแก่และมะเร็ง​",
+              "details": []
+            },
+            "C": {
+              "description": "Switch Control – ความสามารถสลับ growth ↔ repair อย่างยืดหยุ่น​",
+              "details": []
+            }
+          },
+          "modules": [
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "Stream",
+            "Plus",
+            "BOVA",
+            "BENJAKUL",
+            "MORMORDICA",
+            "VITAL",
+            "PLUS",
+            "VITALCELL",
+            "VATTHANOTHAI",
+            "TUNG",
+            "CHAO",
+            "1",
+            "2",
+            "TARANA",
+            "CINNARA"
+          ]
+        },
+        {
+          "axis_id": 8,
+          "name": "Mitochondrial Network",
+          "sub_axes": {
+            "A": {
+              "description": "Bioenergetics – ATP, electron transport chain, membrane potential​",
+              "details": []
+            },
+            "B": {
+              "description": "Quality Control – mitophagy, fusion–fission, การเคลียร์ไมโทคอนเดรียเสีย​",
+              "details": []
+            },
+            "C": {
+              "description": "Biogenesis / Renewal – PGC‑1, mtDNA stability, การสร้างไมโทคอนเดรียใหม่​",
+              "details": []
+            }
+          },
+          "modules": [
+            "AMPUR",
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "BENJAKUL",
+            "MORMORDICA",
+            "VITAL",
+            "PLUS",
+            "VITALIS",
+            "VATTHANOTHAI",
+            "YA",
+            "TEEN",
+            "NOK",
+            "TUNG",
+            "CHAO",
+            "1",
+            "2",
+            "LIVOXY"
+          ]
+        },
+        {
+          "axis_id": 9,
+          "name": "Oxidative Stress",
+          "sub_axes": {
+            "A": {
+              "description": "ROS Load / Oxidative Damage – ภาระ ROS และความเสียหายต่อ DNA/โปรตีน/เยื่อหุ้ม​",
+              "details": []
+            },
+            "B": {
+              "description": "Antioxidant Depletion – สถานะ SOD, GPx, catalase, glutathione​",
+              "details": []
+            },
+            "C": {
+              "description": "Redox Signaling Imbalance – ความเพี้ยนของสัญญาณ redox เช่น NADPH oxidase, peroxiredoxin​",
+              "details": []
+            }
+          },
+          "modules": [
+            "RADICA",
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "LIVOXY"
+          ]
+        },
+        {
+          "axis_id": 10,
+          "name": "Proteostasis–Autophagy–Lysosome",
+          "sub_axes": {
+            "A": {
+              "description": "ER Stress / UPR – ความเครียดจากโปรตีนพับผิด (BiP/CHOP, UPR)​",
+              "details": []
+            },
+            "B": {
+              "description": "Autophagy Flux – initiation → flux ของ autophagy เคลียร์ของเสียในเซลล์​",
+              "details": []
+            },
+            "C": {
+              "description": "Lysosomal Degradation Capacity – ศักยภาพไลโซโซมในการย่อยสลาย/รีไซเคิล​",
+              "details": []
+            }
+          },
+          "modules": [
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "YA",
+            "TEEN",
+            "NOK",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "2"
+          ]
+        }
+      ]
+    },
+    {
+      "domain_id": 3,
+      "title": "Genomic–Longevity Programming (แกนที่ 11–14)",
+      "axes": [
+        {
+          "axis_id": 11,
+          "name": "DNA Repair & Genomic Stability",
+          "sub_axes": {
+            "A": {
+              "description": "DNA Damage Response / Repair Pathways – ระบบตรวจและซ่อมแซมความเสียหาย DNA​",
+              "details": []
+            },
+            "B": {
+              "description": "Mutation Buffering / Genomic Integrity – ความสามารถกันผลเสียจาก mutation สะสม​",
+              "details": []
+            },
+            "C": {
+              "description": "Telomere Stability – ความมั่นคงของ telomere ที่สัมพันธ์กับอายุชีวภาพ​",
+              "details": []
+            }
+          },
+          "modules": [
+            "RADICA",
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "VitalPLUS",
+            "AMPUR",
+            "VATTHANOTHAI",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "2",
+            "SANCHI"
+          ]
+        },
+        {
+          "axis_id": 12,
+          "name": "Epigenetic Regulation",
+          "sub_axes": {
+            "A": {
+              "description": "DNA Methylation Programs – pattern เมทิลเลชันที่กำหนดการเปิด–ปิดยีน​",
+              "details": []
+            },
+            "B": {
+              "description": "Histone / Chromatin Remodeling – สภาพโครมาตินและการเข้าถึงยีน​",
+              "details": []
+            },
+            "C": {
+              "description": "miRNA / Transcriptional Balance – การควบคุมระดับpost‑transcription ผ่าน miRNA ฯลฯ​",
+              "details": []
+            }
+          },
+          "modules": [
+            "AMPUR",
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "VitalPLUS",
+            "BOVA",
+            "SANGVICHAI",
+            "VATTHANOTHAI",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "2"
+          ]
+        },
+        {
+          "axis_id": 13,
+          "name": "Longevity Signaling (SIRT–FOXO–IGF)",
+          "sub_axes": {
+            "A": {
+              "description": "Sirtuin Programs – โปรตีน sirtuin ที่เกี่ยวกับอายุยืนและ stress resistance​",
+              "details": []
+            },
+            "B": {
+              "description": "FOXO Stress Adaptation – การตอบสนองต่อ stress ผ่าน FOXO transcription factors​",
+              "details": []
+            },
+            "C": {
+              "description": "IGF / Anabolic–Longevity Balance – สมดุล IGF‑1 ระหว่างโหมดโตกับโหมดอายุยืน​",
+              "details": []
+            }
+          },
+          "modules": [
+            "AMPUR",
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "VitalPLUS",
+            "SANGVICHAI",
+            "VITALIS",
+            "VATTHANOTHAI",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "2",
+            "RESHIMUNO"
+          ]
+        },
+        {
+          "axis_id": 14,
+          "name": "Senescence & SASP",
+          "sub_axes": {
+            "A": {
+              "description": "Senescent Cell Burden – ปริมาณเซลล์ชราที่หยุดแบ่งตัว​",
+              "details": []
+            },
+            "B": {
+              "description": "SASP Inflammatory Output – สารอักเสบ/โปร‑เสื่อมที่เซลล์ชราหลั่ง (senescence‑associated secretome)​",
+              "details": []
+            },
+            "C": {
+              "description": "Senescence Clearance Potential – ความสามารถกำจัด/รีไซเคิลเซลล์ชรา​",
+              "details": []
+            }
+          },
+          "modules": [
+            "AMPUR",
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "VitalPLUS",
+            "SANGVICHAI",
+            "VITALIS",
+            "VATTHANOTHAI",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "2",
+            "SANCHI",
+            "RESHIMUNO"
+          ]
+        }
+      ]
+    },
+    {
+      "domain_id": 4,
+      "title": "Detox–Digestive–Gut Ecosystem (แกนที่ 15–19)",
+      "axes": [
+        {
+          "axis_id": 15,
+          "name": "Detoxification & Cellular Defense",
+          "sub_axes": {
+            "A": {
+              "description": "Phase I/II Biotransformation – CYP450, glucuronidation, sulfation ฯลฯ​",
+              "details": []
+            },
+            "B": {
+              "description": "Nrf2–GSH Defense Programming – การกระตุ้น Nrf2, glutathione, antioxidant defense​",
+              "details": []
+            },
+            "C": {
+              "description": "Xenobiotic / Metabolite Clearance Capacity – ความสามารถขับ xenobiotics และเมแทบอไลต์พิษ​",
+              "details": [
+                "ยูริคสูง URANA2, DB1, kerra Minoza KS, HEPA2",
+                "สารพิษ ยาเสพติด สารกัมมันตภาพสะสม โลหะหนัก พิษสุรา LIVITA, KERRA, KS, IM6"
+              ]
+            }
+          },
+          "modules": [
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "IM9",
+            "VENTA",
+            "CHATHARIC",
+            "LYPHOLAX",
+            "LAXORIM",
+            "BELAX",
+            "HEPA1",
+            "HEPA2",
+            "HEPA3",
+            "HEPA",
+            "PLUS",
+            "TARANA"
+          ]
+        },
+        {
+          "axis_id": 16,
+          "name": "Digestive–Absorptive",
+          "sub_axes": {
+            "A": {
+              "description": "Gastric Digestion – กรดและการย่อยในกระเพาะ​",
+              "details": []
+            },
+            "B": {
+              "description": "Pancreatic–Bile Function – เอนไซม์ตับอ่อนและน้ำดี​",
+              "details": []
+            },
+            "C": {
+              "description": "Small Intestine Absorption – การดูดซึมสารอาหารในลำไส้เล็ก​",
+              "details": []
+            }
+          },
+          "modules": [
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "IM9",
+            "VENTA",
+            "KURMA",
+            "STOMMA",
+            "CINNARA",
+            "VATTHANOTHAI",
+            "VITALPLUS",
+            "TARANA"
+          ]
+        },
+        {
+          "axis_id": 17,
+          "name": "Microbiome Ecology",
+          "sub_axes": {
+            "A": {
+              "description": "Diversity / Resilience – ความหลากหลายและความยืดหยุ่นของ microbiome​",
+              "details": []
+            },
+            "B": {
+              "description": "SCFA / Metabolite Profile – butyrate, propionate, acetate ฯลฯ​",
+              "details": []
+            },
+            "C": {
+              "description": "Dysbiosis Patterns – รูปแบบเสียสมดุล เช่น overgrowth, loss of keystone species​",
+              "details": [
+                "ท้องเสีย ลำใส้แปรปรวน IBS ลำใส้อักเสบ  -SITTHAJORN, CINNARA, KS, KERRA, MINOZA, STOMMA, KURMA"
+              ]
+            }
+          },
+          "modules": [
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "IM9",
+            "VENTA",
+            "CHATHARIC",
+            "LYPHOLAX",
+            "LAXORIM",
+            "BELAX",
+            "RICEZOZYME",
+            "ZAMINZYME",
+            "FLAXPRO",
+            "TARANA"
+          ]
+        },
+        {
+          "axis_id": 18,
+          "name": "Gut Barrier & Mucosal Integrity",
+          "sub_axes": {
+            "A": {
+              "description": "Tight Junction Integrity – โครงสร้าง tight junction เช่น occludin, claudin​",
+              "details": []
+            },
+            "B": {
+              "description": "Endotoxin Translocation – การรั่วของ LPS/endotoxin เข้ากระแสเลือด​",
+              "details": []
+            },
+            "C": {
+              "description": "Mucosal Immune Interface – การสื่อสารภูมิคุ้มกันที่เยื่อบุลำไส้​",
+              "details": []
+            }
+          },
+          "modules": [
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "IM9",
+            "VENTA",
+            "KURMA",
+            "STOMMA",
+            "CINNARA",
+            "BELAX",
+            "RICEZOZYME",
+            "ZAMINZYME",
+            "FLAXPRO",
+            "IM6",
+            "VATTHANOTHAI",
+            "SITTHIJORN",
+            "TARANA"
+          ]
+        },
+        {
+          "axis_id": 19,
+          "name": "Colon Biofilm & Mucosal Burden",
+          "sub_axes": {
+            "A": {
+              "description": "Biofilm Persistence – biofilm เรื้อรังในลำไส้ใหญ่​",
+              "details": []
+            },
+            "B": {
+              "description": "Colon Plaque / Toxin Burden – คราบ, ของเสีย, toxin ที่เกาะผนังลำไส้​",
+              "details": []
+            },
+            "C": {
+              "description": "Clearance Kinetics – อัตราการผลัดเยื่อบุและเคลียร์คราบ/ของเสีย​",
+              "details": []
+            }
+          },
+          "modules": [
+            "KS",
+            "VENTA",
+            "CHATHARIC",
+            "LYPHOLAX",
+            "LAXORIM",
+            "BELAX",
+            "RICEZOZYME",
+            "ZAMINZYME",
+            "FLAXPRO",
+            "VATTHANOTHAI",
+            "TARANA"
+          ]
+        }
+      ]
+    },
+    {
+      "domain_id": 5,
+      "title": "Vascular–Circulation–Stroke Prevention (แกนที่ 20–23)",
+      "axes": [
+        {
+          "axis_id": 20,
+          "name": "Endothelial Function",
+          "sub_axes": {
+            "A": {
+              "description": "NO/eNOS Tone – การสร้าง nitric oxide จาก endothelial NOS​",
+              "details": []
+            },
+            "B": {
+              "description": "Endothelial Inflammation / Adhesion – การอักเสบที่ผนังหลอดเลือดและการเกาะของเม็ดเลือดขาว​",
+              "details": []
+            },
+            "C": {
+              "description": "Glycocalyx Integrity – ชั้นไกลโคคาลิกซ์ปกป้องผนังเส้นเลือด​",
+              "details": []
+            }
+          },
+          "modules": [
+            "HP1",
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM6",
+            "VitalPLUS",
+            "Stream",
+            "Plus",
+            "BOVA",
+            "VATTHANOTHAI",
+            "AMPUR",
+            "ANAX",
+            "TARANA",
+            "BUTEA",
+            "SUPERBA",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "2",
+            "SANCHI"
+          ]
+        },
+        {
+          "axis_id": 21,
+          "name": "Vascular Remodeling & Microcirculation",
+          "sub_axes": {
+            "A": {
+              "description": "Angiogenesis Signaling – การสร้างเส้นเลือดใหม่​",
+              "details": []
+            },
+            "B": {
+              "description": "Capillary Density / Microvascular Structure – ความหนาแน่นโครงสร้างเส้นเลือดฝอย​",
+              "details": []
+            },
+            "C": {
+              "description": "Tissue Perfusion & Oxygen Delivery – การส่งเลือดและออกซิเจนถึงเนื้อเยื่อ​",
+              "details": []
+            }
+          },
+          "modules": [
+            "HP1",
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM6",
+            "AMPUR",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "BUTEA",
+            "SUPERBA",
+            "2"
+          ]
+        },
+        {
+          "axis_id": 22,
+          "name": "Thrombosis–Hemostasis",
+          "sub_axes": {
+            "A": {
+              "description": "Platelet Activation – การเกาะกลุ่มของเกล็ดเลือด​",
+              "details": []
+            },
+            "B": {
+              "description": "Coagulation Cascade Tone – การทำงานของระบบการแข็งตัวของเลือด​",
+              "details": []
+            },
+            "C": {
+              "description": "Fibrinolysis Balance – การสลายลิ่มเลือดและสมดุลกับการแข็งตัว​",
+              "details": [
+                "ลดการเกาะกลุ่มตัวของเกล็ดเลือด สลายลิ่มเลือด AMPUR, DB1, kerra HP1, Minoza Im1 IM5  IM6, IM9 VitalPLUS,  SANGVICHAI BOVA RIDSEE TUNG CHAO PLUS 1, BUTEA SUPERBA,TUNG CHAO PLUS 2",
+                "เพิ่มความไวการแข็งตัวของเลือด KS, SITTHAJORN"
+              ]
+            }
+          },
+          "modules": []
+        },
+        {
+          "axis_id": 23,
+          "name": "Hemodynamics & Arterial Elasticity",
+          "sub_axes": {
+            "A": {
+              "description": "RAAS Regulation – ระบบ renin–angiotensin–aldosterone​",
+              "details": []
+            },
+            "B": {
+              "description": "Vascular Stiffness / Compliance – ความแข็งหรือลดหยุ่นของผนังหลอดเลือด​",
+              "details": []
+            },
+            "C": {
+              "description": "Blood Pressure Set‑Point – จุดตั้งค่าความดันเลือดของระบบ​",
+              "details": []
+            }
+          },
+          "modules": [
+            "HP1",
+            "BOVA",
+            "VATTHANOTHAI",
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM6",
+            "AMPUR",
+            "VitalPLUS",
+            "SANGVICHAI",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "BUTEA",
+            "SUPERBA",
+            "2"
+          ]
+        }
+      ]
+    },
+    {
+      "domain_id": 6,
+      "title": "Repair–Fibrosis–Regeneration (แกนที่ 24–27)",
+      "axes": [
+        {
+          "axis_id": 24,
+          "name": "Wound Healing (Internal + External)",
+          "sub_axes": {
+            "A": {
+              "description": "Inflammation → Proliferation Transition – การเปลี่ยนเฟสจากอักเสบไปสู่การสร้างเนื้อเยื่อ​",
+              "details": []
+            },
+            "B": {
+              "description": "Epithelialization / Closure Kinetics – ความเร็วในการปิดแผล/สร้างเยื่อบุใหม่​",
+              "details": []
+            },
+            "C": {
+              "description": "Remodeling Quality – คุณภาพของแผลหลังซ่อม รวมถึงแผลเป็น​",
+              "details": []
+            }
+          },
+          "modules": [
+            "AMPUR",
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM6",
+            "RICEZOZYME",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "Plumax"
+          ]
+        },
+        {
+          "axis_id": 25,
+          "name": "Fibrosis & ECM Remodeling",
+          "sub_axes": {
+            "A": {
+              "description": "TGF‑β Fibrotic Signaling – สัญญาณ fibrotic หลักนำโดย TGF‑β​",
+              "details": []
+            },
+            "B": {
+              "description": "Collagen Deposition / Turnover – การสะสมและการสลายคอลลาเจนในอวัยวะ​",
+              "details": []
+            },
+            "C": {
+              "description": "Organ Stiffness Progression – การแข็งของอวัยวะ (ตับแข็ง, พังผืดปอด ฯลฯ)​",
+              "details": []
+            }
+          },
+          "modules": [
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM6",
+            "RICEZOZYME",
+            "IM9",
+            "BetaG",
+            "IMO",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "NARIS",
+            "TARANA",
+            "LIVOXY",
+            "Plumax"
+          ]
+        },
+        {
+          "axis_id": 26,
+          "name": "Stem Cell & Hematopoiesis",
+          "sub_axes": {
+            "A": {
+              "description": "Stem Niche / Regenerative Reserve – สำรองเซลล์ต้นกำเนิดในร่างกาย​",
+              "details": []
+            },
+            "B": {
+              "description": "Hematopoiesis – การสร้างเม็ดเลือดในไขกระดูก​",
+              "details": []
+            },
+            "C": {
+              "description": "Recovery Capacity after Stress / Injury – ความสามารถฟื้นตัวหลังเจ็บป่วยหรือบาดเจ็บหนัก​",
+              "details": []
+            }
+          },
+          "modules": [
+            "AMPUR",
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "BUMINMAX",
+            "BLOOD",
+            "NOURISHING",
+            "RENAX",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "BUTEA",
+            "SUPERBA",
+            "LIVOXY",
+            "Plumax"
+          ]
+        },
+        {
+          "axis_id": 27,
+          "name": "Glycation / Carbonyl Stress (AGE)",
+          "sub_axes": {
+            "A": {
+              "description": "AGE Formation / Carbonyl Load – การก่อตัว advanced glycation end products​",
+              "details": []
+            },
+            "B": {
+              "description": "Protein Crosslinking / Stiffness – การเชื่อมขวางโปรตีน ทำให้เนื้อเยื่อแข็ง/กรอบ​",
+              "details": []
+            },
+            "C": {
+              "description": "Tissue Vulnerability Amplification – ทำให้เนื้อเยื่อเปราะ เสี่ยงต่อโรคหลอดเลือด ไต ฯลฯ​",
+              "details": []
+            }
+          },
+          "modules": [
+            "DB1",
+            "kerra",
+            "Minoza",
+            "KS",
+            "Im1",
+            "IM5",
+            "IM6",
+            "IM9",
+            "BetaG",
+            "IM7",
+            "Beta",
+            "M",
+            "V",
+            "BUMINMAX",
+            "RADICA",
+            "BENJAKUL",
+            "BLOOD",
+            "NOURISHING",
+            "RENAX",
+            "MORMORDICA",
+            "VATTHANOTHAI",
+            "BUTEA",
+            "SUPERBA",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "2",
+            "SANCHI",
+            "LIVOXY",
+            "Plumax"
+          ]
+        }
+      ]
+    },
+    {
+      "domain_id": 7,
+      "title": "Musculoskeletal & Structural Integrity (แกนที่ 28–30)",
+      "axes": [
+        {
+          "axis_id": 28,
+          "name": "Muscle Protein Turnover",
+          "sub_axes": {
+            "A": {
+              "description": "Anabolism – การสร้างโปรตีนกล้ามเนื้อ​",
+              "details": []
+            },
+            "B": {
+              "description": "Catabolism – การสลายกล้ามเนื้อ​",
+              "details": []
+            },
+            "C": {
+              "description": "Myogenesis / Recovery – การสร้างเส้นใยกล้ามเนื้อใหม่และการฟื้นตัว​",
+              "details": []
+            }
+          },
+          "modules": [
+            "BUMINMAX",
+            "AMPUR",
+            "ZAMINZYME",
+            "VITALPLUS",
+            "DERRIS",
+            "SCANDANS",
+            "NARIS",
+            "TARANA",
+            "ANAX"
+          ]
+        },
+        {
+          "axis_id": 29,
+          "name": "Bone Remodeling",
+          "sub_axes": {
+            "A": {
+              "description": "Osteoblast Formation – การสร้างกระดูกโดย osteoblast​",
+              "details": []
+            },
+            "B": {
+              "description": "Osteoclast Resorption – การสลายกระดูกโดย osteoclast​",
+              "details": []
+            },
+            "C": {
+              "description": "Mineral Density Stability – ความหนาแน่นกระดูกและสมดุลแร่ธาตุ​",
+              "details": []
+            }
+          },
+          "modules": [
+            "BUMINMAX",
+            "AMPUR",
+            "ANAX",
+            "ZAMINZYME",
+            "VITALPLUS",
+            "DERRIS",
+            "SCANDANS",
+            "NARIS",
+            "TARANA",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "2",
+            "SANCHI",
+            "REDCAL",
+            "BONAX"
+          ]
+        },
+        {
+          "axis_id": 30,
+          "name": "Connective Tissue Integrity",
+          "sub_axes": {
+            "A": {
+              "description": "Tendon / Ligament ECM Resilience – ความยืดหยุ่นของเอ็น/เส้นเอ็น​",
+              "details": []
+            },
+            "B": {
+              "description": "Joint Matrix Stability – ความสมบูรณ์ของกระดูกอ่อนและข้อต่อ​",
+              "details": []
+            },
+            "C": {
+              "description": "Structural Crosslink Burden – การเชื่อมขวางโครงสร้างที่ทำให้แข็ง/ติด​",
+              "details": [
+                "ใช้ภายนอก KIMLUI YELLOW OIL"
+              ]
+            }
+          },
+          "modules": [
+            "VITALPLUS",
+            "DERRIS",
+            "SCANDANS",
+            "BUMINMAX",
+            "AMPUR",
+            "ANAX",
+            "ZAMINZYME",
+            "KS",
+            "KERRA",
+            "MINOZA",
+            "NARIS",
+            "TARANA",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "1",
+            "2",
+            "SANCHI"
+          ]
+        }
+      ]
+    },
+    {
+      "domain_id": 8,
+      "title": "Endocrine Network (แกนที่ 31–33)",
+      "axes": [
+        {
+          "axis_id": 31,
+          "name": "Female Hormone",
+          "sub_axes": {
+            "A": {
+              "description": "Estrogen Signaling – การทำงานของ estrogen และ receptor​",
+              "details": []
+            },
+            "B": {
+              "description": "Progesterone Signaling – สมดุล progesterone และ estrogen​",
+              "details": []
+            },
+            "C": {
+              "description": "Menopause Physiology & Receptor Balance – ชีววิทยาวัยหมดประจำเดือนและความไวตัวรับ​",
+              "details": []
+            }
+          },
+          "modules": [
+            "LANA",
+            "ANGERA",
+            "ZAMINZYME",
+            "TUNG",
+            "CHAO",
+            "PLUS",
+            "2",
+            "SANCHI"
+          ]
+        },
+        {
+          "axis_id": 32,
+          "name": "Male Androgen",
+          "sub_axes": {
+            "A": {
+              "description": "Testosterone Tone – ระดับและ rhythmicity ของ testosterone​",
+              "details": []
+            },
+            "B": {
+              "description": "DHT / AR Sensitivity – การเปลี่ยนเป็น DHT และความไว androgen receptor​",
+              "details": []
+            },
+            "C": {
+              "description": "Prostate–Hair–Anabolic Linkage – ความเชื่อมโยงระหว่างต่อมลูกหมาก, ผม, มวลกล้ามเนื้อ​",
+              "details": []
+            }
+          },
+          "modules": [
+            "TOPAZ",
+            "BUTEA",
+            "SUPERBA",
+            "VITALPLUS",
+            "BUMINMAX",
+            "PLUS",
+            "AMPUR",
+            "TUNG",
+            "CHAO",
+            "1"
+          ]
+        },
+        {
+          "axis_id": 33,
+          "name": "Thyroid–Adrenal–Growth",
+          "sub_axes": {
+            "A": {
+              "description": "Thyroid Metabolic Control – TSH, T3/T4 และอัตราเมตาบอลิซึม​",
+              "details": []
+            },
+            "B": {
+              "description": "Adrenal / HPA Rhythm – แกน HPA, คอร์ติซอล, จังหวะความเครียด​",
+              "details": []
+            },
+            "C": {
+              "description": "GH–IGF Anabolic Repair Signaling – ฮอร์โมน growth และ IGF‑1 ในการซ่อมแซมและเติบโต​",
+              "details": [
+                "Hypothyroid- VITALPLUS, BLOOD NOURISHING, BOVA, LANA, VETCHAKORN No.6, TARANA, NARIS, XS,TUNG CHAO PLUS 1,TUNG CHAO PLUS 2, TUNG CHAO PLUS SANCHI",
+                "Hyperthyroid - Radica, BOVA, KERRA, IM6, BETA V, MINOZA, LIVITA, YA TEEN NOK"
+              ]
+            }
+          },
+          "modules": [
+            "AMPUR",
+            "RADICA",
+            "VITALPLUS",
+            "SANGVICHAI",
+            "VETCHAKORN",
+            "NO.6",
+            "PSYLAZA",
+            "BRANARA"
+          ]
+        }
+      ]
+    },
+    {
+      "domain_id": 9,
+      "title": "Neuro–Sleep–Stress (แกนที่ 34)",
+      "axes": [
+        {
+          "axis_id": 34,
+          "name": "Neuro–Sleep–Stress–Brain Clearance (Meta‑Axis)",
+          "sub_axes": {
+            "A": {
+              "description": "Neuroinflammation – การอักเสบในสมองและระบบประสาท​",
+              "details": []
+            },
+            "B": {
+              "description": "Sleep–Circadian–Melatonin Repair Programming – คุณภาพการนอน วงจร circadian และเมลาโทนิน​",
+              "details": []
+            },
+            "C": {
+              "description": "HPA–Autonomic–Catecholamine Regulation + Glymphatic Clearance – การคุมเครียด, ระบบประสาทอัตโนมัติ และการระบายของเสียในสมอง (glymphatic)​",
+              "details": []
+            }
+          },
+          "modules": [
+            "BOVA",
+            "VETCHAKORN",
+            "No.6",
+            "SANGVICHAI",
+            "PSYLAZA",
+            "KERRA",
+            "KS",
+            "YA",
+            "TEEN",
+            "NOK",
+            "BRANARA"
+          ]
+        }
+      ]
+    },
+    {
+      "domain_id": 10,
+      "title": "Organ Axis + Oncology (แกนที่ 35–36)",
+      "axes": [
+        {
+          "axis_id": 35,
+          "name": "Organ Resilience & Functional Reserve (Organ Meta‑Axis)",
+          "sub_axes": {
+            "A": {
+              "description": "Visceral Organs – ตับ ไต หัวใจ ปอด ม้าม ตับอ่อน ถุงน้ำดี กระเพาะ ลำไส้ กระเพาะปัสสาวะ ฯลฯ​",
+              "details": [
+                "ตับ HEPA1, HEPA2, HEPA3, HEPA PLUS, KD, KS",
+                "ไต KD IM6 HEPA1, HEPA2, HEPA3, HEPA PLUS, KS",
+                "หัวใจ BOVA, AMPUR, VETCHAKORN No.6, SANGVICHAI, PSYLAZA, KERRA, NARIS",
+                "ม้าม  HEPA1, HEPA2, HEPA3, HEPA PLUS, KD, KS",
+                "ตับอ่อน DB1, HEPA1, KD, KERRA, MINOZA, IM6, RICEZOZYME",
+                "ถุงน้ำดี CINNARA, DB1, HEPA1, KD, KERRA, MINOZA, IM6, RICEZOZYME, KERMA, CURMINA",
+                "กระเพาะอาหาร STOMMA, CINNARA, DB1, HEPA1, KD, KERRA, MINOZA, IM6, RICEZOZYME, KERMA, CURMINA",
+                "ลำใส้ STOMMA, CINNARA, KERMA, CURMINA, RIZZ, RIDSEE, RIZZO, DB1, HEPA1, KD, KERRA, MINOZA, IM6, RICEZOZYME,",
+                "กระเพาะปัสสาวะ DIURETICS, URANA, URANA2 Ivora Luce TOPAZ",
+                "เพิ่มน้ำนม เพิ่มเซลล์ผลิตน้ำนม REVITA"
+              ]
+            },
+            "B": {
+              "description": "Sensory & ENT / Local Inflammatory Organs – ตา จอประสาทตา กระจกตา optic nerve, ต่อมน้ำตา, จมูก ไซนัส คอ หู กล่องเสียง ฯลฯ​",
+              "details": [
+                "ตา จอประสาทตา กระจกตา, ต่อมน้ำตา FOCUZ, KERRA, SINAZA, MINOZA, IM6, ZAMINZYME, RICEZOZYME",
+                "จมูก ไซนัส คอ หู กล่องเสียง KERRA, SINAZA, MINOZA, IM6, ZAMINZYME, RICEZOZYME, VITALPLUS, VARIZ"
+              ]
+            },
+            "C": {
+              "description": "Reproductive & Pelvic / Anorectal Organs – มดลูก รังไข่ อัณฑะ ต่อมลูกหมาก ช่องคลอด ทวารหนัก ริดสีดวง และเยื่อบุทวาร",
+              "details": [
+                "มดลูก ช่องคลอด  Tung chao plus 2, Femoon, Tung chao plus sanchi, Ivora Luce, Urana, Urana2, Angera, Lana, Ava, Absorn, UTERUS,Tung chao plus 2",
+                "ทวารหนัก ริดสีดวง และเยื่อบุทวาร ​RIZZ, RIDSEE, RIZZO, KERRA, MINOZA, IM6, BETA V, RICEZOZYME,",
+                "อัณฑะ ต่อมลูกหมาก TOPAZ, KS KERRA MINOZA IM6 VITALPLUS, UTERUS, URANA2, DIURETIC",
+                "สมรรถภาพทางเพศชาย TOPAZ, VITALPLUS, TUNG CHAO PLUS 1, BUTEA SUPERBA, AMPUR"
+              ]
+            }
+          },
+          "modules": []
+        },
+        {
+          "axis_id": 36,
+          "name": "Oncology",
+          "sub_axes": {
+            "A": {
+              "description": "Oncologic Cell Fate – apoptosis, cell‑cycle checkpoints, การควบคุมการแบ่งตัวของเซลล์มะเร็ง​",
+              "details": []
+            },
+            "B": {
+              "description": "Tumor Microenvironment (TME Ecology) – จุลสิ่งแวดล้อมของก้อนมะเร็งและ immune evasion niche​",
+              "details": []
+            },
+            "C": {
+              "description": "Anti‑Metastatic Dynamics – EMT/MET, circulating tumor cells, invasion และ metastasis control​",
+              "details": [
+                "Modules :",
+                "beta x, Merdana Im1 ImO Reshimuno RENAX",
+                "Im5",
+                "Im6",
+                "Kerra",
+                "Minoza",
+                "Plumax",
+                "Hepa1",
+                "Hepa2",
+                "Hepa3",
+                "Livoxy",
+                "Hepa plus",
+                "Beta x",
+                "Im9",
+                "Beta 1",
+                "Im7",
+                "Beta4",
+                "Beta M",
+                "Rizzo",
+                "rizz",
+                "Ridsee",
+                "Beta5",
+                "Beta L",
+                "Xm2",
+                "36 แกนนี้คือ “ภาษากลาง” ที่ TSPI ใช้เชื่อมข้อมูล lab, microbiome, genome, อาการ, และโมดูลสมุนไพรเข้าด้วยกันเวลาวางแผนฟื้นฟูทีละขั้นตามบันได 9 ขั้นครับ​"
+              ]
+            }
+          },
+          "modules": [
+            "KERRIX",
+            "PLUS",
+            "UMX",
+            "TOPAZ",
+            "Tung",
+            "chao",
+            "plus",
+            "2",
+            "Femoon",
+            "sanchi",
+            "Ivora",
+            "Luce",
+            "Urana",
+            "Urana2",
+            "Angera",
+            "Lana",
+            "Ava",
+            "Absorn",
+            "UTERUS",
+            "BUMINMAX",
+            "ZAMINZYM",
+            "RICEZOZYME",
+            "FLAXPRO"
+          ]
+        }
+      ]
+    }
+  ]
+}

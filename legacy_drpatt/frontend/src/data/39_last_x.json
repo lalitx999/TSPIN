@@ -1,0 +1,1664 @@
+{
+    "framework": "TSPI™ 39 Biological Axes Framework",
+    "full_name": "The Standardized Network Phytochemicals Intelligence",
+    "version": "39-Axis",
+    "total_domains": 12,
+    "total_axes": 39,
+    "domains": [
+        {
+            "domain_id": 1,
+            "title": "Immune–Infection Governance",
+            "axes": [
+                {
+                    "axis_id": 1,
+                    "name": "Systemic Inflammatory Load",
+                    "sub_axes": {
+                        "A": {
+                            "name": "NF‑κB / Cytokine Burden",
+                            "description": "ภาระ IL‑6, TNF‑α, CRP และโปรแกรมยีนอักเสบรวมของทั้งระบบ ซึ่งเป็นแกนกลางของการอักเสบเรื้อรังที่เชื่อมโยงกับโรค NCDs ทุกชนิด รวมถึงการตอบสนองต่อความเครียดจากสิ่งแวดล้อมและภาวะ metabolic stress"
+                        },
+                        "B": {
+                            "name": "Inflammasome Output",
+                            "description": "การทำงานของ NLRP3, IL‑1β, IL‑18 และ danger‑signaling (DAMP) ซึ่งเป็นกลไกสำคัญในการตอบสนองต่อการบาดเจ็บของเซลล์และการติดเชื้อที่นำไปสู่การอักเสบแบบ sterile inflammation"
+                        },
+                        "C": {
+                            "name": "Metabolic Inflammation",
+                            "description": "การอักเสบจากความอ้วน, lipotoxicity, insulin resistance, inflammaging ซึ่งเป็นการอักเสบระดับต่ำที่เกิดจากความผิดปกติของเมตาบอลิซึมและเป็นพื้นฐานของโรค metabolic syndrome, เบาหวาน และโรคหัวใจและหลอดเลือด"
+                        }
+                    },
+                    "modules": [],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 2,
+                    "name": "Immune Homeostasis",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Innate–Adaptive Coordination",
+                            "description": "การประสานกันของภูมิคุ้มกันแบบ innate (มาโครฟาจ, NK cell, dendritic cell) และ adaptive (T cell, B cell, antibody response) เพื่อให้ร่างกายสามารถตอบสนองต่อเชื้อโรคได้อย่างมีประสิทธิภาพและไม่เกิดการอักเสบเรื้อรัง"
+                        },
+                        "B": {
+                            "name": "Immune Polarity",
+                            "description": "สมดุล Th1/Th2, macrophage M1/M2 และแนวโน้ม autoimmune/allergy ซึ่งเป็นตัวกำหนดว่าร่างกายจะตอบสนองต่อสิ่งกระตุ้นในแบบการอักเสบหรือการทนทาน และมีแนวโน้มเป็นโรคภูมิแพ้หรือ autoimmune หรือไม่"
+                        },
+                        "C": {
+                            "name": "Tolerance–Resolution–Recovery",
+                            "description": "Treg, pro‑resolving mediators และความสามารถปิดการอักเสบกลับสู่ baseline ผ่านกลไกของ regulatory T cell, lipoxin, resolvin, protectin และการฟื้นฟูเนื้อเยื่อหลังการอักเสบ"
+                        }
+                    },
+                    "modules": [
+                        "VARIZ",
+                        "Sinaza",
+                        "kerra Minoza KS Im1 Im5 IM6 IM9 BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "beta x",
+                        "Merdana",
+                        "RESHIMUNO",
+                        "Plumax"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 3,
+                    "name": "Pathogen Defense",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Antiviral Defense",
+                            "description": "IFN tone และ interferon‑stimulated genes (ISGs) สำหรับต้านไวรัส รวมถึงการตอบสนองของระบบภูมิคุ้มกันต่อการติดเชื้อไวรัสผ่านการหลั่ง interferon type I และ type II เพื่อยับยั้งการจำลองของไวรัสและกระตุ้นภูมิคุ้มกันแบบ cell-mediated"
+                        },
+                        "B": {
+                            "name": "Antibacterial / Antifungal Defense",
+                            "description": "antimicrobial peptides, phagocytosis และการฆ่าเชื้อแบคทีเรีย/เชื้อรา ผ่านกลไกของ defensin, cathelicidin, การจับกินของมาโครฟาจและนิวโทรฟิล และการกำจัดเชื้อโรคโดยระบบ complement"
+                        },
+                        "C": {
+                            "name": "Mucosal Defense",
+                            "description": "ภูมิคุ้มกันด่าน mucosa (ลำไส้, ทางเดินหายใจ ฯลฯ) ผ่านกลไกของ mucosal IgA, antimicrobial peptides, epithelial barrier function และการสื่อสารระหว่าง microbiome และ mucosal immune system เพื่อป้องกันการบุกรุกของเชื้อโรค"
+                        }
+                    },
+                    "modules": [],
+                    "modules_by_context": {
+                        "A": [
+                            "KS",
+                            "KERRA",
+                            "MINOZA",
+                            "FEVA"
+                        ],
+                        "B": [
+                            "KS",
+                            "KERRA",
+                            "MINOZA",
+                            "FEVA DB1",
+                            "CINNARA",
+                            "IM6"
+                        ],
+                        "C": [
+                            "Plumax",
+                            "Sinaza",
+                            "kerra Minoza KS Im1 IM5 IM6 IM9 BetaG",
+                            "IMO",
+                            "IM7",
+                            "Beta M",
+                            "Beta V",
+                            "CINNARA",
+                            "STOMMA",
+                            "KURMA",
+                            "BENJAKUL",
+                            "VITALPLUA",
+                            "VITALCELL",
+                            "FEVA",
+                            "YA TEEN NOK",
+                            "beta x",
+                            "Merdana"
+                        ]
+                    }
+                },
+                {
+                    "axis_id": 4,
+                    "name": "Post‑Infectious Persistence",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Immune Scar / Chronic Low‑Grade Activation",
+                            "description": "immune tone ไม่ยอมกลับ baseline หลังติดเชื้อ ส่งผลให้เกิดการอักเสบเรื้อรังระดับต่ำและความผิดปกติของระบบภูมิคุ้มกันที่นำไปสู่การเกิดโรคเรื้อรัง เช่น long-COVID, chronic fatigue syndrome และ autoimmune disease"
+                        },
+                        "B": {
+                            "name": "Latent Reactivation Tendency",
+                            "description": "แนวโน้มเชื้อแฝง เช่น TB/HSV/EBV กลับมากระตุ้นเมื่อระบบภูมิคุ้มกันอ่อนแอลง เกิดจากการสูญเสีย immune surveillance และการควบคุมเชื้อที่หลบซ่อนอยู่ในเนื้อเยื่อ"
+                        },
+                        "C": {
+                            "name": "Post‑Viral Syndrome / Dysregulated Recovery",
+                            "description": "long‑covid‑like, fatigue, autonomic dysregulation หลังไวรัส ซึ่งเป็นกลุ่มอาการที่เกิดขึ้นหลังการติดเชื้อไวรัสที่รุนแรง นำไปสู่ความผิดปกติของระบบประสาทอัตโนมัติ ระบบภูมิคุ้มกัน และระบบพลังงานของร่างกาย"
+                        }
+                    },
+                    "modules": [
+                        "Plumax",
+                        "Sinaza",
+                        "kerra Minoza KS Im1 IM5 IM6 IM9 BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "VARIZ",
+                        "VITALPLUS",
+                        "VITALIS",
+                        "beta x",
+                        "Merdana",
+                        "RESHIMUNO"
+                    ],
+                    "modules_by_context": {}
+                }
+            ]
+        },
+        {
+            "domain_id": 2,
+            "title": "Metabolic–Energy Core",
+            "axes": [
+                {
+                    "axis_id": 5,
+                    "name": "Glucose–Insulin Regulation",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Insulin Signaling",
+                            "description": "IR/AKT/GLUT dynamics และความไวต่ออินซูลินของเนื้อเยื่อต่าง ๆ รวมถึงการควบคุมการดูดซึมกลูโคสเข้าสู่เซลล์ผ่าน GLUT4 translocation และการตอบสนองของ insulin receptor ต่อระดับน้ำตาลในเลือด"
+                        },
+                        "B": {
+                            "name": "Hepatic Glucose Output",
+                            "description": "gluconeogenesis, glycogen flux และบทบาทตับในการปล่อยกลูโคสเพื่อรักษาระดับน้ำตาลในเลือดให้คงที่ ผ่านการควบคุมเอนไซม์สำคัญ เช่น PEPCK, G6Pase และ glycogen phosphorylase"
+                        },
+                        "C": {
+                            "name": "Glycemic Variability Stress",
+                            "description": "ความผันผวนของน้ำตาล (glucose swings) และผลเสียสะสมที่เกิดจากการเปลี่ยนแปลงระดับน้ำตาลในเลือดอย่างรวดเร็วและรุนแรง นำไปสู่ oxidative stress, endothelial dysfunction และความผิดปกติของระบบเมตาบอลิซึม"
+                        }
+                    },
+                    "modules": [
+                        "DB1",
+                        "kerra Minoza KS Im1 IM5 IM6",
+                        "IM9 BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "VATTHANOTHAI",
+                        "BOVA",
+                        "BENJAKUL",
+                        "MORMORDICA",
+                        "YA TEEN NOK",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 6,
+                    "name": "Lipid–Lipotoxicity",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Lipoprotein Balance",
+                            "description": "โปรไฟล์ atherogenic ของ LDL, HDL, TG ฯลฯ ซึ่งเป็นตัวกำหนดความเสี่ยงต่อโรคหัวใจและหลอดเลือด ผ่านการควบคุมการขนส่งไขมัน การดูดซึม และการขับออกของ lipoprotein ต่างๆ"
+                        },
+                        "B": {
+                            "name": "Lipotoxic Overload / Ectopic Fat",
+                            "description": "ไขมันพอกตับ (NAFLD), ไขมันเกาะอวัยวะ (ectopic fat) ที่เกิดจากการสะสมของไขมันในอวัยวะที่ไม่ใช่ adipose tissue เช่น ตับ หัวใจ กล้ามเนื้อ และตับอ่อน นำไปสู่การอักเสบและความผิดปกติของอวัยวะ"
+                        },
+                        "C": {
+                            "name": "Fatty Acid Oxidation Programs",
+                            "description": "PPAR/CPT‑driven fat oxidation และ metabolic flexibility ซึ่งเป็นกลไกสำคัญในการปรับเปลี่ยนการใช้เชื้อเพลิงระหว่าง glucose และ fatty acid ตามความต้องการพลังงานของร่างกาย"
+                        }
+                    },
+                    "modules": [
+                        "DB1",
+                        "kerra Minoza KS Im1 IM5 IM6",
+                        "IM9 BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "Stream Plus",
+                        "BOVA",
+                        "BENJAKUL",
+                        "MORMORDICA",
+                        "VATTHANOTHAI",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2",
+                        "XS",
+                        "VITALPLUS",
+                        "TARANA",
+                        "Benjakul"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 7,
+                    "name": "Nutrient Sensing (AMPK–mTOR)",
+                    "sub_axes": {
+                        "A": {
+                            "name": "AMPK Energy Sensing",
+                            "description": "การรับรู้พลังงานต่ำและการเข้าสู่โหมดประหยัด/ซ่อมแซม ผ่านการกระตุ้น AMPK ซึ่งเป็น cellular energy sensor ที่ตอบสนองต่อการขาดพลังงานและกระตุ้น catabolic pathways เพื่อรักษาสมดุลพลังงานและส่งเสริม autophagy"
+                        },
+                        "B": {
+                            "name": "mTORC1 Growth / Anabolism Tone",
+                            "description": "โหมดสร้าง (growth, anabolism) ที่สัมพันธ์กับการแก่และมะเร็ง ผ่านการกระตุ้น mTORC1 ซึ่งเป็นแกนกลางของการเจริญเติบโตของเซลล์ การสังเคราะห์โปรตีน และการสร้างพลังงาน แต่หากถูกกระตุ้นมากเกินไปจะนำไปสู่การแก่ก่อนวัยและมะเร็ง"
+                        },
+                        "C": {
+                            "name": "Switch Control",
+                            "description": "ความสามารถสลับ growth ↔ repair อย่างยืดหยุ่น ระหว่าง anabolic (mTORC1) และ catabolic (AMPK) pathways เพื่อให้ร่างกายสามารถปรับตัวตามสถานะพลังงานและความเครียดได้อย่างเหมาะสม"
+                        }
+                    },
+                    "modules": [
+                        "DB1",
+                        "kerra Minoza KS Im1 IM5 IM6",
+                        "IM9 BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "Stream Plus",
+                        "BOVA",
+                        "BENJAKUL",
+                        "MORMORDICA",
+                        "VITAL PLUS",
+                        "VITALCELL",
+                        "VATTHANOTHAI",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2",
+                        "TARANA",
+                        "CINNARA",
+                        "Benjakul"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 8,
+                    "name": "Mitochondrial Network",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Bioenergetics",
+                            "description": "ATP, electron transport chain, membrane potential ซึ่งเป็นกลไกหลักในการผลิตพลังงานของเซลล์ผ่าน oxidative phosphorylation ใน mitochondrial inner membrane โดยมี electron transport chain (Complex I-V) เป็นตัวกลางในการสร้าง proton gradient ที่ใช้ขับเคลื่อน ATP synthase"
+                        },
+                        "B": {
+                            "name": "Quality Control",
+                            "description": "mitophagy, fusion–fission, การเคลียร์ไมโทคอนเดรียเสีย ผ่านการคัดแยก mitochondria ที่เสียหายหรือทำงานผิดปกติ และการกำจัดด้วยกระบวนการ autophagy เพื่อรักษาคุณภาพและประสิทธิภาพของเครือข่ายไมโทคอนเดรีย"
+                        },
+                        "C": {
+                            "name": "Biogenesis / Renewal",
+                            "description": "PGC‑1, mtDNA stability, การสร้างไมโทคอนเดรียใหม่เพื่อทดแทน mitochondria ที่เสียหายและเพิ่มจำนวน mitochondria ตามความต้องการพลังงานของเซลล์ ผ่านการกระตุ้น PGC-1α และการควบคุมการจำลอง mtDNA"
+                        }
+                    },
+                    "modules": [
+                        "AMPUR",
+                        "DB1",
+                        "kerra Minoza KS Im1 IM5 IM6",
+                        "IM9 BetaG",
+                        "IMO",
+                        "BENJAKUL",
+                        "MORMORDICA",
+                        "VITAL PLUS",
+                        "VITALIS",
+                        "VATTHANOTHAI",
+                        "YA TEEN NOK",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2",
+                        "LIVOXY",
+                        "Benjakul"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 9,
+                    "name": "Oxidative Stress",
+                    "sub_axes": {
+                        "A": {
+                            "name": "ROS Load / Oxidative Damage",
+                            "description": "ภาระ ROS และความเสียหายต่อ DNA/โปรตีน/เยื่อหุ้ม ที่เกิดจากความไม่สมดุลระหว่างการสร้าง reactive oxygen species (ROS) และความสามารถในการกำจัดของระบบ antioxidant นำไปสู่การทำลายโครงสร้างของเซลล์และก่อให้เกิดโรคเรื้อรัง"
+                        },
+                        "B": {
+                            "name": "Antioxidant Depletion",
+                            "description": "สถานะ SOD, GPx, catalase, glutathione ซึ่งเป็นระบบป้องกันหลักของเซลล์ที่ถูกใช้จนหมดหรือสังเคราะห์ไม่เพียงพอเมื่อต้องเผชิญกับ oxidative stress อย่างต่อเนื่อง ส่งผลให้เซลล์เสียหายง่ายขึ้น"
+                        },
+                        "C": {
+                            "name": "Redox Signaling Imbalance",
+                            "description": "ความเพี้ยนของสัญญาณ redox เช่น NADPH oxidase, peroxiredoxin ซึ่งทำให้การส่งสัญญาณของเซลล์ผิดปกติ นำไปสู่การอักเสบเรื้อรัง การแบ่งตัวของเซลล์ผิดปกติ และการตายของเซลล์"
+                        }
+                    },
+                    "modules": [
+                        "RADICA",
+                        "DB1",
+                        "kerra Minoza KS Im1 IM5 IM6",
+                        "IM9 BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "LIVOXY"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 10,
+                    "name": "Proteostasis–Autophagy–Lysosome",
+                    "sub_axes": {
+                        "A": {
+                            "name": "ER Stress / UPR",
+                            "description": "ความเครียดจากโปรตีนพับผิด (BiP/CHOP, UPR) ที่เกิดขึ้นใน endoplasmic reticulum (ER) เมื่อมีโปรตีนที่พับผิดสะสมจำนวนมาก นำไปสู่การกระตุ้น unfolded protein response (UPR) ผ่าน PERK, IRE1, ATF6 เพื่อแก้ไขปัญหาหรือส่งสัญญาณให้เซลล์ตายหากไม่สามารถแก้ไขได้"
+                        },
+                        "B": {
+                            "name": "Autophagy Flux",
+                            "description": "initiation → flux ของ autophagy เคลียร์ของเสียในเซลล์ รวมถึงโปรตีนเสีย, organelle เสีย, และเชื้อโรคภายในเซลล์ ผ่านการสร้าง autophagosome และ fusion กับ lysosome เพื่อย่อยสลายของเสียเหล่านั้น"
+                        },
+                        "C": {
+                            "name": "Lysosomal Degradation Capacity",
+                            "description": "ศักยภาพไลโซโซมในการย่อยสลาย/รีไซเคิล ของเสียภายในเซลล์ผ่านเอนไซม์ไฮโดรเลสต่างๆ ใน lysosome ซึ่งเป็นศูนย์กลางของการกำจัดของเสียและการรีไซเคิลสารในเซลล์"
+                        },
+                        "D": {
+                            "name": "Environmental Stress Adaptation / Stress Resilience",
+                            "description": "การตอบสนองต่อความเครียดจากสิ่งแวดล้อมในระดับเซลล์ ผ่านการปรับตัวของระบบ proteostasis, autophagy, และ antioxidant defense เพื่อให้เซลล์สามารถอยู่รอดและฟื้นตัวจากความเครียดต่างๆ เช่น ความร้อน สารพิษ และภาวะขาดออกซิเจน"
+                        }
+                    },
+                    "modules": [
+                        "DB1",
+                        "kerra Minoza KS Im1 IM5 IM6",
+                        "IM9 BetaG",
+                        "IMO",
+                        "YA TEEN NOK",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2",
+                        "Benjakul"
+                    ],
+                    "modules_by_context": {}
+                }
+            ]
+        },
+        {
+            "domain_id": 3,
+            "title": "Genomic Programming",
+            "axes": [
+                {
+                    "axis_id": 11,
+                    "name": "DNA Repair & Genomic Stability",
+                    "sub_axes": {
+                        "A": {
+                            "name": "DNA Damage Response / Repair Pathways",
+                            "description": "ระบบตรวจและซ่อมแซมความเสียหาย DNA รวมถึง BER, NER, Mismatch Repair, Double-Strand Break Repair (HR และ NHEJ) ซึ่งเป็นกลไกสำคัญในการป้องกันการเกิด mutation และมะเร็ง"
+                        },
+                        "B": {
+                            "name": "Mutation Buffering / Genomic Integrity",
+                            "description": "ความสามารถกันผลเสียจาก mutation สะสม ผ่านกลไก DNA repair, cell-cycle checkpoint, และ apoptosis เพื่อป้องกันไม่ให้เซลล์ที่มีความเสียหายทางพันธุกรรมสะสมและก่อให้เกิดโรค"
+                        },
+                        "C": {
+                            "name": "Telomere Stability",
+                            "description": "ความมั่นคงของ telomere ที่สัมพันธ์กับอายุชีวภาพ โดย telomere ที่สั้นลงหรือมีความผิดปกติจะนำไปสู่ cellular senescence, aging, และเพิ่มความเสี่ยงในการเกิดโรคเรื้อรังและมะเร็ง"
+                        }
+                    },
+                    "modules": [
+                        "RADICA",
+                        "DB1",
+                        "kerra Minoza KS Im1 IM5 IM6",
+                        "IM9 BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "VitalPLUS",
+                        "AMPUR",
+                        "VATTHANOTHAI",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2",
+                        "TUNG CHAO PLUS SANCHI",
+                        "Benjakul"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 12,
+                    "name": "Epigenetic Regulation",
+                    "sub_axes": {
+                        "A": {
+                            "name": "DNA Methylation Programs",
+                            "description": "pattern เมทิลเลชันที่กำหนดการเปิด–ปิดยีน ผ่านการเติมหมู่เมทิลที่ CpG islands ใน promoter region ของยีน ซึ่งควบคุมการแสดงออกของยีนและเป็นกลไกสำคัญในการตอบสนองต่อสิ่งแวดล้อมและ aging"
+                        },
+                        "B": {
+                            "name": "Histone / Chromatin Remodeling",
+                            "description": "สภาพโครมาตินและการเข้าถึงยีน ผ่านการปรับเปลี่ยน histone (acetylation, methylation, phosphorylation, ubiquitination) และการเคลื่อนย้าย nucleosome โดย chromatin remodeling complexes เพื่อควบคุมการเข้าถึง DNA ของ transcription factors"
+                        },
+                        "C": {
+                            "name": "miRNA / Transcriptional Balance",
+                            "description": "การควบคุมระดับ post‑transcription ผ่าน miRNA ฯลฯ ซึ่งเป็น non-coding RNA ขนาดเล็กที่ควบคุมการแสดงออกของยีนโดยการจับกับ mRNA และยับยั้งการแปลเป็นโปรตีนหรือเร่งการสลาย mRNA"
+                        },
+                        "D": {
+                            "name": "Hemostasis & Hemorrhage Control",
+                            "description": "การควบคุมระบบห้ามเลือดและการแข็งตัวของเลือด ผ่านการปรับสมดุลระหว่าง coagulation cascade และ fibrinolysis เพื่อป้องกันการตกเลือดและภาวะลิ่มเลือดอุดตัน"
+                        }
+                    },
+                    "modules": [
+                        "AMPUR",
+                        "DB1",
+                        "kerra Minoza KS Im1 IM5 IM6",
+                        "IM9 BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "VitalPLUS",
+                        "BOVA",
+                        "SANGVICHAI",
+                        "VATTHANOTHAI",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2"
+                    ],
+                    "modules_by_context": {
+                        "D": [
+                            "Sitthajorn",
+                            "RIZZO"
+                        ]
+                    }
+                },
+                {
+                    "axis_id": 13,
+                    "name": "Longevity Signaling (SIRT–FOXO–IGF)",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Sirtuin Programs",
+                            "description": "โปรตีน sirtuin ที่เกี่ยวกับอายุยืนและ stress resistance โดยใช้ NAD+ เป็น cofactor ในการ deacetylase histone และ non-histone proteins เพื่อควบคุมการแสดงออกของยีนที่เกี่ยวข้องกับ aging, metabolism, และ stress response"
+                        },
+                        "B": {
+                            "name": "FOXO Stress Adaptation",
+                            "description": "การตอบสนองต่อ stress ผ่าน FOXO transcription factors ซึ่งควบคุมยีนที่เกี่ยวข้องกับ antioxidant defense, autophagy, cell-cycle arrest, และ apoptosis เพื่อให้เซลล์ปรับตัวและอยู่รอดภายใต้สภาวะ stress"
+                        },
+                        "C": {
+                            "name": "IGF / Anabolic–Longevity Balance",
+                            "description": "สมดุล IGF‑1 ระหว่างโหมดโต (anabolic) กับโหมดอายุยืน (longevity) โดยการลด IGF-1 signaling จะช่วยยืดอายุขัยผ่านการกระตุ้น FOXO และ sirtuin pathways แต่การขาด IGF-1 มากเกินไปจะทำให้เกิด frailty และ muscle wasting"
+                        }
+                    },
+                    "modules": [
+                        "AMPUR",
+                        "DB1",
+                        "kerra Minoza KS Im1 IM5 IM6",
+                        "IM9 BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "VitalPLUS",
+                        "SANGVICHAI",
+                        "VITALIS",
+                        "Benjakul",
+                        "VATTHANOTHAI",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2",
+                        "RESHIMUNO"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 14,
+                    "name": "Senescence & SASP",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Senescent Cell Burden",
+                            "description": "ปริมาณเซลล์ชราที่หยุดแบ่งตัว (senescent cells) ซึ่งสะสมตามอายุและความเครียด นำไปสู่การเสื่อมของเนื้อเยื่อและการเกิดโรคเรื้อรัง ผ่าน p16, p21, p53 และการหยุดวงจรเซลล์แบบถาวร"
+                        },
+                        "B": {
+                            "name": "SASP Inflammatory Output",
+                            "description": "สารอักเสบ/โปร‑เสื่อมที่เซลล์ชราหลั่ง (senescence‑associated secretome) รวมถึง IL-6, TNF-α, IL-1β, MMPs, chemokines ซึ่งก่อให้เกิด inflammaging และส่งเสริมการเกิดโรคเรื้อรังและมะเร็งในเนื้อเยื่อรอบข้าง"
+                        },
+                        "C": {
+                            "name": "Senescence Clearance Potential",
+                            "description": "ความสามารถกำจัด/รีไซเคิลเซลล์ชรา ผ่านระบบภูมิคุ้มกัน (immune surveillance) และ senolytic agents ที่ช่วยกำจัด senescent cells เพื่อลดการอักเสบและชะลอ aging"
+                        }
+                    },
+                    "modules": [
+                        "AMPUR",
+                        "DB1",
+                        "kerra Minoza KS Im1 IM5 IM6",
+                        "IM9 BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "VitalPLUS",
+                        "SANGVICHAI",
+                        "VITALIS",
+                        "VATTHANOTHAI",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2",
+                        "TUNG CHAO PLUS SANCHI",
+                        "RESHIMUNO",
+                        "Benjakul"
+                    ],
+                    "modules_by_context": {}
+                }
+            ]
+        },
+        {
+            "domain_id": 4,
+            "title": "Detoxification & Cellular Clearance",
+            "axes": [
+                {
+                    "axis_id": 15,
+                    "name": "Detoxification & Cellular Defense",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Phase I/II Biotransformation",
+                            "description": "CYP450, glucuronidation, sulfation ฯลฯ ซึ่งเป็นกลไกหลักในการเปลี่ยนสารพิษและยาให้อยู่ในรูปแบบที่สามารถขับออกจากร่างกายได้ โดย Phase I ใช้ CYP450 ในการออกซิไดซ์ และ Phase II ใช้ conjugation (glucuronidation, sulfation, methylation) เพื่อเพิ่มความสามารถในการละลายน้ำ"
+                        },
+                        "B": {
+                            "name": "Nrf2–GSH Defense Programming",
+                            "description": "การกระตุ้น Nrf2, glutathione, antioxidant defense เพื่อป้องกันเซลล์จาก oxidative stress และสารพิษ โดย Nrf2 เป็น transcription factor ที่ควบคุมยีน antioxidant และ detoxification มากกว่า 200 ยีน"
+                        },
+                        "C": {
+                            "name": "Xenobiotic / Metabolite Clearance Capacity",
+                            "description": "ความสามารถขับ xenobiotics และเมแทบอไลต์พิษออกจากร่างกายผ่านระบบทางเดินปัสสาวะ ทางเดินน้ำดี และการหายใจ รวมถึงการกำจัดสารเคมี โลหะหนัก ยา และสารพิษจากสิ่งแวดล้อม"
+                        }
+                    },
+                    "modules": [
+                        "DB1",
+                        "kerra Minoza KS IM9 VENTA",
+                        "CHATHARIC",
+                        "LYPHOLAX",
+                        "LAXORIM",
+                        "BELAX",
+                        "HEPA1",
+                        "HEPA2",
+                        "HEPA3",
+                        "HEPA PLUS",
+                        "TARANA"
+                    ],
+                    "modules_by_context": {
+                        "uric": [
+                            "URANA2",
+                            "DB1",
+                            "kerra Minoza KS",
+                            "HEPA2"
+                        ],
+                        "toxin": [
+                            "LIVITA",
+                            "KERRA",
+                            "KS",
+                            "IM6"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "domain_id": 5,
+            "title": "Digestive–Gut Ecosystem",
+            "axes": [
+                {
+                    "axis_id": 16,
+                    "name": "Digestive–Absorptive",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Gastric Digestion",
+                            "description": "การย่อยอาหารในกระเพาะอาหารผ่านกรดเกลือ (HCl) และเอนไซม์เปปซิน รวมถึงการควบคุมการบีบตัวของกระเพาะเพื่อผสมอาหารและส่งต่อสู่ลำไส้เล็ก การหลั่งของ gastrin และการควบคุม pH ในกระเพาะอาหาร"
+                        },
+                        "B": {
+                            "name": "Pancreatic–Bile Function",
+                            "description": "การทำงานของตับอ่อนในการหลั่งเอนไซม์ย่อยอาหาร (amylase, lipase, protease) และไบคาร์บอเนต รวมถึงการทำงานของถุงน้ำดีในการปล่อยน้ำดีเพื่อช่วยย่อยไขมัน การควบคุมโดย CCK และ secretin และการป้องกันนิ่วถุงน้ำดี"
+                        },
+                        "C": {
+                            "name": "Small Intestine Absorption",
+                            "description": "การดูดซึมสารอาหารในลำไส้เล็กผ่าน villi และ microvilli รวมถึงการดูดซึม glucose, amino acids, fatty acids, vitamins, minerals และการควบคุมโดยฮอร์โมนในทางเดินอาหาร เช่น GLP-1, GIP"
+                        }
+                    },
+                    "modules": [
+                        "DB1",
+                        "kerra Minoza KS IM9 VENTA",
+                        "KURMA",
+                        "STOMMA",
+                        "CINNARA",
+                        "VATTHANOTHAI",
+                        "VITALPLUS",
+                        "TARANA",
+                        "Benjakul",
+                        "Stream Plus"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 17,
+                    "name": "Microbiome Ecology",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Diversity / Resilience",
+                            "description": "ความหลากหลายและความยืดหยุ่นของ microbiome ในระบบนิเวศลำไส้ โดยมีผลต่อสุขภาพโดยรวมผ่านการผลิต metabolites, การควบคุมภูมิคุ้มกัน, และการป้องกันการเจริญเติบโตของเชื้อโรค (colonization resistance)"
+                        },
+                        "B": {
+                            "name": "SCFA / Metabolite Profile",
+                            "description": "butyrate, propionate, acetate ฯลฯ ซึ่งเป็น short-chain fatty acids (SCFAs) ที่ผลิตโดย microbiome และมีบทบาทสำคัญในการเป็นแหล่งพลังงานของเซลล์ลำไส้, ควบคุมการอักเสบ, และส่งผลต่อ metabolism ทั้งระบบผ่าน G-protein coupled receptors (GPCRs)"
+                        },
+                        "C": {
+                            "name": "Dysbiosis Patterns",
+                            "description": "รูปแบบเสียสมดุลของ microbiome เช่น overgrowth ของเชื้อก่อโรค, loss of keystone species (Akkermansia, Bifidobacterium, Faecalibacterium prausnitzii), และการลดลงของความหลากหลายทางชีวภาพ นำไปสู่การอักเสบและโรคเรื้อรัง"
+                        }
+                    },
+                    "modules": [
+                        "DB1",
+                        "kerra Minoza KS IM9 VENTA",
+                        "CHATHARIC",
+                        "LYPHOLAX",
+                        "LAXORIM",
+                        "BELAX",
+                        "RICEZOZYME",
+                        "ZAMINZYME",
+                        "FLAXPRO",
+                        "TARANA",
+                        "Benjakul"
+                    ],
+                    "modules_by_context": {
+                        "IBS": [
+                            "SITTHAJORN",
+                            "CINNARA",
+                            "KS",
+                            "KERRA",
+                            "MINOZA",
+                            "STOMMA",
+                            "KURMA"
+                        ]
+                    }
+                },
+                {
+                    "axis_id": 18,
+                    "name": "Gut Barrier & Mucosal Integrity",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Tight Junction Integrity",
+                            "description": "โครงสร้าง tight junction เช่น occludin, claudin, ZO-1 ที่ควบคุมการผ่านของสารระหว่างเซลล์เยื่อบุลำไส้ ซึ่งหากเสียหายจะนำไปสู่ leaky gut และการผ่านเข้าสู่กระแสเลือดของสารที่ไม่ควรผ่าน"
+                        },
+                        "B": {
+                            "name": "Endotoxin Translocation",
+                            "description": "การรั่วของ LPS/endotoxin จากแบคทีเรีย Gram-negative ในลำไส้เข้าสู่กระแสเลือด กระตุ้น TLR4 และ NF-κB นำไปสู่ systemic inflammation, insulin resistance, metabolic endotoxemia และโรคเรื้อรังต่างๆ"
+                        },
+                        "C": {
+                            "name": "Mucosal Immune Interface",
+                            "description": "การสื่อสารภูมิคุ้มกันที่เยื่อบุลำไส้ ระหว่าง microbiome, epithelial cells, dendritic cells, macrophages, T cells และ B cells เพื่อควบคุม immune tolerance และการตอบสนองต่อเชื้อโรคอย่างสมดุล"
+                        }
+                    },
+                    "modules": [
+                        "DB1",
+                        "kerra Minoza KS IM9 VENTA",
+                        "KURMA",
+                        "STOMMA",
+                        "CINNARA",
+                        "BELAX",
+                        "RICEZOZYME",
+                        "ZAMINZYME",
+                        "FLAXPRO",
+                        "VENTA",
+                        "IM9",
+                        "IM6",
+                        "VATTHANOTHAI",
+                        "SITTHIJORN",
+                        "TARANA"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 19,
+                    "name": "Colon Biofilm & Mucosal Burden",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Biofilm Persistence",
+                            "description": "biofilm เรื้อรังในลำไส้ใหญ่ ที่เกิดจากการรวมตัวของแบคทีเรียและสารคัดหลั่ง ทำให้เชื้อโรคสามารถหลบเลี่ยงระบบภูมิคุ้มกันและยาปฏิชีวนะได้ ส่งผลให้เกิดการอักเสบเรื้อรังและความผิดปกติของลำไส้"
+                        },
+                        "B": {
+                            "name": "Colon Plaque / Toxin Burden",
+                            "description": "คราบ, ของเสีย, toxin ที่เกาะผนังลำไส้จากการสะสมของสารพิษ อาหารตกค้าง และของเสียจากแบคทีเรีย ซึ่งขัดขวางการดูดซึมสารอาหารและทำให้เกิดการอักเสบในลำไส้ใหญ่"
+                        },
+                        "C": {
+                            "name": "Clearance Kinetics",
+                            "description": "อัตราการผลัดเยื่อบุและเคลียร์คราบ/ของเสีย ออกจากลำไส้ใหญ่ผ่านการผลัดเซลล์เยื่อบุ, การบีบตัวของลำไส้ (peristalsis), และการหลั่งของ mucus เพื่อรักษาความสะอาดและสุขภาพของลำไส้"
+                        }
+                    },
+                    "modules": [
+                        "KS",
+                        "VENTA",
+                        "CHATHARIC",
+                        "LYPHOLAX",
+                        "LAXORIM",
+                        "BELAX",
+                        "RICEZOZYME",
+                        "ZAMINZYME",
+                        "FLAXPRO",
+                        "VATTHANOTHAI",
+                        "TARANA",
+                        "Benjakul"
+                    ],
+                    "modules_by_context": {}
+                }
+            ]
+        },
+        {
+            "domain_id": 6,
+            "title": "Vascular–Circulation",
+            "axes": [
+                {
+                    "axis_id": 20,
+                    "name": "Endothelial Function",
+                    "sub_axes": {
+                        "A": {
+                            "name": "NO/eNOS Tone",
+                            "description": "การสร้าง nitric oxide จาก endothelial NOS (eNOS) ซึ่งเป็น vasodilator ที่สำคัญในการควบคุมความดันเลือด, การไหลเวียน, การยับยั้งการเกาะตัวของเกล็ดเลือด, และการป้องกันหลอดเลือดแข็ง โดย NO ยังมีฤทธิ์ต้านการอักเสบและต้านอนุมูลอิสระ"
+                        },
+                        "B": {
+                            "name": "Endothelial Inflammation / Adhesion",
+                            "description": "การอักเสบที่ผนังหลอดเลือดและการเกาะของเม็ดเลือดขาว (leukocyte adhesion) ผ่านการแสดงออกของ adhesion molecules (VCAM-1, ICAM-1, E-selectin) ซึ่งเป็นขั้นตอนเริ่มต้นของ atherosclerosis และ vascular damage"
+                        },
+                        "C": {
+                            "name": "Glycocalyx Integrity",
+                            "description": "ชั้นไกลโคคาลิกซ์ปกป้องผนังเส้นเลือด ซึ่งเป็นชั้นของ glycoproteins และ proteoglycans ที่บุอยู่บน endothelial cell มีหน้าที่ป้องกันการเกาะของเม็ดเลือดขาว, ป้องกันการรั่วของหลอดเลือด, และควบคุม shear stress response"
+                        }
+                    },
+                    "modules": [
+                        "HP1",
+                        "DB1",
+                        "kerra Minoza KS Im1 IM6 VitalPLUS",
+                        "Stream Plus",
+                        "BOVA",
+                        "VATTHANOTHAI",
+                        "AMPUR",
+                        "ANAX",
+                        "TARANA",
+                        "BUTEA SUPERBA",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2",
+                        "TUNG CHAO PLUS SANCHI",
+                        "Benjakul"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 21,
+                    "name": "Vascular Remodeling & Microcirculation",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Angiogenesis Signaling",
+                            "description": "การสร้างเส้นเลือดใหม่ผ่าน VEGF signaling, angiopoietin, และการตอบสนองต่อ hypoxia (HIF-1α) เพื่อเพิ่มการส่งเลือดไปยังเนื้อเยื่อที่ขาดออกซิเจนหรือต้องการซ่อมแซม"
+                        },
+                        "B": {
+                            "name": "Capillary Density / Microvascular Structure",
+                            "description": "ความหนาแน่นโครงสร้างเส้นเลือดฝอยที่ส่งผลต่อการแลกเปลี่ยนสารอาหารและออกซิเจนระหว่างเลือดและเนื้อเยื่อ โดย capillary density ที่ลดลงสัมพันธ์กับ aging, diabetes, และ cardiovascular disease"
+                        },
+                        "C": {
+                            "name": "Tissue Perfusion & Oxygen Delivery",
+                            "description": "การส่งเลือดและออกซิเจนถึงเนื้อเยื่อผ่าน microcirculation เพื่อให้เซลล์ได้รับ oxygen และ nutrients อย่างเพียงพอ รวมถึงการนำของเสียออกจากเนื้อเยื่อผ่าน venous return"
+                        }
+                    },
+                    "modules": [
+                        "HP1",
+                        "DB1",
+                        "kerra Minoza KS Im1",
+                        "IM6",
+                        "AMPUR",
+                        "TUNG CHAO PLUS 1",
+                        "BUTEA SUPERBA",
+                        "TUNG CHAO PLUS 2",
+                        "Stream Plus"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 22,
+                    "name": "Thrombosis–Hemostasis",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Platelet Activation",
+                            "description": "การเกาะกลุ่มของเกล็ดเลือด (platelet aggregation) ที่เกิดจากการกระตุ้นโดย thrombin, collagen, ADP, และ thromboxane A2 นำไปสู่การเกิดลิ่มเลือด (thrombus) และเพิ่มความเสี่ยงต่อโรคหัวใจและหลอดเลือด"
+                        },
+                        "B": {
+                            "name": "Coagulation Cascade Tone",
+                            "description": "การทำงานของระบบการแข็งตัวของเลือด (coagulation cascade) ทั้ง intrinsic pathway และ extrinsic pathway ที่ควบคุมโดย coagulation factors (I-XIII) และมีบทบาทสำคัญในการห้ามเลือดและการเกิด thrombosis"
+                        },
+                        "C": {
+                            "name": "Fibrinolysis Balance",
+                            "description": "การสลายลิ่มเลือดและสมดุลกับการแข็งตัว ผ่านการทำงานของ plasminogen และ tissue plasminogen activator (tPA) เพื่อป้องกันการเกิดลิ่มเลือดส่วนเกินและรักษาสมดุลของระบบห้ามเลือด"
+                        }
+                    },
+                    "modules": [
+                        "AMPUR",
+                        "DB1",
+                        "kerra",
+                        "HP1",
+                        "Minoza",
+                        "Im1",
+                        "IM5",
+                        "IM6",
+                        "IM9",
+                        "VitalPLUS",
+                        "SANGVICHAI",
+                        "BOVA",
+                        "RIDSEE",
+                        "TUNG CHAO PLUS 1",
+                        "BUTEA SUPERBA",
+                        "TUNG CHAO PLUS 2",
+                        "Benjakul",
+                        "Stream Plus"
+                    ],
+                    "modules_by_context": {
+                        "coag": [
+                            "KS",
+                            "SITTHAJORN"
+                        ]
+                    }
+                },
+                {
+                    "axis_id": 23,
+                    "name": "Hemodynamics & Arterial Elasticity",
+                    "sub_axes": {
+                        "A": {
+                            "name": "RAAS Regulation",
+                            "description": "ระบบ renin–angiotensin–aldosterone (RAAS) ที่ควบคุมความดันเลือดและสมดุลน้ำในร่างกาย ผ่านการผลิต angiotensin II และ aldosterone ซึ่งมีผลต่อการหดตัวของหลอดเลือดและการดูดซึมโซเดียมที่ไต"
+                        },
+                        "B": {
+                            "name": "Vascular Stiffness / Compliance",
+                            "description": "ความแข็งหรือลดหยุ่นของผนังหลอดเลือด (vascular stiffness) ที่เกิดจากความเสื่อมของ elastin และการสะสมของ collagen ในผนังหลอดเลือด ส่งผลให้ pulse wave velocity (PWV) เพิ่มขึ้นและเป็นตัวทำนาย cardiovascular events"
+                        },
+                        "C": {
+                            "name": "Blood Pressure Set‑Point",
+                            "description": "จุดตั้งค่าความดันเลือดของระบบที่ถูกควบคุมโดย baroreflex, RAAS, autonomic nervous system, และ vascular tone เพื่อรักษาความดันเลือดให้คงที่ในช่วงที่เหมาะสมกับความต้องการของร่างกาย"
+                        }
+                    },
+                    "modules": [
+                        "HP1",
+                        "BOVA",
+                        "VATTHANOTHAI",
+                        "DB1",
+                        "kerra",
+                        "Minoza",
+                        "KS",
+                        "Im1",
+                        "IM6",
+                        "AMPUR",
+                        "VitalPLUS",
+                        "SANGVICHAI",
+                        "TUNG CHAO PLUS 1",
+                        "BUTEA SUPERBA",
+                        "TUNG CHAO PLUS 2",
+                        "Benjakul",
+                        "Stream Plus"
+                    ],
+                    "modules_by_context": {}
+                }
+            ]
+        },
+        {
+            "domain_id": 7,
+            "title": "Repair–Regeneration",
+            "axes": [
+                {
+                    "axis_id": 24,
+                    "name": "Wound Healing (Internal + External)",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Inflammation → Proliferation Transition",
+                            "description": "การเปลี่ยนเฟสจากอักเสบไปสู่การสร้างเนื้อเยื่อ ผ่านการเปลี่ยนจาก macrophage M1 ไปเป็น M2 และการปล่อย growth factors (TGF-β, VEGF, FGF) เพื่อเริ่มกระบวนการสร้างเนื้อเยื่อใหม่"
+                        },
+                        "B": {
+                            "name": "Epithelialization / Closure Kinetics",
+                            "description": "ความเร็วในการปิดแผล/สร้างเยื่อบุใหม่ ผ่านการเคลื่อนที่ (migration), การแบ่งตัว (proliferation), และการสร้างความแตกต่าง (differentiation) ของ keratinocytes และ epithelial cells เพื่อปิดบาดแผล"
+                        },
+                        "C": {
+                            "name": "Remodeling Quality",
+                            "description": "คุณภาพของแผลหลังซ่อม รวมถึงแผลเป็น โดยการปรับโครงสร้าง collagen จาก type III ไปเป็น type I, การลดการเกิด hypertrophic scar หรือ keloid, และการฟื้นฟูความแข็งแรงและความยืดหยุ่นของเนื้อเยื่อ"
+                        }
+                    },
+                    "modules": [
+                        "AMPUR",
+                        "DB1",
+                        "kerra",
+                        "Minoza",
+                        "KS",
+                        "Im1",
+                        "IM6",
+                        "RICEZOZYME",
+                        "IM9",
+                        "BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "Plumax"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 25,
+                    "name": "Fibrosis & ECM Remodeling",
+                    "sub_axes": {
+                        "A": {
+                            "name": "TGF‑β Fibrotic Signaling",
+                            "description": "สัญญาณ fibrotic หลักนำโดย TGF‑β ซึ่งกระตุ้นการเปลี่ยน fibroblast เป็น myofibroblast และเพิ่มการสังเคราะห์ collagen และ ECM ส่งผลให้เกิดพังผืด (fibrosis) ในอวัยวะต่างๆ"
+                        },
+                        "B": {
+                            "name": "Collagen Deposition / Turnover",
+                            "description": "การสะสมและการสลายคอลลาเจนในอวัยวะ ผ่านสมดุลระหว่างการสังเคราะห์คอลลาเจน (โดย fibroblast) และการสลายคอลลาเจน (โดย MMPs) ซึ่งหากเสียสมดุลจะนำไปสู่การเกิดพังผืดหรือการสูญเสียโครงสร้างเนื้อเยื่อ"
+                        },
+                        "C": {
+                            "name": "Organ Stiffness Progression",
+                            "description": "การแข็งของอวัยวะ (ตับแข็ง, พังผืดปอด, หลอดเลือดแข็ง ฯลฯ) จากการสะสมของ ECM และ collagen มากเกินไป ส่งผลให้อวัยวะสูญเสียการทำงานและนำไปสู่ organ failure"
+                        }
+                    },
+                    "modules": [
+                        "DB1",
+                        "kerra",
+                        "Minoza",
+                        "KS",
+                        "Im1",
+                        "IM6",
+                        "RICEZOZYME",
+                        "IM9",
+                        "BetaG",
+                        "IMO",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "NARIS",
+                        "TARANA",
+                        "LIVOXY",
+                        "Plumax"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 26,
+                    "name": "Stem Cell & Hematopoiesis",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Stem Niche / Regenerative Reserve",
+                            "description": "สำรองเซลล์ต้นกำเนิดในร่างกาย (stem cell niches) ที่อยู่ในเนื้อเยื่อต่างๆ เช่น bone marrow, adipose tissue, skin, intestine ซึ่งสามารถแบ่งตัวและสร้างความแตกต่างเพื่อซ่อมแซมเนื้อเยื่อที่เสียหาย"
+                        },
+                        "B": {
+                            "name": "Hematopoiesis",
+                            "description": "การสร้างเม็ดเลือดในไขกระดูกจาก hematopoietic stem cells (HSCs) ไปเป็น erythrocytes, leukocytes, และ platelets ผ่านกระบวนการ hematopoiesis ที่ควบคุมโดย cytokines, growth factors, และ transcription factors"
+                        },
+                        "C": {
+                            "name": "Recovery Capacity after Stress / Injury",
+                            "description": "ความสามารถฟื้นตัวหลังเจ็บป่วยหรือบาดเจ็บหนัก ผ่านการกระตุ้น stem cell proliferation, mobilization ของ stem cells จาก niches, และการสร้างเนื้อเยื่อใหม่ (regeneration)"
+                        }
+                    },
+                    "modules": [
+                        "AMPUR",
+                        "DB1",
+                        "kerra",
+                        "Minoza",
+                        "KS",
+                        "Im1",
+                        "IM5",
+                        "IM6",
+                        "IM9",
+                        "BetaG",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "BUMINMAX",
+                        "BLOOD NOURISHING",
+                        "RENAX",
+                        "TUNG CHAO PLUS 1",
+                        "BUTEA SUPERBA",
+                        "LIVOXY",
+                        "Plumax"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 27,
+                    "name": "Glycation / Carbonyl Stress (AGE)",
+                    "sub_axes": {
+                        "A": {
+                            "name": "AGE Formation / Carbonyl Load",
+                            "description": "การก่อตัว advanced glycation end products (AGEs) จากปฏิกิริยา Maillard ระหว่างน้ำตาลกับโปรตีนหรือไขมันที่สะสมตามอายุและเมื่อมีระดับน้ำตาลสูง ทำให้เกิด carbonyl stress และความเสียหายต่อเนื้อเยื่อ"
+                        },
+                        "B": {
+                            "name": "Protein Crosslinking / Stiffness",
+                            "description": "การเชื่อมขวางโปรตีน (protein crosslinking) ทำให้เนื้อเยื่อแข็ง/กรอบ สูญเสียความยืดหยุ่น และเกิดความเสียหายต่อโครงสร้างเนื้อเยื่อ เช่น ผิวหนัง หลอดเลือด ข้อต่อ และไต"
+                        },
+                        "C": {
+                            "name": "Tissue Vulnerability Amplification",
+                            "description": "ทำให้เนื้อเยื่อเปราะ เสี่ยงต่อโรคหลอดเลือด ไต จอประสาทตา และระบบประสาท จากผลสะสมของ AGEs ที่ทำลายการทำงานของอวัยวะและเพิ่มความเสี่ยงต่อภาวะแทรกซ้อนของโรคเบาหวานและ aging"
+                        }
+                    },
+                    "modules": [
+                        "DB1",
+                        "kerra",
+                        "Minoza",
+                        "KS",
+                        "Im1",
+                        "IM5",
+                        "IM6",
+                        "IM9",
+                        "BetaG",
+                        "IM7",
+                        "Beta M",
+                        "Beta V",
+                        "BUMINMAX",
+                        "RADICA",
+                        "BENJAKUL",
+                        "BLOOD NOURISHING",
+                        "RENAX",
+                        "MORMORDICA",
+                        "VATTHANOTHAI",
+                        "BUTEA SUPERBA",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2",
+                        "TUNG CHAO PLUS SANCHI",
+                        "LIVOXY",
+                        "Plumax"
+                    ],
+                    "modules_by_context": {}
+                }
+            ]
+        },
+        {
+            "domain_id": 8,
+            "title": "Musculoskeletal & Structural Integrity",
+            "axes": [
+                {
+                    "axis_id": 28,
+                    "name": "Muscle Protein Turnover",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Anabolism",
+                            "description": "การสร้างโปรตีนกล้ามเนื้อ (muscle protein synthesis) ผ่าน mTORC1 signaling, การกระตุ้นโดย insulin, IGF-1, และ amino acids, รวมถึงการตอบสนองต่อการออกกำลังกายและการได้รับสารอาหารที่เพียงพอ"
+                        },
+                        "B": {
+                            "name": "Catabolism",
+                            "description": "การสลายกล้ามเนื้อ (muscle protein breakdown) ผ่าน ubiquitin-proteasome pathway, autophagy, และการกระตุ้นโดย glucocorticoid, inflammatory cytokines (TNF-α, IL-6), และการขาดสารอาหาร"
+                        },
+                        "C": {
+                            "name": "Myogenesis / Recovery",
+                            "description": "การสร้างเส้นใยกล้ามเนื้อใหม่และการฟื้นตัว ผ่านการกระตุ้น satellite cells, myoblast differentiation, และการสร้าง myofiber ใหม่เพื่อทดแทนกล้ามเนื้อที่เสียหายหรือเสื่อม"
+                        }
+                    },
+                    "modules": [
+                        "BUMINMAX",
+                        "AMPUR",
+                        "ZAMINZYME",
+                        "VITALPLUS",
+                        "DERRIS SCANDANS",
+                        "NARIS",
+                        "TARANA",
+                        "ANAX"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 29,
+                    "name": "Bone Remodeling",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Osteoblast Formation",
+                            "description": "การสร้างกระดูกโดย osteoblast ผ่านการทำงานของ Runx2, Wnt/β-catenin signaling, BMP, และการควบคุมโดย PTH, vitamin D, estrogen, และ mechanical loading เพื่อสร้าง bone matrix และ mineralization"
+                        },
+                        "B": {
+                            "name": "Osteoclast Resorption",
+                            "description": "การสลายกระดูกโดย osteoclast ผ่าน RANKL/RANK signaling, NF-κB, และการควบคุมโดย PTH, calcitonin, estrogen เพื่อปรับโครงสร้างกระดูกและปลดปล่อย calcium เข้าสู่กระแสเลือด"
+                        },
+                        "C": {
+                            "name": "Mineral Density Stability",
+                            "description": "ความหนาแน่นกระดูกและสมดุลแร่ธาตุ ผ่านการควบคุม calcium และ phosphate homeostasis โดย PTH, vitamin D, calcitonin, และ hormonal balance (estrogen, testosterone) เพื่อป้องกัน osteoporosis"
+                        }
+                    },
+                    "modules": [
+                        "BUMINMAX",
+                        "AMPUR",
+                        "ANAX",
+                        "ZAMINZYME",
+                        "VITALPLUS",
+                        "DERRIS SCANDANS",
+                        "NARIS",
+                        "TARANA",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2",
+                        "TUNG CHAO PLUS SANCHI",
+                        "REDCAL",
+                        "BONAX"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 30,
+                    "name": "Connective Tissue Integrity",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Tendon / Ligament ECM Resilience",
+                            "description": "ความยืดหยุ่นของเอ็น/เส้นเอ็น ผ่านโครงสร้างของ collagen (type I, III) และ elastin ใน extracellular matrix (ECM), การควบคุมโดย TGF-β, MMPs, และ mechanical loading เพื่อรักษาความแข็งแรงและความยืดหยุ่น"
+                        },
+                        "B": {
+                            "name": "Joint Matrix Stability",
+                            "description": "ความสมบูรณ์ของกระดูกอ่อนและข้อต่อ ผ่านการรักษาสมดุลของ chondrocyte, aggrecan, collagen II, และการควบคุมโดย biomechanical forces, inflammation, และ metabolic factors เพื่อป้องกัน osteoarthritis"
+                        },
+                        "C": {
+                            "name": "Structural Crosslink Burden",
+                            "description": "การเชื่อมขวางโครงสร้างที่ทำให้แข็ง/ติด จากการสะสมของ AGEs และ crosslinking ของ collagen ทำให้เนื้อเยื่อเกี่ยวพัน (ผิวหนัง เอ็น หลอดเลือด) สูญเสียความยืดหยุ่นและเกิดการแข็งเกร็ง"
+                        }
+                    },
+                    "modules": [
+                        "VITALPLUS",
+                        "DERRIS SCANDANS",
+                        "BUMINMAX",
+                        "AMPUR",
+                        "ANAX",
+                        "ZAMINZYME",
+                        "KS",
+                        "KERRA",
+                        "MINOZA",
+                        "NARIS",
+                        "TARANA",
+                        "TUNG CHAO PLUS 1",
+                        "TUNG CHAO PLUS 2",
+                        "TUNG CHAO PLUS SANCHI"
+                    ],
+                    "modules_by_context": {
+                        "external": [
+                            "KIMLUI YELLOW OIL"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "domain_id": 9,
+            "title": "Endocrine Network",
+            "axes": [
+                {
+                    "axis_id": 31,
+                    "name": "Female Hormone Network",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Estrogen Signaling",
+                            "description": "การทำงานของ estrogen และ receptor (ERα, ERβ) ผ่าน genomic และ non-genomic pathways ที่ควบคุมการแสดงออกของยีน, การเจริญเติบโตของเนื้อเยื่อ, bone metabolism, cardiovascular function, และ neuroprotection"
+                        },
+                        "B": {
+                            "name": "Progesterone Balance",
+                            "description": "สมดุล progesterone และ estrogen ผ่านการควบคุมโดย corpus luteum, placenta, และ adrenal gland ซึ่งมีบทบาทใน menstrual cycle, pregnancy, และการป้องกัน endometrial hyperplasia"
+                        },
+                        "C": {
+                            "name": "Menopause Physiology",
+                            "description": "ชีววิทยาวัยหมดประจำเดือนและความไวตัวรับ ผ่านการลดลงของ estrogen และ progesterone, การเปลี่ยนแปลงของ FSH/LH, ผลกระทบต่อ bone density, cardiovascular risk, cognitive function, และ vasomotor symptoms (hot flashes)"
+                        }
+                    },
+                    "modules": [
+                        "LANA",
+                        "ANGERA",
+                        "ZAMINZYME",
+                        "TUNG CHAO PLUS 2",
+                        "TUNG CHAO PLUS SANCHI"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 32,
+                    "name": "Male Androgen Network",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Testosterone Tone",
+                            "description": "ระดับและ rhythmicity ของ testosterone ที่ควบคุมโดย hypothalamic-pituitary-gonadal (HPG) axis, LH/FSH signaling, Leydig cell function, และ circadian rhythm ซึ่งมีผลต่อ muscle mass, bone density, libido, และ metabolic health"
+                        },
+                        "B": {
+                            "name": "DHT / Androgen Receptor Sensitivity",
+                            "description": "การเปลี่ยนเป็น DHT (dihydrotestosterone) โดย 5α-reductase และความไวของ androgen receptor (AR) ผ่านการควบคุมการแสดงออกของ AR และ co-factors ซึ่งมีผลต่อ prostate health, hair growth, และ anabolic signaling"
+                        },
+                        "C": {
+                            "name": "Prostate–Hair–Anabolic Linkage",
+                            "description": "ความเชื่อมโยงระหว่างต่อมลูกหมาก, ผม, มวลกล้ามเนื้อ ผ่าน androgen signaling ทั้ง DHT และ testosterone ซึ่งมีผลต่อ prostate hyperplasia (BPH), hair loss (androgenetic alopecia), และ muscle anabolism"
+                        }
+                    },
+                    "modules": [
+                        "TOPAZ",
+                        "BUTEA SUPERBA",
+                        "VITALPLUS",
+                        "BUMINMAX PLUS",
+                        "AMPUR",
+                        "TUNG CHAO PLUS 1"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 33,
+                    "name": "Thyroid–Adrenal–Growth Axis",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Thyroid Metabolic Control",
+                            "description": "TSH, T3/T4 และอัตราเมตาบอลิซึม ผ่านการควบคุมโดย hypothalamic-pituitary-thyroid (HPT) axis, thyroid hormone receptor (TR) signaling, และ deiodinase activity ซึ่งมีผลต่อ basal metabolic rate, thermogenesis, cardiovascular function, และ growth"
+                        },
+                        "B": {
+                            "name": "HPA / Cortisol Rhythm",
+                            "description": "แกน HPA (hypothalamic-pituitary-adrenal), คอร์ติซอล, จังหวะความเครียด ผ่าน CRH/ACTH/cortisol signaling, circadian rhythm, และ feedback inhibition ซึ่งมีผลต่อ stress response, immune function, metabolism, และ inflammation"
+                        },
+                        "C": {
+                            "name": "GH–IGF Repair Signaling",
+                            "description": "ฮอร์โมน growth และ IGF‑1 ในการซ่อมแซมและเติบโต ผ่าน hypothalamic-pituitary-GH axis, GH receptor signaling, และ IGF-1 production ในตับและเนื้อเยื่อ peripheral ซึ่งมีผลต่อ tissue repair, muscle growth, bone density, และ longevity"
+                        }
+                    },
+                    "modules": [
+                        "AMPUR",
+                        "RADICA",
+                        "VITALPLUS",
+                        "SANGVICHAI",
+                        "VETCHAKORN NO.6",
+                        "PSYLAZA",
+                        "BRANARA"
+                    ],
+                    "modules_by_context": {
+                        "hypothyroid": [
+                            "VITALPLUS",
+                            "BLOOD NOURISHING",
+                            "BOVA",
+                            "LANA",
+                            "VETCHAKORN No.6",
+                            "TARANA",
+                            "NARIS",
+                            "XS",
+                            "TUNG CHAO PLUS 1",
+                            "TUNG CHAO PLUS 2",
+                            "TUNG CHAO PLUS SANCHI",
+                            "Benjakul"
+                        ],
+                        "hyperthyroid": [
+                            "Radica",
+                            "BOVA",
+                            "KERRA",
+                            "IM6",
+                            "BETA V",
+                            "MINOZA",
+                            "LIVITA",
+                            "YA TEEN NOK"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "domain_id": 10,
+            "title": "Neurological Regulation",
+            "axes": [
+                {
+                    "axis_id": 34,
+                    "name": "Neuro–Sleep–Stress–Brain Clearance",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Neuroinflammation",
+                            "description": "การอักเสบในสมองและระบบประสาท ผ่านการกระตุ้น microglia, astrocyte, และการหลั่ง cytokines (IL-6, TNF-α) และ chemokines ซึ่งนำไปสู่ neurodegeneration, cognitive decline, และ neuropsychiatric disorders"
+                        },
+                        "B": {
+                            "name": "Sleep–Circadian–Melatonin Repair",
+                            "description": "คุณภาพการนอน วงจร circadian และเมลาโทนิน ผ่านการควบคุม sleep-wake cycle โดย suprachiasmatic nucleus (SCN), melatonin production จาก pineal gland, และ clock genes (CLOCK, BMAL1, PER, CRY) ซึ่งมีผลต่อการฟื้นฟูระบบประสาทและการควบคุมการอักเสบ"
+                        },
+                        "C": {
+                            "name": "HPA–Autonomic–Glymphatic Clearance",
+                            "description": "การคุมเครียด, ระบบประสาทอัตโนมัติ และการระบายของเสียในสมอง (glymphatic) ผ่าน HPA axis, sympathetic/parasympathetic balance, และ glymphatic system ที่กำจัดของเสีย (β-amyloid) ออกจากสมองระหว่างการนอนหลับ"
+                        }
+                    },
+                    "modules": [
+                        "BOVA",
+                        "VETCHAKORN No.6",
+                        "SANGVICHAI",
+                        "PSYLAZA",
+                        "KERRA",
+                        "KS",
+                        "YA TEEN NOK",
+                        "BRANARA",
+                        "Benjakul"
+                    ],
+                    "modules_by_context": {}
+                }
+            ]
+        },
+        {
+            "domain_id": 11,
+            "title": "Organ Axis",
+            "axes": [
+                {
+                    "axis_id": 35,
+                    "name": "Organ Resilience & Functional Reserve",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Visceral Organ Reserve",
+                            "description": "การสำรองการทำงานของอวัยวะภายใน: ตับ ไต หัวใจ ปอด ม้าม ตับอ่อน ถุงน้ำดี กระเพาะ ลำไส้ กระเพาะปัสสาวะ และอวัยวะภายในอื่นๆ ซึ่งเป็นความสามารถของอวัยวะในการปรับตัวและฟื้นฟูการทำงานภายใต้สภาวะความเครียดหรือการบาดเจ็บ"
+                        },
+                        "B": {
+                            "name": "Sensory & ENT Organ Function",
+                            "description": "การทำงานของอวัยวะรับความรู้สึกและหู คอ จมูก: ตา จอประสาทตา กระจกตา ต่อมน้ำตา จมูก ไซนัส คอ หู กล่องเสียง รวมถึงการทำงานของระบบรับความรู้สึกและการสื่อสารผ่าน sensory organs"
+                        },
+                        "C": {
+                            "name": "Reproductive & Pelvic Organ Function",
+                            "description": "การทำงานของอวัยวะสืบพันธุ์และอุ้งเชิงกราน: มดลูก รังไข่ อัณฑะ ต่อมลูกหมาก ช่องคลอด ทวารหนัก ริดสีดวง และอวัยวะในอุ้งเชิงกรานอื่นๆ ที่เกี่ยวข้องกับการสืบพันธุ์และการขับถ่าย"
+                        }
+                    },
+                    "modules": [],
+                    "modules_by_context": {
+                        "liver": [
+                            "HEPA1",
+                            "HEPA2",
+                            "HEPA3",
+                            "HEPA PLUS",
+                            "KD",
+                            "KS"
+                        ],
+                        "kidney": [
+                            "KD",
+                            "IM6",
+                            "HEPA1",
+                            "HEPA2",
+                            "HEPA3",
+                            "HEPA PLUS",
+                            "KS"
+                        ],
+                        "heart": [
+                            "BOVA",
+                            "AMPUR",
+                            "VETCHAKORN No.6",
+                            "SANGVICHAI",
+                            "PSYLAZA",
+                            "KERRA",
+                            "NARIS"
+                        ],
+                        "spleen": [
+                            "HEPA1",
+                            "HEPA2",
+                            "HEPA3",
+                            "HEPA PLUS",
+                            "KD",
+                            "KS"
+                        ],
+                        "pancreas": [
+                            "DB1",
+                            "HEPA1",
+                            "KD",
+                            "KERRA",
+                            "MINOZA",
+                            "IM6",
+                            "RICEZOZYME"
+                        ],
+                        "gallbladder": [
+                            "CINNARA",
+                            "DB1",
+                            "HEPA1",
+                            "KD",
+                            "KERRA",
+                            "MINOZA",
+                            "IM6",
+                            "RICEZOZYME",
+                            "KERMA",
+                            "CURMINA"
+                        ],
+                        "stomach": [
+                            "STOMMA",
+                            "CINNARA",
+                            "DB1",
+                            "HEPA1",
+                            "KD",
+                            "KERRA",
+                            "MINOZA",
+                            "IM6",
+                            "RICEZOZYME",
+                            "KERMA",
+                            "CURMINA"
+                        ],
+                        "intestine": [
+                            "STOMMA",
+                            "CINNARA",
+                            "KERMA",
+                            "CURMINA",
+                            "RIZZ",
+                            "RIDSEE",
+                            "RIZZO",
+                            "DB1",
+                            "HEPA1",
+                            "KD",
+                            "KERRA",
+                            "MINOZA",
+                            "IM6",
+                            "RICEZOZYME"
+                        ],
+                        "bladder": [
+                            "DIURETICS",
+                            "URANA",
+                            "URANA2",
+                            "Ivora Luce",
+                            "TOPAZ"
+                        ],
+                        "lactation": [
+                            "REVITA"
+                        ],
+                        "eye": [
+                            "FOCUZ",
+                            "KERRA",
+                            "SINAZA",
+                            "MINOZA",
+                            "IM6",
+                            "ZAMINZYME",
+                            "RICEZOZYME"
+                        ],
+                        "ent": [
+                            "KERRA",
+                            "SINAZA",
+                            "MINOZA",
+                            "IM6",
+                            "ZAMINZYME",
+                            "RICEZOZYME",
+                            "VITALPLUS",
+                            "VARIZ"
+                        ],
+                        "uterus": [
+                            "TUNG CHAO PLUS 2",
+                            "Femoon",
+                            "TUNG CHAO PLUS SANCHI",
+                            "Ivora Luce",
+                            "Urana",
+                            "Urana2",
+                            "Angera",
+                            "Lana",
+                            "Ava",
+                            "Absorn",
+                            "UTERUS"
+                        ],
+                        "rectal": [
+                            "RIZZ",
+                            "RIDSEE",
+                            "RIZZO",
+                            "KERRA",
+                            "MINOZA",
+                            "IM6",
+                            "BETA V",
+                            "RICEZOZYME"
+                        ],
+                        "prostate": [
+                            "TOPAZ",
+                            "KS",
+                            "KERRA",
+                            "MINOZA",
+                            "IM6",
+                            "VITALPLUS",
+                            "UTERUS",
+                            "URANA2",
+                            "DIURETIC"
+                        ],
+                        "male_sex": [
+                            "TOPAZ",
+                            "VITALPLUS",
+                            "TUNG CHAO PLUS 1",
+                            "BUTEA SUPERBA",
+                            "AMPUR"
+                        ]
+                    }
+                },
+                {
+                    "axis_id": 36,
+                    "name": "Local Organ & Tissue Interface",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Sensory / ENT Organs",
+                            "description": "ตา จอประสาทตา กระจกตา optic nerve, ต่อมน้ำตา, จมูก ไซนัส คอ หู กล่องเสียง รวมถึงการทำงานของ sensory receptors และการสื่อสารระหว่างอวัยวะรับความรู้สึกกับระบบประสาทส่วนกลาง"
+                        },
+                        "B": {
+                            "name": "Reproductive / Pelvic Organs",
+                            "description": "มดลูก รังไข่ อัณฑะ ต่อมลูกหมาก ช่องคลอด และอวัยวะในอุ้งเชิงกรานที่เกี่ยวข้องกับการสืบพันธุ์ การควบคุมฮอร์โมนเพศ และการทำงานของระบบสืบพันธุ์"
+                        },
+                        "C": {
+                            "name": "Anorectal / Local Mucosal Organs",
+                            "description": "ทวารหนัก ริดสีดวง และเยื่อบุทวาร รวมถึงการทำงานของกล้ามเนื้อหูรูด, การควบคุมการขับถ่าย, และสุขภาพของเยื่อบุในบริเวณทวารหนัก"
+                        }
+                    },
+                    "modules": [],
+                    "modules_by_context": {}
+                }
+            ]
+        },
+        {
+            "domain_id": 12,
+            "title": "Oncology & System-Level Regulation",
+            "axes": [
+                {
+                    "axis_id": 37,
+                    "name": "Oncologic Cell Fate",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Apoptosis",
+                            "description": "apoptosis, cell‑cycle checkpoints, การควบคุมการแบ่งตัวของเซลล์มะเร็ง ผ่านกลไก intrinsic (mitochondrial) และ extrinsic (death receptor) apoptosis pathways รวมถึงการควบคุมโดย p53, Bcl-2 family, และ caspase cascade เพื่อกำจัดเซลล์ที่มีความผิดปกติ"
+                        },
+                        "B": {
+                            "name": "Cell-Cycle Checkpoints",
+                            "description": "cyclin, CDK, checkpoint G1/S/G2/M, uncontrolled proliferation และ cancer initiation ผ่านการควบคุมวงจรเซลล์โดย p53, p21, RB, และ checkpoint kinases (ATM/ATR, CHK1/CHK2) เพื่อป้องกันการแบ่งตัวของเซลล์ที่มี DNA damage"
+                        },
+                        "C": {
+                            "name": "Abnormal Proliferation Control",
+                            "description": "tumor suppressor genes (p53, RB, PTEN, APC), DNA repair genes, apoptosis genes ที่ควบคุมการเจริญเติบโตของเซลล์และป้องกันการเกิดมะเร็ง ผ่านการยับยั้ง oncogenic signaling และการกระตุ้น cell-cycle arrest หรือ apoptosis"
+                        }
+                    },
+                    "modules": [
+                        "beta x",
+                        "Merdana",
+                        "Im1",
+                        "ImO",
+                        "Reshimuno",
+                        "RENAX",
+                        "Im5",
+                        "Im6",
+                        "Kerra",
+                        "Minoza",
+                        "Plumax",
+                        "KERRIX PLUS",
+                        "UMX",
+                        "Hepa1",
+                        "Hepa2",
+                        "Hepa3",
+                        "Livoxy",
+                        "Hepa plus",
+                        "Beta x",
+                        "Beta G",
+                        "Im9",
+                        "Beta 1",
+                        "Im7",
+                        "Beta4",
+                        "Beta M",
+                        "Rizzo",
+                        "rizz",
+                        "Ridsee",
+                        "Beta5",
+                        "Beta L",
+                        "Xm2",
+                        "TOPAZ",
+                        "TUNG CHAO PLUS 2",
+                        "Femoon",
+                        "TUNG CHAO PLUS SANCHI",
+                        "Ivora Luce",
+                        "Urana",
+                        "Urana2",
+                        "Angera",
+                        "Lana",
+                        "Ava",
+                        "Absorn",
+                        "UTERUS",
+                        "BUMINMAX PLUS",
+                        "ZAMINZYME",
+                        "RICEZOZYME",
+                        "FLAXPRO"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 38,
+                    "name": "Tumor Microenvironment & Metastatic Dynamics",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Tumor Immune Evasion",
+                            "description": "PD-1/PD-L1, CTLA-4, Treg, MDSC, immune exhaustion และ tumor immune evasion ซึ่งเป็นกลไกที่มะเร็งใช้หลบเลี่ยงระบบภูมิคุ้มกันผ่านการแสดงออกของ immune checkpoint molecules และการสร้าง immunosuppressive microenvironment"
+                        },
+                        "B": {
+                            "name": "EMT / Invasion / Migration",
+                            "description": "epithelial–mesenchymal transition (EMT), invasion, migration, CTC survival และการแพร่กระจายของเซลล์มะเร็งผ่านการสูญเสีย E-cadherin, การเพิ่ม expression ของ vimentin, snail, slug, และการกระตุ้น MMPs เพื่อทำลาย ECM"
+                        },
+                        "C": {
+                            "name": "Anti-Metastatic Network Control",
+                            "description": "EMT/MET (mesenchymal–epithelial transition), circulating tumor cells (CTCs), invasion และ metastasis control ผ่านการควบคุม signaling pathways (TGF-β, Wnt, Notch, Hedgehog) และการป้องกันการสร้าง metastatic niche ในอวัยวะเป้าหมาย"
+                        }
+                    },
+                    "modules": [
+                        "KS",
+                        "beta x",
+                        "Merdana",
+                        "Im1",
+                        "ImO",
+                        "Reshimuno",
+                        "RENAX",
+                        "Im5",
+                        "Im6",
+                        "Kerra",
+                        "Minoza",
+                        "Plumax",
+                        "Rizzo",
+                        "rizz",
+                        "Ridsee",
+                        "Beta5",
+                        "Beta L",
+                        "Beta V",
+                        "Beta M",
+                        "Xm2"
+                    ],
+                    "modules_by_context": {}
+                },
+                {
+                    "axis_id": 39,
+                    "name": "Genomic Regulation Homeostasis",
+                    "sub_axes": {
+                        "A": {
+                            "name": "Whole-System Gene Expression Balance",
+                            "description": "การควบคุมภาพรวมการแสดงออกของยีนทั้งระบบ ไม่ให้เปิด/ปิดผิดทิศทาง ผ่านการรักษาสมดุลระหว่าง pro-inflammatory และ anti-inflammatory genes, oncogenes และ tumor suppressors, growth และ repair genes เพื่อป้องกัน pathological gene expression drift"
+                        },
+                        "B": {
+                            "name": "Transcription–Translation Coordination",
+                            "description": "การประสานงานระหว่าง transcription และ translation เพื่อให้โปรตีนถูกสร้างอย่างเหมาะสม ผ่านการควบคุมโดย transcription factors (NF-κB, FOXO, NRF2), epigenetic modifications, และ post-transcriptional regulation (miRNA, RNA-binding proteins)"
+                        },
+                        "C": {
+                            "name": "Adaptive Gene Program Reset Toward Prakati",
+                            "description": "ความสามารถของระบบในการรีเซ็ตโปรแกรมการแสดงออกของยีนกลับสู่สภาวะสมดุล (Prakati) หลังจากการตอบสนองต่อความเครียด การอักเสบ หรือการบาดเจ็บ เพื่อให้ร่างกายกลับสู่สภาวะ homeostasis และป้องกันการเกิดโรคเรื้อรัง"
+                        }
+                    },
+                    "modules": [
+                        "KS",
+                        "beta x",
+                        "Beta G",
+                        "Beta L",
+                        "Beta M",
+                        "Im1",
+                        "ImO",
+                        "Reshimuno",
+                        "RENAX",
+                        "Im5",
+                        "Im6",
+                        "Kerra",
+                        "Ricezozyme",
+                        "Zaminzyme",
+                        "Minoza",
+                        "Plumax",
+                        "Vitalplus"
+                    ],
+                    "modules_by_context": {}
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,4557 @@
+{
+  "file_name": "fundamental_medicine_part3_modules_training_complete.json",
+  "version": "3.0",
+  "description": "ส่วนที่ 3: TSPI Phytochemical Modules Master Data (ฉบับสมบูรณ์ 72 โมดูล) และ Training Pairs (100 คู่) สำหรับการเทรนโมเดล",
+  "metadata": {
+    "total_modules": 72,
+    "total_training_pairs": 100,
+    "total_axes_covered": 39,
+    "total_diseases_covered": 25,
+    "generated_date": "2026-06-25"
+  },
+  "tspi_modules": [
+    {
+      "code": "KS",
+      "name": "KS (Kerra-Synergy)",
+      "category": "Immune-Metabolic Core",
+      "primary_function": "Multi-system immune modulation และ metabolic support",
+      "mechanisms": [
+        "ปรับสมดุล NF-κB และ cytokine network",
+        "สนับสนุน mitochondrial function",
+        "เสริม antiviral และ antibacterial defense",
+        "ควบคุม inflammasome activity"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        8,
+        9,
+        37,
+        38,
+        39
+      ],
+      "primary_networks": [
+        1,
+        2,
+        11,
+        12,
+        17,
+        28,
+        29,
+        67,
+        68
+      ],
+      "clinical_indications": [
+        "Chronic inflammation",
+        "Metabolic syndrome",
+        "Post-viral syndrome",
+        "Autoimmune disease"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "KERRA",
+        "MINOZA",
+        "IM6",
+        "IM9",
+        "BETA G"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "KERRA",
+      "name": "Kerra",
+      "category": "Immune-Inflammatory Core",
+      "primary_function": "การปรับสมดุล cytokine และการตอบสนองภูมิคุ้มกัน",
+      "mechanisms": [
+        "ลด IL-6, TNF-α, IL-1β",
+        "ปรับสมดุล Th1/Th2 และ Treg/Th17",
+        "สนับสนุน immune surveillance",
+        "ควบคุม inflammation resolution"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        9,
+        10
+      ],
+      "primary_networks": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10
+      ],
+      "clinical_indications": [
+        "Autoimmune disease",
+        "Chronic inflammation",
+        "Allergy",
+        "IBD"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "KS",
+        "MINOZA",
+        "IM6",
+        "IM9",
+        "VARIZ"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "MINOZA",
+      "name": "Minoza",
+      "category": "Immune-Detox Core",
+      "primary_function": "สนับสนุน immune function และ detoxification pathway",
+      "mechanisms": [
+        "เสริม innate และ adaptive immunity",
+        "สนับสนุน Phase I/II detoxification",
+        "ควบคุม oxidative stress",
+        "ฟื้น mucosal immunity"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        4,
+        9,
+        15,
+        16,
+        17,
+        18
+      ],
+      "primary_networks": [
+        5,
+        6,
+        11,
+        12,
+        33,
+        34,
+        37,
+        38,
+        39,
+        40
+      ],
+      "clinical_indications": [
+        "Chronic infection",
+        "Post-viral syndrome",
+        "Environmental toxin exposure",
+        "Immunodeficiency"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "KS",
+        "KERRA",
+        "IM6",
+        "DB1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "IM6",
+      "name": "IM6 (Immune-Metabolic 6)",
+      "category": "Immune-Metabolic Core",
+      "primary_function": "การควบคุม immune-metabolic integration",
+      "mechanisms": [
+        "ควบคุม inflammatory tone",
+        "สนับสนุน mitochondrial function",
+        "ปรับสมดุล glucose-insulin metabolism",
+        "ฟื้น immune tolerance"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        5,
+        6,
+        8,
+        9,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        1,
+        2,
+        17,
+        18,
+        19,
+        28,
+        29,
+        40,
+        41,
+        42
+      ],
+      "clinical_indications": [
+        "Metabolic syndrome",
+        "Diabetes",
+        "Chronic inflammation",
+        "Autoimmune disease"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "KS",
+        "KERRA",
+        "MINOZA",
+        "DB1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "IM9",
+      "name": "IM9 (Immune-Metabolic 9)",
+      "category": "Immune-Metabolic-Repair Core",
+      "primary_function": "การฟื้นฟู immune surveillance และ tissue repair",
+      "mechanisms": [
+        "เสริม NK cell function",
+        "สนับสนุน inflammation resolution",
+        "ฟื้น mucosal barrier",
+        "ควบคุม gut-liver axis"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        9,
+        15,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        6,
+        9,
+        11,
+        33,
+        34,
+        37,
+        38,
+        39,
+        40
+      ],
+      "clinical_indications": [
+        "Cancer support",
+        "Chronic infection",
+        "Gut barrier dysfunction",
+        "Post-viral syndrome"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "KS",
+        "KERRA",
+        "MINOZA",
+        "PLUMAX"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BETA_G",
+      "name": "Beta G (Beta-Glucan Complex)",
+      "category": "Immune-Repair Core",
+      "primary_function": "immune modulation และ tissue repair",
+      "mechanisms": [
+        "กระตุ้น macrophage และ NK cell",
+        "ควบคุม NLRP3 inflammasome",
+        "สนับสนุน wound healing",
+        "ปรับสมดุล inflammatory response"
+      ],
+      "primary_axes": [
+        1,
+        3,
+        4,
+        8,
+        9,
+        10,
+        24,
+        25,
+        26
+      ],
+      "primary_networks": [
+        1,
+        3,
+        4,
+        9,
+        10,
+        11,
+        75,
+        76,
+        77,
+        78
+      ],
+      "clinical_indications": [
+        "Chronic inflammation",
+        "Wound healing",
+        "Cancer support",
+        "Infection recovery"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "IM9",
+        "PLUMAX",
+        "KERRA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BETA_M",
+      "name": "Beta M (Beta-Metabolic)",
+      "category": "Metabolic-Immune Core",
+      "primary_function": "ควบคุม metabolic inflammation และ insulin sensitivity",
+      "mechanisms": [
+        "ลด chronic low-grade inflammation",
+        "ปรับ insulin sensitivity",
+        "ควบคุม lipid metabolism",
+        "สนับสนุน mitochondrial function"
+      ],
+      "primary_axes": [
+        1,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "primary_networks": [
+        1,
+        2,
+        4,
+        17,
+        18,
+        19,
+        21,
+        22,
+        28,
+        29
+      ],
+      "clinical_indications": [
+        "Metabolic syndrome",
+        "Type 2 diabetes",
+        "NAFLD",
+        "Atherosclerosis"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "DB1",
+        "BOVA",
+        "IM6"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BETA_V",
+      "name": "Beta V (Beta-Vascular)",
+      "category": "Vascular-Immune Core",
+      "primary_function": "สนับสนุน vascular health และ immune-vascular integration",
+      "mechanisms": [
+        "ปรับ endothelial function",
+        "ควบคุม vascular inflammation",
+        "สนับสนุน NO signaling",
+        "ลด platelet aggregation"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        20,
+        21,
+        22,
+        23
+      ],
+      "primary_networks": [
+        81,
+        82,
+        86,
+        87,
+        88,
+        89,
+        90
+      ],
+      "clinical_indications": [
+        "Atherosclerosis",
+        "Hypertension",
+        "CVD prevention",
+        "Endothelial dysfunction"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "HP1",
+        "BOVA",
+        "TUNG CHAO PLUS 1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BETA_L",
+      "name": "Beta L (Beta-Liver)",
+      "category": "Hepatic-Repair Core",
+      "primary_function": "สนับสนุน liver function และ hepatic repair",
+      "mechanisms": [
+        "สนับสนุน Phase I/II detoxification",
+        "ควบคุม hepatic inflammation",
+        "ฟื้น hepatocyte regeneration",
+        "ควบคุม liver fibrosis"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        24,
+        25,
+        26,
+        27
+      ],
+      "primary_networks": [
+        33,
+        34,
+        35,
+        36,
+        121,
+        122,
+        123,
+        124
+      ],
+      "clinical_indications": [
+        "NAFLD",
+        "NASH",
+        "Liver fibrosis",
+        "Toxin exposure"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "HEPA1",
+        "HEPA2",
+        "HEPA3",
+        "KD"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "DB1",
+      "name": "DB1 (Digestive-Balance 1)",
+      "category": "Digestive-Metabolic Core",
+      "primary_function": "ฟื้นฟู digestive function และ metabolic balance",
+      "mechanisms": [
+        "ฟื้น microbiome diversity",
+        "สนับสนุน gut barrier integrity",
+        "ปรับ insulin sensitivity",
+        "ควบคุม lipid metabolism"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        7,
+        8,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        17,
+        18,
+        19,
+        21,
+        22,
+        33,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "clinical_indications": [
+        "Metabolic syndrome",
+        "IBD",
+        "Gut dysbiosis",
+        "Diabetes"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "KERRA",
+        "MINOZA",
+        "IM6",
+        "BETA M"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "CINNARA",
+      "name": "Cinnara",
+      "category": "Digestive-Immune Core",
+      "primary_function": "สนับสนุน digestive-immune barrier function",
+      "mechanisms": [
+        "ฟื้น mucosal barrier",
+        "ควบคุม gut inflammation",
+        "สนับสนุน digestive enzyme function",
+        "ควบคุม gut-brain axis"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        19,
+        34
+      ],
+      "primary_networks": [
+        39,
+        40,
+        41,
+        42,
+        131,
+        132,
+        133
+      ],
+      "clinical_indications": [
+        "IBD",
+        "IBS",
+        "Food allergy",
+        "Gut barrier dysfunction"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "STOMMA",
+        "KURMA",
+        "DB1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "PLUMAX",
+      "name": "Plumax",
+      "category": "Immune-Repair Core",
+      "primary_function": "สนับสนุน immune surveillance และ tissue repair",
+      "mechanisms": [
+        "เสริม NK cell และ macrophage function",
+        "ควบคุม inflammation resolution",
+        "สนับสนุน wound healing",
+        "ฟื้น immune tolerance"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        24,
+        25,
+        26
+      ],
+      "primary_networks": [
+        5,
+        6,
+        9,
+        11,
+        75,
+        76,
+        77,
+        78
+      ],
+      "clinical_indications": [
+        "Cancer support",
+        "Chronic infection",
+        "Wound healing",
+        "Autoimmune disease"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "IM9",
+        "BETA G",
+        "RESHIMUNO"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "RESHIMUNO",
+      "name": "Reshimuno",
+      "category": "Immune-Adaptogen Core",
+      "primary_function": "การปรับสมดุลภูมิคุ้มกันและ stress response",
+      "mechanisms": [
+        "ปรับสมดุล Treg/Th17",
+        "ควบคุม HPA axis",
+        "สนับสนุน immune surveillance",
+        "ลด neuroinflammation"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        34,
+        39
+      ],
+      "primary_networks": [
+        7,
+        8,
+        9,
+        104,
+        113,
+        114
+      ],
+      "clinical_indications": [
+        "Autoimmune disease",
+        "Chronic stress",
+        "Chronic inflammation",
+        "Neurodegeneration"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "VARIZ",
+        "PLUMAX",
+        "PSYLAZA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "VARIZ",
+      "name": "Variz",
+      "category": "Immune-Neuro Core",
+      "primary_function": "สนับสนุน immune-neuro integration",
+      "mechanisms": [
+        "ปรับสมดุล Th1/Th2",
+        "ควบคุม neuroinflammation",
+        "สนับสนุน immune tolerance",
+        "ฟื้น vagal regulation"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        8,
+        34,
+        39
+      ],
+      "primary_networks": [
+        7,
+        8,
+        9,
+        103,
+        113,
+        114
+      ],
+      "clinical_indications": [
+        "Autoimmune disease",
+        "Neuroinflammation",
+        "Chronic stress",
+        "Post-viral syndrome"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "SINAZA",
+        "RESHIMUNO",
+        "PSYLAZA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BOVA",
+      "name": "Bova",
+      "category": "Neuro-Vascular Core",
+      "primary_function": "สนับสนุน neurovascular health และ metabolic balance",
+      "mechanisms": [
+        "ควบคุม HPA axis",
+        "สนับสนุน NO signaling",
+        "ปรับ insulin sensitivity",
+        "ลด neuroinflammation"
+      ],
+      "primary_axes": [
+        5,
+        20,
+        21,
+        23,
+        34
+      ],
+      "primary_networks": [
+        17,
+        18,
+        19,
+        81,
+        82,
+        83,
+        104,
+        105,
+        111
+      ],
+      "clinical_indications": [
+        "CVD",
+        "Metabolic syndrome",
+        "Neurodegeneration",
+        "Chronic stress"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "HP1",
+        "VATTHANOTHAI",
+        "SANGVICHAI"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "HP1",
+      "name": "HP1 (Heart-Protect 1)",
+      "category": "Cardiovascular Core",
+      "primary_function": "สนับสนุน cardiovascular function และ vascular integrity",
+      "mechanisms": [
+        "ปรับ endothelial function",
+        "ควบคุม NO signaling",
+        "ลด platelet aggregation",
+        "ควบคุม vascular inflammation"
+      ],
+      "primary_axes": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "primary_networks": [
+        81,
+        82,
+        83,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93
+      ],
+      "clinical_indications": [
+        "Hypertension",
+        "Atherosclerosis",
+        "CVD prevention",
+        "Endothelial dysfunction"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "BOVA",
+        "TUNG CHAO PLUS 1",
+        "BUTEA SUPERBA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "VATTHANOTHAI",
+      "name": "Vatthanothai",
+      "category": "Metabolic-Cardiovascular Core",
+      "primary_function": "สนับสนุน metabolic-cardiovascular integration",
+      "mechanisms": [
+        "ปรับ insulin sensitivity",
+        "ควบคุม lipid metabolism",
+        "สนับสนุน vascular function",
+        "ลด inflammation"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        7,
+        8,
+        20,
+        21,
+        22,
+        23
+      ],
+      "primary_networks": [
+        17,
+        18,
+        19,
+        21,
+        22,
+        81,
+        82,
+        83,
+        86
+      ],
+      "clinical_indications": [
+        "Metabolic syndrome",
+        "Type 2 diabetes",
+        "CVD",
+        "NAFLD"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "DB1",
+        "BOVA",
+        "TUNG CHAO PLUS 1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "HEPA1",
+      "name": "Hepa1",
+      "category": "Hepatic Core",
+      "primary_function": "สนับสนุน Phase I detoxification และ liver health",
+      "mechanisms": [
+        "สนับสนุน CYP450 enzyme function",
+        "ควบคุม hepatic inflammation",
+        "ฟื้น hepatocyte regeneration",
+        "ควบคุม bile acid metabolism"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        24,
+        25,
+        26,
+        27
+      ],
+      "primary_networks": [
+        33,
+        34,
+        121,
+        122,
+        123,
+        124,
+        125
+      ],
+      "clinical_indications": [
+        "NAFLD",
+        "Toxin exposure",
+        "Liver inflammation",
+        "Detoxification support"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "HEPA2",
+        "HEPA3",
+        "KD"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "HEPA2",
+      "name": "Hepa2",
+      "category": "Hepatic Core",
+      "primary_function": "สนับสนุน Phase II detoxification และ liver repair",
+      "mechanisms": [
+        "สนับสนุน glucuronidation, sulfation",
+        "ควบคุม liver fibrosis",
+        "สนับสนุน antioxidant defense",
+        "ฟื้น bile flow"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        24,
+        25,
+        26,
+        27
+      ],
+      "primary_networks": [
+        33,
+        34,
+        35,
+        121,
+        122,
+        123,
+        124,
+        125
+      ],
+      "clinical_indications": [
+        "NASH",
+        "Liver fibrosis",
+        "Toxin exposure",
+        "Cholestasis"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "HEPA1",
+        "HEPA3",
+        "KD"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "HEPA3",
+      "name": "Hepa3",
+      "category": "Hepatic Core",
+      "primary_function": "สนับสนุน liver regeneration และ metabolic function",
+      "mechanisms": [
+        "ฟื้น hepatocyte regeneration",
+        "ควบคุม lipid metabolism",
+        "สนับสนุน bile acid homeostasis",
+        "ควบคุม liver inflammation"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        15,
+        16,
+        24,
+        25,
+        26,
+        27
+      ],
+      "primary_networks": [
+        17,
+        18,
+        21,
+        22,
+        121,
+        122,
+        123,
+        124,
+        125
+      ],
+      "clinical_indications": [
+        "NAFLD",
+        "NASH",
+        "Liver fibrosis",
+        "Metabolic syndrome"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "HEPA1",
+        "HEPA2",
+        "KD"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "KD",
+      "name": "KD (Kidney-Detox)",
+      "category": "Renal Core",
+      "primary_function": "สนับสนุน kidney function และ detoxification",
+      "mechanisms": [
+        "สนับสนุน renal filtration",
+        "ควบคุม renal inflammation",
+        "ลด uremic toxin",
+        "สนับสนุน acid-base balance"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        23,
+        24,
+        27,
+        28
+      ],
+      "primary_networks": [
+        33,
+        34,
+        35,
+        36,
+        126,
+        127,
+        128,
+        129,
+        130
+      ],
+      "clinical_indications": [
+        "CKD",
+        "Toxin exposure",
+        "Metabolic acidosis",
+        "Renal inflammation"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "HEPA1",
+        "HEPA2",
+        "IM6"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "TUNG_CHAO_PLUS_1",
+      "name": "Tung Chao Plus 1",
+      "category": "Metabolic-Cardiovascular-Reproductive Core",
+      "primary_function": "multi-system support",
+      "mechanisms": [
+        "ปรับ metabolic function",
+        "สนับสนุน cardiovascular health",
+        "ฟื้น reproductive function",
+        "ควบคุม inflammation"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        7,
+        8,
+        20,
+        21,
+        22,
+        23,
+        31,
+        32
+      ],
+      "primary_networks": [
+        17,
+        18,
+        19,
+        21,
+        22,
+        28,
+        29,
+        81,
+        82,
+        83,
+        172,
+        173,
+        174
+      ],
+      "clinical_indications": [
+        "Metabolic syndrome",
+        "CVD",
+        "Reproductive health",
+        "Chronic inflammation"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "TUNG CHAO PLUS 2",
+        "BUTEA SUPERBA",
+        "BOVA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "TUNG_CHAO_PLUS_2",
+      "name": "Tung Chao Plus 2",
+      "category": "Metabolic-Reproductive Core",
+      "primary_function": "สนับสนุน metabolic-reproductive integration",
+      "mechanisms": [
+        "ปรับ estrogen signaling",
+        "ควบคุม metabolic inflammation",
+        "สนับสนุน reproductive health",
+        "ฟื้น cellular metabolism"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        7,
+        8,
+        31,
+        32
+      ],
+      "primary_networks": [
+        17,
+        18,
+        19,
+        21,
+        22,
+        28,
+        29,
+        172,
+        173
+      ],
+      "clinical_indications": [
+        "Menopause",
+        "PCOS",
+        "Metabolic syndrome",
+        "Female reproductive health"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "TUNG CHAO PLUS 1",
+        "LANA",
+        "ANGERA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "AMPUR",
+      "name": "Ampur",
+      "category": "Mitochondrial-Repair Core",
+      "primary_function": "สนับสนุน mitochondrial function และ tissue repair",
+      "mechanisms": [
+        "ฟื้น ATP production",
+        "ควบคุม mitophagy",
+        "สนับสนุน mitochondrial biogenesis",
+        "ฟื้น tissue regeneration"
+      ],
+      "primary_axes": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        24,
+        25,
+        26
+      ],
+      "primary_networks": [
+        28,
+        29,
+        30,
+        31,
+        67,
+        68,
+        69,
+        75,
+        76,
+        77,
+        78
+      ],
+      "clinical_indications": [
+        "Chronic fatigue",
+        "Neurodegeneration",
+        "Mitochondrial dysfunction",
+        "Aging"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "DB1",
+        "VITALPLUS",
+        "RADICA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "RADICA",
+      "name": "Radica",
+      "category": "Redox-Genomic Core",
+      "primary_function": "สนับสนุน redox balance และ genomic stability",
+      "mechanisms": [
+        "ควบคุม oxidative stress",
+        "สนับสนุน antioxidant defense",
+        "ฟื้น DNA repair",
+        "ควบคุม senescence"
+      ],
+      "primary_axes": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "primary_networks": [
+        13,
+        14,
+        15,
+        16,
+        47,
+        48,
+        49,
+        50,
+        64,
+        65,
+        66
+      ],
+      "clinical_indications": [
+        "Oxidative stress",
+        "Aging",
+        "Neurodegeneration",
+        "Cancer prevention"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "AMPUR",
+        "LIVOXY",
+        "VITALPLUS"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "LIVOXY",
+      "name": "Livoxy",
+      "category": "Redox-Hepatic Core",
+      "primary_function": "สนับสนุน redox balance และ liver health",
+      "mechanisms": [
+        "ควบคุม oxidative stress",
+        "สนับสนุน liver detoxification",
+        "ฟื้น liver repair",
+        "ควบคุม inflammation"
+      ],
+      "primary_axes": [
+        9,
+        10,
+        15,
+        16,
+        24,
+        25,
+        26,
+        27
+      ],
+      "primary_networks": [
+        13,
+        14,
+        15,
+        16,
+        33,
+        34,
+        35,
+        121,
+        122,
+        123,
+        124
+      ],
+      "clinical_indications": [
+        "NAFLD",
+        "NASH",
+        "Oxidative stress",
+        "Liver inflammation"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "RADICA",
+        "HEPA1",
+        "HEPA2",
+        "HEPA3"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BUMINMAX",
+      "name": "Buminmax",
+      "category": "Musculoskeletal-Repair Core",
+      "primary_function": "สนับสนุน musculoskeletal health และ repair",
+      "mechanisms": [
+        "ฟื้น muscle protein synthesis",
+        "สนับสนุน bone remodeling",
+        "ควบคุม connective tissue integrity",
+        "ฟื้น tissue regeneration"
+      ],
+      "primary_axes": [
+        28,
+        29,
+        30
+      ],
+      "primary_networks": [
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147
+      ],
+      "clinical_indications": [
+        "Sarcopenia",
+        "Osteoporosis",
+        "Muscle wasting",
+        "Joint degeneration"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "AMPUR",
+        "ZAMINZYME",
+        "VITALPLUS"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BLOOD_NOURISHING",
+      "name": "Blood Nourishing",
+      "category": "Hematology Core",
+      "primary_function": "สนับสนุน hematopoiesis และ blood health",
+      "mechanisms": [
+        "สนับสนุน erythropoiesis",
+        "ฟื้น hemoglobin synthesis",
+        "ควบคุม iron metabolism",
+        "สนับสนุน leukopoiesis"
+      ],
+      "primary_axes": [
+        26,
+        27
+      ],
+      "primary_networks": [
+        164,
+        165,
+        166,
+        167
+      ],
+      "clinical_indications": [
+        "Anemia",
+        "Fatigue",
+        "Post-chemotherapy",
+        "Chronic disease"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "BUMINMAX",
+        "AMPUR"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "ZAMINZYME",
+      "name": "Zaminzyme",
+      "category": "Digestive-Enzyme Core",
+      "primary_function": "สนับสนุน digestive enzyme function",
+      "mechanisms": [
+        "สนับสนุน pancreatic enzyme",
+        "ฟื้น nutrient absorption",
+        "ควบคุม digestive inflammation",
+        "สนับสนุน microbiome health"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        131,
+        132,
+        133,
+        134,
+        135,
+        136
+      ],
+      "clinical_indications": [
+        "Malabsorption",
+        "Pancreatic insufficiency",
+        "Dyspepsia",
+        "IBS"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "RICEZOZYME",
+        "FLAXPRO",
+        "CINNARA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "RICEZOZYME",
+      "name": "Ricezozyme",
+      "category": "Digestive-Repair Core",
+      "primary_function": "สนับสนุน digestive repair และ microbiome health",
+      "mechanisms": [
+        "ฟื้น gut barrier",
+        "สนับสนุน SCFA production",
+        "ควบคุม gut inflammation",
+        "ฟื้น mucosal integrity"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        19,
+        24,
+        25
+      ],
+      "primary_networks": [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        75,
+        76,
+        77
+      ],
+      "clinical_indications": [
+        "IBD",
+        "Gut dysbiosis",
+        "Leaky gut",
+        "Food allergy"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "ZAMINZYME",
+        "FLAXPRO",
+        "CINNARA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "FLAXPRO",
+      "name": "Flaxpro",
+      "category": "Digestive-Inflammatory Core",
+      "primary_function": "สนับสนุน digestive health และควบคุม inflammation",
+      "mechanisms": [
+        "สนับสนุน SCFA production",
+        "ควบคุม gut inflammation",
+        "ฟื้น mucosal barrier",
+        "สนับสนุน microbiome diversity"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "clinical_indications": [
+        "IBD",
+        "Gut dysbiosis",
+        "Chronic inflammation",
+        "Constipation"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "ZAMINZYME",
+        "RICEZOZYME",
+        "CINNARA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "PSYLAZA",
+      "name": "Psylaza",
+      "category": "Neuro-Stress Core",
+      "primary_function": "สนับสนุน neuro-stress regulation",
+      "mechanisms": [
+        "ควบคุม HPA axis",
+        "ปรับ autonomic balance",
+        "สนับสนุน neuroinflammation control",
+        "ฟื้น sleep architecture"
+      ],
+      "primary_axes": [
+        34,
+        39
+      ],
+      "primary_networks": [
+        101,
+        102,
+        104,
+        105,
+        109,
+        110,
+        111,
+        112,
+        113
+      ],
+      "clinical_indications": [
+        "Chronic stress",
+        "Sleep disorder",
+        "Anxiety",
+        "Neurodegeneration"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "BOVA",
+        "VETCHAKORN No.6",
+        "SANGVICHAI"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "VETCHAKORN_No6",
+      "name": "Vetchakorn No.6",
+      "category": "Neuro-Metabolic Core",
+      "primary_function": "สนับสนุน neuro-metabolic integration",
+      "mechanisms": [
+        "ควบคุม HPA axis",
+        "ฟื้น metabolic function",
+        "สนับสนุน neuroinflammation control",
+        "ฟื้น cognitive function"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        8,
+        34,
+        39
+      ],
+      "primary_networks": [
+        17,
+        18,
+        19,
+        28,
+        29,
+        104,
+        111,
+        112,
+        113,
+        114
+      ],
+      "clinical_indications": [
+        "Chronic stress",
+        "Metabolic syndrome",
+        "Neurodegeneration",
+        "Cognitive decline"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "BOVA",
+        "SANGVICHAI",
+        "PSYLAZA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "SANGVICHAI",
+      "name": "Sangvichai",
+      "category": "Cardiovascular-Repair Core",
+      "primary_function": "สนับสนุน cardiovascular repair และ health",
+      "mechanisms": [
+        "ควบคุม vascular inflammation",
+        "ฟื้น endothelial function",
+        "สนับสนุน NO signaling",
+        "ฟื้น cardiac function"
+      ],
+      "primary_axes": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "primary_networks": [
+        81,
+        82,
+        83,
+        86,
+        87,
+        88,
+        89,
+        90,
+        94,
+        95,
+        96
+      ],
+      "clinical_indications": [
+        "CVD",
+        "Hypertension",
+        "Endothelial dysfunction",
+        "Cardiac repair"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "HP1",
+        "BOVA",
+        "TUNG CHAO PLUS 1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "STOMMA",
+      "name": "Stomma",
+      "category": "Digestive-Gastric Core",
+      "primary_function": "สนับสนุน gastric health และ digestive function",
+      "mechanisms": [
+        "ควบคุม gastric acid",
+        "ฟื้น gastric mucosal barrier",
+        "สนับสนุน digestive enzyme",
+        "ลด gastric inflammation"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        131,
+        132,
+        133,
+        136
+      ],
+      "clinical_indications": [
+        "Gastritis",
+        "Dyspepsia",
+        "GERD",
+        "Peptic ulcer"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "CINNARA",
+        "KURMA",
+        "DB1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "KURMA",
+      "name": "Kurma",
+      "category": "Digestive-Intestinal Core",
+      "primary_function": "สนับสนุน intestinal health และ motility",
+      "mechanisms": [
+        "ควบคุม intestinal motility",
+        "ฟื้น mucosal barrier",
+        "สนับสนุน microbiome",
+        "ลด intestinal inflammation"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        131
+      ],
+      "clinical_indications": [
+        "IBS",
+        "Constipation",
+        "IBD",
+        "Intestinal inflammation"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "CINNARA",
+        "STOMMA",
+        "DB1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "NARIS",
+      "name": "Naris",
+      "category": "Musculoskeletal-Joint Core",
+      "primary_function": "สนับสนุน joint health และ musculoskeletal repair",
+      "mechanisms": [
+        "ฟื้น cartilage matrix",
+        "ควบคุม joint inflammation",
+        "สนับสนุน collagen synthesis",
+        "ลด joint pain"
+      ],
+      "primary_axes": [
+        28,
+        29,
+        30
+      ],
+      "primary_networks": [
+        145,
+        146,
+        147,
+        148
+      ],
+      "clinical_indications": [
+        "Osteoarthritis",
+        "Joint pain",
+        "Cartilage degeneration",
+        "Tendinopathy"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "TARANA",
+        "DERRIS SCANDANS",
+        "BUMINMAX"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "TARANA",
+      "name": "Tarana",
+      "category": "Digestive-Metabolic Core",
+      "primary_function": "สนับสนุน digestive-metabolic integration",
+      "mechanisms": [
+        "ฟื้น microbiome",
+        "สนับสนุน gut barrier",
+        "ควบคุม metabolic inflammation",
+        "ปรับ nutrient absorption"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        33,
+        34,
+        37,
+        38,
+        39,
+        40,
+        131,
+        132
+      ],
+      "clinical_indications": [
+        "Metabolic syndrome",
+        "Gut dysbiosis",
+        "Malabsorption",
+        "Chronic inflammation"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "DB1",
+        "CINNARA",
+        "VATTHANOTHAI"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BUTEA_SUPERBA",
+      "name": "Butea Superba",
+      "category": "Reproductive-Metabolic Core",
+      "primary_function": "สนับสนุน male reproductive function และ metabolic health",
+      "mechanisms": [
+        "สนับสนุน testosterone production",
+        "ปรับ sexual function",
+        "ควบคุม metabolic health",
+        "สนับสนุน muscle mass"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        7,
+        8,
+        32
+      ],
+      "primary_networks": [
+        17,
+        18,
+        19,
+        21,
+        22,
+        174,
+        175
+      ],
+      "clinical_indications": [
+        "Andropause",
+        "Sexual dysfunction",
+        "Metabolic syndrome",
+        "Sarcopenia"
+      ],
+      "contraindications": [
+        "Prostate cancer",
+        "Hormone-sensitive cancer"
+      ],
+      "synergy_with": [
+        "TOPAZ",
+        "TUNG CHAO PLUS 1",
+        "VITALPLUS"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "LANA",
+      "name": "Lana",
+      "category": "Reproductive-Female Core",
+      "primary_function": "สนับสนุน female reproductive health และ hormone balance",
+      "mechanisms": [
+        "ปรับ estrogen-progesterone balance",
+        "สนับสนุน menstrual health",
+        "ควบคุม menopause symptoms",
+        "ฟื้น reproductive function"
+      ],
+      "primary_axes": [
+        31,
+        32
+      ],
+      "primary_networks": [
+        172,
+        173
+      ],
+      "clinical_indications": [
+        "Menopause",
+        "PCOS",
+        "Menstrual disorder",
+        "Hormone imbalance"
+      ],
+      "contraindications": [
+        "Hormone-sensitive cancer"
+      ],
+      "synergy_with": [
+        "ANGERA",
+        "TUNG CHAO PLUS 2",
+        "FEMOON"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "ANGERA",
+      "name": "Angera",
+      "category": "Reproductive-Female Core",
+      "primary_function": "สนับสนุน female reproductive health และ uterine function",
+      "mechanisms": [
+        "ฟื้น uterine health",
+        "ควบคุม menstrual cycle",
+        "สนับสนุน fertility",
+        "ลด pelvic inflammation"
+      ],
+      "primary_axes": [
+        31,
+        32
+      ],
+      "primary_networks": [
+        172,
+        173
+      ],
+      "clinical_indications": [
+        "Uterine fibroids",
+        "Endometriosis",
+        "Menstrual disorder",
+        "Infertility"
+      ],
+      "contraindications": [
+        "Pregnancy",
+        "Hormone-sensitive cancer"
+      ],
+      "synergy_with": [
+        "LANA",
+        "TUNG CHAO PLUS 2",
+        "UTERUS"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "TOPAZ",
+      "name": "Topaz",
+      "category": "Reproductive-Male Core",
+      "primary_function": "สนับสนุน male reproductive health และ prostate function",
+      "mechanisms": [
+        "สนับสนุน prostate health",
+        "ควบคุม testosterone metabolism",
+        "ฟื้น sexual function",
+        "ลด prostate inflammation"
+      ],
+      "primary_axes": [
+        32,
+        33
+      ],
+      "primary_networks": [
+        174,
+        175
+      ],
+      "clinical_indications": [
+        "Prostate health",
+        "Andropause",
+        "Sexual dysfunction",
+        "Urinary health"
+      ],
+      "contraindications": [
+        "Prostate cancer"
+      ],
+      "synergy_with": [
+        "BUTEA SUPERBA",
+        "TUNG CHAO PLUS 1",
+        "VITALPLUS"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BENJAKUL",
+      "name": "Benjakul",
+      "category": "Multi-System Core",
+      "primary_function": "multi-system support และ metabolic regulation",
+      "mechanisms": [
+        "ควบคุม inflammation",
+        "ปรับ metabolic function",
+        "สนับสนุน immune health",
+        "ฟื้น cellular function"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        5,
+        6,
+        7,
+        8,
+        9,
+        39
+      ],
+      "primary_networks": [
+        1,
+        2,
+        4,
+        17,
+        18,
+        19,
+        21,
+        22,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "clinical_indications": [
+        "Metabolic syndrome",
+        "Chronic inflammation",
+        "General health maintenance",
+        "Aging"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "DB1",
+        "BOVA",
+        "VATTHANOTHAI"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "VITALPLUS",
+      "name": "Vitalplus",
+      "category": "Multi-System Support Core",
+      "primary_function": "multi-system support และ vitality enhancement",
+      "mechanisms": [
+        "สนับสนุน mitochondrial function",
+        "ควบคุม inflammation",
+        "ฟื้น cellular health",
+        "สนับสนุน energy production"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        5,
+        6,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14
+      ],
+      "primary_networks": [
+        13,
+        14,
+        15,
+        16,
+        28,
+        29,
+        30,
+        47,
+        48,
+        49,
+        50,
+        61,
+        62,
+        63
+      ],
+      "clinical_indications": [
+        "Chronic fatigue",
+        "Aging",
+        "General health maintenance",
+        "Recovery"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "AMPUR",
+        "RADICA",
+        "DB1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "VITALIS",
+      "name": "Vitalis",
+      "category": "Multi-System Repair Core",
+      "primary_function": "multi-system repair และ regeneration",
+      "mechanisms": [
+        "สนับสนุน tissue repair",
+        "ควบคุม inflammation",
+        "ฟื้น cellular regeneration",
+        "สนับสนุน healing"
+      ],
+      "primary_axes": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        24,
+        25,
+        26
+      ],
+      "primary_networks": [
+        28,
+        29,
+        30,
+        67,
+        68,
+        69,
+        70,
+        75,
+        76,
+        77,
+        78
+      ],
+      "clinical_indications": [
+        "Tissue injury",
+        "Post-surgery recovery",
+        "Chronic disease",
+        "Aging"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "AMPUR",
+        "PLUMAX",
+        "BUMINMAX"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "FEVA",
+      "name": "Feva",
+      "category": "Immune-Antiviral Core",
+      "primary_function": "สนับสนุน antiviral defense และ immune function",
+      "mechanisms": [
+        "เสริม interferon response",
+        "สนับสนุน antiviral immunity",
+        "ควบคุม viral replication",
+        "ฟื้น immune function"
+      ],
+      "primary_axes": [
+        3,
+        4,
+        11
+      ],
+      "primary_networks": [
+        11,
+        12
+      ],
+      "clinical_indications": [
+        "Viral infection",
+        "Post-viral syndrome",
+        "Influenza",
+        "COVID-19"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "KS",
+        "KERRA",
+        "MINOZA",
+        "VARIZ"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "SINAZA",
+      "name": "Sinaza",
+      "category": "Immune-Respiratory Core",
+      "primary_function": "สนับสนุน immune-respiratory health",
+      "mechanisms": [
+        "สนับสนุน respiratory immunity",
+        "ควบคุม airway inflammation",
+        "ฟื้น mucosal defense",
+        "ลด respiratory infection"
+      ],
+      "primary_axes": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "primary_networks": [
+        11,
+        12,
+        138,
+        139
+      ],
+      "clinical_indications": [
+        "Respiratory infection",
+        "Asthma",
+        "COPD",
+        "Allergy"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "VARIZ",
+        "KERRA",
+        "MINOZA",
+        "PLUMAX"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "MORMORDICA",
+      "name": "Mormordica",
+      "category": "Metabolic-Glucose Core",
+      "primary_function": "สนับสนุน glucose metabolism และ insulin sensitivity",
+      "mechanisms": [
+        "ปรับ insulin sensitivity",
+        "ควบคุม glucose metabolism",
+        "สนับสนุน beta-cell function",
+        "ลด glycemic load"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        7
+      ],
+      "primary_networks": [
+        17,
+        18,
+        19,
+        20
+      ],
+      "clinical_indications": [
+        "Type 2 diabetes",
+        "Metabolic syndrome",
+        "Insulin resistance",
+        "Pre-diabetes"
+      ],
+      "contraindications": [
+        "Hypoglycemia"
+      ],
+      "synergy_with": [
+        "DB1",
+        "VATTHANOTHAI",
+        "BOVA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "CHATHARIC",
+      "name": "Chatharic",
+      "category": "Digestive-Detox Core",
+      "primary_function": "สนับสนุน digestive detoxification และ colon health",
+      "mechanisms": [
+        "สนับสนุน colon cleansing",
+        "ฟื้น microbiome",
+        "ลด toxin burden",
+        "สนับสนุน bowel movement"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "clinical_indications": [
+        "Constipation",
+        "Toxin overload",
+        "Colon health",
+        "Detoxification"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "LYPHOLAX",
+        "LAXORIM",
+        "BELAX"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "LYPHOLAX",
+      "name": "Lypholax",
+      "category": "Digestive-Colon Core",
+      "primary_function": "สนับสนุน colon function และ bowel regularity",
+      "mechanisms": [
+        "สนับสนุน bowel movement",
+        "ฟื้น colon health",
+        "ลด constipation",
+        "สนับสนุน detoxification"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "clinical_indications": [
+        "Constipation",
+        "Bowel irregularity",
+        "Colon health",
+        "Detoxification"
+      ],
+      "contraindications": [
+        "Intestinal obstruction"
+      ],
+      "synergy_with": [
+        "CHATHARIC",
+        "LAXORIM",
+        "BELAX"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "LAXORIM",
+      "name": "Laxorim",
+      "category": "Digestive-Colon Core",
+      "primary_function": "สนับสนุน colon motility และ bowel elimination",
+      "mechanisms": [
+        "สนับสนุน colon motility",
+        "ฟื้น bowel elimination",
+        "ลด constipation",
+        "สนับสนุน detoxification"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "clinical_indications": [
+        "Chronic constipation",
+        "Bowel elimination",
+        "Colon health"
+      ],
+      "contraindications": [
+        "Intestinal obstruction"
+      ],
+      "synergy_with": [
+        "CHATHARIC",
+        "LYPHOLAX",
+        "BELAX"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BELAX",
+      "name": "Belax",
+      "category": "Digestive-Colon Core",
+      "primary_function": "สนับสนุน colon health และ bowel function",
+      "mechanisms": [
+        "สนับสนุน bowel movement",
+        "ฟื้น colon microbiome",
+        "ลด inflammation",
+        "สนับสนุน detoxification"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "clinical_indications": [
+        "Constipation",
+        "Bowel dysfunction",
+        "Colon health",
+        "Detoxification"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "CHATHARIC",
+        "LYPHOLAX",
+        "LAXORIM"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "RENAX",
+      "name": "Renax",
+      "category": "Renal-Repair Core",
+      "primary_function": "สนับสนุน renal health และ repair",
+      "mechanisms": [
+        "สนับสนุน renal filtration",
+        "ควบคุม renal inflammation",
+        "ฟื้น renal repair",
+        "ลด uremic toxin"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        23,
+        24,
+        27,
+        28
+      ],
+      "primary_networks": [
+        126,
+        127,
+        128,
+        129,
+        130
+      ],
+      "clinical_indications": [
+        "CKD",
+        "Renal repair",
+        "Uremic toxin",
+        "Renal inflammation"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "KD",
+        "HEPA1",
+        "HEPA2"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "REDCAL",
+      "name": "Redcal",
+      "category": "Bone-Mineral Core",
+      "primary_function": "สนับสนุน bone health และ mineral balance",
+      "mechanisms": [
+        "สนับสนุน bone mineralization",
+        "ควบคุม calcium metabolism",
+        "ฟื้น bone density",
+        "สนับสนุน vitamin D"
+      ],
+      "primary_axes": [
+        29,
+        30
+      ],
+      "primary_networks": [
+        143,
+        144
+      ],
+      "clinical_indications": [
+        "Osteoporosis",
+        "Bone health",
+        "Calcium deficiency",
+        "Vitamin D deficiency"
+      ],
+      "contraindications": [
+        "Hypercalcemia"
+      ],
+      "synergy_with": [
+        "BONAX",
+        "BUMINMAX",
+        "VITALPLUS"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BONAX",
+      "name": "Bonax",
+      "category": "Bone-Repair Core",
+      "primary_function": "สนับสนุน bone repair และ regeneration",
+      "mechanisms": [
+        "สนับสนุน bone formation",
+        "ควบคุม bone resorption",
+        "ฟื้น bone density",
+        "สนับสนุน bone repair"
+      ],
+      "primary_axes": [
+        29,
+        30
+      ],
+      "primary_networks": [
+        143,
+        144
+      ],
+      "clinical_indications": [
+        "Osteoporosis",
+        "Bone fracture",
+        "Bone repair",
+        "Bone health"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "REDCAL",
+        "BUMINMAX",
+        "VITALPLUS"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "DERRIS_SCANDANS",
+      "name": "Derris Scandans",
+      "category": "Musculoskeletal-Joint Core",
+      "primary_function": "สนับสนุน joint health และ connective tissue",
+      "mechanisms": [
+        "สนับสนุน joint integrity",
+        "ควบคุม connective tissue",
+        "ฟื้น cartilage health",
+        "ลด joint inflammation"
+      ],
+      "primary_axes": [
+        28,
+        29,
+        30
+      ],
+      "primary_networks": [
+        145,
+        146,
+        147,
+        148
+      ],
+      "clinical_indications": [
+        "Osteoarthritis",
+        "Joint pain",
+        "Connective tissue",
+        "Tendon health"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "NARIS",
+        "TARANA",
+        "BUMINMAX"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BRANARA",
+      "name": "Branara",
+      "category": "Neuro-Cognitive Core",
+      "primary_function": "สนับสนุน cognitive function และ brain health",
+      "mechanisms": [
+        "สนับสนุน cognitive function",
+        "ควบคุม neuroinflammation",
+        "ฟื้น synaptic plasticity",
+        "สนับสนุน memory"
+      ],
+      "primary_axes": [
+        34,
+        39
+      ],
+      "primary_networks": [
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117
+      ],
+      "clinical_indications": [
+        "Cognitive decline",
+        "Memory loss",
+        "Neurodegeneration",
+        "Brain health"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "BOVA",
+        "PSYLAZA",
+        "VETCHAKORN No.6"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "FOCUZ",
+      "name": "Focuz",
+      "category": "Neuro-Ocular Core",
+      "primary_function": "สนับสนุน ocular health และ vision",
+      "mechanisms": [
+        "สนับสนุน retinal health",
+        "ควบคุม ocular inflammation",
+        "ฟื้น vision",
+        "สนับสนุน optic nerve"
+      ],
+      "primary_axes": [
+        34,
+        35
+      ],
+      "primary_networks": [
+        168,
+        169
+      ],
+      "clinical_indications": [
+        "Vision decline",
+        "Retinal degeneration",
+        "Ocular inflammation",
+        "Eye health"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "KERRA",
+        "SINAZA",
+        "MINOZA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "DIURETICS",
+      "name": "Diuretics",
+      "category": "Renal-Urinary Core",
+      "primary_function": "สนับสนุน urinary health และ fluid balance",
+      "mechanisms": [
+        "สนับสนุน urinary flow",
+        "ควบคุม fluid balance",
+        "ฟื้น urinary health",
+        "ลด urinary tract inflammation"
+      ],
+      "primary_axes": [
+        23,
+        24,
+        25
+      ],
+      "primary_networks": [
+        126,
+        127,
+        128,
+        129
+      ],
+      "clinical_indications": [
+        "Urinary health",
+        "Fluid retention",
+        "Urinary tract infection",
+        "Kidney health"
+      ],
+      "contraindications": [
+        "Dehydration",
+        "Electrolyte imbalance"
+      ],
+      "synergy_with": [
+        "URANA",
+        "URANA2",
+        "KD"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "URANA",
+      "name": "Urana",
+      "category": "Renal-Urinary Core",
+      "primary_function": "สนับสนุน urinary health และ detoxification",
+      "mechanisms": [
+        "สนับสนุน urinary detoxification",
+        "ควบคุม urinary inflammation",
+        "ฟื้น urinary health",
+        "ลด uric acid"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        23,
+        24,
+        25
+      ],
+      "primary_networks": [
+        126,
+        127,
+        128,
+        129
+      ],
+      "clinical_indications": [
+        "Uric acid",
+        "Urinary health",
+        "Kidney health",
+        "Detoxification"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "URANA2",
+        "DIURETICS",
+        "KD"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "URANA2",
+      "name": "Urana2",
+      "category": "Renal-Urinary Core",
+      "primary_function": "สนับสนุน uric acid metabolism และ urinary health",
+      "mechanisms": [
+        "ควบคุม uric acid metabolism",
+        "สนับสนุน urinary health",
+        "ฟื้น urinary detoxification",
+        "ลด urinary inflammation"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        23,
+        24,
+        25
+      ],
+      "primary_networks": [
+        126,
+        127,
+        128,
+        129
+      ],
+      "clinical_indications": [
+        "Gout",
+        "Uric acid",
+        "Urinary health",
+        "Kidney health"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "URANA",
+        "DIURETICS",
+        "KD"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "IVORA_LUCE",
+      "name": "Ivora Luce",
+      "category": "Reproductive-Female Core",
+      "primary_function": "สนับสนุน female reproductive health และ hormone balance",
+      "mechanisms": [
+        "ปรับ hormone balance",
+        "สนับสนุน reproductive health",
+        "ฟื้น uterine health",
+        "ควบคุม menstrual cycle"
+      ],
+      "primary_axes": [
+        31,
+        32
+      ],
+      "primary_networks": [
+        172,
+        173
+      ],
+      "clinical_indications": [
+        "Hormone imbalance",
+        "Menstrual disorder",
+        "Reproductive health",
+        "Menopause"
+      ],
+      "contraindications": [
+        "Pregnancy",
+        "Hormone-sensitive cancer"
+      ],
+      "synergy_with": [
+        "LANA",
+        "ANGERA",
+        "TUNG CHAO PLUS 2"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "FEMOON",
+      "name": "Femoon",
+      "category": "Reproductive-Female Core",
+      "primary_function": "สนับสนุน female reproductive health และ fertility",
+      "mechanisms": [
+        "สนับสนุน fertility",
+        "ฟื้น reproductive health",
+        "ควบคุม menstrual cycle",
+        "ปรับ hormone balance"
+      ],
+      "primary_axes": [
+        31,
+        32
+      ],
+      "primary_networks": [
+        172,
+        173
+      ],
+      "clinical_indications": [
+        "Fertility support",
+        "PCOS",
+        "Menstrual disorder",
+        "Reproductive health"
+      ],
+      "contraindications": [
+        "Pregnancy"
+      ],
+      "synergy_with": [
+        "LANA",
+        "ANGERA",
+        "TUNG CHAO PLUS 2"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "UTERUS",
+      "name": "Uterus",
+      "category": "Reproductive-Female Core",
+      "primary_function": "สนับสนุน uterine health และ reproductive function",
+      "mechanisms": [
+        "ฟื้น uterine health",
+        "ควบคุม uterine inflammation",
+        "สนับสนุน reproductive function",
+        "ปรับ hormone balance"
+      ],
+      "primary_axes": [
+        31,
+        32
+      ],
+      "primary_networks": [
+        172,
+        173
+      ],
+      "clinical_indications": [
+        "Uterine health",
+        "Endometriosis",
+        "Uterine fibroids",
+        "Reproductive health"
+      ],
+      "contraindications": [
+        "Pregnancy"
+      ],
+      "synergy_with": [
+        "ANGERA",
+        "LANA",
+        "TUNG CHAO PLUS 2"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "ABSORN",
+      "name": "Absorn",
+      "category": "Reproductive-Female Core",
+      "primary_function": "สนับสนุน female reproductive health และ nutrient absorption",
+      "mechanisms": [
+        "สนับสนุน nutrient absorption",
+        "ฟื้น reproductive health",
+        "ควบคุม hormone balance",
+        "สนับสนุน fertility"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        31,
+        32
+      ],
+      "primary_networks": [
+        132,
+        172,
+        173
+      ],
+      "clinical_indications": [
+        "Malabsorption",
+        "Reproductive health",
+        "Fertility support",
+        "Hormone balance"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "LANA",
+        "ZAMINZYME",
+        "RICEZOZYME"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "AVA",
+      "name": "Ava",
+      "category": "Reproductive-Female Core",
+      "primary_function": "สนับสนุน female reproductive health และ hormonal balance",
+      "mechanisms": [
+        "ปรับ hormone balance",
+        "สนับสนุน reproductive health",
+        "ฟื้น menstrual health",
+        "ควบคุม menopause symptoms"
+      ],
+      "primary_axes": [
+        31,
+        32
+      ],
+      "primary_networks": [
+        172,
+        173
+      ],
+      "clinical_indications": [
+        "Menopause",
+        "Hormone imbalance",
+        "Menstrual disorder",
+        "Reproductive health"
+      ],
+      "contraindications": [
+        "Pregnancy",
+        "Hormone-sensitive cancer"
+      ],
+      "synergy_with": [
+        "LANA",
+        "ANGERA",
+        "TUNG CHAO PLUS 2"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "REVITA",
+      "name": "Revita",
+      "category": "Reproductive-Female Core",
+      "primary_function": "สนับสนุน lactation และ postpartum health",
+      "mechanisms": [
+        "สนับสนุน lactation",
+        "ฟื้น postpartum health",
+        "ควบคุม hormone balance",
+        "สนับสนุน uterine recovery"
+      ],
+      "primary_axes": [
+        31,
+        32
+      ],
+      "primary_networks": [
+        172,
+        173
+      ],
+      "clinical_indications": [
+        "Lactation support",
+        "Postpartum recovery",
+        "Hormone balance",
+        "Uterine health"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "LANA",
+        "ANGERA",
+        "BLOOD NOURISHING"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "KERRIX_PLUS",
+      "name": "Kerrix Plus",
+      "category": "Immune-Oncology Core",
+      "primary_function": "สนับสนุน immune-oncology function",
+      "mechanisms": [
+        "สนับสนุน immune surveillance",
+        "ควบคุม tumor microenvironment",
+        "ฟื้น immune function",
+        "สนับสนุน anti-cancer immunity"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        36,
+        37,
+        38,
+        39
+      ],
+      "primary_networks": [
+        6,
+        7,
+        8,
+        155,
+        156,
+        157,
+        158
+      ],
+      "clinical_indications": [
+        "Cancer support",
+        "Immune recovery",
+        "Post-chemotherapy",
+        "Oncology"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "UMX",
+        "PLUMAX",
+        "RESHIMUNO",
+        "BETA X"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "UMX",
+      "name": "UMX",
+      "category": "Oncology-Metabolic Core",
+      "primary_function": "สนับสนุน oncology-metabolic function",
+      "mechanisms": [
+        "ควบคุม cancer metabolism",
+        "สนับสนุน immune function",
+        "ฟื้น cellular health",
+        "ลด tumor inflammation"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        8,
+        36,
+        37,
+        38,
+        39
+      ],
+      "primary_networks": [
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160
+      ],
+      "clinical_indications": [
+        "Cancer support",
+        "Metabolic support",
+        "Oncology",
+        "Immune recovery"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "KERRIX PLUS",
+        "PLUMAX",
+        "BETA X"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BETA_X",
+      "name": "Beta X",
+      "category": "Oncology-Immune Core",
+      "primary_function": "สนับสนุน oncology-immune function",
+      "mechanisms": [
+        "สนับสนุน immune surveillance",
+        "ควบคุม tumor progression",
+        "ฟื้น immune function",
+        "สนับสนุน anti-cancer immunity"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        36,
+        37,
+        38,
+        39
+      ],
+      "primary_networks": [
+        6,
+        7,
+        8,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160
+      ],
+      "clinical_indications": [
+        "Cancer support",
+        "Immune therapy",
+        "Oncology",
+        "Post-chemotherapy recovery"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "MERDANA",
+        "PLUMAX",
+        "RESHIMUNO",
+        "KERRIX PLUS"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "MERDANA",
+      "name": "Merdana",
+      "category": "Oncology-Immune Core",
+      "primary_function": "สนับสนุน oncology-immune-metabolic function",
+      "mechanisms": [
+        "สนับสนุน immune surveillance",
+        "ควบคุม tumor metabolism",
+        "ฟื้น immune function",
+        "สนับสนุน anti-cancer immunity"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        5,
+        6,
+        8,
+        36,
+        37,
+        38,
+        39
+      ],
+      "primary_networks": [
+        6,
+        7,
+        8,
+        17,
+        18,
+        19,
+        28,
+        29,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160
+      ],
+      "clinical_indications": [
+        "Cancer support",
+        "Metabolic support",
+        "Immune recovery",
+        "Oncology"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "BETA X",
+        "PLUMAX",
+        "RESHIMUNO"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "RIDSEE",
+      "name": "Ridsee",
+      "category": "Digestive-Colon Core",
+      "primary_function": "สนับสนุน colon health และ hemorrhoid treatment",
+      "mechanisms": [
+        "สนับสนุน colon health",
+        "ควบคุม hemorrhoid inflammation",
+        "ฟื้น colon repair",
+        "ลด bleeding"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "clinical_indications": [
+        "Hemorrhoids",
+        "Colon health",
+        "Bleeding",
+        "Anal inflammation"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "RIZZO",
+        "RIZZ",
+        "KERRA",
+        "MINOZA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "RIZZO",
+      "name": "Rizzo",
+      "category": "Digestive-Colon Core",
+      "primary_function": "สนับสนุน colon health และ bowel function",
+      "mechanisms": [
+        "สนับสนุน bowel function",
+        "ควบคุม colon inflammation",
+        "ฟื้น colon health",
+        "สนับสนุน detoxification"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "clinical_indications": [
+        "Colon health",
+        "Bowel irregularity",
+        "Inflammation",
+        "Detoxification"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "RIDSEE",
+        "RIZZ",
+        "KERRA",
+        "MINOZA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "RIZZ",
+      "name": "Rizz",
+      "category": "Digestive-Colon Core",
+      "primary_function": "สนับสนุน colon health และ hemorrhoid treatment",
+      "mechanisms": [
+        "สนับสนุน colon health",
+        "ควบคุม hemorrhoid inflammation",
+        "ฟื้น colon repair",
+        "ลด anal discomfort"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "clinical_indications": [
+        "Hemorrhoids",
+        "Colon health",
+        "Anal inflammation",
+        "Bowel health"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "RIDSEE",
+        "RIZZO",
+        "KERRA",
+        "MINOZA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "VENTA",
+      "name": "Venta",
+      "category": "Digestive-Microbiome Core",
+      "primary_function": "สนับสนุน microbiome health และ digestive function",
+      "mechanisms": [
+        "ฟื้น microbiome diversity",
+        "สนับสนุน gut barrier",
+        "ควบคุม gut inflammation",
+        "สนับสนุน digestive health"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "clinical_indications": [
+        "Gut dysbiosis",
+        "IBD",
+        "Digestive health",
+        "Microbiome support"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "DB1",
+        "KERRA",
+        "MINOZA",
+        "IM9"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "XS",
+      "name": "XS",
+      "category": "Metabolic-Cardiovascular Core",
+      "primary_function": "สนับสนุน metabolic-cardiovascular health",
+      "mechanisms": [
+        "ควบคุม lipid metabolism",
+        "สนับสนุน vascular function",
+        "ปรับ metabolic health",
+        "ควบคุม inflammation"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        20,
+        21,
+        22,
+        23
+      ],
+      "primary_networks": [
+        17,
+        18,
+        19,
+        21,
+        22,
+        81,
+        82,
+        83,
+        86
+      ],
+      "clinical_indications": [
+        "Dyslipidemia",
+        "Metabolic syndrome",
+        "CVD",
+        "Vascular health"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "DB1",
+        "BOVA",
+        "VATTHANOTHAI"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "STREAM_PLUS",
+      "name": "Stream Plus",
+      "category": "Cardiovascular-Metabolic Core",
+      "primary_function": "สนับสนุน cardiovascular-metabolic health",
+      "mechanisms": [
+        "สนับสนุน vascular function",
+        "ควบคุม lipid metabolism",
+        "ปรับ blood flow",
+        "ควบคุม inflammation"
+      ],
+      "primary_axes": [
+        5,
+        6,
+        20,
+        21,
+        22,
+        23
+      ],
+      "primary_networks": [
+        17,
+        18,
+        19,
+        21,
+        22,
+        81,
+        82,
+        83,
+        86
+      ],
+      "clinical_indications": [
+        "Atherosclerosis",
+        "Metabolic syndrome",
+        "CVD",
+        "Vascular health"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "HP1",
+        "BOVA",
+        "VATTHANOTHAI"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "IM1",
+      "name": "IM1",
+      "category": "Immune-Inflammatory Core",
+      "primary_function": "ควบคุม acute inflammatory response",
+      "mechanisms": [
+        "ควบคุม acute inflammation",
+        "สนับสนุน immune function",
+        "ลด excessive inflammation",
+        "ฟื้น resolution"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "primary_networks": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "clinical_indications": [
+        "Acute inflammation",
+        "Infection",
+        "Immune support",
+        "Inflammatory flare"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "IM5",
+        "IM6",
+        "KERRA",
+        "MINOZA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "IM5",
+      "name": "IM5",
+      "category": "Immune-Inflammatory Core",
+      "primary_function": "สนับสนุน immune surveillance และ inflammation control",
+      "mechanisms": [
+        "สนับสนุน immune surveillance",
+        "ควบคุม inflammation",
+        "ฟื้น immune function",
+        "สนับสนุน resolution"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "primary_networks": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "clinical_indications": [
+        "Chronic inflammation",
+        "Immune support",
+        "Infection",
+        "Autoimmune disease"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "IM1",
+        "IM6",
+        "KERRA",
+        "MINOZA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "IM7",
+      "name": "IM7",
+      "category": "Immune-Metabolic Core",
+      "primary_function": "สนับสนุน immune-metabolic integration",
+      "mechanisms": [
+        "ควบคุม inflammation",
+        "สนับสนุน metabolic function",
+        "ฟื้น immune tolerance",
+        "ควบคุม redox balance"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        5,
+        6,
+        8,
+        9
+      ],
+      "primary_networks": [
+        1,
+        2,
+        4,
+        17,
+        18,
+        19,
+        21,
+        22,
+        28,
+        29
+      ],
+      "clinical_indications": [
+        "Metabolic syndrome",
+        "Chronic inflammation",
+        "Diabetes",
+        "Autoimmune disease"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "IM6",
+        "DB1",
+        "BETA M"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "IMO",
+      "name": "IMO",
+      "category": "Immune-Oncology Core",
+      "primary_function": "สนับสนุน immune-oncology function",
+      "mechanisms": [
+        "สนับสนุน immune surveillance",
+        "ควบคุม tumor microenvironment",
+        "ฟื้น immune function",
+        "สนับสนุน anti-cancer immunity"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        3,
+        36,
+        37,
+        38,
+        39
+      ],
+      "primary_networks": [
+        6,
+        7,
+        8,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158
+      ],
+      "clinical_indications": [
+        "Cancer support",
+        "Immune recovery",
+        "Oncology",
+        "Post-chemotherapy"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "IM1",
+        "PLUMAX",
+        "RESHIMUNO",
+        "BETA X"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BETA1",
+      "name": "Beta1",
+      "category": "Metabolic-Immune Core",
+      "primary_function": "สนับสนุน metabolic-immune function",
+      "mechanisms": [
+        "ควบคุม inflammation",
+        "สนับสนุน metabolic function",
+        "ฟื้น immune health",
+        "ควบคุม redox balance"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "primary_networks": [
+        1,
+        2,
+        4,
+        17,
+        18,
+        19,
+        21,
+        22,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "clinical_indications": [
+        "Metabolic syndrome",
+        "Chronic inflammation",
+        "Diabetes",
+        "Immune support"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "BETA M",
+        "BETA G",
+        "DB1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BETA4",
+      "name": "Beta4",
+      "category": "Multi-System Core",
+      "primary_function": "multi-system support",
+      "mechanisms": [
+        "ควบคุม inflammation",
+        "สนับสนุน metabolic function",
+        "ฟื้น immune health",
+        "สนับสนุน cellular function"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        5,
+        6,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14
+      ],
+      "primary_networks": [
+        1,
+        2,
+        4,
+        17,
+        18,
+        19,
+        21,
+        22,
+        28,
+        29,
+        47,
+        48,
+        49,
+        50
+      ],
+      "clinical_indications": [
+        "General health",
+        "Aging",
+        "Chronic inflammation",
+        "Metabolic syndrome"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "BETA M",
+        "BETA G",
+        "VITALPLUS"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "BETA5",
+      "name": "Beta5",
+      "category": "Multi-System Core",
+      "primary_function": "multi-system support และ repair",
+      "mechanisms": [
+        "สนับสนุน repair",
+        "ควบคุม inflammation",
+        "ฟื้น cellular function",
+        "สนับสนุน regeneration"
+      ],
+      "primary_axes": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        24,
+        25,
+        26
+      ],
+      "primary_networks": [
+        28,
+        29,
+        30,
+        67,
+        68,
+        69,
+        70,
+        75,
+        76,
+        77,
+        78
+      ],
+      "clinical_indications": [
+        "Tissue repair",
+        "Aging",
+        "Chronic disease",
+        "Regeneration"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "BETA4",
+        "AMPUR",
+        "PLUMAX"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "XM2",
+      "name": "XM2",
+      "category": "Multi-System Core",
+      "primary_function": "multi-system support และ metabolic regulation",
+      "mechanisms": [
+        "ควบคุม metabolism",
+        "สนับสนุน immune function",
+        "ฟื้น cellular health",
+        "ควบคุม inflammation"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "primary_networks": [
+        1,
+        2,
+        4,
+        17,
+        18,
+        19,
+        21,
+        22,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "clinical_indications": [
+        "Metabolic syndrome",
+        "Chronic inflammation",
+        "Immune support",
+        "General health"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "DB1",
+        "BOVA",
+        "BETA M"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "LIVITA",
+      "name": "Livita",
+      "category": "Hepatic-Detox Core",
+      "primary_function": "สนับสนุน liver detoxification และ repair",
+      "mechanisms": [
+        "สนับสนุน liver detoxification",
+        "ควบคุม hepatic inflammation",
+        "ฟื้น liver repair",
+        "ควบคุม toxin metabolism"
+      ],
+      "primary_axes": [
+        15,
+        16,
+        24,
+        25,
+        26,
+        27
+      ],
+      "primary_networks": [
+        33,
+        34,
+        35,
+        36,
+        121,
+        122,
+        123,
+        124
+      ],
+      "clinical_indications": [
+        "Liver toxicity",
+        "Alcohol toxicity",
+        "Drug-induced liver injury",
+        "Detoxification"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "HEPA1",
+        "HEPA2",
+        "HEPA3",
+        "KD"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "VITALPLUA",
+      "name": "Vitalplua",
+      "category": "Multi-System Support Core",
+      "primary_function": "multi-system support และ vitality",
+      "mechanisms": [
+        "สนับสนุน energy production",
+        "ควบคุม inflammation",
+        "ฟื้น cellular health",
+        "สนับสนุน immune function"
+      ],
+      "primary_axes": [
+        1,
+        2,
+        5,
+        6,
+        8,
+        9
+      ],
+      "primary_networks": [
+        13,
+        14,
+        15,
+        16,
+        28,
+        29,
+        30
+      ],
+      "clinical_indications": [
+        "Chronic fatigue",
+        "General health",
+        "Aging",
+        "Vitality support"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "VITALPLUS",
+        "AMPUR",
+        "DB1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "VITALCELL",
+      "name": "Vitalcell",
+      "category": "Cellular Health Core",
+      "primary_function": "สนับสนุน cellular health และ repair",
+      "mechanisms": [
+        "สนับสนุน cellular repair",
+        "ควบคุม inflammation",
+        "ฟื้น cellular function",
+        "สนับสนุน regeneration"
+      ],
+      "primary_axes": [
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "primary_networks": [
+        28,
+        29,
+        30,
+        47,
+        48,
+        49,
+        50,
+        67,
+        68,
+        69,
+        70
+      ],
+      "clinical_indications": [
+        "Cellular health",
+        "Aging",
+        "Repair",
+        "Regeneration"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "VITALPLUS",
+        "AMPUR",
+        "RADICA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "YA_TEEN_NOK",
+      "name": "Ya Teen Nok",
+      "category": "Neuro-Immune Core",
+      "primary_function": "สนับสนุน neuro-immune function",
+      "mechanisms": [
+        "ควบคุม neuroinflammation",
+        "สนับสนุน immune function",
+        "ฟื้น cognitive health",
+        "ควบคุม stress response"
+      ],
+      "primary_axes": [
+        34,
+        39
+      ],
+      "primary_networks": [
+        101,
+        102,
+        104,
+        105,
+        113,
+        114,
+        115
+      ],
+      "clinical_indications": [
+        "Neuroinflammation",
+        "Cognitive health",
+        "Stress",
+        "Immune support"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "BOVA",
+        "PSYLAZA",
+        "VETCHAKORN No.6"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "TUNG_CHAO_PLUS_SANCHI",
+      "name": "Tung Chao Plus Sanchi",
+      "category": "Cardiovascular-Repair Core",
+      "primary_function": "สนับสนุน cardiovascular repair และ health",
+      "mechanisms": [
+        "สนับสนุน cardiovascular function",
+        "ควบคุม vascular inflammation",
+        "ฟื้น vascular repair",
+        "สนับสนุน blood flow"
+      ],
+      "primary_axes": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "primary_networks": [
+        81,
+        82,
+        83,
+        86,
+        87,
+        88,
+        89,
+        90
+      ],
+      "clinical_indications": [
+        "CVD",
+        "Vascular repair",
+        "Hypertension",
+        "Atherosclerosis"
+      ],
+      "contraindications": [
+        "Bleeding disorder"
+      ],
+      "synergy_with": [
+        "TUNG CHAO PLUS 1",
+        "TUNG CHAO PLUS 2",
+        "HP1"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "KIMLUI_YELLOW_OIL",
+      "name": "Kimlui Yellow Oil",
+      "category": "Musculoskeletal-Topical Core",
+      "primary_function": "สนับสนุน musculoskeletal health และ pain relief",
+      "mechanisms": [
+        "ลด joint inflammation",
+        "สนับสนุน muscle relaxation",
+        "ฟื้น tissue repair",
+        "ลด pain"
+      ],
+      "primary_axes": [
+        28,
+        29,
+        30
+      ],
+      "primary_networks": [
+        145,
+        146,
+        147,
+        148
+      ],
+      "clinical_indications": [
+        "Joint pain",
+        "Muscle pain",
+        "Arthritis",
+        "Tendinopathy"
+      ],
+      "contraindications": [
+        "Skin irritation"
+      ],
+      "synergy_with": [
+        "NARIS",
+        "TARANA",
+        "DERRIS SCANDANS"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    },
+    {
+      "code": "SITTHAJORN",
+      "name": "Sitthajorn",
+      "category": "Digestive-Immune Core",
+      "primary_function": "สนับสนุน digestive-immune function",
+      "mechanisms": [
+        "ควบคุม gut inflammation",
+        "สนับสนุน immune function",
+        "ฟื้น digestive health",
+        "สนับสนุน microbiome"
+      ],
+      "primary_axes": [
+        16,
+        17,
+        18,
+        19
+      ],
+      "primary_networks": [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "clinical_indications": [
+        "IBS",
+        "IBD",
+        "Gut inflammation",
+        "Immune support"
+      ],
+      "contraindications": [],
+      "synergy_with": [
+        "CINNARA",
+        "KURMA",
+        "STOMMA"
+      ],
+      "antagonism_with": [],
+      "mapping_status": "PROVISIONAL"
+    }
+  ],
+  "training_pairs": [
+    {
+      "id": "TP_001",
+      "question": "ทฤษฎีเวชศาสตร์รากฐานคืออะไรและมีรากฐานมาจากอะไร",
+      "answer": "ทฤษฎีเวชศาสตร์รากฐานคือการปฏิวัติแนวคิดเพื่ออนาคตสุขภาพมนุษยชาติ โดยมีรากฐานมาจากพระคัมภีร์สมุฏฐานวินิจฉัยของแพทย์แผนไทย และผสานกับความก้าวหน้าทางชีววิทยา ชีวะเคมี และการแพทย์สมัยใหม่ เพื่ออธิบายกลไกเดิมด้วยภาษาวิทยาศาสตร์ร่วมสมัย มีหัวใจคือ 'กุญแจ 3 ดอก' และ 'บันได 9 ขั้น'"
+    },
+    {
+      "id": "TP_002",
+      "question": "อะไรคือปัญหาหลักของการแพทย์สมัยใหม่ตามทฤษฎีเวชศาสตร์รากฐาน",
+      "answer": "การแพทย์สมัยใหม่มีรากฐานจากแนวคิดแบบกลไกที่มองร่างกายเสมือนเครื่องจักร ทำให้การรักษาเน้นไปที่การกำจัดอาการและการแก้ไขปัญหาเฉพาะหน้า โดยใช้ยาเคมีและการผ่าตัดเป็นหลัก ส่งผลให้เกิดวัฏจักรของความเจ็บป่วยที่ไม่มีที่สิ้นสุด และสูญเสียมุมมององค์รวมของสุขภาพ"
+    },
+    {
+      "id": "TP_003",
+      "question": "กุญแจ 3 ดอกของทฤษฎีเวชศาสตร์รากฐานคืออะไรบ้างและมีความสัมพันธ์กับตรีธาตุสมุฏฐานอย่างไร",
+      "answer": "กุญแจ 3 ดอกประกอบด้วย: 1) Metabolic Energy - การแสดงออกของปิตตะในระดับชีวเคมี 2) Biological Dynamics - การแสดงออกของเสมหะในฐานะหลักการแห่งการยึดเหนี่ยวและการตั้งอยู่ 3) Biointegrity - การแสดงออกของวาตะในฐานะหลักการของการเคลื่อนไหว การสื่อสาร และการประสานระบบ โดยทั้งสามต้องสมดุลพร้อมกัน"
+    },
+    {
+      "id": "TP_004",
+      "question": "บันได 9 ขั้นของสุขภาวะคืออะไร และทำไมต้องเรียงลำดับแบบนั้น",
+      "answer": "บันได 9 ขั้นคือลำดับตรรกะในการฟื้นฟูระบบชีวภาพจากพื้นที่สุดสู่ระดับยีน: 1) Detoxification 2) Microbiome 3) Immune-Inflammatory 4) Redox 5) Mitochondrial 6) Autophagy 7) Genomic Stability 8) Genomic Regulation 9) Prakati โดยต้องเรียงลำดับนี้เพราะถ้ายังมี toxin overload อยู่ การแก้ไขชั้นบนจะไม่ติดผล และสารพิษยังรบกวน microbiome"
+    },
+    {
+      "id": "TP_005",
+      "question": "ตรีธาตุสมุฏฐานคืออะไรและเชื่อมโยงกับกุญแจ 3 ดอกอย่างไร",
+      "answer": "ตรีธาตุสมุฏฐานคือสามัญลักษณะพื้นฐานของสรรพสิ่ง: ปิตตะ (พลังงาน) วาตะ (การเคลื่อนไหว) และเสมหะ (การยึดเหนี่ยว) ซึ่งเชื่อมโยงกับกุญแจ 3 ดอกดังนี้: ปิตตะ → Metabolic Energy, วาตะ → Biointegrity, เสมหะ → Biological Dynamics"
+    },
+    {
+      "id": "TP_006",
+      "question": "Biological Dynamics หรือเสมหะมีความสำคัญอย่างไรในทฤษฎีเวชศาสตร์รากฐาน",
+      "answer": "Biological Dynamics หรือเสมหะคือรากฐานนิเวศของชีวิต ประกอบด้วย microbiome, เยื่อบุ, ECM และโครงสร้างร่างกายทั้งหมดที่คอยพยุงระบบอื่นให้ทำงาน เมื่อเสมหะเสียสมดุลจะเกิด microbiome พัง, gut barrier รั่ว, เยื่อบุเสื่อม, และความทนต่อสิ่งกระตุ้นของภูมิคุ้มกันหายไป นำไปสู่โรคอักเสบเรื้อรัง ภูมิแพ้ และภูมิคุ้มกันผิดปกติ"
+    },
+    {
+      "id": "TP_007",
+      "question": "Metabolic Energy หรือปิตตะเกี่ยวข้องกับโรคอะไรบ้าง",
+      "answer": "Metabolic Energy เกี่ยวข้องกับโรค metabolic syndrome, เบาหวาน, ภาวะอักเสบเรื้อรัง, ความเสื่อมของอวัยวะ, mitochondrial dysfunction, และโรคที่เกิดจากความผิดปกติของระบบพลังงานของร่างกาย เช่น chronic fatigue syndrome"
+    },
+    {
+      "id": "TP_008",
+      "question": "Biointegrity หรือวาตะคืออะไรและเกี่ยวข้องกับโรคอะไร",
+      "answer": "Biointegrity คือความสามารถของร่างกายในการดำรงอยู่เป็นองค์รวมเดียวกัน เป็นการประสานระบบต่างๆ ให้ทำงานร่วมกัน เมื่อเสียสมดุลจะเกิดโรคเครือข่าย เช่น อักเสบเรื้อรัง นอนไม่หลับ ภูมิแพ้ autoimmune ลำไส้รั่ว สมองล้า ปวดเรื้อรัง fibrosis metabolic syndrome และมะเร็ง"
+    },
+    {
+      "id": "TP_009",
+      "question": "ความสัมพันธ์ระหว่างกุญแจ 3 ดอกและบันได 9 ขั้นเป็นอย่างไร",
+      "answer": "กุญแจ 3 ดอกคือมิติที่ต้องมอง (ฐาน–ไฟ–จังหวะ) ส่วนบันได 9 ขั้นคือลำดับในการฟื้นฟูระบบชีวภาพจากล่างขึ้นบน เมื่อเอาสองชั้นนี้มาซ้อนกันจึงกลายเป็น framework เวชศาสตร์รากฐานเต็มรูปแบบ โดยกุญแจ 3 ดอกเป็นกรอบการอธิบายและบันได 9 ขั้นเป็นแนวทางการปฏิบัติ"
+    },
+    {
+      "id": "TP_010",
+      "question": "12 Health Domains ของทฤษฎีเวชศาสตร์รากฐานคืออะไรบ้าง",
+      "answer": "12 Health Domains ประกอบด้วย: Digestive-Microbiome, Immune, Inflammatory, Redox, Metabolic, Mitochondrial, Genomic, Neuroendocrine, Cardiovascular, Regenerative, Longevity, และ Oncology ซึ่งครอบคลุมทุกมิติของสุขภาพมนุษย์"
+    },
+    {
+      "id": "TP_011",
+      "question": "ทำไมการทำ Detoxification ต้องเป็นขั้นตอนแรกในบันได 9 ขั้น",
+      "answer": "การทำ Detoxification ต้องเป็นขั้นตอนแรกเพราะถ้ายังมี toxin overload อยู่ จะกระตุ้น oxidative stress, inflammation, และ mitochondrial dysfunction ต่อเนื่อง ทำให้การแก้ไขในชั้นบนไม่ได้ผล และสารพิษยังรบกวน microbiome ทำให้การจัดจุลชีพไม่เสถียร"
+    },
+    {
+      "id": "TP_012",
+      "question": "การฟื้นฟู Microbiome มีความสำคัญอย่างไรในลำดับการรักษา",
+      "answer": "การฟื้นฟู Microbiome เป็นขั้นที่ 2 ต่อจาก Detoxification เพราะสารพิษจำนวนมากรบกวน microbiome ถ้าไม่ลดภาระพิษก่อน การจัดจุลชีพจะไม่เสถียร เมื่อ microbiome ดีขึ้นจะทำให้ SCFA ดีขึ้น immune tolerance เพิ่ม inflammation จากลำไส้ลด และการดูดซึมสารอาหารดีขึ้น"
+    },
+    {
+      "id": "TP_013",
+      "question": "Step 7: Genomic Stability & Proteostasis คืออะไร",
+      "answer": "Step 7 คือการรักษาความเสถียร ความสมบูรณ์ และดุลยภาพของระบบข้อมูลชีวภาพ ตั้งแต่ genome, epigenome, transcriptome, proteome ไปจนถึง regulatory signaling networks เพื่อให้เซลล์สามารถตอบสนอง ซ่อมแซม ปรับตัว และดำรงความเป็นระเบียบของชีวิตได้อย่างต่อเนื่อง"
+    },
+    {
+      "id": "TP_014",
+      "question": "Prakati หรือ Step 9 คืออะไร",
+      "answer": "Prakati คือภาวะดุลยภาพโดยเนื้อแท้ของชีวิต เป็นสภาวะที่ระบบภูมิคุ้มกันสมดุล เมตาบอลิซึมลื่นไหล ระบบประสาท–ฮอร์โมนประสานกัน และกลไกซ่อมแซม–ปรับตัวทำงานอย่างต่อเนื่อง ร่างกายกลับสู่สภาวะที่ถูกรบกวนได้ยากและฟื้นคืน baseline ได้เร็ว"
+    },
+    {
+      "id": "TP_015",
+      "question": "TSPI Modules คืออะไรและมีบทบาทอย่างไร",
+      "answer": "TSPI (The Standardized Network Phytochemicals Intelligence) คือระบบโมดูลไฟโตเคมิคอลที่ออกแบบมาเพื่อสนับสนุนการฟื้นฟู Biological Networks แต่ละเครือข่าย โดยแต่ละโมดูลมีกลไกการออกฤทธิ์จำเพาะต่อ Axis และ Network ต่างๆ อย่างเป็นระบบ รวมทั้งหมด 72 โมดูล"
+    },
+    {
+      "id": "TP_016",
+      "question": "KS Module มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "KS (Kerra-Synergy) เป็นโมดูล Immune-Metabolic Core ที่ทำหน้าที่ปรับสมดุล NF-κB และ cytokine network, สนับสนุน mitochondrial function, เสริม antiviral และ antibacterial defense, และควบคุม inflammasome activity ใช้ใน chronic inflammation, metabolic syndrome, post-viral syndrome และ autoimmune disease"
+    },
+    {
+      "id": "TP_017",
+      "question": "โรค Metabolic Syndrome เกี่ยวข้องกับ Biological Axes ใดบ้าง",
+      "answer": "Metabolic Syndrome เกี่ยวข้องกับ Axes: Systemic Inflammatory Load (1), Glucose-Insulin Regulation (5), Lipid-Lipotoxicity (6), Nutrient Sensing (7), Mitochondrial Network (8), Oxidative Stress (9), Endothelial Function (20), และ Hemodynamics (23)"
+    },
+    {
+      "id": "TP_018",
+      "question": "โรคมะเร็งในมุมมองของทฤษฎีเวชศาสตร์รากฐานเกิดจากอะไร",
+      "answer": "มะเร็งไม่ได้เกิดจากการกลายพันธุ์ของยีนเพียงตัวเดียว แต่เกิดจากความเสียสมดุลของหลายระบบร่วมกัน ได้แก่ Genomic instability (แกน 11), Epigenetic dysregulation (แกน 12), Immune evasion (แกน 2,3), Chronic inflammation (แกน 1), Metabolic reprogramming (แกน 5,6,8), และ Tumor microenvironment (แกน 36)"
+    },
+    {
+      "id": "TP_019",
+      "question": "Long COVID ในมุมมองของทฤษฎีเวชศาสตร์รากฐานคืออะไรและรักษาอย่างไร",
+      "answer": "Long COVID คือภาวะ immune dysregulation และ autonomic dysfunction หลังติดเชื้อ เกิดจาก persistent inflammation (แกน 1), mitochondrial dysfunction (แกน 8), และ autonomic dysregulation (แกน 34) ซึ่งต้องฟื้นฟูตามบันได 9 ขั้นตั้งแต่ Detoxification ไปจนถึง Autophagy ด้วยโมดูลเช่น PLUMAX, SINAZA, KERRA, MINOZA และ VITALPLUS"
+    },
+    {
+      "id": "TP_020",
+      "question": "โรค Autoimmune เกี่ยวข้องกับ Biological Networks ใดบ้าง",
+      "answer": "Autoimmune disease เกี่ยวข้องกับ NF-κB Inflammatory Switch Network (1), Cytokine Burden Network (2), Adaptive Immune Coordination Network (7), Treg-Th17 Balance Network (8), Microbiome Diversity Network (37), Intestinal Barrier Integrity Network (40), และ LPS-TLR4 Activation Network (42)"
+    },
+    {
+      "id": "TP_021",
+      "question": "โครงสร้างลำดับชั้นของทฤษฎีเวชศาสตร์รากฐานเป็นอย่างไร",
+      "answer": "โครงสร้างเป็นลำดับชั้น: 3 Keys (มิติหลัก) → 9 Steps (ลำดับการฟื้นฟู) → 12 Domains (อาณาเขตหน้าที่) → 39 Axes (แกนชีววิทยาหลัก) → 180 Networks (ระบบเครือข่ายปฏิบัติการ) → TSPI Modules (ชั้นการแทรกแซง 72 โมดูล) โดยแต่ละชั้นเชื่อมโยงและสนับสนุนซึ่งกันและกันอย่างเป็นระบบ"
+    },
+    {
+      "id": "TP_022",
+      "question": "ทำไมการรักษาตามทฤษฎีเวชศาสตร์รากฐานจึงต้องเริ่มจาก 'ราก' ไม่ใช่ 'อาการ'",
+      "answer": "เพราะโรคคืออาการหรือสัญญาณที่แสดงออกมาจากความเสียหายหรือความเสียสมดุลของเครือข่ายชีวภาพที่อยู่ลึกลงไป การรักษาที่อาการเพียงอย่างเดียวเหมือนการตัดกิ่งไม้โดยไม่ถอนราก โรคจะกลับมาใหม่เสมอ ในขณะที่การแก้ที่สมุฏฐานหรือรากเหง้าจะทำให้โรคคลี่คลายอย่างยั่งยืน"
+    },
+    {
+      "id": "TP_023",
+      "question": "Biological Dynamics, Metabolic Energy, และ Biointegrity ทำงานร่วมกันอย่างไร",
+      "answer": "Biological Dynamics คือฐานนิเวศที่ทำให้ชีวิตตั้งอยู่ (เสมหะ), Metabolic Energy คือพลังงานที่ทำให้ชีวิตดำเนินไป (ปิตตะ), และ Biointegrity คือความประสานสมบูรณ์ที่ทำให้ชีวิตเป็นหนึ่งเดียว (วาตะ) ทั้งสามต้องสมดุลพร้อมกัน หากขาดดอกใดดอกหนึ่ง การรักษาจะไม่ยั่งยืน"
+    },
+    {
+      "id": "TP_024",
+      "question": "อะไรคือความหมายของ 'Prakati' ในทฤษฎีเวชศาสตร์รากฐาน",
+      "answer": "Prakati คือธรรมชาติพื้นฐานของชีวิตที่สมดุล เป็นภาวะดุลยภาพโดยเนื้อแท้ที่ระบบภูมิคุ้มกันสมดุล เมตาบอลิซึมลื่นไหล ระบบประสาท–ฮอร์โมนประสานกัน และกลไกซ่อมแซม–ปรับตัวทำงานอย่างต่อเนื่อง ร่างกายจะกลับสู่สภาวะที่ถูกรบกวนได้ยากและฟื้นคืน baseline ได้เร็ว"
+    },
+    {
+      "id": "TP_025",
+      "question": "เครือข่าย NF-κB Inflammatory Switch Network มีหน้าที่อะไร",
+      "answer": "NF-κB Inflammatory Switch Network ควบคุมการเปิดสัญญาณอักเสบหลัก เป็นตัวเชื่อมระหว่าง stress signals, cytokines, และ inflammatory gene expression เมื่อเครือข่ายนี้เสียสมดุลจะเกิด chronic inflammation, autoimmune disease, cancer progression และ insulin resistance"
+    },
+    {
+      "id": "TP_026",
+      "question": "โมดูล DB1 มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "DB1 (Digestive-Balance 1) เป็นโมดูล Digestive-Metabolic Core ที่ฟื้นฟู microbiome diversity, สนับสนุน gut barrier integrity, ปรับ insulin sensitivity และควบคุม lipid metabolism ใช้ใน metabolic syndrome, IBD, gut dysbiosis และ diabetes"
+    },
+    {
+      "id": "TP_027",
+      "question": "โมดูล BOVA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "BOVA เป็นโมดูล Neuro-Vascular Core ที่ควบคุม HPA axis, สนับสนุน NO signaling, ปรับ insulin sensitivity และลด neuroinflammation ใช้ใน CVD, metabolic syndrome, neurodegeneration และ chronic stress"
+    },
+    {
+      "id": "TP_028",
+      "question": "ความเชื่อมโยงระหว่าง gut microbiome กับ autoimmune disease เป็นอย่างไร",
+      "answer": "Microbiome dysbiosis → gut barrier leak → LPS translocation → immune dysregulation → autoimmunity การฟื้นฟู microbiome และ gut barrier จึงเป็นหัวใจสำคัญของการรักษา autoimmune disease ตามทฤษฎีเวชศาสตร์รากฐาน"
+    },
+    {
+      "id": "TP_029",
+      "question": "โรคหัวใจและหลอดเลือดในมุมมองของทฤษฎีเวชศาสตร์รากฐานเกิดจากอะไร",
+      "answer": "CVD เกิดจาก endothelial inflammation → NO reduction → plaque formation → thrombosis → ischemia ซึ่งเกี่ยวข้องกับ Axes: Systemic Inflammatory Load, Lipid-Lipotoxicity, Endothelial Function, Thrombosis-Hemostasis และ Hemodynamics-Arterial Elasticity"
+    },
+    {
+      "id": "TP_030",
+      "question": "โมดูล AMPUR มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "AMPUR เป็นโมดูล Mitochondrial-Repair Core ที่ฟื้น ATP production, ควบคุม mitophagy, สนับสนุน mitochondrial biogenesis และฟื้น tissue regeneration ใช้ใน chronic fatigue, neurodegeneration, mitochondrial dysfunction และ aging"
+    },
+    {
+      "id": "TP_031",
+      "question": "สารพิษ (toxin) มีผลกระทบต่อสุขภาพอย่างไรตามทฤษฎีเวชศาสตร์รากฐาน",
+      "answer": "สารพิษกระตุ้น oxidative stress, inflammation, mitochondrial dysfunction และรบกวน microbiome ทำให้เกิด chronic disease, metabolic dysfunction และ immune dysregulation การ Detoxification จึงเป็นขั้นตอนแรกในการฟื้นฟูสุขภาพ"
+    },
+    {
+      "id": "TP_032",
+      "question": "โมดูล HEPA1, HEPA2, HEPA3 แตกต่างกันอย่างไร",
+      "answer": "HEPA1 สนับสนุน Phase I detoxification (CYP450), HEPA2 สนับสนุน Phase II detoxification (glucuronidation, sulfation) และ HEPA3 สนับสนุน liver regeneration และ metabolic function ทั้งสามทำงานร่วมกันเพื่อฟื้นฟู liver health"
+    },
+    {
+      "id": "TP_033",
+      "question": "โรคไตเรื้อรังเกี่ยวข้องกับ Biological Axes ใดบ้าง",
+      "answer": "CKD เกี่ยวข้องกับ Axes: Systemic Inflammatory Load (1), Lipid-Lipotoxicity (6), Mitochondrial Network (8), Oxidative Stress (9), Hemodynamics (23), Detoxification (15), และ Fibrosis (25) เกิดจาก glycation → oxidative stress → inflammation → fibrosis → nephron loss"
+    },
+    {
+      "id": "TP_034",
+      "question": "โมดูล RADICA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "RADICA เป็นโมดูล Redox-Genomic Core ที่ควบคุม oxidative stress, สนับสนุน antioxidant defense, ฟื้น DNA repair และควบคุม senescence ใช้ใน oxidative stress, aging, neurodegeneration และ cancer prevention"
+    },
+    {
+      "id": "TP_035",
+      "question": "ความแตกต่างระหว่าง acute inflammation และ chronic inflammation คืออะไร",
+      "answer": "Acute inflammation เป็นการตอบสนองป้องกันภัยที่จำกัด (เครือข่ายที่ 3) ส่วน chronic inflammation เป็นการอักเสบเรื้อรังระดับต่ำที่เป็นพื้นหลังของ NCDs (เครือข่ายที่ 4) เกิดจาก failure ของ inflammation resolution"
+    },
+    {
+      "id": "TP_036",
+      "question": "โมดูล PLUMAX มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "PLUMAX เป็นโมดูล Immune-Repair Core ที่เสริม NK cell และ macrophage function, ควบคุม inflammation resolution, สนับสนุน wound healing และฟื้น immune tolerance ใช้ใน cancer support, chronic infection, wound healing และ autoimmune disease"
+    },
+    {
+      "id": "TP_037",
+      "question": "โรคอัลไซเมอร์ในมุมมองของทฤษฎีเวชศาสตร์รากฐานเกิดจากอะไร",
+      "answer": "Alzheimer's เกิดจาก protein aggregation → neuroinflammation → mitochondrial dysfunction → synaptic loss → neurodegeneration ซึ่งเกี่ยวข้องกับ Axes: Mitochondrial Network, Oxidative Stress, Genomic Stability, Neuro-Sleep-Stress และ Proteostasis"
+    },
+    {
+      "id": "TP_038",
+      "question": "โมดูล PSYLAZA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "PSYLAZA เป็นโมดูล Neuro-Stress Core ที่ควบคุม HPA axis, ปรับ autonomic balance, สนับสนุน neuroinflammation control และฟื้น sleep architecture ใช้ใน chronic stress, sleep disorder, anxiety และ neurodegeneration"
+    },
+    {
+      "id": "TP_039",
+      "question": "ทำไมการฟื้นฟู mitochondrial function ต้องอยู่หลังจาก autophagy (ขั้นที่ 6)",
+      "answer": "เพราะการดัน mitochondrial function โดยไม่เคลียร์ของเสีย (autophagy) จะเหมือนอัดพลังงานเข้าเครื่องที่ยังเต็มไปด้วยเศษเหล็ก → พังเร็ว การทำ autophagy ก่อนจะเคลียร์ mitochondria เสียออกไป ทำให้การเพิ่มพลังให้เครือข่ายที่เหลืออยู่ปลอดภัยและยั่งยืนกว่า"
+    },
+    {
+      "id": "TP_040",
+      "question": "โมดูล CINNARA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "CINNARA เป็นโมดูล Digestive-Immune Core ที่ฟื้น mucosal barrier, ควบคุม gut inflammation, สนับสนุน digestive enzyme function และควบคุม gut-brain axis ใช้ใน IBD, IBS, food allergy และ gut barrier dysfunction"
+    },
+    {
+      "id": "TP_041",
+      "question": "โรคซึมเศร้าและวิตกกังวลในมุมมองของทฤษฎีเวชศาสตร์รากฐานเกิดจากอะไร",
+      "answer": "Depression และ Anxiety เกิดจาก gut-brain axis dysfunction → neuroinflammation → HPA dysregulation → neurotransmitter imbalance ซึ่งเกี่ยวข้องกับ Axes: Systemic Inflammatory Load, Neuro-Sleep-Stress, และ Gut Barrier การฟื้นฟู microbiome และ HPA axis จึงสำคัญ"
+    },
+    {
+      "id": "TP_042",
+      "question": "โมดูล BUMINMAX มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "BUMINMAX เป็นโมดูล Musculoskeletal-Repair Core ที่ฟื้น muscle protein synthesis, สนับสนุน bone remodeling, ควบคุม connective tissue integrity และฟื้น tissue regeneration ใช้ใน sarcopenia, osteoporosis, muscle wasting และ joint degeneration"
+    },
+    {
+      "id": "TP_043",
+      "question": "โรคข้อเสื่อม (Osteoarthritis) เกี่ยวข้องกับ Biological Networks ใดบ้าง",
+      "answer": "Osteoarthritis เกี่ยวข้องกับ Cartilage Matrix Network (145), Synovial Joint Homeostasis Network (146), Tendon-Ligament Integrity Network (147), Fascial Communication Network (148), และ Fibrosis Decision Network (78) เกิดจาก mechanical stress → cartilage degradation → inflammation"
+    },
+    {
+      "id": "TP_044",
+      "question": "โมดูล HP1 มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "HP1 (Heart-Protect 1) เป็นโมดูล Cardiovascular Core ที่ปรับ endothelial function, ควบคุม NO signaling, ลด platelet aggregation และควบคุม vascular inflammation ใช้ใน hypertension, atherosclerosis, CVD prevention และ endothelial dysfunction"
+    },
+    {
+      "id": "TP_045",
+      "question": "ความสัมพันธ์ระหว่าง gut-liver axis และ metabolic syndrome เป็นอย่างไร",
+      "answer": "Microbiome dysbiosis → LPS translocation → portal inflammation → liver fat accumulation → insulin resistance → metabolic syndrome การฟื้นฟู gut-liver axis ด้วยการดีท็อกซ์และฟื้น microbiome จึงสำคัญต่อการรักษา metabolic syndrome"
+    },
+    {
+      "id": "TP_046",
+      "question": "โมดูล BETA_G มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "BETA_G เป็นโมดูล Immune-Repair Core ที่กระตุ้น macrophage และ NK cell, ควบคุม NLRP3 inflammasome, สนับสนุน wound healing และปรับสมดุล inflammatory response ใช้ใน chronic inflammation, wound healing, cancer support และ infection recovery"
+    },
+    {
+      "id": "TP_047",
+      "question": "ทำไมการควบคุม oxidative stress (ขั้นที่ 4) ต้องมาก่อนการฟื้นฟู mitochondria (ขั้นที่ 5)",
+      "answer": "เพราะ oxidative stress ทำให้ mitochondria เสียหาย การฟื้นฟู mitochondria โดยที่ยังมี oxidative stress สูงอยู่ จะทำให้ mitochondria ใหม่ถูกทำลายได้อีก การควบคุม oxidative stress ก่อนจึงทำให้ mitochondria ใหม่สามารถอยู่ได้อย่างยั่งยืน"
+    },
+    {
+      "id": "TP_048",
+      "question": "โมดูล TUNG CHAO PLUS 1 และ TUNG CHAO PLUS 2 แตกต่างกันอย่างไร",
+      "answer": "TUNG CHAO PLUS 1 เป็น Metabolic-Cardiovascular-Reproductive Core ที่สนับสนุน multi-system health ส่วน TUNG CHAO PLUS 2 เป็น Metabolic-Reproductive Core ที่เน้น estrogen signaling และ female reproductive health โดยเฉพาะ menopause และ PCOS"
+    },
+    {
+      "id": "TP_049",
+      "question": "โรค NASH ในมุมมองของทฤษฎีเวชศาสตร์รากฐานเกิดจากอะไร",
+      "answer": "NASH เกิดจาก fat accumulation → lipotoxicity → inflammation → fibrosis → cirrhosis ซึ่งเกี่ยวข้องกับ Axes: Lipid-Lipotoxicity, Systemic Inflammatory Load, Detoxification, Gut-Liver Axis และ Fibrosis ต้องฟื้นฟูตามบันได 9 ขั้นตั้งแต่ detoxification"
+    },
+    {
+      "id": "TP_050",
+      "question": "โมดูล RESHIMUNO มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "RESHIMUNO เป็นโมดูล Immune-Adaptogen Core ที่ปรับสมดุล Treg/Th17, ควบคุม HPA axis, สนับสนุน immune surveillance และลด neuroinflammation ใช้ใน autoimmune disease, chronic stress, chronic inflammation และ neurodegeneration"
+    },
+    {
+      "id": "TP_051",
+      "question": "Biological Networks ทำงานร่วมกันอย่างไรในร่างกายมนุษย์",
+      "answer": "Biological Networks ทำงานเป็น 'เครือข่ายของเครือข่าย' (Network of Networks) เช่น เมื่อรับประทานอาหาร: Microbiome → ระบบดูดซึม → Metabolism → Mitochondria → ฮอร์โมน → ภูมิคุ้มกัน → Gene expression → ซ่อมแซม ทุกอย่างเกิดขึ้นพร้อมกันอย่างต่อเนื่อง"
+    },
+    {
+      "id": "TP_052",
+      "question": "โมดูล VARIZ มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "VARIZ เป็นโมดูล Immune-Neuro Core ที่ปรับสมดุล Th1/Th2, ควบคุม neuroinflammation, สนับสนุน immune tolerance และฟื้น vagal regulation ใช้ใน autoimmune disease, neuroinflammation, chronic stress และ post-viral syndrome"
+    },
+    {
+      "id": "TP_053",
+      "question": "การฟื้นฟูตามบันได 9 ขั้นใช้เวลานานแค่ไหน",
+      "answer": "ระยะเวลาขึ้นอยู่กับความรุนแรงของโรคและความเสียหายของระบบ แต่ละขั้นต้องใช้เวลาในการฟื้นฟู อย่างน้อย 3-6 เดือนต่อขั้น โดยเฉพาะขั้นที่ 7-9 ที่เกี่ยวข้องกับ genomic regulation อาจใช้เวลา 1-2 ปี จึงจะเห็นผลลัพธ์ที่ยั่งยืน"
+    },
+    {
+      "id": "TP_054",
+      "question": "โมดูล KD มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "KD (Kidney-Detox) เป็นโมดูล Renal Core ที่สนับสนุน renal filtration, ควบคุม renal inflammation, ลด uremic toxin และสนับสนุน acid-base balance ใช้ใน CKD, toxin exposure, metabolic acidosis และ renal inflammation"
+    },
+    {
+      "id": "TP_055",
+      "question": "ทำไมโรคเรื้อรังส่วนใหญ่จึงเป็น 'โรคเครือข่าย' ไม่ใช่โรคของอวัยวะเดียว",
+      "answer": "เพราะร่างกายทำงานเป็นเครือข่ายที่เชื่อมโยงกัน การเสียสมดุลของเครือข่ายหนึ่งจะส่งผลต่อเครือข่ายอื่นๆ เสมอ เช่น เบาหวานเกี่ยวข้องกับ insulin, metabolism, mitochondria, redox, microbiome, และ inflammation พร้อมกัน ไม่ใช่แค่ 'น้ำตาลสูง'"
+    },
+    {
+      "id": "TP_056",
+      "question": "โมดูล VITALPLUS มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "VITALPLUS เป็นโมดูล Multi-System Support Core ที่สนับสนุน mitochondrial function, ควบคุม inflammation, ฟื้น cellular health และสนับสนุน energy production ใช้ใน chronic fatigue, aging, general health maintenance และ recovery"
+    },
+    {
+      "id": "TP_057",
+      "question": "โรคอ้วนในมุมมองของทฤษฎีเวชศาสตร์รากฐานเกิดจากอะไร",
+      "answer": "Obesity เกิดจาก metabolic inflammation → insulin resistance → lipid accumulation → adipocyte dysfunction ซึ่งเกี่ยวข้องกับ Axes: Nutrient Sensing, Lipid-Lipotoxicity, Systemic Inflammatory Load และ Mitochondrial Network การฟื้นฟู metabolic flexibility จึงสำคัญ"
+    },
+    {
+      "id": "TP_058",
+      "question": "โมดูล BENJAKUL มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "BENJAKUL เป็นโมดูล Multi-System Core ที่ควบคุม inflammation, ปรับ metabolic function, สนับสนุน immune health และฟื้น cellular function ใช้ใน metabolic syndrome, chronic inflammation, general health maintenance และ aging"
+    },
+    {
+      "id": "TP_059",
+      "question": "ความแตกต่างระหว่าง 'การรักษาโรค' และ 'การฟื้นฟูสุขภาพ' ตามทฤษฎีเวชศาสตร์รากฐาน",
+      "answer": "'การรักษาโรค' มุ่งเน้นกำจัดอาการหรือควบคุมตัวเลขทางห้องปฏิบัติการ ในขณะที่ 'การฟื้นฟูสุขภาพ' มุ่งเน้นการคืนสมดุลให้เครือข่ายชีวภาพ เมื่อเครือข่ายกลับมาทำงานร่วมกันได้ พลังงานจะดีขึ้น การอักเสบลดลง การซ่อมแซมเกิดขึ้น และโรคจะคลี่คลายตามมา"
+    },
+    {
+      "id": "TP_060",
+      "question": "โมดูล SANGVICHAI มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "SANGVICHAI เป็นโมดูล Cardiovascular-Repair Core ที่ควบคุม vascular inflammation, ฟื้น endothelial function, สนับสนุน NO signaling และฟื้น cardiac function ใช้ใน CVD, hypertension, endothelial dysfunction และ cardiac repair"
+    },
+    {
+      "id": "TP_061",
+      "question": "ทำไมการนอนหลับจึงสำคัญต่อการฟื้นฟูสุขภาพตามทฤษฎีเวชศาสตร์รากฐาน",
+      "answer": "การนอนหลับเกี่ยวข้องกับ Glymphatic Clearance Network (112) ที่清除 beta-amyloid และ metabolic waste, และ Sleep Architecture Network (110) ที่ควบคุม REM/NREM cycles เพื่อ recovery physiology การนอนไม่เพียงพอจะ disrupt circadian rhythm และทำให้ inflammation เพิ่มขึ้น"
+    },
+    {
+      "id": "TP_062",
+      "question": "โมดูล FLAXPRO มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "FLAXPRO เป็นโมดูล Digestive-Inflammatory Core ที่สนับสนุน SCFA production, ควบคุม gut inflammation, ฟื้น mucosal barrier และสนับสนุน microbiome diversity ใช้ใน IBD, gut dysbiosis, chronic inflammation และ constipation"
+    },
+    {
+      "id": "TP_063",
+      "question": "มะเร็งกับการอักเสบเรื้อรังมีความสัมพันธ์กันอย่างไร",
+      "answer": "Chronic inflammation → DNA damage → genomic instability → oncogene activation → immune evasion → cancer progression การควบคุม inflammation จึงเป็นการป้องกันมะเร็งที่สำคัญตามทฤษฎีเวชศาสตร์รากฐาน"
+    },
+    {
+      "id": "TP_064",
+      "question": "โมดูล LIVOXY มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "LIVOXY เป็นโมดูล Redox-Hepatic Core ที่ควบคุม oxidative stress, สนับสนุน liver detoxification, ฟื้น liver repair และควบคุม inflammation ใช้ใน NAFLD, NASH, oxidative stress และ liver inflammation"
+    },
+    {
+      "id": "TP_065",
+      "question": "ความสัมพันธ์ระหว่าง HPA axis และ autoimmune disease เป็นอย่างไร",
+      "answer": "Chronic stress → HPA dysregulation → cortisol imbalance → immune dysregulation → autoimmune flare การควบคุม HPA axis ด้วยการลด stress และฟื้น autonomic balance จึงสำคัญในการรักษา autoimmune disease"
+    },
+    {
+      "id": "TP_066",
+      "question": "โมดูล ZAMINZYME มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "ZAMINZYME เป็นโมดูล Digestive-Enzyme Core ที่สนับสนุน pancreatic enzyme, ฟื้น nutrient absorption, ควบคุม digestive inflammation และสนับสนุน microbiome health ใช้ใน malabsorption, pancreatic insufficiency, dyspepsia และ IBS"
+    },
+    {
+      "id": "TP_067",
+      "question": "ทำไมการฟื้นฟู genomic stability (ขั้นที่ 7-8) ต้องอยู่หลังการฟื้นฟู mitochondria (ขั้นที่ 5-6)",
+      "answer": "เพราะ mitochondrial dysfunction สร้าง ROS ที่ทำลาย DNA ทำให้ genomic instability การฟื้นฟู mitochondrial function ก่อนจะลด ROS load ทำให้การซ่อมแซม DNA ในขั้นที่ 7-8 มีประสิทธิภาพมากขึ้นและยั่งยืนกว่า"
+    },
+    {
+      "id": "TP_068",
+      "question": "โมดูล BUTEA SUPERBA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "BUTEA SUPERBA เป็นโมดูล Reproductive-Metabolic Core ที่สนับสนุน testosterone production, ปรับ sexual function, ควบคุม metabolic health และสนับสนุน muscle mass ใช้ใน andropause, sexual dysfunction, metabolic syndrome และ sarcopenia"
+    },
+    {
+      "id": "TP_069",
+      "question": "โรค IBD เกี่ยวข้องกับ Biological Networks ใดบ้าง",
+      "answer": "IBD เกี่ยวข้องกับ Microbiome Diversity Network (37), Keystone Microbe Network (38), SCFA Production Network (39), Intestinal Barrier Integrity Network (40), Mucosal Barrier Network (41), LPS-TLR4 Activation Network (42), และ Gut-Immune Axis Network (46)"
+    },
+    {
+      "id": "TP_070",
+      "question": "โมดูล STOMMA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "STOMMA เป็นโมดูล Digestive-Gastric Core ที่ควบคุม gastric acid, ฟื้น gastric mucosal barrier, สนับสนุน digestive enzyme และลด gastric inflammation ใช้ใน gastritis, dyspepsia, GERD และ peptic ulcer"
+    },
+    {
+      "id": "TP_071",
+      "question": "ความแตกต่างระหว่าง Biological Dynamics และ Biointegrity คืออะไร",
+      "answer": "Biological Dynamics (เสมหะ) คือ 'ฐานนิเวศ' ที่ทำให้ชีวิตตั้งอยู่ เช่น microbiome, เยื่อบุ, ECM ส่วน Biointegrity (วาตะ) คือ 'การประสาน' ที่ทำให้ชีวิตเป็นหนึ่งเดียว เช่น การสื่อสารระหว่างระบบ, การควบคุมจังหวะ, การฟื้นฟูสมดุล"
+    },
+    {
+      "id": "TP_072",
+      "question": "โมดูล TARANA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "TARANA เป็นโมดูล Digestive-Metabolic Core ที่ฟื้น microbiome, สนับสนุน gut barrier, ควบคุม metabolic inflammation และปรับ nutrient absorption ใช้ใน metabolic syndrome, gut dysbiosis, malabsorption และ chronic inflammation"
+    },
+    {
+      "id": "TP_073",
+      "question": "ทำไมโรคเรื้อรังจึงมักเกิดร่วมกัน (comorbidity) ตามทฤษฎีเวชศาสตร์รากฐาน",
+      "answer": "เพราะโรคเรื้อรังเกิดจากความเสียสมดุลของเครือข่ายชีวภาพเดียวกัน เช่น metabolic syndrome, diabetes, CVD, NAFLD ล้วนเกิดจาก systemic inflammation, insulin resistance, และ mitochondrial dysfunction จึงมักเกิดร่วมกัน"
+    },
+    {
+      "id": "TP_074",
+      "question": "โมดูล NARIS มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "NARIS เป็นโมดูล Musculoskeletal-Joint Core ที่ฟื้น cartilage matrix, ควบคุม joint inflammation, สนับสนุน collagen synthesis และลด joint pain ใช้ใน osteoarthritis, joint pain, cartilage degeneration และ tendinopathy"
+    },
+    {
+      "id": "TP_075",
+      "question": "ความสัมพันธ์ระหว่าง gut-brain axis และ neurodegenerative disease เป็นอย่างไร",
+      "answer": "Gut dysbiosis → LPS translocation → systemic inflammation → neuroinflammation → neurodegeneration การฟื้นฟู microbiome และ gut barrier จึงเป็นการป้องกัน neurodegeneration ที่สำคัญตามทฤษฎีเวชศาสตร์รากฐาน"
+    },
+    {
+      "id": "TP_076",
+      "question": "โมดูล RICEZOZYME มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "RICEZOZYME เป็นโมดูล Digestive-Repair Core ที่ฟื้น gut barrier, สนับสนุน SCFA production, ควบคุม gut inflammation และฟื้น mucosal integrity ใช้ใน IBD, gut dysbiosis, leaky gut และ food allergy"
+    },
+    {
+      "id": "TP_077",
+      "question": "ทำไมการฟื้นฟูตามบันได 9 ขั้นจึงต้องทำตามลำดับ ไม่สามารถข้ามขั้นได้",
+      "answer": "เพราะแต่ละขั้นเป็นพื้นฐานของขั้นถัดไป เช่น ถ้ายังมี toxin overload (ขั้นที่ 1) microbiome จะไม่เสถียร (ขั้นที่ 2) ถ้า microbiome ไม่ดี immune-inflammation จะไม่สมดุล (ขั้นที่ 3) ถ้า redox ยังเสีย mitochondria จะฟื้นไม่ได้ (ขั้นที่ 4-5) การข้ามขั้นจะทำให้การฟื้นฟูไม่ยั่งยืน"
+    },
+    {
+      "id": "TP_078",
+      "question": "โมดูล LANA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "LANA เป็นโมดูล Reproductive-Female Core ที่ปรับ estrogen-progesterone balance, สนับสนุน menstrual health, ควบคุม menopause symptoms และฟื้น reproductive function ใช้ใน menopause, PCOS, menstrual disorder และ hormone imbalance"
+    },
+    {
+      "id": "TP_079",
+      "question": "โรคเบาหวานชนิดที่ 2 ในมุมมองของทฤษฎีเวชศาสตร์รากฐานเกิดจากอะไร",
+      "answer": "Type 2 diabetes เกิดจาก lipotoxicity → mitochondrial dysfunction → ROS → insulin resistance → beta-cell exhaustion ซึ่งเกี่ยวข้องกับ Axes: Glucose-Insulin Regulation, Lipid-Lipotoxicity, Mitochondrial Network, Oxidative Stress และ Nutrient Sensing"
+    },
+    {
+      "id": "TP_080",
+      "question": "โมดูล TOPAZ มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "TOPAZ เป็นโมดูล Reproductive-Male Core ที่สนับสนุน prostate health, ควบคุม testosterone metabolism, ฟื้น sexual function และลด prostate inflammation ใช้ใน prostate health, andropause, sexual dysfunction และ urinary health"
+    },
+    {
+      "id": "TP_081",
+      "question": "CELA Network (Cognitive-Emotional Loop Architecture) คืออะไร",
+      "answer": "CELA Network (120) คือระบบ thought loops, rumination, stress amplification, HPA activation, microbiome interaction และ chronic disease propagation เป็นวงจรที่เชื่อมความคิด อารมณ์ ความเครียด และโรคเรื้อรังเข้าด้วยกัน"
+    },
+    {
+      "id": "TP_082",
+      "question": "โมดูล BETA_X และ MERDANA ใช้ในโรคอะไร",
+      "answer": "BETA_X และ MERDANA เป็นโมดูล Oncology-Immune Core ที่สนับสนุน immune surveillance, ควบคุม tumor progression, ฟื้น immune function และสนับสนุน anti-cancer immunity ใช้ใน cancer support, immune therapy, oncology และ post-chemotherapy recovery"
+    },
+    {
+      "id": "TP_083",
+      "question": "ทำไมการตรวจ biomarkers จึงสำคัญในการรักษาตามทฤษฎีเวชศาสตร์รากฐาน",
+      "answer": "Biomarkers ช่วยประเมินสถานะของแต่ละ Biological Network เช่น IL-6, TNF-α สำหรับ Inflammation Network, GSH/GSSG สำหรับ Redox Network, ATP production สำหรับ Mitochondrial Network ทำให้สามารถติดตามความก้าวหน้าของการฟื้นฟูได้อย่างเป็นรูปธรรม"
+    },
+    {
+      "id": "TP_084",
+      "question": "โมดูล VATTHANOTHAI มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "VATTHANOTHAI เป็นโมดูล Metabolic-Cardiovascular Core ที่ปรับ insulin sensitivity, ควบคุม lipid metabolism, สนับสนุน vascular function และลด inflammation ใช้ใน metabolic syndrome, type 2 diabetes, CVD และ NAFLD"
+    },
+    {
+      "id": "TP_085",
+      "question": "ความแตกต่างระหว่าง 'การป้องกัน' และ 'การรักษา' ตามทฤษฎีเวชศาสตร์รากฐาน",
+      "answer": "'การป้องกัน' คือการรักษาสมดุลของ Biological Networks ตั้งแต่แรก เพื่อไม่ให้เกิดโรค ส่วน 'การรักษา' คือการฟื้นฟูสมดุลของ Biological Networks ที่เสียไปแล้วให้กลับคืนมา ทั้งสองต้องทำควบคู่กันเพื่อสุขภาพที่ยั่งยืน"
+    },
+    {
+      "id": "TP_086",
+      "question": "โมดูล VETCHAKORN No.6 มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "VETCHAKORN No.6 เป็นโมดูล Neuro-Metabolic Core ที่ควบคุม HPA axis, ฟื้น metabolic function, สนับสนุน neuroinflammation control และฟื้น cognitive function ใช้ใน chronic stress, metabolic syndrome, neurodegeneration และ cognitive decline"
+    },
+    {
+      "id": "TP_087",
+      "question": "โรคมะเร็งกับการอักเสบเรื้อรังมีความสัมพันธ์กันอย่างไร",
+      "answer": "Chronic inflammation → DNA damage → genomic instability → oncogene activation → immune evasion → cancer progression การควบคุม inflammation จึงเป็นการป้องกันมะเร็งที่สำคัญตามทฤษฎีเวชศาสตร์รากฐาน"
+    },
+    {
+      "id": "TP_088",
+      "question": "โมดูล BRANARA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "BRANARA เป็นโมดูล Neuro-Cognitive Core ที่สนับสนุน cognitive function, ควบคุม neuroinflammation, ฟื้น synaptic plasticity และสนับสนุน memory ใช้ใน cognitive decline, memory loss, neurodegeneration และ brain health"
+    },
+    {
+      "id": "TP_089",
+      "question": "การฟื้นฟู microbiome ส่งผลต่อ mental health อย่างไร",
+      "answer": "Microbiome ส่งผลต่อ mental health ผ่าน Gut-Brain Axis Network (45): microbiome → SCFA → vagus nerve → neurotransmitter → brain function การฟื้นฟู microbiome จึงช่วยลด anxiety, depression, brain fog และ improve cognitive function"
+    },
+    {
+      "id": "TP_090",
+      "question": "โมดูล CHATHARIC, LYPHOLAX, LAXORIM, BELAX ใช้ในโรคอะไร",
+      "answer": "โมดูลเหล่านี้เป็น Digestive-Colon Core ที่สนับสนุน colon cleansing, ฟื้น microbiome, ลด toxin burden และสนับสนุน bowel movement ใช้ใน constipation, toxin overload, colon health และ detoxification"
+    },
+    {
+      "id": "TP_091",
+      "question": "ทำไมการฟื้นฟู 'Biointegrity' (วาตะ) ต้องเป็นขั้นตอนสุดท้าย",
+      "answer": "Biointegrity คือการประสานทุกระบบให้เป็นหนึ่งเดียว ต้องเกิดขึ้นหลังจากระบบย่อยๆ (ฐานนิเวศ พลังงาน ภูมิคุ้มกัน จีโนม) ฟื้นตัวแล้ว หากฟื้นฟู Biointegrity ก่อน ระบบที่เสียอยู่ก็ไม่สามารถประสานได้อย่างมีประสิทธิภาพ"
+    },
+    {
+      "id": "TP_092",
+      "question": "โมดูล RIDSEE, RIZZO, RIZZ ใช้ในโรคอะไร",
+      "answer": "โมดูลเหล่านี้เป็น Digestive-Colon Core ที่สนับสนุน colon health, ควบคุม hemorrhoid inflammation, ฟื้น colon repair และลด bleeding ใช้ใน hemorrhoids, colon health, anal inflammation และ bowel health"
+    },
+    {
+      "id": "TP_093",
+      "question": "การอักเสบเรื้อรังระดับต่ำ (chronic low-grade inflammation) ส่งผลต่อโรคอะไรบ้าง",
+      "answer": "Chronic low-grade inflammation เป็นพื้นหลังของ NCDs เกือบทุกชนิด เช่น metabolic syndrome, diabetes, CVD, cancer, neurodegeneration, autoimmune disease, depression และ aging (inflammaging)"
+    },
+    {
+      "id": "TP_094",
+      "question": "โมดูล FEVA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "FEVA เป็นโมดูล Immune-Antiviral Core ที่เสริม interferon response, สนับสนุน antiviral immunity, ควบคุม viral replication และฟื้น immune function ใช้ใน viral infection, post-viral syndrome, influenza และ COVID-19"
+    },
+    {
+      "id": "TP_095",
+      "question": "ความสัมพันธ์ระหว่าง oxidative stress และ aging เป็นอย่างไร",
+      "answer": "Oxidative stress → DNA damage → telomere shortening → mitochondrial dysfunction → senescence → inflammaging → biological aging การควบคุม oxidative stress (ขั้นที่ 4) จึงเป็นการชะลอ aging ที่สำคัญ"
+    },
+    {
+      "id": "TP_096",
+      "question": "โมดูล SINAZA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "SINAZA เป็นโมดูล Immune-Respiratory Core ที่สนับสนุน respiratory immunity, ควบคุม airway inflammation, ฟื้น mucosal defense และลด respiratory infection ใช้ใน respiratory infection, asthma, COPD และ allergy"
+    },
+    {
+      "id": "TP_097",
+      "question": "ทำไมการฟื้นฟู 'Prakati' (ขั้นที่ 9) จึงเป็นเป้าหมายสูงสุดของการรักษา",
+      "answer": "Prakati คือภาวะดุลยภาพโดยเนื้อแท้ที่ร่างกายสามารถรักษาสมดุลได้ด้วยตนเอง เป็นสภาวะที่ระบบภูมิคุ้มกันสมดุล เมตาบอลิซึมลื่นไหล ระบบประสาท–ฮอร์โมนประสานกัน และกลไกซ่อมแซม–ปรับตัวทำงานอย่างต่อเนื่อง"
+    },
+    {
+      "id": "TP_098",
+      "question": "โมดูล MORMORDICA มีหน้าที่อะไรและใช้ในโรคอะไร",
+      "answer": "MORMORDICA เป็นโมดูล Metabolic-Glucose Core ที่ปรับ insulin sensitivity, ควบคุม glucose metabolism, สนับสนุน beta-cell function และลด glycemic load ใช้ใน type 2 diabetes, metabolic syndrome, insulin resistance และ pre-diabetes"
+    },
+    {
+      "id": "TP_099",
+      "question": "สรุปภาพรวมของทฤษฎีเวชศาสตร์รากฐานในหนึ่งย่อหน้า",
+      "answer": "ทฤษฎีเวชศาสตร์รากฐานคือการปฏิวัติแนวคิดสุขภาพที่มองมนุษย์เป็น 'เครือข่ายชีวภาพ 180 ระบบ' ที่ทำงานร่วมกันอย่างเป็นเอกภาพ โดยมี 'กุญแจ 3 ดอก' (Metabolic Energy, Biological Dynamics, Biointegrity) เป็นมิติหลัก และ 'บันได 9 ขั้น' เป็นลำดับการฟื้นฟูจากพื้นที่สุดสู่สมดุลชีวิต โรคคือการเสียสมดุลของเครือข่าย การรักษาคือการฟื้นฟูสมดุลนั้นด้วย TSPI Modules ที่ออกแบบมาเฉพาะสำหรับแต่ละเครือข่าย"
+    },
+    {
+      "id": "TP_100",
+      "question": "โมดูล KERRIX PLUS และ UMX ใช้ในโรคอะไร",
+      "answer": "KERRIX PLUS และ UMX เป็นโมดูล Oncology-Immune Core ที่สนับสนุน immune surveillance, ควบคุม tumor microenvironment, ฟื้น immune function และสนับสนุน anti-cancer immunity ใช้ใน cancer support, immune recovery, post-chemotherapy และ oncology"
+    }
+  ],
+  "statistics": {
+    "total_modules": 72,
+    "total_training_pairs": 100,
+    "modules_by_category": {
+      "Immune-Metabolic Core": 6,
+      "Immune-Inflammatory Core": 6,
+      "Immune-Detox Core": 1,
+      "Immune-Repair Core": 3,
+      "Metabolic-Immune Core": 3,
+      "Vascular-Immune Core": 1,
+      "Hepatic-Repair Core": 2,
+      "Digestive-Metabolic Core": 3,
+      "Digestive-Immune Core": 3,
+      "Digestive-Enzyme Core": 3,
+      "Immune-Adaptogen Core": 1,
+      "Immune-Neuro Core": 1,
+      "Neuro-Vascular Core": 2,
+      "Cardiovascular Core": 4,
+      "Hepatic Core": 6,
+      "Renal Core": 6,
+      "Mitochondrial-Repair Core": 1,
+      "Redox-Genomic Core": 1,
+      "Redox-Hepatic Core": 1,
+      "Musculoskeletal-Repair Core": 6,
+      "Hematology Core": 1,
+      "Neuro-Stress Core": 5,
+      "Neuro-Cognitive Core": 2,
+      "Neuro-Ocular Core": 1,
+      "Reproductive-Female Core": 9,
+      "Reproductive-Male Core": 3,
+      "Oncology-Immune Core": 5,
+      "Multi-System Core": 8,
+      "Musculoskeletal-Topical Core": 1,
+      "Immune-Antiviral Core": 1,
+      "Immune-Respiratory Core": 1,
+      "Metabolic-Glucose Core": 1,
+      "Digestive-Colon Core": 9,
+      "Cardiovascular-Metabolic Core": 2,
+      "Bone-Mineral Core": 2,
+      "Renal-Urinary Core": 4,
+      "Digestive-Gastric Core": 1,
+      "Digestive-Intestinal Core": 1,
+      "Cellular Health Core": 1
+    },
+    "total_axes_covered": 39,
+    "total_diseases_covered": 25,
+    "generated_date": "2026-06-25",
+    "version": "3.0"
+  }
+}

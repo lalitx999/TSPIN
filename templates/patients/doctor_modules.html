@@ -1,0 +1,88 @@
+{% extends 'layouts/doctor_base.html' %}
+
+{% block title %}ทะเบียนสูตรตำรับ 200 โมดูล (Phytochemical Modules) - TSPI CLINIC{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6" x-data="{
+    search: '',
+    selectedCategory: 'all',
+    modules: [
+        { code: 'KERRA', name: 'Kerra Capsule', active: 'สารสกัดไฟโตเคมีคอลต้านการอักเสบระดับเซลล์', axes: 'A01, A02, A03', indications: 'ลด NF-κB, ยับยั้ง IL-6 และ TNF-α ในโรคเรื้อรังและสะเก็ดเงิน' },
+        { code: 'MINOZA', name: 'Minoza Complex', active: 'กลุ่มสารสกัดปรับสมดุลระบบภูมิคุ้มกัน Th1/Th2', axes: 'A01, A02, A04', indications: 'ควบคุม Inflammasome NLRP3 และลดการแพ้ภูมิตัวเอง' },
+        { code: 'KS', name: 'KS Capsule', active: 'สารสกัดต้านไวรัสและเสริมเกราะป้องกัน Host Defense', axes: 'A01, A03, A04', indications: 'กระตุ้น Interferon Response และกำจัดเชื้อแฝงเรื้อรัง' },
+        { code: 'MERDANA', name: 'Merdana Formula', active: 'สารต้านการอักเสบและการแพ้ระบบทางเดินอาหาร', axes: 'A01, A02, A19', indications: 'รักษาอาการผื่นคัน ลำไส้อักเสบ และ Mast cell activation' },
+        { code: 'BETA_G', name: 'Beta G Immunomodulator', active: 'Beta-Glucan 1,3/1,6 บริสุทธิ์สูง', axes: 'A01, A02, A03', indications: 'กระตุ้น Macrophage และเสริมสร้างความแข็งแกร่งของภูมิคุ้มกัน' },
+        { code: 'IM-6', name: 'IM-6 Immune Support', active: 'พฤกษเคมีควบคุมไซโตไคน์', axes: 'A01, A03', indications: 'ลดภาระการอักเสบหลังการติดเชื้อเรื้อรัง' },
+        { code: 'DB1', name: 'DB-1 Metabolic Reset', active: 'Momordica charantia & Gymnema sylvestre', axes: 'A05, A06, A07', indications: 'เพิ่มความไวต่ออินซูลินและฟื้นฟู AMPK Energy Sensing' },
+        { code: 'BOVA', name: 'Bova Capsule', active: 'สารสกัดควบคุมน้ำตาลและไขมันพอกตับ', axes: 'A05, A06, A08', indications: 'ลด Hepatic Glucose Output และลด Lipotoxicity' },
+        { code: 'CINNARA', name: 'Cinnara Capsule', active: 'สารสกัด Cynara scolymus & เอนไซม์ธรรมชาติ', axes: 'A07, A16, A19', indications: 'ซ่อมแซมเยื่อบุทางเดินอาหาร กระตุ้นน้ำดี ขับสารพิษ' },
+        { code: 'HEPA-1', name: 'TSPI Master Liver Detox', active: 'Silymarin, Curcuminoids & Choline', axes: 'A16, A09', indications: 'ฟื้นฟูเส้นทาง Phase 1 & 2 ของตับ และกระตุ้นกลูตาไธโอน' },
+        { code: 'HEPA-3', name: 'Advanced Liver Protocol', active: 'สูตรขจัดสารพิษและฟื้นฟูเซลล์ตับระดับลึก', axes: 'A16, A08', indications: 'ฟื้นฟูภาวะตับคั่งไขมัน (NASH) และสารพิษตกค้าง' },
+        { code: 'KD', name: 'Kidney Defense Regeneration', active: 'สารสกัดบำรุงไตและระบบกรองของเสีย', axes: 'A20, A21', indications: 'ชะลอการเสื่อมของไต ลดโปรตีนรั่ว ฟื้นฟู Endothelium' },
+        { code: 'BONAX', name: 'Bonax Bone & Vascular', active: 'สูตรเสริมความหนาแน่นกระดูกและหลอดเลือด', axes: 'A26, A21', indications: 'ป้องกันแคลเซียมเกาะผนังหลอดเลือดและบำรุงกระดูก' },
+        { code: 'LIVOXY', name: 'Livoxy Mitochondrial Renewal', active: 'CoQ10, PQQ & Resveratrol Complex', axes: 'A08, A09, A10', indications: 'กระตุ้น Mitochondrial Biogenesis และเพิ่มระดับ ATP' },
+        { code: 'RIZZO', name: 'Rizzo Vascular Repair', active: 'สารสกัดฟลาโวนอยด์เสริมความยืดหยุ่นหลอดเลือด', axes: 'A21, A22, A24', indications: 'ลดการอักเสบของหลอดเลือดและควบคุมความดัน' }
+    ],
+    filteredModules() {
+        return this.modules.filter(m => {
+            return m.code.toLowerCase().includes(this.search.toLowerCase()) ||
+                   m.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                   m.axes.toLowerCase().includes(this.search.toLowerCase()) ||
+                   m.indications.toLowerCase().includes(this.search.toLowerCase());
+        });
+    }
+}">
+
+    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                    <i class="fas fa-seedling mr-1"></i> Pharmacopeia & Formulations
+                </span>
+                <span class="text-xs text-gray-400">ทะเบียนสารสกัดและโมดูลตำรับสมุนไพร TSPI</span>
+            </div>
+            <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
+                ทะเบียนสูตรตำรับ 200 โมดูล (Phytochemical Modules)
+            </h1>
+            <p class="text-sm text-gray-500 mt-0.5">
+                สารสกัดมาตรฐานที่มีหลักฐานเชิงประจักษ์ (Evidence-Based) ออกฤทธิ์ตรงตามกลไกชีววิทยา 38 แกน
+            </p>
+        </div>
+
+        <div class="w-full md:w-72">
+            <input type="text" x-model="search" placeholder="ค้นหาชื่อโมดูล แกน หรือสรรพคุณ..." class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:ring-primary focus:border-primary">
+        </div>
+    </div>
+
+    <!-- Modules Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <template x-for="mod in filteredModules()" :key="mod.code">
+            <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs hover:border-primary/50 transition-all space-y-3">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <span class="px-2 py-0.5 rounded text-xs font-mono font-bold bg-primary/10 text-primary border border-primary/20" x-text="mod.code"></span>
+                        <h3 class="text-base font-semibold text-gray-900 mt-1" x-text="mod.name"></h3>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-mono">Standardized Extract</span>
+                </div>
+
+                <div class="text-xs space-y-1.5 pt-2 border-t border-gray-100">
+                    <div>
+                        <span class="font-medium text-gray-500">สารออกฤทธิ์สำคัญ:</span>
+                        <span class="text-gray-800" x-text="mod.active"></span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-500">แกนเป้าหมาย:</span>
+                        <span class="font-mono text-primary font-semibold" x-text="mod.axes"></span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-500">ข้อบ่งใช้ทางคลินิก:</span>
+                        <p class="text-gray-700 bg-gray-50 p-2 rounded-lg mt-0.5" x-text="mod.indications"></p>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+</div>
+{% endblock %}

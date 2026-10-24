@@ -37,3 +37,8 @@ gunicorn>=22.0.0
 # Cache & Rate Limiting Backend
 redis>=5.0.0
 
+# Dedicated AI Chatbot & Copilot Microservice (FastAPI on port 8001)
+fastapi>=0.110.0
+uvicorn>=0.28.0
+sse-starlette>=2.0.0
+httpx>=0.27.0

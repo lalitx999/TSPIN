@@ -1,0 +1,993 @@
+TSPI Precision Biological Network Intelligence Report™
+Physician Edition
+Version 1.0
+Report Structure
+(ประมาณ 25–30 หน้า)
+
+Chapter 1
+Executive Summary
+1.1 Clinical Impression
+สรุปคนไข้ใน 1 หน้า
+อายุ
+เพศ
+โรคหลัก
+โรคร่วม
+ระยะโรค
+1.2 Network Severity Score
+คะแนน
+0–100
+ของ
+Metabolic Dysfunction
+Inflammatory Dysfunction
+Microbiome Dysfunction
+Mitochondrial Dysfunction
+Neuroendocrine Dysfunction
+1.3 Top Biological Priorities
+5 ปัญหาหลักที่ควรแก้ก่อน
+1.4 Recommended TSPI Modules
+Top 10 modules
+ที่ AI แนะนำ
+พร้อม Confidence Score
+
+Chapter 2
+Comprehensive Patient Data Integration
+Clinical History
+Medication History
+Surgical History
+Family History
+Lifestyle History
+Sleep
+Diet
+Stress
+Exercise
+Alcohol
+Smoking
+Timeline Analysis
+สร้าง Timeline
+5 ปี
+10 ปี
+20 ปี
+ย้อนหลัง
+
+Chapter 3
+Laboratory Intelligence Layer
+Hematology
+Chemistry
+Lipid Profile
+Liver Function
+Renal Function
+Endocrine
+Inflammatory Biomarkers
+Tumor Markers
+AI วิเคราะห์
+Trend
+Trajectory
+Risk Pattern
+
+Chapter 4
+Diagnostic Intelligence Layer
+Imaging Analysis
+CT
+MRI
+PET
+Ultrasound
+X-Ray
+Disease Progression Analysis
+Organ System Mapping
+
+Chapter 5
+39 Biological Axes Analysis
+Axis Scoring
+39 แกน
+ทุกแกน
+แสดง
+Normal
+↓
+Mild
+↓
+Moderate
+↓
+Severe
+
+Top Disrupted Axes
+Top 10
+พร้อมเหตุผล
+และหลักฐาน
+
+Chapter 6
+180 Living Biological Network Analysis
+Network Heatmap
+180 Networks
+จัดอันดับ
+ความผิดปกติ
+Network Clustering
+เช่น
+Microbiome Cluster
+↓
+Immune Cluster
+↓
+Liver Cluster
+↓
+Metabolic Cluster
+↓
+Neural Cluster
+
+Disease Network Map
+Network ที่กำลังผลักโรค
+
+Chapter 7
+Disease Network Intelligence
+Root Cause Analysis
+AI วิเคราะห์
+Network Driver
+Top 10
+ตัวที่ผลักโรคมากที่สุด
+
+Propagation Analysis
+Network A
+↓
+Network B
+↓
+Network C
+↓
+Clinical Disease
+
+Biological Causality Map
+Disease Network Graph
+แบบ Interactive
+
+Chapter 8
+Therapeutic Module Matching Engine
+200 TSPI Modules Screening
+AI จะรัน
+200 Modules
+ทั้งหมด
+
+Matching Score
+แต่ละ Module
+ได้คะแนน
+0–100
+
+Network Coverage Score
+Module นี้ครอบคลุม
+กี่ Axes
+กี่ Networks
+
+Biological Precision Score
+เหมาะกับผู้ป่วยรายนี้กี่ %
+
+Chapter 9
+Precision Intervention Design
+Tier 1 Modules
+โมดูลที่สำคัญที่สุด
+Top 5
+
+Tier 2 Modules
+โมดูลเสริม
+Top 10
+
+Synergy Analysis
+เช่น
+KS + Kerra + Minoza
+Synergy Score
+เท่าไร
+
+Risk Analysis
+ข้อควรระวัง
+Drug-Herb
+Disease-Herb
+Interaction
+
+Chapter 10
+Evidence Intelligence
+Mechanistic Evidence
+งานวิจัย
+In vitro
+Animal
+Human
+
+TSPI Clinical Database
+ผู้ป่วยคล้ายกัน
+กี่ราย
+
+Similar Case Matching
+Case Similarity
+0–100%
+
+Expected Outcome
+AI คาดการณ์
+1 เดือน
+3 เดือน
+6 เดือน
+12 เดือน
+
+Appendix A
+39 Axes Dashboard
+
+Appendix B
+180 Network Dashboard
+
+Appendix C
+200 Module Ranking
+
+Appendix D
+Clinical Evidence Library
+
+Appendix E
+Personalized Follow-up Roadmap
+30 วัน
+90 วัน
+180 วัน
+365 วัน
+พร้อม Biomarkers ที่ควรติดตาม
+
+TSPI PATIENT BIOLOGICAL NETWORK REPORT™
+Your Personalized Health Restoration Blueprint
+
+บทที่ 1
+HEALTH SUMMARY
+สุขภาพของคุณในภาพรวม
+AI อธิบาย
+คุณกำลังเผชิญปัญหาอะไร
+ระบบใดกำลังเสียสมดุล
+จุดแข็งของร่างกายคืออะไร
+จุดที่ควรฟื้นฟูก่อนคืออะไร
+แสดง
+Health Score
+0–100
+แบ่งเป็น
+Metabolic Score
+Immune Score
+Digestive Score
+Energy Score
+Longevity Score
+Resilience Score
+
+บทที่ 2
+YOUR HEALTH STORY
+เส้นทางสุขภาพของคุณ
+AI สร้าง Timeline
+การเริ่มป่วย
+การใช้ยา
+การผ่าตัด
+การเปลี่ยนแปลงของผลเลือด
+การเปลี่ยนแปลงของ Imaging
+เหตุการณ์สำคัญของชีวิต
+สร้าง
+Disease Journey Map
+ให้ผู้ป่วยเข้าใจว่า
+สุขภาพไม่ได้พังในวันเดียว
+และไม่ได้หายในวันเดียว
+
+บทที่ 3
+BIOLOGICAL ROOT CAUSE ANALYSIS
+วิเคราะห์สาเหตุรากของปัญหา
+AI วิเคราะห์
+Root Drivers
+เช่น
+ไมโครไบโอม
+การอักเสบ
+การนอน
+ความเครียด
+อาหาร
+ยา
+ภูมิคุ้มกัน
+ฮอร์โมน
+ระบบประสาทอัตโนมัติ
+เรียงลำดับ
+Top 10
+พร้อมคะแนน
+
+บทที่ 4
+39 BIOLOGICAL AXES REPORT
+แกนชีวภาพของคุณ
+AI วิเคราะห์ครบ
+39 แกน
+แล้วจัดเป็น
+สีเขียว ปกติ
+สีเหลือง เริ่มเสียสมดุล
+สีส้ม ผิดปกติปานกลาง
+สีแดง ควรฟื้นฟู
+พร้อมอธิบาย
+ภาษาคนทั่วไป
+ไม่ใช่ภาษาวิชาการ
+
+บทที่ 5
+180 BIOLOGICAL NETWORK REPORT
+Network Health Map
+AI สร้าง
+Network Heatmap
+180 Networks
+พร้อมอธิบาย
+Network ไหนกำลังผลักโรค
+Network ไหนกำลังฟื้นตัว
+Network ไหนเป็นจุดอ่อนของคุณ
+
+บทที่ 6
+YOUR PERSONALIZED MODULES
+โมดูลที่เหมาะกับคุณที่สุด
+AI คัดเลือก
+จาก
+200 TSPI Modules
+แสดง
+Tier 1 สำคัญที่สุด
+Tier 2 เสริม
+Tier 3 ดูแลระยะยาว
+พร้อม
+เหตุผลที่เลือก
+แกนที่ดูแล
+Network ที่ครอบคลุม
+งานวิจัยสนับสนุน
+และ
+ขนาดรับประทานตามแพทย์สั่ง
+
+บทที่ 7
+PERSONALIZED NUTRITION PLAN
+อาหารเฉพาะสำหรับคุณ
+AI ออกแบบ
+Nutrition Blueprint
+ตาม
+อายุ
+โรค
+ผลเลือด
+ลำไส้
+ตับ
+ไต
+ภูมิคุ้มกัน
+หลักพื้นฐาน
+50%
+ผักและผลไม้
+25%
+ธัญพืชไม่ขัดสี
+25%
+โปรตีนคุณภาพดี
+
+อาหารที่ควรกิน
+เฉพาะรายบุคคล
+
+อาหารที่ควรหลีกเลี่ยง
+เฉพาะรายบุคคล
+
+Meal Plan
+7 วัน
+14 วัน
+30 วัน
+
+บทที่ 8
+PERSONALIZED MOVEMENT PROGRAM
+โปรแกรมการเคลื่อนไหวเฉพาะบุคคล
+AI จะออกแบบตาม
+อายุ
+โรค
+ข้อจำกัด
+หัวใจ
+ปอด
+ข้อเข่า
+กล้ามเนื้อ
+39 Axes
+
+AEROBIC TRAINING
+เช่น
+เดิน
+เดินเร็ว
+วิ่ง
+จ๊อกกิ้ง
+ว่ายน้ำ
+ปั่นจักรยาน
+เต้น
+แอโรบิก
+กำหนด
+Zone
+เวลา
+ความถี่
+รายสัปดาห์
+
+RESISTANCE TRAINING
+เช่น
+ดัมเบล
+ยางยืด
+Weight Machine
+Body Weight
+Squat
+Push-up
+Deadlift
+Lunges
+AI กำหนด
+น้ำหนัก
+จำนวนครั้ง
+จำนวนเซต
+ตามสภาพร่างกาย
+
+ANAEROBIC TRAINING
+เช่น
+Sprint
+Interval
+HIIT
+ใช้เฉพาะผู้ที่เหมาะสม
+
+REBOUNDING
+กระโดดแทรมโพลีน
+สำหรับ
+ระบบน้ำเหลือง
+กระดูก
+เมตาบอลิซึม
+
+MOBILITY
+ยืดเหยียด
+โยคะ
+Tai Chi
+Qigong
+
+FUNCTIONAL MOVEMENT
+Animal Flow
+ท่าสัตว์ 7 ชนิด
+สุริยะนมัสการ
+BRS Movement
+
+VAGUS ACTIVATION
+ปราณยามะ
+Box Breathing
+Alternate Nostril Breathing
+Humming
+Chanting
+เพื่อ
+เปิดระบบพาราซิมพาเทติก
+
+บทที่ 9
+MIND • BREATH • SLEEP PROGRAM
+โปรแกรมฟื้นฟูสมองและระบบประสาท
+Morning Protocol
+สมาธิ
+ลมหายใจ
+แสงแดด
+
+Evening Protocol
+งดหน้าจอ
+ฝึกลมหายใจ
+ปล่อยวางความคิด
+
+Sleep Protocol
+เข้านอนก่อน 22:00
+
+
+ห้องมืด
+
+
+ห้องเย็น
+
+
+ฝึกลมหายใจจนหลับ
+
+
+
+บทที่ 10
+YOUR RECOVERY ROADMAP
+แผนฟื้นฟูสุขภาพ
+30 วัน
+90 วัน
+180 วัน
+365 วัน
+
+เป้าหมาย
+ระบบขับถ่าย
+ระบบตับ
+ระบบไต
+ภูมิคุ้มกัน
+การอักเสบ
+พลังงาน
+การนอน
+สมาธิ
+น้ำหนัก
+
+Biomarkers ที่ต้องติดตาม
+CBC
+AST
+ALT
+ALP
+GGT
+Creatinine
+eGFR
+Lipid Profile
+HbA1c
+hs-CRP
+Vitamin D
+Urinalysis
+และอื่น ๆ ตามโรค
+
+Early Warning Signs
+AI แจ้ง
+อาการใดควรรีบพบแพทย์
+
+Next Follow-up
+AI กำหนดวันติดตาม
+และสิ่งที่ควรตรวจครั้งต่อไป
+
+FINAL MESSAGE
+เป้าหมายของรายงานนี้
+ไม่ใช่เพียงบอกว่าคุณเป็นโรคอะไร
+แต่ช่วยให้คุณเข้าใจ
+ว่า
+“ระบบใดกำลังเสียสมดุล”
+“ทำไมคุณจึงป่วย”
+“จะฟื้นฟูอย่างไร”
+และ
+“จะกลับไปมีสุขภาพดีในระยะยาวได้อย่างไร”
+
+
+
+กรณีผู้ป่วยมีผลมัลติโอมิกจะต้องมีการวิเคราะห์เพิ่มเติมดังนี้
+
+
+TSPI Multi-Omics Biological Network Report™
+Scope for AI-Generated Patient & Physician Report
+รายงานเชื่อมโยงมัลติโอมิคของผู้ป่วยกับมัลติโอมิคของโมดูลสมุนไพร
+
+บทที่ 1
+Executive Summary: Multi-Omics Health Overview
+วัตถุประสงค์
+สรุปภาพรวมสุขภาพผู้ป่วยจากข้อมูลหลายชั้น ได้แก่
+Clinical phenotype
+ผลเลือด
+Imaging
+Genomics / NGS
+Epigenomics
+Microbiome
+Metabolomics
+Proteomics
+Pharmacogenomics
+Lifestyle data
+TSPI 39 Biological Axes
+180 Biological Networks
+200 Herbal Phytochemical Modules
+สิ่งที่ AI ต้องสรุป
+ปัญหาหลักของผู้ป่วย
+Network ที่เสียสมดุลมากที่สุด
+Omics ที่สนับสนุนข้อสรุปนั้น
+ความเสี่ยงสำคัญในอนาคต
+โมดูลที่เหมาะสมที่สุด
+สิ่งที่ควรติดตามซ้ำ
+
+บทที่ 2
+Data Quality and Evidence Confidence
+วัตถุประสงค์
+ป้องกันไม่ให้ AI วิเคราะห์เกินข้อมูล
+AI ต้องระบุ
+ข้อมูลใดมีจริง
+ ข้อมูลใดไม่มี
+ ข้อมูลใดเป็นการอนุมาน
+ ข้อมูลใดต้องตรวจเพิ่ม
+แบ่งระดับความมั่นใจ
+High confidence: มีผลตรวจยืนยันหลายชั้น
+Moderate confidence: มีผลเลือดและอาการสนับสนุน
+Low confidence: เป็นสมมติฐาน ต้องตรวจเพิ่ม
+ตัวอย่าง
+ถ้ามีแค่ CRP สูง แต่ไม่มี cytokine panel
+ AI ห้ามสรุปว่า IL-6 สูงโดยตรง
+ ให้เขียนว่า “สงสัย immune-inflammatory activation ควรตรวจเพิ่มเติม”
+
+บทที่ 3
+Clinical Phenome Integration
+ข้อมูลที่ใช้
+อาการหลัก
+โรคประจำตัว
+ระยะเวลาป่วย
+ประวัติยา
+ประวัติการรักษา
+ประวัติผ่าตัด
+อาหาร
+การนอน
+ความเครียด
+การขับถ่าย
+การออกกำลังกาย
+AI ต้องเชื่อม
+Clinical symptoms
+ ↓
+ Organ systems
+ ↓
+ Biological axes
+ ↓
+ Omics evidence
+ ↓
+ Module matching
+
+บทที่ 4
+Genomics / NGS Report
+วิเคราะห์
+Gene variants
+SNPs
+Cancer-related mutations
+Drug metabolism genes
+Detoxification genes
+Inflammation genes
+Lipid metabolism genes
+Methylation-related genes
+Oxidative stress genes
+ตัวอย่างแกนที่เกี่ยวข้อง
+Genomic Stability
+Detoxification
+Inflammatory Regulation
+Lipid Metabolism
+Mitochondrial Function
+Drug Safety
+AI ต้องตอบ
+ยีนใดมีความเสี่ยง
+ความเสี่ยงนั้นเกี่ยวข้องกับโรคใด
+ต้องระวังยาอะไร
+โมดูลใดอาจช่วยสนับสนุน biological pathway นั้น
+ต้องตรวจอะไรเพิ่ม
+
+บทที่ 5
+Pharmacogenomics and Drug–Herb Safety
+วิเคราะห์
+CYP450
+CYP2D6
+CYP2C19
+CYP3A4
+SLCO1B1
+NAT2
+GST
+UGT
+Drug sensitivity
+Statin intolerance risk
+Chemotherapy sensitivity
+Anticoagulant risk
+AI ต้องรายงาน
+ยาที่ควรระวัง
+สมุนไพรที่ควรระวังเมื่อใช้ร่วมกับยา
+ความเสี่ยงต่อตับ
+ความเสี่ยงต่อไต
+ความเสี่ยงเลือดออก
+ความเสี่ยงน้ำตาลต่ำ
+ความเสี่ยงความดันต่ำ
+หลักสำคัญ
+โมดูลทุกตัวต้องผ่าน Safety Filter ก่อนเสนอให้แพทย์พิจารณา
+
+บทที่ 6
+Epigenomics Report
+วิเคราะห์
+DNA methylation age
+Biological age
+Immune age
+Metabolic age
+Inflammation age
+Liver age
+Gut age
+Methylation pattern
+Gene expression regulation risk
+AI ต้องเชื่อมกับ
+การอักเสบเรื้อรัง
+การนอน
+ความเครียด
+อาหาร
+ไมโครไบโอม
+สารพิษ
+การออกกำลังกาย
+โมดูลสมุนไพร
+Output
+Epigenetic imbalance map
+Biological age gap
+Reversal potential
+Lifestyle priority
+Module priority
+
+บทที่ 7
+Microbiome Report
+วิเคราะห์
+Alpha diversity
+Beta diversity
+Akkermansia
+Bifidobacterium
+Lactobacillus
+Faecalibacterium
+Roseburia
+Prevotella
+Bacteroides
+SCFA-producing bacteria
+Pathobionts
+Dysbiosis index
+AI ต้องตอบ
+ลำไส้มีความหลากหลายดีหรือไม่
+เชื้อดีต่ำหรือไม่
+เชื้อก่ออักเสบสูงหรือไม่
+มีแนวโน้มท้องผูก ท้องเสีย SIBO หรือ gut inflammation หรือไม่
+เกี่ยวข้องกับตับ ภูมิแพ้ ภูมิคุ้มกัน สมอง หรือเมตาบอลิซึมอย่างไร
+Module Matching
+เชื่อมกับโมดูล
+Prebiotic modules
+Fiber modules
+Fermentation modules
+Gut barrier modules
+Bowel motility modules
+Anti-inflammatory gut modules
+
+บทที่ 8
+Metabolomics Report
+วิเคราะห์ metabolite สำคัญ
+SCFAs
+Butyrate
+Acetate
+Propionate
+Lactate
+Succinate
+Bile acids
+TMAO
+Kynurenine
+Tryptophan metabolites
+Carnitine
+Amino acids
+Organic acids
+Glutathione-related metabolites
+NAD-related metabolites
+AI ต้องแปล
+Metabolites
+ ↓
+ Pathways
+ ↓
+ Networks
+ ↓
+ Axes
+ ↓
+ Disease risk
+ ↓
+ Module support
+ตัวอย่าง
+Butyrate ต่ำ
+ ↓
+ Gut barrier อ่อน
+ ↓
+ Inflammation สูง
+ ↓
+ เลือกโมดูลฟื้นฟู microbiome และ fiber network
+
+บทที่ 9
+Proteomics and Cytokine Network Report
+วิเคราะห์
+IL-6
+TNF-alpha
+IL-1β
+IL-10
+CRP
+hs-CRP
+VEGF
+IGF-1
+FGF21
+ApoB
+ApoA1
+Albumin
+Complement
+Coagulation proteins
+AI ต้องเชื่อม
+Protein signaling
+ ↓
+ Inflammation network
+ ↓
+ Immune regulation
+ ↓
+ Cancer risk / metabolic risk / vascular risk
+ ↓
+ Module selection
+Output
+Inflammation signature
+Immune imbalance signature
+Vascular risk signature
+Tissue repair signature
+
+บทที่ 10
+Mitochondrial and Energy Network Report
+ข้อมูลที่ใช้
+Lactate
+Pyruvate
+ATP-related markers
+Organic acids
+Fatigue score
+Exercise tolerance
+HbA1c
+Lipid profile
+CoQ10 status หากมี
+Oxidative stress markers
+วิเคราะห์
+Cellular energy
+Mitochondrial stress
+Fat oxidation
+Glucose oxidation
+Redox balance
+Autophagy
+Recovery capacity
+AI ต้องเลือกโมดูลที่สนับสนุน
+Mitochondrial energy
+Autophagy
+Redox balance
+Metabolic flexibility
+Exercise adaptation
+
+บทที่ 11
+Integrated 39 Biological Axes Mapping
+AI ต้องรวมข้อมูลทั้งหมด
+Clinical
+ +
+ Labs
+ +
+ Imaging
+ +
+ Genomics
+ +
+ Epigenomics
+ +
+ Microbiome
+ +
+ Metabolomics
+ +
+ Proteomics
+แล้วแปลงเป็นคะแนน 39 แกน
+Output
+แต่ละแกนต้องมี
+คะแนน 0–100
+ระดับผิดปกติ
+หลักฐานที่ใช้
+Omics ที่สนับสนุน
+ความมั่นใจ
+โมดูลที่เกี่ยวข้อง
+Biomarker ที่ควรติดตาม
+
+บทที่ 12
+180 Living Biological Networks Mapping
+AI ต้องสร้าง
+Network heatmap
+Disease network map
+Recovery network map
+Root network drivers
+Network propagation map
+ตัวอย่าง Network
+Gut–Liver Axis
+Gut–Brain Axis
+Immune–Inflammatory Network
+Mitochondrial Network
+Redox Network
+Lipid Network
+Detoxification Network
+Autophagy Network
+Genomic Stability Network
+Microvascular Network
+Output
+ระบุว่า
+Network ใดเสียมากที่สุด
+Network ใดเป็นตัวผลักโรค
+Network ใดควรฟื้นฟูก่อน
+Network ใดตอบสนองต่อโมดูลใด
+
+บทที่ 13
+Herbal Module Multi-Omics Matching
+วัตถุประสงค์
+เชื่อมมัลติโอมิคของผู้ป่วยกับมัลติโอมิคของโมดูลสมุนไพร
+ข้อมูลของแต่ละโมดูลที่ AI ต้องใช้
+Phytochemical profile
+Target proteins
+Gene expression effects
+Pathway enrichment
+Microbiome effects
+Metabolomic effects
+Anti-inflammatory profile
+Mitochondrial effects
+Safety profile
+Clinical database outcomes
+AI ต้องคำนวณ
+Module–Axis Match Score
+Module–Network Coverage Score
+Module–Omics Reversal Score
+Module Synergy Score
+Safety Score
+Physician Review Priority
+ตัวอย่างโครงสร้างผลลัพธ์
+Module A
+ เหมาะกับผู้ป่วยเพราะ
+ครอบคลุม Gut–Liver Axis
+สนับสนุน microbiome diversity
+ลด inflammatory signature
+สนับสนุน bile acid signaling
+มีข้อมูลผู้ป่วย TSPI คล้ายกันตอบสนองดี
+
+บทที่ 14
+Personalized Network Intervention Plan
+AI ต้องเสนอแผนเป็น 3 ระยะ
+Phase 1: Stabilization
+เป้าหมาย
+ลดอาการรุนแรง
+ลดการอักเสบ
+ปรับขับถ่าย
+ลด burden ของ disease network
+Phase 2: Restoration
+เป้าหมาย
+ฟื้นฟู microbiome
+ฟื้นฟู mitochondria
+ฟื้นฟู gut barrier
+ฟื้นฟู liver metabolism
+Phase 3: Resilience
+เป้าหมาย
+ลดการพึ่งพา
+สร้าง biological resilience
+ป้องกันโรคกลับมา
+ดูแลระยะยาว
+ในแต่ละระยะต้องมี
+Module list
+ขนาดตามแพทย์สั่ง
+Lifestyle plan
+Exercise plan
+Food plan
+Monitoring biomarkers
+Criteria for adjustment
+
+บทที่ 15
+Prognosis, Risk Prediction, and Follow-up Omics Roadmap
+AI ต้องพยากรณ์
+ความเสี่ยง 1 ปี
+ความเสี่ยง 3 ปี
+ความเสี่ยง 5 ปี
+ถ้าไม่เปลี่ยนพฤติกรรม
+ถ้าทำตามแผนฟื้นฟู
+วิเคราะห์ความเสี่ยง
+Metabolic disease
+Fatty liver
+Diabetes
+CKD
+Cardiovascular disease
+Cancer risk
+Cognitive decline
+Autoimmune activation
+Frailty
+Sarcopenia
+Follow-up Testing
+แนะนำตรวจซ้ำตามระดับรายงาน
+Essential
+CBC
+Liver
+Kidney
+Lipid
+HbA1c
+hs-CRP
+Urinalysis
+Advanced
+Microbiome
+Vitamin D
+Ferritin
+B12
+Homocysteine
+Insulin
+HOMA-IR
+Precision
+Metabolomics
+Proteomics
+Epigenetic age
+NGS update
+Pharmacogenomics
+Cytokine panel
+Final Output
+AI ต้องสรุปเป็น
+Top 5 Risks
+Top 5 Root Drivers
+Top 5 Modules
+Top 5 Lifestyle Priorities
+Top 5 Tests to Follow
+
+หลักการสำคัญของ TSPI Multi-Omics Report
+รายงานนี้ต้องไม่ใช่การเดา
+แต่ต้องสร้างจากโครงสร้างนี้
+Patient Multi-Omics
+ ↓
+ Biological Pathways
+ ↓
+ 180 Networks
+ ↓
+ 39 Axes
+ ↓
+ Disease Network
+ ↓
+ Herbal Module Multi-Omics
+ ↓
+ Network Matching
+ ↓
+ Physician-Approved Personalized Plan
+
+ข้อความจำกัดความรับผิดชอบ
+รายงานนี้เป็นเครื่องมือช่วยวิเคราะห์เชิงระบบชีวภาพ ไม่ใช่การวินิจฉัยแทนแพทย์
+การใช้โมดูลสมุนไพร ขนาดรับประทาน การปรับยา หรือการหยุดยาใด ๆ ต้องอยู่ภายใต้การพิจารณาของแพทย์หรือผู้เชี่ยวชาญที่ดูแลผู้ป่วยเท่านั้น
+

@@ -1,0 +1,52 @@
+# Dependency directories
+node_modules/
+.next/
+.next_dev_cache/
+out/
+build/
+dist/
+
+# Python Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment files (Secrets)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+*.env.local
+
+# Database files & backups
+*.sql
+*.sqlite3
+*.dump
+*.db
+
+# OS files
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+firebase-debug.log
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Firebase Admin SDK keys
+*firebase-adminsdk*.json
+data/*firebase-adminsdk*.json
+admin-sdk*.json
+

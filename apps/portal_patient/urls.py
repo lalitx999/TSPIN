@@ -20,9 +20,21 @@ from patients.views_line import (
 app_name = 'portal_patient'
 
 urlpatterns = [
-    # Primary Patient Dashboard (Satisfies core tests & accounts redirect)
+    # Primary Patient Dashboard
     path('', views.patient_dashboard, name='dashboard'),
     path('dashboard/', views.patient_dashboard, name='dashboard'),
+
+    # Patient Experience & AI Intake Routes (Prevent 404s)
+    path('ai-intake/', views.patient_ai_intake, name='patient_ai_intake'),
+    path('checkin/', views.patient_checkin, name='patient_checkin'),
+    path('checkin/<str:session_id>/', views.patient_checkin, name='patient_checkin_session'),
+    path('axes-result/', views.patient_axes_result, name='patient_axes_result'),
+    path('digital-twin/', views.patient_digital_twin, name='patient_digital_twin'),
+    path('history/', views.patient_history, name='patient_history'),
+    path('download/', views.patient_download, name='patient_download'),
+    path('rewards/', views.patient_rewards, name='patient_rewards'),
+    path('settings/', views.patient_settings, name='patient_settings'),
+    path('consent/', views.patient_consent, name='patient_consent'),
 
     # Mobile-First Wellness Portal Views
     path('portal/', portal_dashboard_view, name='portal_dashboard'),

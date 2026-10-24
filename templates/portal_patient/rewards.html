@@ -1,0 +1,53 @@
+{% extends 'layouts/patient_base.html' %}
+
+{% block title %}คะแนนความสม่ำเสมอในการดูแลสุขภาพ | TSPI Health{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+    <div class="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-xs flex items-center justify-between">
+        <div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200 mb-1">
+                <i class="fas fa-award mr-1"></i> Adherence & Wellness Rewards
+            </span>
+            <h1 class="text-2xl font-bold text-gray-900">คะแนนความสม่ำเสมอและการดูแลตนเอง</h1>
+            <p class="text-xs text-gray-500 mt-1">สะสมคะแนนจากการทานสารสกัดตรงเวลา การบันทึกอาการ และการมาพบแพทย์ตามนัด</p>
+        </div>
+        <div class="text-right">
+            <span class="text-3xl font-bold text-primary">850</span>
+            <span class="block text-xs text-gray-400">Total Points</span>
+        </div>
+    </div>
+
+    <!-- Adherence Milestones -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-2 text-center">
+            <div class="w-12 h-12 rounded-full bg-green-100 text-green-700 flex items-center justify-center mx-auto text-lg font-bold">
+                <i class="fas fa-check"></i>
+            </div>
+            <h4 class="text-sm font-semibold text-gray-900">ทานสารสกัดต่อเนื่อง</h4>
+            <p class="text-xs text-gray-500">บันทึกครบ 28 วันติดต่อกัน</p>
+            <span class="inline-block mt-2 text-xs font-bold text-primary">+200 Points</span>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-2 text-center">
+            <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center mx-auto text-lg font-bold">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <h4 class="text-sm font-semibold text-gray-900">ตรงต่อเวลานัด</h4>
+            <p class="text-xs text-gray-500">เข้าพบแพทย์ตรงตามกำหนด 100%</p>
+            <span class="inline-block mt-2 text-xs font-bold text-primary">+150 Points</span>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-2 text-center">
+            <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center mx-auto text-lg font-bold">
+                <i class="fas fa-heart"></i>
+            </div>
+            <h4 class="text-sm font-semibold text-gray-900">อาการอักเสบลดลง</h4>
+            <p class="text-xs text-gray-500">ผลแล็บดีขึ้นเกินเป้าหมาย</p>
+            <span class="inline-block mt-2 text-xs font-bold text-primary">+500 Points</span>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

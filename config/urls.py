@@ -34,6 +34,8 @@ urlpatterns = [
     # Direct LINE Webhook Routes (Pillar 14)
     path('line/webhook/', line_webhook_view, name='root_line_webhook'),
     path('line/confirm/', line_account_binding_callback_view, name='root_line_confirm'),
+    path('link/', line_account_binding_callback_view, name='root_line_link_alias'),
+    path('liff/identity/', line_account_binding_callback_view, name='root_liff_identity_alias'),
 ]
 
 # ในโหมด Development สามารถ serve static/media ได้

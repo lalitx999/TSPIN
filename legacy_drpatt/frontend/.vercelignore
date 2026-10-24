@@ -1,0 +1,14 @@
+# Vercel Ignore Rules to prevent uploading cache and node_modules
+node_modules
+.next
+.next_dev_cache
+.vercel
+.git
+reports
+scratch
+sammary
+summary
+*.log
+*.pdf
+*.tsbuildinfo
+local_audit_logs.json

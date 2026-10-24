@@ -1,0 +1,3190 @@
+[
+  {
+    "action": "VOICE_TRANSCRIPTION",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "inputRaw": "\"น้องมิน\" (นามสมมติ) 📋 ข้อมูลพื้นฐาน รายการ\tรายละเอียด ชื่อ\tด.ญ. มิน (นามสมมติ) อายุ\t3 ปี 8 เดือน เพศ\tหญิง ผู้ปกครอง\tมารดา (อายุ 24 ปี) — มาด้วยกัน ผู้อ้างอิง\tรพ. ส่งต่อมาจากคลินิกเด็กเอกชน ❌ อาการหลัก (มารดาเล่า) \"น้องไข้ขึ้นสูง 39.5 องศา สามวันแล้วค่ะ กินยาลดไข้ก็ลงบ้างแต่ไม่หาย เมื่อวานน้องเริ่มเดินกะเผลก ไม่ยอมลงน้ำหนักขาซ้าย หมอที่คลินิกบอกให้มาตรวจเลือดที่โรงพยาบาลใหญ่\"  📝 อาการอื่นที่มารดาเล่าเพิ่ม (เมื่อพยาบาลถาม) ร้องงอแงผิดปกติ ร้องไม่หยุด ปลอบยาก กินนมได้น้อยลง  ซึมลง เมื่อเทียบกับปกติ (ปกติเป็นเด็ก active ชอบวิ่งเล่น)  มีผื่น ขึ้นที่ขาทั้งสองข้าง เป็นจุดเล็กๆ สีม่วงแดง ไม่นูน ไม่หายเมื่อกด  บวม ที่เข่าซ้าย บวมแดงร้อน  ไม่มีประวัติหกล้ม หรืออุบัติเหตุ (มารดายืนยัน)  ไม่มีไข้ชัก  กินยา เฉพาะพาราเซตามอลกับไอบูโพรเฟนสลับกัน (ตามที่คลินิกให้มา)  📋 ประวัติเพิ่มเติม รายการ\tรายละเอียด ประวัติการคลอด\tคลอดปกติ ครบกำหนด นน. 3,200 กรัม พัฒนาการ\tเดินได้ 1.2 ขวบ พูดเป็นประโยค 2.5 ขวบ — ปกติ วัคซีน\tไม่ครบ (ขาด MMR เข็ม 2, DTP เข็ม 4) เพราะโควิด ทำให้เลื่อนแล้วลืมนัด ประวัติแพ้ยา\tไม่มี ประวัติครอบครัว\tไม่มีโรคเลือดหรือภูมิต้านตนเอง สภาพบ้าน\tอยู่แฟลต ชั้น 4 ไม่มีรั้วระเบียง มีหนูและแมลงสาบ ผู้เลี้ยงดู\tมารดาเลี้ยงเอง (คุณยายช่วยบ้างช่วงเย็น) บิดาไม่ได้อยู่ด้วย 🩸 ผลตรวจเลือดที่ OPD (ด่วน) Lab\tValue\tปกติ\tNote WBC\t24,000 /uL\t5,000-15,000\tสูงมาก Neutrophil\t85%\t40-60\tdominant Lymphocyte\t10%\t20-40\tต่ำ Hb\t9.8 g/dL\t10.5-14\tต่ำเล็กน้อย Platelet\t35,000 /uL\t150,000-450,000\tต่ำมาก CRP\t180 mg/L\t<5\tสูงมาก ESR\t85 mm/hr\t<15\tสูงมาก Blood culture\tส่งแล้ว\t-\tรอผล PT/PTT\tปกติ\t-\t 🩺 การตรวจร่างกาย (เบื้องต้น) Vital signs:  BT 39.2°C, HR 140 bpm, RR 32/min, BP 95/60 mmHg, SpO2 98%  HEENT: เยื่อบุตาซีดเล็กน้อย ไม่มีผื่นในปาก  CVS: S1 S2 ปกติ ไม่มี gallop  Lungs: เคลียร์ทั้งสองข้าง  Abdomen: นุ่ม ไม่กดเจ็บ ไม่มีตับม้ามโต  Extremities:  ขาซ้าย: บวมแดงร้อนที่เข่า, ข้อจำกัดการเคลื่อนไหว  มี petechiae และ ecchymosis ที่หน้าแข้งทั้งสองข้าง (หลายตำแหน่ง)  เดินกะเผลก ไม่ยืนลงน้ำหนัก  Neurological: แรงดี, ไม่มีสัญญาณเยื่อหุ้มสมองอักเสบ  🗣️ มารดาพูดระหว่างซักประวัติ \"หมอคะ น้องมินไม่เคยป่วยหนักขนาดนี้มาก่อนเลย หนูกังวลมาก\" \"ปกติเขาก็ซนนะคะ แต่ไม่ใช่แบบนี้ จะมีอะไรผิดปกติมั้ย\" \"ผื่นนี่มาเมื่อสองวันก่อน หนูคิดว่าคงเป็นผื่นจากไข้ แต่สามีหนู... อ่อ ไม่ได้มีอะไรค่ะ\" (พูดแล้วหลบตา พูดติดอ่าง)",
+      "outputStructured": {
+        "subjective": "เด็กหญิงอายุ 3 ปี 8 เดือน มีไข้สูง 39.5 องศา สามวัน ร้องงอแงผิดปกติ กินนมได้น้อยลง ซึมลง มีผื่นขึ้นที่ขาทั้งสองข้าง",
+        "objective": "WBC 24,000 /uL, Neutrophil 85%, Lymphocyte 10%, Hb 9.8 g/dL, Platelet 35,000 /uL, CRP 180 mg/L, ESR 85 mm/hr, BT 39.2°C, HR 140 bpm, RR 32/min, BP 95/60 mmHg, SpO2 98%, มีบวมแดงร้อนที่เข่าซ้าย",
+        "assessment": "เด็กมีการติดเชื้อแบคทีเรียหรือไวรัสที่รุนแรง ซึ่งแสดงจากผลเลือดและอาการที่มี",
+        "plan": "ต้องตรวจวิเคราะห์ผลเลือดเพิ่มเติม และให้ยาปฏิชีวนะหรือการรักษาเฉพาะจุดตามที่แพทย์ระบุ",
+        "key_symptoms": [
+          "ไข้สูง",
+          "ผื่น",
+          "บวมแดงร้อน",
+          "กินนมได้น้อยลง",
+          "ซึมลง"
+        ],
+        "severity": "severe",
+        "summary_short": "เด็กหญิงอายุ 3 ปี 8 เดือน มีอาการไข้สูง ผื่น และบวมแดงร้อน ซึ่งอาจเป็นการติดเชื้อแบคทีเรียหรือไวรัสที่รุนแรง"
+      },
+      "is_audio": false,
+      "executionTimeMs": 1441,
+      "success": true
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile",
+      "channel": "manual_text"
+    },
+    "timestamp": "2026-05-20T01:49:11.939Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T01:49:39.932Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T01:50:05.620Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T01:50:50.838Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T01:51:17.375Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T01:51:39.943Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T01:52:05.453Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "CLINICAL_INTAKE_PROCESSED",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "inputRaw": "[วิเคราะห์รูปภาพ: cbc.webp]\n\nคำบรรยายภาพทางคลินิก:\nไม่ได้รับข้อมูลประวัติผู้ป่วยหรืออาการแสดงจากผู้ป่วยโดยตรง มีเพียงผลตรวจทางห้องปฏิบัติการเท่านั้น",
+      "outputStructured": {
+        "subjective": "ไม่ได้รับข้อมูลประวัติผู้ป่วยหรืออาการแสดงจากผู้ป่วยโดยตรง มีเพียงผลตรวจทางห้องปฏิบัติการเท่านั้น",
+        "objective": "ผลตรวจ CBC วันที่ 28 กุมภาพันธ์ 2562 ของผู้ป่วยหญิงอายุ 29 ปี มีความผิดปกติดังนี้:\n*   RBC: 6.76 (H - สูงกว่าปกติ, ค่าอ้างอิง: 3.90-5.00 10^6/uL)\n*   HGB: 10.1 (L - ต่ำกว่าปกติ, ค่าอ้างอิง: 12.5-14.3 gm/dl)\n*   HCT: 32.1 (L - ต่ำกว่าปกติ, ค่าอ้างอิง: 37.1-42.7 %)\n*   MCV: 47.5 (L - ต่ำกว่าปกติมาก, ค่าอ้างอิง: 82-97 fL)\n*   MCH: 14.9 (L - ต่ำกว่าปกติ, ค่าอ้างอิง: 27-31 pg)\n*   MCHC: 31.5 (L - ต่ำกว่าปกติ, ค่าอ้างอิง: 32-36 gm/dl)\n*   Monocyte: 9 (H - สูงกว่าปกติ, ค่าอ้างอิง: 4-8 %)\nส่วนค่า WBC, PLT, Neutrophil, Lymphocyte, Eosinophil, และ Basophil อยู่ในเกณฑ์ปกติ",
+        "assessment": "ผู้ป่วยหญิงอายุ 29 ปี มีภาวะโลหิตจางชนิดเม็ดเลือดแดงขนาดเล็กและสีจาง (Microcytic Hypochromic Anemia) ซึ่งบ่งชี้จากค่า HGB, HCT, MCV, MCH, และ MCHC ที่ต่ำกว่าปกติอย่างชัดเจน โดยเฉพาะค่า MCV ที่ต่ำมาก (47.5 fL) ชี้ให้เห็นถึงความเป็นไปได้สูงของภาวะธาลัสซีเมียแฝง (Thalassemia trait) หรือภาวะขาดธาตุเหล็กอย่างรุนแรง นอกจากนี้ยังพบจำนวนเม็ดเลือดแดง (RBC) สูงกว่าปกติ ซึ่งอาจเป็นผลจากการผลิตเม็ดเลือดแดงขนาดเล็กจำนวนมากเพื่อชดเชยภาวะโลหิตจาง และมีภาวะเม็ดเลือดขาวชนิดโมโนไซต์สูงเล็กน้อย (Monocytosis) ซึ่งอาจสัมพันธ์กับการติดเชื้อเรื้อรัง การอักเสบ หรือภาวะอื่น ๆ",
+        "plan": "1.  **การตรวจเพิ่มเติม:**\n    *   ตรวจระดับธาตุเหล็กในเลือด (Iron studies: Ferritin, Serum Iron, TIBC) เพื่อยืนยันหรือตัดภาวะขาดธาตุเหล็ก\n    *   ตรวจวิเคราะห์ชนิดฮีโมโกลบิน (Hemoglobin typing/Electrophoresis) เพื่อยืนยันภาวะธาลัสซีเมีย\n    *   พิจารณาการตรวจเพิ่มเติมเพื่อหาสาเหตุของ Monocytosis หากมีอาการหรือความเสี่ยงที่เกี่ยวข้อง\n2.  **การรักษาเบื้องต้น/คำแนะนำ:**\n    *   หากยืนยันภาวะขาดธาตุเหล็ก: พิจารณาให้ยาเสริมธาตุเหล็ก (Oral Iron Supplementation) และแนะนำอาหารที่อุดมด้วยธาตุเหล็ก\n    *   หากยืนยันภาวะธาลัสซีเมียแฝง: ให้คำแนะนำเกี่ยวกับการดูแลตนเองและผลกระทบต่อการวางแผนครอบครัว\n    *   ติดตามผลการตรวจเลือด CBC ซ้ำใน 3-6 เดือน หรือตามดุลยพินิจของแพทย์\n3.  **การปรับพฤติกรรม:** แนะนำให้รับประทานอาหารครบ 5 หมู่ พักผ่อนให้เพียงพอ และสังเกตอาการผิดปกติที่อาจเกิดขึ้น เช่น อ่อนเพลีย เวียนศีรษะ ใจสั่น หากมีอาการดังกล่าวควรรีบพบแพทย์",
+        "key_symptoms": [
+          "ภาวะโลหิตจาง",
+          "เม็ดเลือดแดงขนาดเล็กและสีจาง",
+          "เม็ดเลือดขาวโมโนไซต์สูง"
+        ],
+        "severity": "moderate",
+        "summary_short": "ผู้ป่วยหญิงอายุ 29 ปี มีภาวะโลหิตจางชนิดเม็ดเลือดแดงขนาดเล็กและสีจางรุนแรงปานกลาง สงสัยภาวะธาลัสซีเมียแฝงหรือขาดธาตุเหล็ก พร้อมกับมีเม็ดเลือดขาวโมโนไซต์สูงเล็กน้อย"
+      },
+      "is_file": true,
+      "mime_type": "image/webp",
+      "executionTimeMs": 18152,
+      "success": true
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash",
+      "channel": "file_upload"
+    },
+    "timestamp": "2026-05-20T02:23:09.952Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "CLINICAL_INTAKE_PROCESSED",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "inputRaw": "ผู้ป่วยชายมีอาการบ้านหมุนหลังตื่นนอนต่อเนื่องมา 3 วัน ร่วมกับอาการเวียนหัว วูบวาบ และรู้สึกคลื่นไส้คล้ายจะอาเจียนตลอดเวลา อาการเริ่มเป็นเมื่อประมาณ 3 วันที่แล้ว หลังจากตื่นนอนตอนเช้า ก่อนหน้านั้นผู้ป่วยมีประวัติไปเที่ยวเกาะล้านโดยสารเรือใหญ่ไป-กลับ ใช้เวลาเดินทางประมาณ 1 ชั่วโมงต่อเที่ยว แต่หลังกลับมายังไม่มีอาการทันที ผู้ป่วยระบุว่ารับประทานอาหารครบ 3 มื้อ ไม่ดื่มแอลกอฮอล์ ไม่สูบบุหรี่หรือสารเสพติด และออกกำลังกายเป็นประจำ เช่น วิ่งบนลู่วิ่ง ผู้ป่วยยังไม่ทราบสาเหตุของอาการที่เกิดขึ้น",
+      "outputStructured": {
+        "subjective": "ผู้ป่วยชายมีอาการบ้านหมุนหลังตื่นนอนต่อเนื่องมา 3 วัน ร่วมกับอาการเวียนหัว วูบวาบ และรู้สึกคลื่นไส้คล้ายจะอาเจียนตลอดเวลา อาการเริ่มเป็นเมื่อประมาณ 3 วันที่แล้ว หลังจากตื่นนอนตอนเช้า ก่อนหน้านั้นผู้ป่วยมีประวัติไปเที่ยวเกาะล้านโดยสารเรือใหญ่ไป-กลับ ใช้เวลาเดินทางประมาณ 1 ชั่วโมงต่อเที่ยว แต่หลังกลับมายังไม่มีอาการทันที ผู้ป่วยระบุว่ารับประทานอาหารครบ 3 มื้อ ไม่ดื่มแอลกอฮอล์ ไม่สูบบุหรี่หรือสารเสพติด และออกกำลังกายเป็นประจำ เช่น วิ่งบนลู่วิ่ง ผู้ป่วยยังไม่ทราบสาเหตุของอาการที่เกิดขึ้น",
+        "objective": "-",
+        "assessment": "ผู้ป่วยมีอาการเวียนศีรษะแบบบ้านหมุนเฉียบพลัน (Acute Vertigo) ร่วมกับอาการคลื่นไส้ ซึ่งเริ่มเป็นหลังตื่นนอน และมีประวัติการเดินทางทางเรือก่อนหน้า อาจต้องพิจารณาภาวะเกี่ยวกับระบบประสาทหู การทรงตัว หรือปัจจัยกระตุ้นอื่นๆ เนื่องจากผู้ป่วยมีสุขภาพดี ออกกำลังกายเป็นประจำ และไม่มีประวัติดื่ม/สูบ จึงอาจลดความเสี่ยงจากปัจจัยเหล่านี้ลงได้ แต่ยังคงต้องหาสาเหตุที่ชัดเจนต่อไป",
+        "plan": [
+          "แนะนำให้ผู้ป่วยพักผ่อนให้เพียงพอ หลีกเลี่ยงการเปลี่ยนท่าทางอย่างรวดเร็ว",
+          "สังเกตอาการเพิ่มเติม เช่น อาการเป็นมากขึ้นเมื่อทำอะไร มีอาการอื่นๆ ร่วมด้วยหรือไม่ (เช่น หูอื้อ มีเสียงในหู การได้ยินผิดปกติ)",
+          "หากอาการไม่ดีขึ้น หรือมีอาการรุนแรงขึ้น เช่น มีไข้ ปวดศีรษะรุนแรง มองเห็นภาพซ้อน แขนขาอ่อนแรง ควรรีบพบแพทย์เพื่อตรวจวินิจฉัยเพิ่มเติม",
+          "พิจารณาการส่งต่อผู้ป่วยเพื่อประเมินโดยแพทย์เฉพาะทาง เช่น โสต ศอ นาสิก หรือ อายุรกรรมประสาท หากอาการยังคงอยู่หรือไม่แน่ใจสาเหตุ",
+          "อาจพิจารณาการใช้ยาบรรเทาอาการเวียนศีรษะและคลื่นไส้ภายใต้คำแนะนำของแพทย์"
+        ],
+        "key_symptoms": [
+          "บ้านหมุน",
+          "เวียนหัว",
+          "คลื่นไส้คล้ายจะอาเจียน"
+        ],
+        "severity": "moderate",
+        "summary_short": "ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน."
+      },
+      "is_file": true,
+      "mime_type": "audio/x-m4a",
+      "executionTimeMs": 16015,
+      "success": true
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash",
+      "channel": "file_upload"
+    },
+    "timestamp": "2026-05-20T02:29:22.847Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T02:30:09.540Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T02:30:27.382Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "gemini-2.5-flash",
+      "model": "gemini-2.5-flash",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash"
+    },
+    "timestamp": "2026-05-20T03:02:09.277Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "gemini-2.5-flash",
+      "model": "gemini-2.5-flash",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash"
+    },
+    "timestamp": "2026-05-20T03:07:04.020Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "gemini-2.5-flash",
+      "model": "gemini-2.5-flash",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash"
+    },
+    "timestamp": "2026-05-20T03:17:57.001Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "LAB_OCR_PROCESSED",
+    "patientId": "002228",
+    "details": {
+      "parameters_found": 13,
+      "axis_count": 7,
+      "saved_document_id": null,
+      "patient_name": "Unknown"
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash",
+      "channel": "API"
+    },
+    "timestamp": "2026-05-20T03:25:15.838Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "LAB_OCR_PROCESSED",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "parameters_found": 13,
+      "axis_count": 9,
+      "saved_document_id": null,
+      "patient_name": "Unknown"
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash",
+      "channel": "API"
+    },
+    "timestamp": "2026-05-20T03:31:57.943Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "LAB_OCR_PROCESSED",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "parameters_found": 13,
+      "axis_count": 5,
+      "saved_document_id": null,
+      "patient_name": "Unknown"
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash",
+      "channel": "API"
+    },
+    "timestamp": "2026-05-20T03:37:24.132Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "LAB_TEXT_ANALYZED",
+    "details": {
+      "parameters_found": 9,
+      "axis_count": 8
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash",
+      "channel": "API"
+    },
+    "timestamp": "2026-05-20T05:10:59.373Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "LAB_TEXT_ANALYZED",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "parameters_found": 9,
+      "axis_count": 7
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash",
+      "channel": "API"
+    },
+    "timestamp": "2026-05-20T05:19:33.844Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน.",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T05:28:15.569Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779254899862",
+        "timestamp": "2026-05-20T05:28:19.862Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_2": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_3": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_4": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_5": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_6": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_7": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_8": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_9": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_10": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_11": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_12": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_13": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_14": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_15": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_16": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_17": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_18": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_19": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_20": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_21": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_22": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_23": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_24": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_25": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_26": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_27": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_28": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_29": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_30": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_31": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_32": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_33": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_34": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_35": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_36": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_37": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_38": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_39": {
+            "score": 65,
+            "severity": "Moderate"
+          }
+        },
+        "mechanisticInsights": "Based on the patient's symptoms and observations, I will perform a Systems Biology synthesis of the patient's condition.\n\n**Symptoms and Observations**\n\nThe patient presents with อาการบ้านหมุน (dizziness), เวียนศีรษะ (head spinning), and คลื่นไส้ (nausea), which have persisted for 3 days after waking up. The patient has a history of traveling by boat before the onset of symptoms.\n\n**Systems Biology Analysis**\n\n1. **Neuro-Sleep-Stress Axis**: The patient's symptoms suggest a disruption in the vestibular system, which is responsible for balance and spatial orientation. This axis is interconnected with the **Neuro-Sleep-Stress-Brain Clearance (Meta-Axis)**, which may be affected due to the patient's history of traveling by boat, potentially leading to a imbalance in the vestibular system.\n2. **Vascular-Circulation-Stroke Prevention Axis**: The patient's dizziness and head spinning may be related to changes in blood flow and circulation, particularly in the inner ear and brain. This axis is interconnected with the **Hemodynamics & Arterial Elasticity** axis, which may be affected due to the patient's recent travel by boat, potentially leading to changes in blood pressure and vascular tone.\n3. **Detox-Digestive-Gut Ecosystem Axis**: The patient's nausea may be related to gastrointestinal disturbances, which can be interconnected with the **Microbiome Ecology** axis. The patient's recent travel by boat may have exposed them to new microbial environments, potentially leading to an imbalance in the gut microbiome.\n4. **Endocrine Network Axis**: The patient's symptoms may be related to hormonal changes, particularly in the **Thyroid-Adrenal-Growth** axis, which can affect the vestibular system and balance.\n\n**Network Effect**\n\nThe patient's symptoms can be seen as a result of an interconnected network of systems biology axes, including:\n\n* Neuro-Sleep-Stress Axis → Neuro-Sleep-Stress-Brain Clearance (Meta-Axis) → Vascular-Circulation-Stroke Prevention Axis\n* Detox-Digestive-Gut Ecosystem Axis → Microbiome Ecology Axis → Endocrine Network Axis\n\n**Mechanistic Pathways**\n\nThe patient's symptoms may be caused by a combination of factors, including:\n\n* Vestibular system disruption due to changes in blood flow and circulation\n* Gastrointestinal disturbances and microbiome imbalance\n* Hormonal changes affecting the vestibular system and balance\n\n**Therapeutic Modules**\n\nBased on the Systems Biology analysis, potential therapeutic modules may include:\n\n* Vestibular rehabilitation therapy to improve balance and spatial orientation\n* Gastrointestinal support, such as probiotics, to restore balance to the gut microbiome\n* Hormonal regulation therapy, such as thyroid hormone replacement, to address potential hormonal imbalances\n* Lifestyle modifications, such as stress management and sleep hygiene, to support overall health and well-being.\n\n**Clinical Guidelines**\n\n1. Synthesize the \"Network Effect\" showing how these axes are biologically interconnected: The patient's symptoms are interconnected with multiple systems biology axes, including Neuro-Sleep-Stress, Vascular-Circulation-Stroke Prevention, Detox-Digestive-Gut Ecosystem, and Endocrine Network.\n2. Map clinical symptoms directly to physiological dysfunctions across the 39 systems biology axes: The patient's symptoms can be mapped to specific physiological dysfunctions, including vestibular system disruption, gastrointestinal disturbances, and hormonal changes.\n3. Incorporate the provided Closed-Circuit RAG Knowledge explicitly when proposing explanations or justifications: The patient's history of traveling by boat and the lack of specialized guidelines loaded in local memory are taken into account in the analysis.\n4. Outline mechanistic pathways of recommended therapeutic modules: The therapeutic modules are based on the Systems Biology analysis and aim to address the underlying physiological dysfunctions.\n5. Keep explanations clear, rigorous, and highly actionable for clinicians: The analysis provides a clear and actionable framework for clinicians to address the patient's symptoms and underlying physiological dysfunctions.",
+        "recommendedProtocol": []
+      },
+      "executionTimeMs": 4294,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T05:28:19.863Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779254899862"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-20T05:28:19.868Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน.",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T05:35:35.254Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779255339008",
+        "timestamp": "2026-05-20T05:35:39.008Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_2": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_3": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_4": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_5": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_6": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_7": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_8": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_9": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_10": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_11": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_12": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_13": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_14": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_15": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_16": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_17": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_18": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_19": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_20": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_21": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_22": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_23": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_24": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_25": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_26": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_27": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_28": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_29": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_30": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_31": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_32": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_33": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_34": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_35": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_36": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_37": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_38": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_39": {
+            "score": 65,
+            "severity": "Moderate"
+          }
+        },
+        "mechanisticInsights": "**Systems Biology Synthesis:**\n\nBased on the patient's symptoms of dizziness (บ้านหมุน), head-spinning sensation (เวียนศีรษะ), and nausea (คลื่นไส้), which have persisted for 3 days after waking up, and considering their history of recent travel by boat, a comprehensive systems biology synthesis can be performed.\n\n**Interconnected Axes:**\n\n1. **Neuro–Sleep–Stress–Brain Clearance (Meta‑Axis):** The patient's symptoms suggest a potential disruption in the neuro-sleep-stress axis, which may be related to the recent travel and changes in sleep patterns. The head-spinning sensation and dizziness could be indicative of vestibular system dysfunction, which is closely linked to the neuro-sleep-stress axis (Score: 65%, Moderate).\n2. **Oxidative Stress:** The patient's symptoms may also be related to oxidative stress, which can be triggered by changes in sleep patterns, travel, and other environmental factors. Oxidative stress can lead to inflammation and damage to the nervous system, exacerbating symptoms (Score: 65%, Moderate).\n3. **Gut Barrier & Mucosal Integrity:** The patient's nausea and potential gastrointestinal symptoms may be related to gut barrier dysfunction, which can be triggered by changes in diet, travel, or other environmental factors. The gut-brain axis is closely linked, and disruption of the gut barrier can lead to neuroinflammation and contribute to the patient's symptoms (Score: 65%, Moderate).\n4. **Vascular–Circulation–Stroke Prevention:** The patient's dizziness and head-spinning sensation may also be related to vascular dysfunction, which can be triggered by changes in blood pressure, blood flow, or other cardiovascular factors. The vascular system is closely linked to the neuro-sleep-stress axis, and dysfunction can contribute to the patient's symptoms (Score: 65%, Moderate).\n\n**Physiological Dysfunctions:**\n\n1. **Vestibular System Dysfunction:** The patient's head-spinning sensation and dizziness suggest a potential disruption in the vestibular system, which is responsible for balance and spatial orientation.\n2. **Neuroinflammation:** The patient's symptoms may be related to neuroinflammation, which can be triggered by oxidative stress, gut barrier dysfunction, or other environmental factors.\n3. **Gut-Brain Axis Dysfunction:** The patient's nausea and potential gastrointestinal symptoms may be related to disruption of the gut-brain axis, which can lead to neuroinflammation and contribute to the patient's symptoms.\n\n**Therapeutic Modules:**\n\n1. **Vestibular Rehabilitation:** The patient may benefit from vestibular rehabilitation exercises to help improve balance and spatial orientation.\n2. **Antioxidant and Anti-Inflammatory Therapies:** The patient may benefit from antioxidant and anti-inflammatory therapies to reduce oxidative stress and neuroinflammation.\n3. **Gut-Brain Axis Support:** The patient may benefit from therapies that support the gut-brain axis, such as probiotics, prebiotics, or other nutritional interventions.\n4. **Sleep Hygiene and Stress Management:** The patient may benefit from sleep hygiene and stress management techniques to help regulate the neuro-sleep-stress axis.\n\n**Mechanistic Pathways:**\n\n1. **Vestibular System:** The vestibular system plays a critical role in balance and spatial orientation. Disruption of the vestibular system can lead to symptoms such as dizziness and head-spinning sensation.\n2. **Neuroinflammation:** Neuroinflammation can be triggered by oxidative stress, gut barrier dysfunction, or other environmental factors. Neuroinflammation can lead to disruption of the neuro-sleep-stress axis and contribute to the patient's symptoms.\n3. **Gut-Brain Axis:** The gut-brain axis plays a critical role in regulating the neuro-sleep-stress axis. Disruption of the gut-brain axis can lead to neuroinflammation and contribute to the patient's symptoms.\n\n**Clinical Guidelines:**\n\n1. **Monitor and Manage Symptoms:** The patient's symptoms should be closely monitored and managed to prevent exacerbation.\n2. **Vestibular Rehabilitation:** The patient should be referred to a vestibular rehabilitation program to help improve balance and spatial orientation.\n3. **Antioxidant and Anti-Inflammatory Therapies:** The patient may benefit from antioxidant and anti-inflammatory therapies to reduce oxidative stress and neuroinflammation.\n4. **Gut-Brain Axis Support:** The patient may benefit from therapies that support the gut-brain axis, such as probiotics, prebiotics, or other nutritional interventions.\n5. **Sleep Hygiene and Stress Management:** The patient should be educated on sleep hygiene and stress management techniques to help regulate the neuro-sleep-stress axis.",
+        "recommendedProtocol": []
+      },
+      "executionTimeMs": 3755,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T05:35:39.008Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779255339008"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-20T05:35:39.014Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน.",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T06:07:21.107Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779257244301",
+        "timestamp": "2026-05-20T06:07:24.301Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_2": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_3": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_4": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_5": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_6": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_7": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_8": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_9": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_10": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_11": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_12": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_13": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_14": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_15": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_16": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_17": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_18": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_19": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_20": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_21": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_22": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_23": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_24": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_25": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_26": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_27": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_28": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_29": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_30": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_31": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_32": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_33": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_34": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_35": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_36": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_37": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_38": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_39": {
+            "score": 65,
+            "severity": "Moderate"
+          }
+        },
+        "mechanisticInsights": "Based on the patient's symptoms of dizziness (บ้านหมุน), head spinning (เวียนศีรษะ), and nausea (คลื่นไส้), which have been persistent for 3 days after waking up, and considering the patient's history of traveling by boat, a Systems Biology synthesis of the patient's condition can be performed as follows:\n\n1. **Network Effect**: The patient's symptoms can be interconnected through the following axes:\n\t* **Neuro-Sleep-Stress-Brain Clearance (Meta-Axis)**: The symptoms of dizziness, head spinning, and nausea can be related to the brain's balance and equilibrium control, which is influenced by the vestibular system, visual input, and proprioception. The patient's history of traveling by boat may have disrupted the vestibular system, leading to a mismatch between the sensory inputs and the brain's expectations.\n\t* **Endocrine Network**: The patient's symptoms may also be related to hormonal changes, particularly in the hypothalamic-pituitary-adrenal (HPA) axis, which regulates stress response. The HPA axis can influence the vestibular system and contribute to the development of symptoms.\n\t* **Detox-Digestive-Gut Ecosystem**: The patient's nausea and dizziness may also be related to gastrointestinal issues, such as motion sickness or food poisoning, which can be influenced by the gut microbiome and the enteric nervous system.\n2. **Mapping Clinical Symptoms to Physiological Dysfunctions**: The patient's symptoms can be mapped to the following physiological dysfunctions:\n\t* **Vestibular dysfunction**: The patient's symptoms of dizziness and head spinning may indicate a problem with the vestibular system, which can be related to the **Neuro-Sleep-Stress-Brain Clearance (Meta-Axis)**.\n\t* **Gastrointestinal dysfunction**: The patient's nausea may indicate a problem with the gastrointestinal system, which can be related to the **Detox-Digestive-Gut Ecosystem**.\n\t* **Hormonal imbalance**: The patient's symptoms may also be related to hormonal changes, particularly in the **Endocrine Network**.\n3. **Incorporating Closed-Circuit RAG Knowledge**: Based on the patient's history of traveling by boat, it is possible that the patient may have developed a condition known as \"mal de débarquement\" or \"disembarkation syndrome\", which is a rare condition that occurs after a period of time spent on a boat or ship. This condition can cause symptoms such as dizziness, head spinning, and nausea.\n4. **Mechanistic Pathways of Recommended Therapeutic Modules**: The following therapeutic modules may be recommended:\n\t* **Vestibular rehabilitation therapy**: To help the patient's vestibular system recover and improve balance and equilibrium control.\n\t* **Gastrointestinal support**: To help manage nausea and gastrointestinal symptoms, such as anti-nausea medications or gut-friendly probiotics.\n\t* **Hormonal regulation**: To help regulate hormonal imbalances, such as stress management techniques or hormonal supplements.\n\t* **Relaxation techniques**: To help manage stress and anxiety, such as meditation or deep breathing exercises.\n\nOverall, the patient's symptoms can be synthesized through a Systems Biology approach, considering the interconnections between the **Neuro-Sleep-Stress-Brain Clearance (Meta-Axis)**, **Endocrine Network**, and **Detox-Digestive-Gut Ecosystem**. A comprehensive treatment plan that addresses the patient's vestibular dysfunction, gastrointestinal issues, and hormonal imbalances may be necessary to alleviate the patient's symptoms.",
+        "recommendedProtocol": []
+      },
+      "executionTimeMs": 3196,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T06:07:24.302Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779257244301"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-20T06:07:24.309Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "gemini-2.5-flash",
+      "model": "gemini-2.5-flash",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash"
+    },
+    "timestamp": "2026-05-20T06:08:38.162Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน.",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T06:12:40.501Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779257564039",
+        "timestamp": "2026-05-20T06:12:44.039Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_2": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_3": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_4": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_5": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_6": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_7": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_8": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_9": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_10": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_11": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_12": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_13": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_14": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_15": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_16": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_17": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_18": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_19": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_20": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_21": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_22": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_23": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_24": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_25": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_26": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_27": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_28": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_29": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_30": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_31": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_32": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_33": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_34": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_35": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_36": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_37": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_38": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_39": {
+            "score": 65,
+            "severity": "Moderate"
+          }
+        },
+        "mechanisticInsights": "**Systems Biology Synthesis**\n\nBased on the patient's symptoms and observations, a comprehensive analysis of the 39 systems biology axes is conducted to identify potential underlying physiological dysfunctions.\n\n**Primary Axes Affected:**\n\n1. **Neuro–Sleep–Stress–Brain Clearance (Meta‑Axis)**: 70% (Moderate to High)\n\t* The patient's symptoms of dizziness, headache, and nausea may be related to disruptions in brain clearance and neuro-inflammatory processes.\n2. **Vascular–Circulation–Stroke Prevention**: 65% (Moderate)\n\t* The patient's history of traveling by boat and sudden onset of symptoms may be related to vestibular disturbances, which can affect blood flow and vascular function.\n3. **Detox–Digestive–Gut Ecosystem**: 65% (Moderate)\n\t* The patient's nausea and symptoms may be related to gastrointestinal disturbances, which can affect detoxification processes and the gut-brain axis.\n4. **Endocrine Network**: 60% (Mild to Moderate)\n\t* The patient's symptoms may be related to hormonal imbalances, particularly in the hypothalamic-pituitary-adrenal (HPA) axis, which can affect stress response and cortisol regulation.\n5. **Proteostasis & Cellular Integrity**: 60% (Mild to Moderate)\n\t* The patient's symptoms may be related to cellular stress and proteostasis imbalances, which can affect protein quality control and mitochondrial function.\n\n**Network Effect:**\n\nThe patient's symptoms and observations suggest a complex interplay between multiple systems biology axes. The following network effect is proposed:\n\n* Vestibular disturbances (related to travel by boat) → disruptions in brain clearance and neuro-inflammatory processes (Neuro–Sleep–Stress–Brain Clearance) → gastrointestinal disturbances (Detox–Digestive–Gut Ecosystem) → hormonal imbalances (Endocrine Network) → cellular stress and proteostasis imbalances (Proteostasis & Cellular Integrity)\n\n**Clinical Symptoms Mapping:**\n\nThe patient's symptoms can be mapped to the following physiological dysfunctions:\n\n* Dizziness: vestibular disturbances, brain clearance disruptions, and neuro-inflammatory processes\n* Headache: neuro-inflammatory processes, hormonal imbalances, and cellular stress\n* Nausea: gastrointestinal disturbances, detoxification processes, and gut-brain axis imbalances\n\n**Therapeutic Modules:**\n\nBased on the systems biology synthesis, the following therapeutic modules are proposed:\n\n1. **Vestibular rehabilitation therapy**: to address vestibular disturbances and promote balance and equilibrium\n2. **Neuro-inflammatory modulation**: to reduce neuro-inflammatory processes and promote brain clearance\n3. **Gastrointestinal support**: to address gastrointestinal disturbances and promote detoxification processes\n4. **Hormonal balancing**: to address hormonal imbalances and promote stress response regulation\n5. **Cellular stress reduction**: to reduce cellular stress and promote proteostasis and mitochondrial function\n\n**Actionable Recommendations:**\n\n1. Conduct a comprehensive medical history and physical examination to rule out underlying conditions.\n2. Perform vestibular function tests to assess vestibular disturbances.\n3. Prescribe vestibular rehabilitation therapy and neuro-inflammatory modulation therapies.\n4. Recommend gastrointestinal support and hormonal balancing therapies.\n5. Monitor patient symptoms and adjust therapeutic modules as needed.\n\nBy applying a systems biology approach, clinicians can better understand the complex interplay between multiple physiological axes and develop targeted therapeutic strategies to address the patient's condition.",
+        "recommendedProtocol": []
+      },
+      "executionTimeMs": 3539,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T06:12:44.039Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779257564039"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-20T06:12:44.042Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน.",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T06:13:02.268Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779257585846",
+        "timestamp": "2026-05-20T06:13:05.846Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_2": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_3": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_4": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_5": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_6": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_7": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_8": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_9": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_10": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_11": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_12": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_13": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_14": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_15": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_16": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_17": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_18": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_19": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_20": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_21": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_22": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_23": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_24": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_25": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_26": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_27": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_28": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_29": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_30": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_31": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_32": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_33": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_34": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_35": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_36": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_37": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_38": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_39": {
+            "score": 65,
+            "severity": "Moderate"
+          }
+        },
+        "mechanisticInsights": "Based on the patient's symptoms of บ้านหมุน (dizziness), เวียนศีรษะ (head spinning), and คลื่นไส้ (nausea), along with the observation of having a history of traveling by boat, a systems biology synthesis can be performed to understand the underlying physiological dysfunctions.\n\nThe patient's symptoms can be mapped to multiple systems biology axes, including:\n\n1. **Neuro–Sleep–Stress–Brain Clearance (Meta‑Axis)**: The symptoms of dizziness, head spinning, and nausea can be related to vestibular system dysfunction, which is regulated by the neuro-sleep-stress-brain clearance meta-axis.\n2. **Vascular–Circulation–Stroke Prevention**: The dizziness and head spinning can also be related to vascular circulation issues, such as orthostatic hypotension or vasovagal syncope.\n3. **Detox–Digestive–Gut Ecosystem**: The nausea and dizziness can be related to gastrointestinal issues, such as motion sickness or gastroesophageal reflux disease (GERD).\n4. **Musculoskeletal & Structural Integrity**: The dizziness and head spinning can also be related to musculoskeletal issues, such as cervical spine dysfunction or temporomandibular joint (TMJ) disorders.\n\nThe patient's history of traveling by boat suggests that they may have been exposed to motion sickness, which can trigger a complex interplay between the vestibular system, the nervous system, and the gastrointestinal system.\n\nThe computed physiological scoring indicates that the patient has moderate dysfunction in multiple systems biology axes, including:\n\n1. **Systemic Inflammatory Load**: 65% (Moderate)\n2. **Immune Homeostasis**: 65% (Moderate)\n3. **Oxidative Stress**: 65% (Moderate)\n4. **Mitochondrial Network**: 65% (Moderate)\n\nThe institutional RAG knowledge suggests that there is no specific guideline for this patient's condition. However, the computed physiological scoring and systems biology synthesis suggest that the patient's condition may be related to a combination of vestibular system dysfunction, gastrointestinal issues, and musculoskeletal problems.\n\nTo further understand the patient's condition, it is recommended to:\n\n1. Perform a thorough physical examination to assess the patient's vestibular system, gastrointestinal system, and musculoskeletal system.\n2. Conduct laboratory tests to assess the patient's inflammatory load, immune function, and oxidative stress levels.\n3. Develop a personalized therapeutic plan that addresses the patient's specific needs and dysfunction, including vestibular rehabilitation, gastrointestinal therapy, and musculoskeletal rehabilitation.\n\nThe proposed therapeutic modules may include:\n\n1. Vestibular rehabilitation therapy to improve balance and reduce dizziness.\n2. Gastrointestinal therapy to manage nausea and vomiting.\n3. Musculoskeletal rehabilitation to address cervical spine dysfunction or TMJ disorders.\n4. Antioxidant and anti-inflammatory therapies to reduce oxidative stress and systemic inflammatory load.\n5. Stress management and relaxation techniques to reduce stress and promote immune homeostasis.\n\nThese therapeutic modules can be tailored to the patient's specific needs and can be adjusted based on their response to treatment. Regular follow-up appointments and monitoring of the patient's condition can help to refine the therapeutic plan and optimize treatment outcomes.",
+        "recommendedProtocol": []
+      },
+      "executionTimeMs": 3578,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T06:13:05.847Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779257585846"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-20T06:13:05.849Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน.",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T08:05:57.342Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779264360334",
+        "timestamp": "2026-05-20T08:06:00.334Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_2": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_3": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_4": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_5": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_6": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_7": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_8": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_9": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_10": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_11": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_12": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_13": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_14": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_15": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_16": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_17": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_18": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_19": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_20": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_21": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_22": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_23": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_24": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_25": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_26": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_27": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_28": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_29": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_30": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_31": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_32": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_33": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_34": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_35": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_36": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_37": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_38": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_39": {
+            "score": 65,
+            "severity": "Moderate"
+          }
+        },
+        "mechanisticInsights": "Based on the patient's symptoms and observations, I will perform a Systems Biology synthesis to identify the underlying physiological dysfunctions and potential interconnectedness of the 39 systems biology axes.\n\n**Symptoms and Observations:**\n\n* บ้านหมุน (dizziness)\n* เวียนศีรษะ (vertigo)\n* คลื่นไส้ (nausea)\n* มีอาการต่อเนื่อง 3 วันหลังตื่นนอน (symptoms persist for 3 days after waking up)\n* มีประวัติเดินทางทางเรือมาก่อน (history of traveling by sea)\n\n**Potential Physiological Dysfunctions:**\n\n1. **Neuro-Sleep-Stress Axis:** The patient's symptoms of dizziness, vertigo, and nausea may be related to an imbalance in the neuro-sleep-stress axis, specifically in the vestibular system, which is responsible for balance and equilibrium.\n2. **Oxidative Stress:** The patient's symptoms may also be related to oxidative stress, which can cause damage to the inner ear and vestibular system, leading to dizziness and vertigo.\n3. **Mitochondrial Network:** The patient's symptoms may be related to mitochondrial dysfunction, which can lead to impaired energy production and increased oxidative stress.\n4. **Gut-Brain Axis:** The patient's symptoms of nausea and dizziness may be related to an imbalance in the gut-brain axis, specifically in the gut motility and secretion of neurotransmitters.\n5. **Detox-Digestive-Gut Ecosystem:** The patient's symptoms may be related to an imbalance in the detox-digestive-gut ecosystem, specifically in the liver's ability to detoxify and eliminate toxins.\n\n**Interconnectedness of Axes:**\n\n1. **Neuro-Sleep-Stress Axis** → **Oxidative Stress:** The neuro-sleep-stress axis can influence oxidative stress levels, which can in turn affect the vestibular system and contribute to dizziness and vertigo.\n2. **Oxidative Stress** → **Mitochondrial Network:** Oxidative stress can damage mitochondria, leading to impaired energy production and increased oxidative stress.\n3. **Mitochondrial Network** → **Gut-Brain Axis:** Mitochondrial dysfunction can affect the gut-brain axis, leading to impaired gut motility and secretion of neurotransmitters.\n4. **Gut-Brain Axis** → **Detox-Digestive-Gut Ecosystem:** The gut-brain axis can influence the detox-digestive-gut ecosystem, specifically in the liver's ability to detoxify and eliminate toxins.\n\n**Therapeutic Modules:**\n\n1. **Nutritional Support:** Provide nutritional support to reduce oxidative stress and improve mitochondrial function, such as CoQ10, vitamin C, and omega-3 fatty acids.\n2. **Vestibular Rehabilitation:** Provide vestibular rehabilitation therapy to improve balance and equilibrium.\n3. **Gut Motility Support:** Provide gut motility support, such as probiotics and digestive enzymes, to improve gut function and reduce nausea.\n4. **Stress Management:** Provide stress management techniques, such as meditation and deep breathing, to reduce stress and improve sleep quality.\n\n**Conclusion:**\n\nThe patient's symptoms of dizziness, vertigo, and nausea may be related to an imbalance in the neuro-sleep-stress axis, oxidative stress, mitochondrial network, gut-brain axis, and detox-digestive-gut ecosystem. The interconnectedness of these axes suggests that a comprehensive approach to treatment, including nutritional support, vestibular rehabilitation, gut motility support, and stress management, may be necessary to improve the patient's symptoms and overall health.",
+        "recommendedProtocol": []
+      },
+      "executionTimeMs": 2993,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T08:06:00.335Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779264360334"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-20T08:06:00.341Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน.",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T08:06:52.604Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779264416697",
+        "timestamp": "2026-05-20T08:06:56.697Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_2": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_3": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_4": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_5": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_6": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_7": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_8": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_9": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_10": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_11": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_12": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_13": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_14": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_15": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_16": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_17": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_18": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_19": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_20": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_21": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_22": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_23": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_24": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_25": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_26": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_27": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_28": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_29": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_30": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_31": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_32": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_33": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_34": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_35": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_36": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_37": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_38": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_39": {
+            "score": 65,
+            "severity": "Moderate"
+          }
+        },
+        "mechanisticInsights": "Based on the patient's symptoms and observations, I will perform a Systems Biology synthesis of the patient's condition.\n\n**Symptoms and Observations:**\n\n* บ้านหมุน (dizziness or vertigo)\n* เวียนศีรษะ (head spinning)\n* คลื่นไส้ (nausea)\n* อาการเริ่มต้น 3 วันหลังตื่นนอน (symptoms started 3 days after waking up)\n* มีประวัติเดินทางทางเรือมาก่อน (patient has a history of traveling by boat)\n\n**Systems Biology Synthesis:**\n\nBased on the patient's symptoms, I will analyze the axes that are most likely to be involved:\n\n1. **Neuro–Sleep–Stress–Brain Clearance (Meta‑Axis):** The patient's symptoms of dizziness, vertigo, and nausea could be related to issues with balance and equilibrium, which are regulated by the vestibular system in the inner ear. The fact that symptoms started 3 days after waking up suggests a possible link to sleep or circadian rhythm disturbances.\n2. **Vascular–Circulation–Stroke Prevention:** The patient's history of traveling by boat may have exposed them to motion sickness, which can cause dizziness and nausea.\n3. **Detox–Digestive–Gut Ecosystem:** The patient's symptoms of nausea and dizziness could be related to gastrointestinal disturbances, such as motion sickness or food poisoning.\n4. **Endocrine Network:** Hormonal changes, such as those that occur during travel or stress, may contribute to the patient's symptoms.\n5. **Oxidative Stress:** The patient's symptoms could be related to oxidative stress, which can cause inflammation and tissue damage.\n\n**Biological Network Effect:**\n\nThe patient's symptoms are likely the result of a complex interplay between multiple systems, including:\n\n* The vestibular system in the inner ear, which regulates balance and equilibrium\n* The gastrointestinal system, which may be experiencing motion sickness or food poisoning\n* The endocrine system, which may be experiencing hormonal changes due to travel or stress\n* The oxidative stress pathway, which may be contributing to inflammation and tissue damage\n\n**Mechanistic Pathways:**\n\nBased on the patient's symptoms and observations, the following mechanistic pathways may be involved:\n\n1. Vestibular-ocular reflex (VOR) dysfunction, which can cause dizziness and vertigo\n2. Gastrointestinal motility disorders, which can cause nausea and vomiting\n3. Hormonal changes, such as those that occur during travel or stress, which can contribute to symptoms\n4. Oxidative stress and inflammation, which can cause tissue damage and contribute to symptoms\n\n**Therapeutic Modules:**\n\nBased on the patient's symptoms and observations, the following therapeutic modules may be recommended:\n\n1. Vestibular rehabilitation therapy (VRT) to improve balance and equilibrium\n2. Anti-nausea medication to manage gastrointestinal symptoms\n3. Hormonal replacement therapy (HRT) to manage hormonal changes\n4. Antioxidant and anti-inflammatory therapies to manage oxidative stress and inflammation\n\n**Clinical Guidelines:**\n\n1. The patient should be evaluated for vestibular function and balance disorders.\n2. The patient should be screened for gastrointestinal disorders, such as motion sickness or food poisoning.\n3. The patient should be evaluated for hormonal changes, such as those that occur during travel or stress.\n4. The patient should be treated with anti-nausea medication and vestibular rehabilitation therapy (VRT) as needed.\n\nNote: This is a hypothetical case, and the recommendations are based on the provided information. A thorough medical evaluation and diagnosis are necessary to determine the underlying cause of the patient's symptoms and to develop an effective treatment plan.",
+        "recommendedProtocol": []
+      },
+      "executionTimeMs": 4094,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T08:06:56.697Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779264416697"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-20T08:06:56.703Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน.",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T08:12:19.902Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779264742941",
+        "timestamp": "2026-05-20T08:12:22.941Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_2": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_3": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_4": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_5": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_6": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_7": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_8": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_9": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_10": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_11": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_12": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_13": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_14": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_15": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_16": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_17": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_18": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_19": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_20": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_21": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_22": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_23": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_24": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_25": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_26": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_27": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_28": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_29": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_30": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_31": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_32": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_33": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_34": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_35": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_36": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_37": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_38": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_39": {
+            "score": 65,
+            "severity": "Moderate"
+          }
+        },
+        "mechanisticInsights": "Based on the patient's symptoms of บ้านหมุน (dizziness), เวียนศีรษะ (lightheadedness), and คลื่นไส้ (nausea), along with the observation of a history of traveling by boat, a Systems Biology synthesis of the patient's condition can be performed as follows:\n\n1. **Network Effect**: The patient's symptoms can be connected to multiple systems biology axes, including:\n\t* Neuro-Sleep-Stress-Brain Clearance (Meta-Axis): The patient's dizziness and lightheadedness may be related to disruptions in the brain's balance and equilibrium systems, which can be influenced by stress, sleep deprivation, and other neurological factors.\n\t* Vascular-Circulation-Stroke Prevention: The patient's symptoms may also be related to changes in blood flow and blood pressure, which can be affected by the body's response to motion and stress.\n\t* Detox-Digestive-Gut Ecosystem: The patient's nausea and dizziness may be related to gastrointestinal disturbances, which can be influenced by the body's response to motion and changes in gut flora.\n2. **Clinical Symptom Mapping**: The patient's symptoms can be mapped to physiological dysfunctions across the following systems biology axes:\n\t* Neuro-Sleep-Stress-Brain Clearance (Meta-Axis): The patient's dizziness and lightheadedness may be related to abnormalities in the brain's balance and equilibrium systems, such as problems with the vestibular system or cerebellar function.\n\t* Vascular-Circulation-Stroke Prevention: The patient's symptoms may be related to changes in blood flow and blood pressure, such as orthostatic hypotension or changes in cerebral blood flow.\n\t* Detox-Digestive-Gut Ecosystem: The patient's nausea and dizziness may be related to gastrointestinal disturbances, such as motion sickness or changes in gut motility.\n3. **Incorporation of Closed-Circuit RAG Knowledge**: The patient's history of traveling by boat suggests that they may be experiencing motion sickness, which can be related to conflicts between the body's sensory systems, including the visual, vestibular, and proprioceptive systems.\n4. **Mechanistic Pathways**: The patient's symptoms may be related to the following mechanistic pathways:\n\t* The vestibular-ocular reflex (VOR) pathway, which helps to maintain balance and equilibrium, may be disrupted in the patient, leading to dizziness and lightheadedness.\n\t* The gut-brain axis, which connects the gut microbiome to the central nervous system, may be affected in the patient, leading to gastrointestinal disturbances and nausea.\n\t* The stress response system, which includes the hypothalamic-pituitary-adrenal (HPA) axis, may be activated in the patient, leading to changes in blood flow and blood pressure, as well as gastrointestinal disturbances.\n5. **Therapeutic Modules**: Based on the patient's symptoms and the Systems Biology synthesis, the following therapeutic modules may be considered:\n\t* Vestibular rehabilitation therapy to help improve balance and equilibrium.\n\t* Anti-motion sickness medication to help alleviate nausea and dizziness.\n\t* Gut-directed hypnotherapy or other gut-brain axis-targeted therapies to help manage gastrointestinal disturbances.\n\t* Stress management techniques, such as meditation or yoga, to help reduce stress and activate the parasympathetic nervous system.\n\nThese therapeutic modules can be tailored to the patient's specific needs and can be adjusted based on their response to treatment.",
+        "recommendedProtocol": []
+      },
+      "executionTimeMs": 3041,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-20T08:12:22.942Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779264742941"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-20T08:12:22.948Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน.",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-23T05:22:14.545Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779513739923",
+        "timestamp": "2026-05-23T05:22:19.923Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_2": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_3": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_4": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_5": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_6": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_7": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_8": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_9": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_10": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_11": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_12": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_13": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_14": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_15": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_16": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_17": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_18": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_19": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_20": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_21": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_22": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_23": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_24": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_25": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_26": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_27": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_28": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_29": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_30": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_31": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_32": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_33": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_34": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_35": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_36": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_37": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_38": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_39": {
+            "score": 65,
+            "severity": "Moderate"
+          }
+        },
+        "mechanisticInsights": "**Systems Biology Synthesis:**\n\nThe patient's symptoms of dizziness (บ้านหมุน), head spinning (เวียนศีรษะ), and nausea (คลื่นไส้) can be attributed to a complex interplay of multiple systems biology axes. Based on the provided information, we can synthesize the \"Network Effect\" as follows:\n\n1. **Neuro-Sleep-Stress Axis (65%):** The patient's symptoms are likely related to vestibular dysfunction, which can be influenced by the neuro-sleep-stress axis. The vestibular system, responsible for balance and equilibrium, is closely linked to the brain's stress response and sleep-wake cycle.\n2. **Oxidative Stress (65%):** The patient's symptoms may be exacerbated by oxidative stress, which can damage the vestibular system and disrupt balance and equilibrium.\n3. **Mitochondrial Network (65%):** Mitochondrial dysfunction can contribute to fatigue, dizziness, and nausea, as the mitochondria play a crucial role in energy production and cellular function.\n4. **Gut-Brain Axis (via Detox-Digestive-Gut Ecosystem, 65%):** The patient's nausea and dizziness may be related to gut dysfunction, as the gut and brain are connected through the vagus nerve. Gut inflammation or dysbiosis can influence the brain's stress response and contribute to vestibular symptoms.\n5. **Vascular-Circulation-Stroke Prevention (65%):** The patient's dizziness and head spinning may be related to changes in blood flow and circulation, particularly in the context of vestibular dysfunction.\n6. **Post-Infectious Persistence (65%):** The patient's recent travel history and exposure to new environments may have increased their risk of infection, which could contribute to their symptoms.\n7. **Proteostasis-Autophagy-Lysosome (65%):** The patient's symptoms may be related to proteostasis dysfunction, which can influence cellular function and contribute to oxidative stress and mitochondrial dysfunction.\n\n**Clinical Hypothesis:**\n\nBased on the systems biology synthesis, it is likely that the patient's symptoms are related to a combination of vestibular dysfunction, oxidative stress, mitochondrial dysfunction, and gut-brain axis dysregulation. The patient's recent travel history and exposure to new environments may have contributed to their symptoms, possibly through post-infectious persistence or other mechanisms.\n\n**Therapeutic Modules:**\n\nTo address the patient's symptoms, the following therapeutic modules may be considered:\n\n1. **Vestibular rehabilitation therapy:** To address vestibular dysfunction and improve balance and equilibrium.\n2. **Antioxidant and mitochondrial support:** To reduce oxidative stress and support mitochondrial function.\n3. **Gut-directed therapies:** To address gut dysfunction and promote a healthy gut-brain axis.\n4. **Stress management and sleep hygiene:** To reduce stress and promote healthy sleep-wake cycles.\n5. **Infection control and prevention:** To reduce the risk of post-infectious persistence and other infections.\n\n**Mechanistic Pathways:**\n\nThe proposed therapeutic modules may work through the following mechanistic pathways:\n\n1. **Vestibular rehabilitation therapy:** Enhances vestibular function and promotes neural plasticity.\n2. **Antioxidant and mitochondrial support:** Reduces oxidative stress and promotes mitochondrial biogenesis and function.\n3. **Gut-directed therapies:** Modulates the gut microbiome, reduces inflammation, and promotes gut-brain axis function.\n4. **Stress management and sleep hygiene:** Regulates the hypothalamic-pituitary-adrenal axis, reduces stress hormones, and promotes healthy sleep-wake cycles.\n5. **Infection control and prevention:** Reduces the risk of infection and promotes immune function.\n\nBy addressing the complex interplay of systems biology axes and mechanistic pathways, clinicians can develop a personalized treatment plan to address the patient's symptoms and promote overall health and well-being.",
+        "recommendedProtocol": []
+      },
+      "executionTimeMs": 5379,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-23T05:22:19.924Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779513739923"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-23T05:22:19.932Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน.",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T02:45:24.135Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779590728206",
+        "timestamp": "2026-05-24T02:45:28.206Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_2": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_3": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_4": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_5": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_6": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_7": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_8": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_9": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_10": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_11": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_12": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_13": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_14": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_15": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_16": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_17": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_18": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_19": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_20": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_21": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_22": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_23": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_24": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_25": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_26": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_27": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_28": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_29": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_30": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_31": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_32": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_33": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_34": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_35": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_36": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_37": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_38": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_39": {
+            "score": 65,
+            "severity": "Moderate"
+          }
+        },
+        "mechanisticInsights": "Based on the patient's symptoms (อาการบ้านหมุน, เวียนศีรษะ, คลื่นไส้) and history of traveling by boat, I will perform a Systems Biology synthesis of the patient's condition.\n\n**Initial Hypothesis:**\nThe patient's symptoms are consistent with a condition known as Motion Sickness or Seasickness, which is a common problem for people who travel by boat, car, or other vehicles. However, to ensure a comprehensive understanding, I will analyze the patient's condition through the lens of Systems Biology.\n\n**Network Effect:**\nThe patient's symptoms can be connected to multiple systems biology axes, including:\n\n1. **Neuro-Sleep-Stress Axis (65%):** The patient's symptoms of dizziness (เวียนศีรษะ) and nausea (คลื่นไส้) can be related to the neuro-sleep-stress axis, which may be affected by the motion of the boat.\n2. **Vascular-Circulation-Stroke Prevention Axis (65%):** The patient's dizziness and lightheadedness may be related to changes in blood pressure and blood flow, which can be influenced by the vascular-circulation-stroke prevention axis.\n3. **Detox-Digestive-Gut Ecosystem Axis (65%):** The patient's nausea and vomiting may be related to changes in gut motility and secretions, which can be influenced by the detox-digestive-gut ecosystem axis.\n4. **Musculoskeletal & Structural Integrity Axis (65%):** The patient's symptoms may also be related to changes in muscle tone and proprioception, which can be influenced by the musculoskeletal and structural integrity axis.\n\n**Clinical Symptoms to Physiological Dysfunctions:**\nThe patient's symptoms can be mapped to the following physiological dysfunctions:\n\n1. **Inner Ear Dysfunction:** The patient's dizziness and vertigo may be related to dysfunction of the inner ear, which can affect balance and equilibrium.\n2. **Autonomic Nervous System Dysfunction:** The patient's symptoms may be related to dysfunction of the autonomic nervous system, which can affect heart rate, blood pressure, and digestive function.\n3. **Gut Motility Dysfunction:** The patient's nausea and vomiting may be related to changes in gut motility and secretions, which can be influenced by the detox-digestive-gut ecosystem axis.\n\n**Mechanistic Pathways:**\nThe patient's symptoms may be related to the following mechanistic pathways:\n\n1. **Vestibular-Ocular Reflex (VOR) Pathway:** The patient's dizziness and vertigo may be related to dysfunction of the VOR pathway, which connects the inner ear to the brain and eye.\n2. **Autonomic Nervous System (ANS) Pathway:** The patient's symptoms may be related to dysfunction of the ANS pathway, which connects the brain to the heart, blood vessels, and digestive system.\n3. **Gut-Brain Axis Pathway:** The patient's nausea and vomiting may be related to changes in the gut-brain axis pathway, which connects the gut to the brain and influences digestive function and mood.\n\n**Therapeutic Modules:**\nBased on the patient's symptoms and the Systems Biology synthesis, the following therapeutic modules may be recommended:\n\n1. **Motion Sickness Medications:** Medications such as antihistamines or anticholinergics may be prescribed to alleviate the patient's symptoms.\n2. **Vestibular Rehabilitation Therapy (VRT):** VRT may be recommended to help the patient improve their balance and equilibrium.\n3. **Gut-Directed Hypnotherapy:** Gut-directed hypnotherapy may be recommended to help the patient manage their nausea and vomiting.\n\n**Conclusion:**\nThe patient's symptoms are consistent with Motion Sickness or Seasickness, which can be related to multiple systems biology axes, including the neuro-sleep-stress axis, vascular-circulation-stroke prevention axis, detox-digestive-gut ecosystem axis, and musculoskeletal & structural integrity axis. The patient's symptoms can be mapped to physiological dysfunctions, including inner ear dysfunction, autonomic nervous system dysfunction, and gut motility dysfunction. The patient's symptoms may be related to mechanistic pathways, including the vestibular-ocular reflex pathway, autonomic nervous system pathway, and gut-brain axis pathway. Therapeutic modules, including motion sickness medications, vestibular rehabilitation therapy, and gut-directed hypnotherapy, may be recommended to alleviate the patient's symptoms.",
+        "recommendedProtocol": []
+      },
+      "executionTimeMs": 4073,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T02:45:28.208Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779590728206"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-24T02:45:28.214Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยมีอาการบ้านหมุน เวียนศีรษะ และคลื่นไส้ต่อเนื่อง 3 วันหลังตื่นนอน โดยไม่ทราบสาเหตุ และมีประวัติเดินทางทางเรือมาก่อน.",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T05:55:30.712Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779602134614",
+        "timestamp": "2026-05-24T05:55:34.614Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_2": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_3": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_4": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_5": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_6": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_7": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_8": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_9": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_10": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_11": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_12": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_13": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_14": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_15": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_16": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_17": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_18": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_19": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_20": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_21": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_22": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_23": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_24": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_25": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_26": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_27": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_28": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_29": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_30": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_31": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_32": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_33": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_34": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_35": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_36": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_37": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_38": {
+            "score": 65,
+            "severity": "Moderate"
+          },
+          "AXIS_39": {
+            "score": 65,
+            "severity": "Moderate"
+          }
+        },
+        "mechanisticInsights": "Based on the patient's symptoms and observations, I will perform a Systems Biology synthesis of the patient's condition, considering the 39 systems biology axes and the provided Closed-Circuit Institutional RAG Knowledge.\n\n**Network Effect Synthesis:**\n\nThe patient's symptoms of บ้านหมุน (dizziness), เวียนศีรษะ (head spinning), and คลื่นไส้ (nausea) can be related to multiple systems biology axes. The primary axes involved are:\n\n1. **Neuro–Sleep–Stress–Brain Clearance (Meta‑Axis)**: The patient's dizziness and head spinning symptoms may be related to vestibular system dysfunction, which is linked to the neuro-axis.\n2. **Vascular–Circulation–Stroke Prevention**: The patient's dizziness and nausea symptoms may be related to blood flow and circulation issues, which are linked to the vascular-axis.\n3. **Detox–Digestive–Gut Ecosystem**: The patient's nausea symptom may be related to gastrointestinal issues, which are linked to the detox-axis.\n4. **Oxidative Stress**: The patient's symptoms may be related to oxidative stress, which can affect multiple systems, including the neuro-axis, vascular-axis, and detox-axis.\n\n**Mapping Clinical Symptoms to Physiological Dysfunctions:**\n\nBased on the patient's symptoms and observations, the following physiological dysfunctions can be inferred:\n\n1. **Vestibular system dysfunction**: The patient's dizziness and head spinning symptoms suggest a problem with the vestibular system, which is responsible for balance and spatial orientation.\n2. **Circulatory system dysfunction**: The patient's dizziness and nausea symptoms may be related to blood flow and circulation issues, which can be caused by various factors, including dehydration, anemia, or cardiovascular disease.\n3. **Gastrointestinal system dysfunction**: The patient's nausea symptom may be related to gastrointestinal issues, such as gastroparesis, gastroesophageal reflux disease (GERD), or irritable bowel syndrome (IBS).\n4. **Oxidative stress and inflammation**: The patient's symptoms may be related to oxidative stress and inflammation, which can affect multiple systems, including the neuro-axis, vascular-axis, and detox-axis.\n\n**Incorporating Closed-Circuit Institutional RAG Knowledge:**\n\nGiven the patient's history of traveling by boat, it is possible that the patient may have experienced motion sickness, which can cause dizziness, nausea, and vomiting. The patient's symptoms may also be related to other factors, such as dehydration, sleep deprivation, or stress, which can exacerbate vestibular system dysfunction and circulatory system dysfunction.\n\n**Mechanistic Pathways of Recommended Therapeutic Modules:**\n\nBased on the patient's symptoms and physiological dysfunctions, the following therapeutic modules may be recommended:\n\n1. **Vestibular rehabilitation therapy**: To address vestibular system dysfunction and improve balance and spatial orientation.\n2. **Circulatory system support**: To address circulatory system dysfunction and improve blood flow and circulation.\n3. **Gastrointestinal system support**: To address gastrointestinal system dysfunction and improve digestive function.\n4. **Antioxidant and anti-inflammatory therapy**: To address oxidative stress and inflammation, and reduce symptoms.\n\n**Clear, Rigorous, and Actionable Explanations for Clinicians:**\n\nThe patient's symptoms of บ้านหมุน (dizziness), เวียนศีรษะ (head spinning), and คลื่นไส้ (nausea) may be related to multiple systems biology axes, including the neuro-axis, vascular-axis, detox-axis, and oxidative stress axis. The patient's history of traveling by boat and experiencing motion sickness may have contributed to the development of these symptoms. A comprehensive treatment plan should address vestibular system dysfunction, circulatory system dysfunction, gastrointestinal system dysfunction, and oxidative stress and inflammation. Further evaluation and testing may be necessary to determine the underlying causes of the patient's symptoms and to develop an effective treatment plan.",
+        "recommendedProtocol": []
+      },
+      "executionTimeMs": 3903,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T05:55:34.615Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779602134614"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-24T05:55:34.622Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "CLINICAL_INTAKE_PROCESSED",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "inputRaw": "เคราะห์อาการเบื้องต้น: ข้อมูลพื้นฐาน รายการ รายละเอียด อายุ 34 ปี เพศ หญิง อาชีพ พนักงานออฟฟิศ (บริษัทเอกชน) สถานะ สมรสแล้ว มีลูกชาย 1 คน (อายุ 6 ขวบ) ผู้อ้างอิง มาด้วยตนเอง (แต่สามีโทรมาบอกพยาบาลก่อนว่า \"ให้ช่วยดูแลเมียผมหน่อย\") ❌ อาการหลัก (chief complaint) \"หนูมาเพราะปวดหัวเรื้อรังค่ะ เป็นมาเป็นปีแล้ว ตรวจมาหมดแล้วก็ไม่เจออะไร แต่ล่าสุดปวดจนกินยาแก้ปวดไม่หาย แถมหนูรู้สึกว่า... หนูไม่เป็นคนเดิมแล้ว โฟกัสงานไม่ได้ ความจำแย่ลง เดินไปเดินมาในบ้านลืมว่าจะเอาอะไร\" 📝 อาการอื่นที่บอกเพิ่ม (เมื่อถาม)",
+      "outputStructured": {
+        "subjective": "ผู้ป่วยหญิง อายุ 34 ปี อาชีพพนักงานออฟฟิศ สมรส มีบุตรชาย 1 คน มาด้วยอาการปวดศีรษะเรื้อรังนานเป็นปี ซึ่งล่าสุดอาการปวดรุนแรงขึ้นจนยาแก้ปวดที่กินเองไม่สามารถบรรเทาได้ ผู้ป่วยรู้สึกว่าตนเองไม่เหมือนเดิม โฟกัสงานไม่ได้ ความจำแย่ลง และหลงลืมง่าย นอกจากนี้ยังมีอาการนอนไม่หลับต่อเนื่องหลายคืน ทั้งหลับยากและตื่นกลางดึกแล้วกลับไปนอนต่อไม่ได้ ความอยากอาหารลดลง กินได้เพียงวันละมื้อหรือเพียงกาแฟกับขนมปัง ทำให้น้ำหนักลดลง 7 กิโลกรัมใน 3 เดือน มีอาการเหนื่อยล้าตลอดเวลา ตื่นมาไม่สดชื่น ต้องฝืนตัวเองไปทำงาน หงุดหงิดง่าย โวยวายใส่คนในครอบครัว และร้องไห้คนเดียวในรถ บางครั้งมีอาการใจสั่นมือสั่น โดยเฉพาะเมื่อต้องนำเสนองานหรือถูกซักถาม ผู้ป่วยคิดมาก คิดวนเวียนเรื่องเดิมๆ และเคยมีความคิดว่า 'ถ้าหนูเป็นภาระ หนูไม่อยากมีชีวิตอยู่ดีกว่า' โดยมีความคิดถึงการทำร้ายตัวเองแต่ระงับไว้ได้เพราะลูกยังเล็ก ผู้ป่วยเคยใช้ยาแก้ปวดหลายชนิด (Paracetamol, Ibuprofen, Naproxen) และซื้อยานอนหลับ 'Sleep Aid' จากออนไลน์มากินได้ 1 เดือน ผลการตรวจ MRI สมอง, EKG, ไทรอยด์ และค่าเลือดทั่วไปในอดีตปกติ ผู้ป่วยเคยถูกนัดพบจิตแพทย์แต่ปฏิเสธการไปเพราะ 'ไม่อยากถูกตราหน้าว่าบ้า' ไม่มีโรคประจำตัว เคยออกกำลังกายแต่ปัจจุบันเลิกไปแล้ว ไม่สูบบุหรี่ ดื่มเหล้าเพื่อเข้าสังคมบ้าง แต่ 3 เดือนนี้ไม่ดื่มเลย มีประวัติมารดาเป็นซึมเศร้า เคยเข้ารักษาที่โรงพยาบาลจิตเวช บิดาเสียชีวิตจากอุบัติเหตุเมื่อผู้ป่วยอายุ 12 ปี ความสัมพันธ์กับสามีมีเรื่องทะเลาะกันบ่อยครั้งเกี่ยวกับหน้าที่การงานและการเลี้ยงลูก ปัจจุบันผู้ป่วยลางานบ่อย เดือนนี้มาทำงานไม่ถึง 10 วัน และกลัวว่าจะถูกไล่ออก ผู้ป่วยบอกว่าไม่รู้ว่าตัวเองเป็นอะไรและสงสัยว่าตนเองกำลังจะเป็นบ้า",
+        "objective": "สังเกตเห็นอาการมือสั่นเล็กน้อยขณะพยาบาลซักถาม",
+        "assessment": "ผู้ป่วยหญิงวัยกลางคนมีอาการเข้าข่ายกลุ่มอาการซึมเศร้ารุนแรง (Major Depressive Disorder) ร่วมกับอาการวิตกกังวล และความผิดปกติทางด้านการรับรู้ (cognitive symptoms) โดยมีอาการต่อเนื่องเป็นระยะเวลานาน (เป็นปี) อาการเด่นได้แก่ ปวดศีรษะเรื้อรัง การเปลี่ยนแปลงด้านอารมณ์ (หงุดหงิดง่าย, ร้องไห้), ความผิดปกติของการนอนหลับ, การลดลงของความอยากอาหารและน้ำหนักตัวลดลงอย่างมีนัยสำคัญ, ความเหนื่อยล้า และปัญหาด้านสมาธิและความจำ นอกจากนี้ยังพบอาการทางกายเช่น ใจสั่น มือสั่น และที่สำคัญคือมีภาวะความคิดอยากทำร้ายตนเอง (suicidal ideation) ร่วมกับมีประวัติครอบครัวเป็นซึมเศร้า (มารดา) และประวัติการสูญเสียในวัยเด็ก (บิดาเสียชีวิต) การใช้ยาแก้ปวดและยานอนหลับที่ซื้อมาเองโดยไม่มีการควบคุมทางการแพทย์อาจเป็นความเสี่ยง ควรพิจารณาเรื่องภาวะสุขภาพจิตอย่างเร่งด่วน เนื่องจากส่งผลกระทบอย่างมากต่อการทำงานและคุณภาพชีวิต",
+        "plan": [
+          "ส่งปรึกษาจิตแพทย์เพื่อประเมินและวินิจฉัยภาวะทางจิตเวชอย่างละเอียด โดยเฉพาะ Major Depressive Disorder และ Anxiety Disorder",
+          "ประเมินและวางแผนการจัดการภาวะความคิดอยากทำร้ายตนเอง (Suicidal Risk Assessment and Safety Planning)",
+          "ให้คำแนะนำเกี่ยวกับการนอนหลับและสุขอนามัยการนอน (Sleep Hygiene) และประเมินยานอนหลับที่ใช้จากออนไลน์",
+          "ให้คำแนะนำด้านโภชนาการและการดูแลสุขภาพเพื่อป้องกันภาวะขาดสารอาหาร",
+          "พิจารณาการรักษาทางจิตเภสัชวิทยา (Pharmacotherapy) เช่น ยาต้านเศร้า (Antidepressants) และ/หรือยาคลายกังวล (Anxiolytics) ตามความเหมาะสม",
+          "พิจารณาการทำจิตบำบัด (Psychotherapy) เช่น Cognitive Behavioral Therapy (CBT)",
+          "ให้ความรู้และแนวทางการดูแลผู้ป่วยแก่สามีและครอบครัวเพื่อสร้างความเข้าใจและแรงสนับสนุน",
+          "นัดติดตามอาการอย่างใกล้ชิดและต่อเนื่อง"
+        ],
+        "key_symptoms": [
+          "ปวดศีรษะเรื้อรัง",
+          "นอนไม่หลับ",
+          "น้ำหนักลดลงอย่างมีนัยสำคัญ",
+          "เหนื่อยล้าตลอดเวลา",
+          "หงุดหงิดง่าย/อารมณ์เศร้า",
+          "ใจสั่น/มือสั่น",
+          "ปัญหาความจำและสมาธิ",
+          "ความคิดอยากทำร้ายตนเอง"
+        ],
+        "severity": "severe",
+        "summary_short": "ผู้ป่วยหญิง 34 ปี มีอาการปวดศีรษะเรื้อรัง, นอนไม่หลับ, น้ำหนักลด และภาวะซึมเศร้ารุนแรงพร้อมความคิดอยากทำร้ายตนเอง ซึ่งส่งผลกระทบต่อชีวิตประจำวันและการงานอย่างมาก"
+      },
+      "is_file": false,
+      "executionTimeMs": 19917,
+      "success": true
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash",
+      "channel": "manual_text"
+    },
+    "timestamp": "2026-05-24T06:40:49.594Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T06:42:29.975Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T06:43:51.381Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T06:44:38.908Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T06:45:24.663Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T06:45:57.091Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_ANALYSIS",
+    "details": {
+      "engine": "gemini-2.5-flash",
+      "model": "gemini-2.5-flash",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2"
+    },
+    "metadata": {
+      "model": "gemini-2.5-flash"
+    },
+    "timestamp": "2026-05-24T06:50:31.370Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยหญิง 34 ปี มีอาการปวดศีรษะเรื้อรัง, นอนไม่หลับ, น้ำหนักลด และภาวะซึมเศร้ารุนแรงพร้อมความคิดอยากทำร้ายตนเอง ซึ่งส่งผลกระทบต่อชีวิตประจำวันและการงานอย่างมาก",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T07:05:10.826Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779606314406",
+        "timestamp": "2026-05-24T07:05:14.406Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_2": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_3": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_4": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_5": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_6": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_7": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_8": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_9": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_10": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_11": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_12": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_13": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_14": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_15": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_16": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_17": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_18": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_19": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_20": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_21": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_22": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_23": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_24": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_25": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_26": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_27": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_28": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_29": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_30": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_31": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_32": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_33": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_34": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_35": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_36": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_37": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_38": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_39": {
+            "score": 75,
+            "severity": "High"
+          }
+        },
+        "mechanisticInsights": "**Systems Biology Synthesis**\n\nPatient Symptoms: ปวดศีรษะเรื้อรัง, นอนไม่หลับ, น้ำหนักลด, ภาวะซึมเศร้ารุนแรง, ความคิดอยากทำร้ายตนเอง\nObservations: ผู้ป่วยหญิง 34 ปี มีอาการที่ส่งผลกระทบต่อชีวิตประจำวันและการงานอย่างมาก\n\n**High-Burden Domains:**\n\n1. **Neuro–Sleep–Stress**: ปวดศีรษะเรื้อรัง, นอนไม่หลับ, และภาวะซึมเศร้ารุนแรง เกี่ยวข้องกับ trụcทางประสาทและระบบการนอนหลับ\n2. **Endocrine Network**: น้ำหนักลด และภาวะซึมเศร้ารุนแรง อาจเกี่ยวข้องกับฮอร์โมนและระบบ nội tiết\n3. **Immune–Infection Governance**: อาการซึมเศร้าและความคิดอยากทำร้ายตนเอง อาจเกี่ยวข้องกับระบบภูมิคุ้มกันและความเครียด\n4. **Metabolic–Energy Core**: น้ำหนักลด อาจเกี่ยวข้องกับระบบเมแทบอลิซึมและพลังงาน\n\n**Active Critical Axes:**\n\n1. **Systemic Inflammatory Load**: อาการปวดศีรษะเรื้อรังและภาวะซึมเศร้ารุนแรง อาจเกี่ยวข้องกับอาการอักเสบระบบ\n2. **Neuro–Sleep–Stress–Brain Clearance (Meta‑Axis)**: ปวดศีรษะเรื้อรัง, นอนไม่หลับ, และภาวะซึมเศร้ารุนแรง เกี่ยวข้องกับ trụcทางประสาทและระบบการนอนหลับ\n3. **Oxidative Stress**: อาการปวดศีรษะเรื้อรังและภาวะซึมเศร้ารุนแรง อาจเกี่ยวข้องกับอาการเครียดออกซิเดต\n4. **Epigenetic Regulation**: อาการซึมเศร้าและความคิดอยากทำร้ายตนเอง อาจเกี่ยวข้องกับการควบคุมระบบพันธุกรรม\n\n**Network Effect:**\n\nอาการปวดศีรษะเรื้อรัง, นอนไม่หลับ, น้ำหนักลด, ภาวะซึมเศร้ารุนแรง, และความคิดอยากทำร้ายตนเอง เกี่ยวข้องกับ軌ทางประสาท, ระบบการนอนหลับ, ระบบภูมิคุ้มกัน, ระบบเมแทบอลิซึม, และระบบ nội tiếtที่สอดคล้องกันอย่างใกล้ชิด การเปลี่ยนแปลงในระบบหนึ่งอาจมีผลกระทบต่อระบบอื่นๆ ทำให้เกิดอาการที่ซับซ้อนและหลากหลาย\n\n**Clinical Implications:**\n\n1. ประเมินและรักษา軌ทางประสาทและระบบการนอนหลับ\n2. ตรวจสอบและรักษาระบบภูมิคุ้มกันและความเครียด\n3. ประเมินและรักษาระบบเมแทบอลิซึมและพลังงาน\n4. ตรวจสอบและรักษาระบบ nội tiếtและฮอร์โมน\n5. ใช้ยาหรือการบำบัดที่มุ่งเน้นการควบคุมระบบพันธุกรรมและอาการเครียดออกซิเดต\n\n**Therapeutic Modules:**\n\n1. การบำบัดด้วยยาที่มุ่งเน้นการควบคุม軌ทางประสาทและระบบการนอนหลับ\n2. การบำบัดด้วยการออกกำลังกายและกิจกรรมที่ช่วยลดความเครียด\n3. การให้คำปรึกษาทางด้านอาหารและการควบคุมน้ำหนัก\n4. การบำบัดด้วยการรักษาระบบภูมิคุ้มกันและความเครียด\n5. การให้คำปรึกษาทางด้านสุขภาพจิตและการรักษาเสพติด\n\nการบำบัดและดูแลผู้ป่วยควรเป็นไปอย่างครอบคลุมและบูรณาการ โดยพิจารณาจากอาการที่ซับซ้อนและหลากหลายของผู้ป่วย และควรทำการประเมินและติดตามผลอย่างใกล้ชิดเพื่อปรับเปลี่ยนการบำบัดให้เหมาะสมกับความต้องการของผู้ป่วย",
+        "recommendedProtocol": [
+          {
+            "moduleId": "H-009",
+            "name": "HO REN YIN MIXTURE",
+            "rationale": "Targeting axes: AXIS_2, AXIS_21, AXIS_22, AXIS_27, AXIS_29, AXIS_33, AXIS_35, AXIS_1, AXIS_8, AXIS_9, AXIS_11, AXIS_13, AXIS_14, AXIS_21, AXIS_23, AXIS_24, AXIS_26, AXIS_28, AXIS_29, AXIS_31, AXIS_32, AXIS_33, AXIS_35 with synergy score 17.25",
+            "priority": 1725
+          },
+          {
+            "moduleId": "H-010",
+            "name": "MOMORDICA CHARANTIA CAPSULE",
+            "rationale": "Targeting axes: AXIS_9, AXIS_18, AXIS_19, AXIS_21, AXIS_24, AXIS_27, AXIS_28, AXIS_5, AXIS_7, AXIS_8, AXIS_9, AXIS_21, AXIS_23, AXIS_24, AXIS_26, AXIS_28, AXIS_29, AXIS_31, AXIS_32, AXIS_33, AXIS_35 with synergy score 15.75",
+            "priority": 1575
+          },
+          {
+            "moduleId": "H-014",
+            "name": "RID-SI CAPSULE",
+            "rationale": "Targeting axes: AXIS_1, AXIS_9, AXIS_21, AXIS_22, AXIS_25, AXIS_26, AXIS_31, AXIS_9, AXIS_21, AXIS_22, AXIS_25, AXIS_31, AXIS_33, AXIS_34, AXIS_1, AXIS_9, AXIS_21, AXIS_22, AXIS_25, AXIS_26, AXIS_31 with synergy score 15.75",
+            "priority": 1575
+          },
+          {
+            "moduleId": "H-012",
+            "name": "COMPOUND YHATEENNOK CAPSULE",
+            "rationale": "Targeting axes: AXIS_1, AXIS_9, AXIS_21, AXIS_22, AXIS_27, AXIS_32, AXIS_33, AXIS_1, AXIS_2, AXIS_9, AXIS_18, AXIS_19, AXIS_21, AXIS_31 with synergy score 10.50",
+            "priority": 1050
+          },
+          {
+            "moduleId": "H-013",
+            "name": "STOMMA CAPSULE",
+            "rationale": "Targeting axes: AXIS_1, AXIS_9, AXIS_16, AXIS_17, AXIS_18, AXIS_19, AXIS_1, AXIS_2, AXIS_3, AXIS_9, AXIS_18, AXIS_19, AXIS_21 with synergy score 9.75",
+            "priority": 975
+          },
+          {
+            "moduleId": "H-005",
+            "name": "COMPOUND DERRIS VELVET CAPSULE",
+            "rationale": "Targeting axes: AXIS_2, AXIS_7, AXIS_9, AXIS_21, AXIS_22, AXIS_25, AXIS_27, AXIS_30, AXIS_33, AXIS_35, AXIS_36 with synergy score 8.25",
+            "priority": 825
+          }
+        ]
+      },
+      "executionTimeMs": 3582,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T07:05:14.407Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779606314406"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-24T07:05:14.416Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_REQUEST",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "rawInput": "พบอาการ: ผู้ป่วยหญิง 34 ปี มีอาการปวดศีรษะเรื้อรัง, นอนไม่หลับ, น้ำหนักลด และภาวะซึมเศร้ารุนแรงพร้อมความคิดอยากทำร้ายตนเอง ซึ่งส่งผลกระทบต่อชีวิตประจำวันและการงานอย่างมาก",
+      "has_labs": true,
+      "voiceTranscript": ""
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T07:06:59.829Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "AI_INTAKE_RESPONSE",
+    "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+    "details": {
+      "outputStructured": {
+        "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+        "snapshotId": "snap_1779606423448",
+        "timestamp": "2026-05-24T07:07:03.448Z",
+        "axesState": {
+          "AXIS_1": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_2": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_3": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_4": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_5": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_6": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_7": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_8": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_9": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_10": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_11": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_12": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_13": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_14": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_15": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_16": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_17": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_18": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_19": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_20": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_21": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_22": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_23": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_24": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_25": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_26": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_27": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_28": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_29": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_30": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_31": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_32": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_33": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_34": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_35": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_36": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_37": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_38": {
+            "score": 75,
+            "severity": "High"
+          },
+          "AXIS_39": {
+            "score": 75,
+            "severity": "High"
+          }
+        },
+        "mechanisticInsights": "Based on the provided patient symptoms and observations, a Systems Biology synthesis can be performed to understand the interconnectedness of the various physiological systems and axes that may be contributing to the patient's condition.\n\n**Identified Axes and Domains:**\n\n1. **Neuro-Sleep-Stress Axis (75%):** Chronic headaches, insomnia, and depression are indicative of dysregulation in this axis, which affects the brain's ability to regulate stress, sleep, and emotional responses.\n2. **Endocrine Network (75%):** Depression and weight loss may be related to hormonal imbalances, such as changes in cortisol, thyroid, or adrenal hormone levels.\n3. **Detox-Digestive-Gut Ecosystem (75%):** The patient's symptoms, including headaches and weight loss, may be influenced by gut dysbiosis, inflammation, or impaired detoxification processes.\n4. **Metabolic-Energy Core (75%):** Weight loss and fatigue may be related to impaired glucose regulation, mitochondrial dysfunction, or other metabolic abnormalities.\n5. **Immune-Infection Governance (75%):** Chronic inflammation and oxidative stress may be contributing to the patient's symptoms, potentially related to an underlying infection or immune system dysregulation.\n6. **Genomic-Longevity Programming (75%):** The patient's symptoms, including depression and weight loss, may be influenced by genetic factors, epigenetic modifications, or telomere shortening.\n7. **Psychological-Cognitive-Emotional Loop Axis (CELA) (75%):** The patient's symptoms, including suicidal thoughts, are indicative of a complex interplay between cognitive, emotional, and psychological factors.\n\n**Network Effect:**\n\nThe identified axes and domains are interconnected and can influence each other. For example:\n\n* Dysregulation in the Neuro-Sleep-Stress Axis can lead to changes in the Endocrine Network, affecting hormone levels and contributing to depression and weight loss.\n* Impaired Detox-Digestive-Gut Ecosystem function can lead to chronic inflammation and oxidative stress, affecting the Immune-Infection Governance and Metabolic-Energy Core axes.\n* Genetic and epigenetic factors (Genomic-Longevity Programming) can influence the expression of genes involved in the aforementioned axes, contributing to the patient's symptoms.\n\n**Mechanistic Pathways:**\n\nThe following mechanistic pathways may be contributing to the patient's condition:\n\n1. The hypothalamic-pituitary-adrenal (HPA) axis dysregulation, leading to changes in cortisol and other hormone levels, affecting the Endocrine Network and Neuro-Sleep-Stress Axis.\n2. Impaired serotonin and dopamine signaling in the brain, contributing to depression and suicidal thoughts (Neuro-Sleep-Stress Axis and Psychological-Cognitive-Emotional Loop Axis).\n3. Gut dysbiosis and impaired detoxification processes, leading to chronic inflammation and oxidative stress (Detox-Digestive-Gut Ecosystem and Immune-Infection Governance axes).\n4. Mitochondrial dysfunction and impaired glucose regulation, affecting energy metabolism and contributing to weight loss and fatigue (Metabolic-Energy Core axis).\n\n**Recommended Therapeutic Modules:**\n\nBased on the identified axes, domains, and mechanistic pathways, the following therapeutic modules may be recommended:\n\n1. **Stress management and cognitive-behavioral therapy** to address the Psychological-Cognitive-Emotional Loop Axis and Neuro-Sleep-Stress Axis.\n2. **Nutritional and dietary interventions** to support the Detox-Digestive-Gut Ecosystem and Metabolic-Energy Core axes, such as a balanced diet, probiotics, and omega-3 fatty acids.\n3. **Hormone regulation and supplementation** to address the Endocrine Network axis, if necessary.\n4. **Antioxidant and anti-inflammatory therapies** to reduce oxidative stress and inflammation (Immune-Infection Governance and Detox-Digestive-Gut Ecosystem axes).\n5. **Genetic and epigenetic testing** to identify potential genetic and epigenetic factors contributing to the patient's condition (Genomic-Longevity Programming axis).\n\n**Actionable Recommendations for Clinicians:**\n\n1. Conduct a comprehensive medical history and physical examination to identify potential underlying causes of the patient's symptoms.\n2. Order laboratory tests to assess hormone levels, inflammatory markers, and other relevant biomarkers.\n3. Develop a personalized treatment plan incorporating the recommended therapeutic modules and addressing the identified axes and domains.\n4. Monitor the patient's response to treatment and adjust the therapeutic plan as necessary.",
+        "recommendedProtocol": [
+          {
+            "moduleId": "H-009",
+            "name": "HO REN YIN MIXTURE",
+            "rationale": "Targeting axes: AXIS_2, AXIS_21, AXIS_22, AXIS_27, AXIS_29, AXIS_33, AXIS_35, AXIS_1, AXIS_8, AXIS_9, AXIS_11, AXIS_13, AXIS_14, AXIS_21, AXIS_23, AXIS_24, AXIS_26, AXIS_28, AXIS_29, AXIS_31, AXIS_32, AXIS_33, AXIS_35 with synergy score 17.25",
+            "priority": 1725
+          },
+          {
+            "moduleId": "H-010",
+            "name": "MOMORDICA CHARANTIA CAPSULE",
+            "rationale": "Targeting axes: AXIS_9, AXIS_18, AXIS_19, AXIS_21, AXIS_24, AXIS_27, AXIS_28, AXIS_5, AXIS_7, AXIS_8, AXIS_9, AXIS_21, AXIS_23, AXIS_24, AXIS_26, AXIS_28, AXIS_29, AXIS_31, AXIS_32, AXIS_33, AXIS_35 with synergy score 15.75",
+            "priority": 1575
+          },
+          {
+            "moduleId": "H-014",
+            "name": "RID-SI CAPSULE",
+            "rationale": "Targeting axes: AXIS_1, AXIS_9, AXIS_21, AXIS_22, AXIS_25, AXIS_26, AXIS_31, AXIS_9, AXIS_21, AXIS_22, AXIS_25, AXIS_31, AXIS_33, AXIS_34, AXIS_1, AXIS_9, AXIS_21, AXIS_22, AXIS_25, AXIS_26, AXIS_31 with synergy score 15.75",
+            "priority": 1575
+          },
+          {
+            "moduleId": "H-012",
+            "name": "COMPOUND YHATEENNOK CAPSULE",
+            "rationale": "Targeting axes: AXIS_1, AXIS_9, AXIS_21, AXIS_22, AXIS_27, AXIS_32, AXIS_33, AXIS_1, AXIS_2, AXIS_9, AXIS_18, AXIS_19, AXIS_21, AXIS_31 with synergy score 10.50",
+            "priority": 1050
+          },
+          {
+            "moduleId": "H-013",
+            "name": "STOMMA CAPSULE",
+            "rationale": "Targeting axes: AXIS_1, AXIS_9, AXIS_16, AXIS_17, AXIS_18, AXIS_19, AXIS_1, AXIS_2, AXIS_3, AXIS_9, AXIS_18, AXIS_19, AXIS_21 with synergy score 9.75",
+            "priority": 975
+          },
+          {
+            "moduleId": "H-005",
+            "name": "COMPOUND DERRIS VELVET CAPSULE",
+            "rationale": "Targeting axes: AXIS_2, AXIS_7, AXIS_9, AXIS_21, AXIS_22, AXIS_25, AXIS_27, AXIS_30, AXIS_33, AXIS_35, AXIS_36 with synergy score 8.25",
+            "priority": 825
+          }
+        ]
+      },
+      "executionTimeMs": 3619,
+      "success": true
+    },
+    "metadata": {
+      "model": "groq/llama-3.3-70b-versatile"
+    },
+    "timestamp": "2026-05-24T07:07:03.450Z",
+    "version": "1.0.0-local-fallback"
+  },
+  {
+    "action": "ADMIN_ACTION",
+    "details": {
+      "type": "PRECISION_ANALYSIS",
+      "patientId": "Mn98e7NhY5WlgD6nEaFROqJbQJs2",
+      "snapshotId": "snap_1779606423448"
+    },
+    "metadata": {
+      "engine": "TSPI-Multi-Model"
+    },
+    "timestamp": "2026-05-24T07:07:03.454Z",
+    "version": "1.0.0-local-fallback"
+  }
+]

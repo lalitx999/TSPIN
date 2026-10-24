@@ -1,0 +1,65 @@
+{% extends 'layouts/doctor_base.html' %}
+
+{% block title %}ตั้งค่าระบบและคลินิก (Settings) - TSPI CLINIC{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-6">
+
+    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                    <i class="fas fa-cog mr-1"></i> System Governance
+                </span>
+                <span class="text-xs text-gray-400">การกำหนดค่าและการตั้งค่าทางคลินิก</span>
+            </div>
+            <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
+                ตั้งค่าบัญชีและข้อมูลคลินิก (Settings)
+            </h1>
+            <p class="text-sm text-gray-500 mt-0.5">
+                จัดการโปรไฟล์แพทย์ ลายเซ็นดิจิทัลสำหรับอนุมัติรายงาน และการตั้งค่า AI Physician
+            </p>
+        </div>
+    </div>
+
+    <!-- Doctor Profile & Signature Card -->
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-6">
+        <h3 class="text-base font-semibold text-gray-900 border-b border-gray-100 pb-3">ข้อมูลแพทย์ผู้รักษา</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">ชื่อ-นามสกุล</label>
+                <input type="text" value="{{ request.user.get_full_name|default:request.user.username }}" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-gray-800">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">เลขที่ใบประกอบวิชาชีพเวชกรรม (Medical License No.)</label>
+                <input type="text" value="ว. 48291" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-gray-800 font-mono">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">สาขาความเชี่ยวชาญ</label>
+                <input type="text" value="เวชศาสตร์แม่นยำและชีววิทยาระบบ (Systems Biology & Functional Medicine)" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-gray-800">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">อีเมลติดต่อ</label>
+                <input type="email" value="{{ request.user.email|default:'doctor@tspiclinic.com' }}" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-gray-800">
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-gray-100">
+            <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">ลายเซ็นดิจิทัลสำหรับลงนามรายงาน (Digital Signature)</h4>
+            <div class="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center bg-gray-50/50">
+                <i class="fas fa-signature text-3xl text-primary mb-2 block"></i>
+                <span class="text-sm font-semibold text-gray-800 block">Digital Signature Verified (Pillar 15)</span>
+                <span class="text-xs text-gray-400 mt-1 block">ลายเซ็นจะถูกแนบอัตโนมัติใน Precision Report ฉบับสมบูรณ์เมื่อกดอนุมัติผล</span>
+            </div>
+        </div>
+
+        <div class="flex justify-end pt-3">
+            <button type="button" class="px-6 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark shadow-xs transition-all">
+                บันทึกการตั้งค่า
+            </button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

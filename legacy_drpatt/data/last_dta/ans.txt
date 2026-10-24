@@ -1,0 +1,385 @@
+ข้อคิดเห็นและข้อกำหนดการแก้ไขระบบ TSPI
+การทบทวนเชิงลึกของ Physician Edition, Patient Edition และ Multi‑Omics Edition รุ่น 2.0
+เอกสารสำหรับทีม Developer • Domain Expert Review • ฉบับภาษาไทย
+เป้าหมาย: ทำให้ TSPI เป็น Clinical Intelligence Engine ที่ deterministic, evidence‑traceable, network‑based และไม่หลอน/ไม่เดา
+
+
+สถานะการอนุมัติ ณ ปัจจุบัน
+ทิศทาง Software และ Governance ดีขึ้นอย่างมีนัยสำคัญ แต่ Evidence/Scoring integrity, Network reasoning, Module matching และ Cross-report consistency ยังไม่ผ่านเกณฑ์สำหรับ Physician Pilot หรือ Patient-facing Release
+
+แหล่งข้อมูลที่ตรวจ
+• TSPI_Report_26-00001_report_Dpctor (Physician Edition v2.0, 39 หน้า)
+• TSPI_Report_26-00001_report_Patient (Patient Edition v2.0, 21 หน้า)
+• TSPI_Report_26-00001_report_Miomic (Multi-Omics Edition v2.0, 18 หน้า)
+• Master “39 แกน 12 โดเมน กุญแจ 3 ดอก” และ 180 Living Biological Networks
+• TSPI Open Questions / Gap Analysis / Candidate Module Registry ที่เกี่ยวข้อง
+
+1. Executive Summary — คำตัดสินภาพรวม
+ระบบที่ Developer อัปเดตมา “ดีขึ้นมาก” ในระดับ governance: เริ่มใช้ Reasoning Ledger, แยก Evidence Status, ไม่ใช้ default 50, มี NOT_ASSESSED, มี Physician approval gate, ระบุ Module/Network/Research registry ที่ยังไม่พร้อม และไม่สร้างผลวิจัยเชิงตัวเลขปลอมใน Multi‑Omics Edition แล้ว อย่างไรก็ตาม ความผิดพลาดสำคัญได้ย้ายจากระดับ “ไม่มีโครงสร้าง” มาเป็นระดับ “ความหมายของแต่ละ layer ยังปะปนกัน” ซึ่งถ้าไม่แก้ใน backend จะทำให้รายงานดูดีแต่ reasoning ผิดอย่างเป็นระบบ
+องค์ประกอบ	สถานะปัจจุบัน	คำตัดสิน/สิ่งที่ต้องทำ
+Software direction	ถูกทาง	รักษา deterministic pipeline + Reasoning Ledger
+Physician approval / release gate	ถูกทาง	คง fail-closed และห้าม patient release ก่อน sign-off
+Canonical ontology compliance	บางส่วน	ห้ามสร้าง Domain/Step/Axis semantics ใหม่ใน report layer
+Evidence semantics	ยังผิดหลายจุด	P0: HYPOTHESIS ห้ามมี severity score; Key score ห้ามเป็น MEASURED
+Axis scoring	ยังไม่ผ่าน	P0: แก้ A8/A22/A27/A29-A30/A33/A35/A37-A38
+180 Network reasoning	Provisional	ห้ามเรียก LLM causal narrative ว่า official Network Propagation
+Module matching	Blocked	ห้าม report invent module function/axis; ใช้ Registry เท่านั้น
+Cross-report consistency	Fail	สามฉบับต้องเป็น views ของ analysis record เดียวกัน
+Patient-facing readiness	ยังไม่พร้อม	ลด technical content + module/provisional internals; แก้ footer/semantic contradictions
+Multi-Omics	ดีขึ้นแต่ยังต้องปรับ	Omics เป็น resolution layer ไม่ใช่ prerequisite; test ต้องผ่าน utility gate
+
+หลักที่ต้องเข้าใจให้ตรงกัน
+ปัญหาปัจจุบันไม่ใช่ “เขียนคำอธิบายไม่สวย” แต่คือ semantic integrity ของ structured analysis record. ห้ามแก้ PDF ทีละฉบับแยกกัน ต้องแก้ reasoning layer แล้วให้ 3 reports render จาก record เดียวกัน
+
+2. สิ่งที่ Developer ทำถูกแล้วและต้องรักษาไว้
+    • LLM ไม่ควรเป็นผู้ตั้ง Axis score, Network identity หรือ Module name เอง; deterministic engine ต้องเป็น source of truth
+    • No data = NOT_ASSESSED / NOT_AVAILABLE ไม่ใช่ normal และไม่ใช่คะแนน 0
+    • การแยก MEASURED / DERIVED / CLINICAL_INFERENCE / HYPOTHESIS / NOT_AVAILABLE เป็นทิศทางที่ถูก
+    • HYPOTHESIS ตั้งขึ้นเพื่อสร้างคำถามและคำอธิบาย แต่ตามกติกาเดิมของระบบ “HYPOTHESIS never scores”
+    • Red-flag screening และ critical alerts ต้องมาก่อน network/module reasoning
+    • Safety เป็น gate ไม่ใช่เพียงคะแนนความเสี่ยง
+    • Physician approval ก่อน patient release และเก็บ audit/version ทุกครั้ง
+    • Case Intelligence และ Research Intelligence ที่ยังไม่เชื่อมต้องแสดง UNAVAILABLE ไม่แต่ง case similarity / p-value / effect size
+    • Module Registry และ Network Registry ที่ยังไม่ approved ต้องไม่แสดง final match/ranking/score
+    • Reasoning Ledger / immutable analysis record เป็นแกนกลางของระบบที่ถูกต้อง
+3. ล็อกความเข้าใจ Canonical Architecture ให้ตรงก่อนแก้โค้ด
+Master TSPI ที่ยืนยันแล้วกำหนด conceptual architecture ดังนี้:
+3 Keys
+  -> 9 Restoration Steps
+    -> 12 Domains
+      -> 39 Biological Axes
+        -> 180 Living Biological Networks
+          -> Approved Modules / Intervention Layer
+แต่ conceptual hierarchy ไม่เท่ากับ runtime inference order. Developer ปัจจุบันมีแนวโน้มใช้ hierarchy เป็น pipeline และสลับลำดับตามความรุนแรงของผู้ป่วย ซึ่งทำให้ ontology เปลี่ยนตามเคส
+Runtime ที่ควรใช้:
+RAW PATIENT DATA
+-> Provenance Normalization
+-> Red Flag / Critical Safety
+-> Structured Phenotype
+-> Evidence Classification
+-> Axis / Network Candidate Generation
+-> Minimum-Evidence Gate
+-> Axis & Network Assessment
+-> Domain / Key Roll-up
+-> Canonical 9-Step Status
+-> Current Clinical Priority
+-> Approved Module Eligibility / Safety / Ranking
+-> Physician Decision
+-> ONE Immutable Analysis Record
+-> Physician / Patient / Multi-Omics Views
+4. P0 — ความผิดพลาดที่ต้องแก้ก่อน Physician Pilot
+4.1 HYPOTHESIS ถูกให้คะแนน Severity 70–75/100 — ขัดกติกาหลักของ TSPI
+ใน Physician และ Multi‑Omics Edition มี A8, A28, A30, A33, A34 ที่ติดสถานะ HYPOTHESIS แต่ยังมีคะแนน 70–75/100 และถูกนำไปจัด Top Biological Priorities. สิ่งนี้ขัดกับกติกาที่ Developer เคยสรุปไว้เองว่า “HYPOTHESIS never scores”
+ผลกระทบ
+เมื่อ Hypothesis มีตัวเลข Severity ตัวเลขนั้นจะไหลต่อไปยัง Key score, priority, Module match, longitudinal outcome และทำให้สมมติฐานกลายเป็น pseudo‑fact แม้ป้ายแดงจะเขียนว่า HYPOTHESIS
+
+Backend rule ที่ควรเป็น:
+if evidence_status == HYPOTHESIS:
+    severity_score = null
+    severity_band = NOT_SCORED
+    assessment_status = AXIS_CANDIDATE
+    eligible_for_NSS = false
+    eligible_for_module_match = false
+ถ้าต้องการแสดง “น่าสงสัยมาก” ให้ใช้ hypothesis_relevance / candidate_probability / confirmation_priority แยกจาก Severity
+4.2 Three Biological Keys 68/58/75 ถูกติดป้าย MEASURED — ต้องแก้เป็น DERIVED
+Biointegrity, Metabolic Energy และ Biological Dynamics เป็น system-level constructs ไม่มีแล็บที่วัดค่าเหล่านี้โดยตรง. หากมีสูตรรวมจาก Axis/Domain ต้องเป็น DERIVED พร้อม formula version, coverage, confidence และ uncertainty. ในเคสนี้ยังมี Axes จำนวนมาก NOT_ASSESSED จึงไม่ควรแสดง precision แบบเต็ม 0–100 โดยไม่บอก coverage
+key_score
+key_score_status = DERIVED
+key_formula_version
+key_assessment_coverage
+key_confidence
+key_uncertainty
+contributing_axis_ids[]
+missing_core_axes[]
+ถ้ายังไม่มีสูตรที่ ratified ให้ score=null และแสดง qualitative status เท่านั้น. หากคะแนนสูงหมายถึงผิดปกติมาก ให้ใช้ชื่อ “Disturbance Score” เพื่อไม่ให้คนอ่านเข้าใจกลับด้าน
+4.3 Nine Restoration Steps ถูกสับสนกับ Patient Priority
+รายงานจัด “Immune Regulation” เป็น Step ลำดับ 1 และ “Mitochondrial Restoration” เป็น Step ลำดับ 2 ตามความเร่งด่วนของเคส. นี่ผิด concept: หมายเลข Canonical Step ต้องคงที่; สิ่งที่เปลี่ยนตามผู้ป่วยคือ current_clinical_priority_rank
+canonical_step_no = fixed
+canonical_step_name = fixed
+current_clinical_priority_rank = dynamic
+current_step_status = dynamic
+ห้าม reorder/rename canonical step เพื่อสะท้อนความเร่งด่วนของคนไข้
+4.4 Developer สร้าง Domain เชิงอวัยวะเองและเรียกว่า TSPI Domain
+ใน Physician Edition มี “Pulmonary & Cardiovascular”, “Renal & Electrolyte”, “Hematologic & Coagulation” ฯลฯ ซึ่งเป็น clinical problem groups ไม่ใช่ canonical 12 Domains. สามารถมี view แบบนี้ได้ แต่ต้องอยู่ namespace แยก
+canonical_domain_code / canonical_domain_name
+clinical_problem_group_code / clinical_problem_group_name
+ห้ามให้ report writer สร้าง ontology ใหม่เพื่อความสะดวกในการเล่าเรื่อง
+4.5 Axis semantics และ scoring ยังไม่สอดคล้องกับ Master
+หัวข้อ	สิ่งที่ Developer ทำอยู่	ปัญหาต่อ TSPI	คำสั่งแก้ไข
+A26 Stem Cell & Hematopoiesis	ใช้ Hb/Hct/WBC/platelet แล้วสรุป “จุดเริ่มต้น” ของ energy failure / marrow failure	Severity สูงไม่ได้พิสูจน์ causal origin หรือ bone marrow failure	แยก severity, urgency, causal-driver probability; คำว่า root driver ต้องมี evidence/edge รองรับ
+A8 Mitochondrial Network	hypoxemia + fatigue -> A8 75	Hypoxemia เป็นบริบท ไม่ใช่ direct mitochondrial measurement	A8 = candidate; severity=null จนผ่าน minimum-evidence rule
+A22 Thrombosis–Hemostasis	Marker table มี platelet/PT/aPTT/D-dimer map A22 แต่ later report บอก A22 NOT_ASSESSED	Backend state กับ report state ขัดกัน	ถ้า Marker Registry approved ให้ A22 assessed ตาม rule; ถ้ายังไม่ approved ต้องทั้งระบบเป็น provisional
+A29 vs A30	bone metastasis/ALP/hypercalcemia ถูกใช้ให้ A30 Connective Tissue 75	Bone remodeling เป็น A29; A30 คือ connective tissue integrity	ใช้ A29 เป็น primary bone axis; A30 เฉพาะเมื่อมี connective-tissue evidence
+A35 Visceral Organ Functional Reserve	BUN/Cr/eGFR/AST/ALT/Bilirubin map A35 แต่ later report บอก A35 NOT_ASSESSED	ขัด Master ที่ A35 ครอบคลุม visceral organ reserve	ถ้า marker rules ratified, A35 ต้องมี status ตาม evidence; ไม่ใช่ NOT_AVAILABLE
+A37–A38 Oncology	มี confirmed metastatic NSCLC/malignant pleural findings แต่บางส่วนบอกไม่มีข้อมูล oncology axes	การไม่มี scoring formula ไม่เท่ากับไม่มี evidence	ใช้ ASSESSED_CONTEXTUALLY / NOT_SCORED หากยังไม่มี severity rule; แยก evidence availability กับ score availability
+A33 Thyroid–Adrenal–Growth	Na/K/BP ใน renal/systemic illness -> A33 75	confounding สูง	ใช้ SUPPORTING_CONTEXT + confounders; non-scoring จนมี direct/ratified phenotype evidence
+A27 Glycation / Carbonyl	history DM + renal dysfunction -> A27 40	risk context ไม่เท่ากับ measured glycation/carbonyl burden	A27 candidate/risk context; score only from approved A27 markers/rules
+4.6 Marker Registry ต้องแยก “ความเกี่ยวข้อง” ออกจาก “สิทธิ์ในการให้คะแนน”
+ปัจจุบัน marker หนึ่งตัวถูก map หลาย Axis โดยไม่มี relationship type. สิ่งนี้เสี่ยง evidence multiplication / double counting. ต้องเพิ่มประเภทความสัมพันธ์:
+DIRECT_SCORING
+SUPPORTING
+CONTEXT_ONLY
+CONFOUNDED
+EXCLUSION
+CONTRADICTORY
+NON_SCORING
+ตัวอย่าง: Creatinine->A35 DIRECT_SCORING (ถ้า rule approved); Na/K->A33 SUPPORTING + renal confounder; CEA->A37 supporting oncology context แต่ไม่จำเป็นต้องเป็น severity marker โดยตรง
+ต้องมี evidence de-duplication: หลักฐาน 1 รายการอาจสนับสนุนหลาย biological interpretations แต่ห้าม contribution เต็มซ้ำหลาย Axis เว้นแต่ Registry ระบุ independent components ชัดเจน
+4.7 Evidence vocabulary ดีขึ้น แต่ Source Type กับ Evidence Status ยังปะปน
+ประวัติโรค, patient-reported symptom, physical exam, pathology และ laboratory measurement ไม่ใช่ source type เดียวกัน. แนะนำแยก:
+source_type = LAB | VITAL | HISTORY | PATIENT_REPORTED | EXAM | IMAGING | PATHOLOGY | MEDICATION | CLINICIAN_OBSERVATION
+evidence_status = MEASURED | DERIVED | CLINICAL_INFERENCE | HYPOTHESIS | NOT_AVAILABLE
+จะป้องกันกรณี “ประวัติเบาหวาน = MEASURED” หรือ “subjective symptom = MEASURED” โดยไม่มีนิยามชัด
+4.8 Network Registry ยังไม่ approved แต่รายงานสร้าง Official-like Network Propagation เอง
+รายงานใช้คำ Oncologic Toxicity–Inflammation Cycle, Bioenergetic Failure Cycle, Homeostatic Failure และ “จุดเริ่มต้น chain” ทั้งที่ 180 Network Registry/Edges ยังไม่ approved. ช่วงนี้ narrative เหล่านี้ต้องเป็น CLINICAL_CAUSAL_HYPOTHESIS ไม่ใช่ TSPI Network Propagation
+official_network_edge = false
+eligible_for_network_score = false
+label = CLINICAL_CAUSAL_HYPOTHESIS
+หลัง crosswalk/edges approved แล้ว จึงใช้ permanent Network IDs + edge IDs + evidence/source/version จริง. CELA ต้องถูกล็อกเป็น TSPI-NET-0120, Primary Axis A34 ตาม Domain Expert approval
+4.9 Severity ≠ Root Driver ≠ Clinical Urgency ≠ Treatment Priority
+Developer ปัจจุบันมีแนวโน้มใช้ highest Axis score -> Primary Axis -> root cause -> priority #1. TSPI ต้องแยกตัวแปรเหล่านี้คนละ field
+severity_score
+clinical_urgency
+axis_role
+causal_driver_probability
+network_centrality
+restoration_priority_rank
+treatment_priority_rank
+การแยกนี้คือหัวใจของ Fundamental Medicine: สิ่งที่อันตรายที่สุดตอนนี้ไม่จำเป็นต้องเป็น root driver ที่สุด และ root driver ไม่จำเป็นต้องเป็นสิ่งที่ต้องรักษาก่อนถ้ามี safety/acute priorities
+4.10 “Tertiary Axis” ไม่ควรเพิ่มเป็น Canonical Tier
+Physician Edition ใช้ Primary / Secondary / Tertiary. ถ้า TSPI ต้องการ role ของ Axis ในผู้ป่วย ให้ล็อก vocabulary เช่น PRIMARY, SECONDARY, MONITORING, CANDIDATE, NOT_ASSESSED. ห้าม report layer สร้าง canonical tier ใหม่
+4.11 Module Layer ยังผิดทิศแม้ติดป้าย PROVISIONAL
+Module Registry ปัจจุบันยัง provisional และ Candidate Remap ยังมี mapping/identity conflicts. แต่ Physician/Patient Reports ยังแสดงชื่อ module พร้อม function และ Axes เช่น RENAX, IMO, Livoxy, Plumax, RESHIMUNO, Sangvichai. ที่สำคัญ mapping ใน report ไม่ตรงกับ Candidate Registry บางรายการ แสดงว่า report writer ยัง infer module semantics เอง
+กฎเด็ดขาด
+Report layer ห้าม invent module indication / function / target axis / target network / mechanism จากชื่อผลิตภัณฑ์หรือบริบท. ทุก field ต้อง lookup จาก Approved Module Registry + Approved Claim Registry เท่านั้น
+
+report.module_name = ApprovedModuleRegistry.canonical_name
+report.module_axes = ApprovedModuleRegistry.target_axes
+report.module_networks = ApprovedModuleRegistry.target_networks
+report.module_mechanisms = ApprovedClaimRegistry.approved_claims
+จนกว่า Registry approved: Patient Edition ไม่ควรแสดงชื่อ Module ใด; Physician Edition ถ้าต้องแสดงเพื่อ QA ให้แยก Development QA Appendix ออกจาก Clinical Report
+4.12 Cross-report consistency ยัง FAIL
+ทั้งสาม reports อ้างว่าใช้ Reasoning Ledger เดียวกัน แต่มี hard contradictions. ตัวอย่าง:
+    • Patient Edition บอกระดับน้ำตาล/ไขมัน “ยังไม่พบความผิดปกติรุนแรง MEASURED” แต่ Physician/Multi‑Omics บอก FBS, HbA1c, lipid profile = NOT_AVAILABLE
+    • Patient Edition บางส่วนบอก oncology A37/A38 ยังไม่มีข้อมูล ขณะที่ Physician มี malignant pleural findings / metastatic context และ marker mapping oncology
+    • Mentzer Index ถูกใช้สลับ MEASURED/DERIVED และ source MCV/RBC ไม่สม่ำเสมอ
+    • Three Key scores ถูกเรียก MEASURED ทั้งที่เป็น DERIVED system score
+    • Provisional modules และ module axes/functions ไม่เหมือนกันระหว่าง report
+กฎระบบ
+สาม reports ต้อง “ไม่ reason ใหม่” แต่ render จาก immutable structured record เดียวกัน. ความต่างได้เฉพาะ language/detail level ไม่ใช่ clinical state
+
+4.13 ต้องมี Cross‑Report Invariant Validator ก่อน PDF Generation
+FAIL if HYPOTHESIS has numeric severity_score
+FAIL if same evidence_id differs in value/unit/status across editions
+FAIL if same axis has different score/status across editions
+FAIL if one edition says NOT_AVAILABLE and another says MEASURED for same timepoint
+FAIL if unapproved module appears as patient recommendation
+FAIL if report module mapping != Approved Module Registry
+FAIL if unapproved network edge is presented as canonical Network Propagation
+FAIL if provisional cutoff generates official TSPI severity band
+ถ้า invariant fail ต้อง block report generation ไม่ใช่ generate แล้วให้แพทย์ไล่จับด้วยตา
+4.14 Mentzer Index: provenance และ Safety Gate ต้องแยกให้ชัด
+รายงานบางส่วนระบุว่า MCV/RBC ไม่มีใน lab แต่กลับใช้ MCV=47.5, RBC=6.76 เพื่อ derive Mentzer 7.03. ถ้ามาจาก source อื่น ต้องเก็บ source_document_id/source_timestamp/source_field/verification_status. ถ้าไม่มี source จริง ห้าม reconstruct input จาก derived flag
+Safety ไม่ควรใช้ global “CONTRAINDICATED” ที่ทำให้เข้าใจว่าทุก intervention ถูกห้าม. ควรเป็น intervention-specific eligibility เช่น IRON_SUPPLEMENTATION = HOLD_PENDING_CONFIRMATION พร้อม global critical alerts แยกต่างหาก
+global_alerts[]
+intervention_eligibility[]
+  intervention_id
+  status = PASS | MONITOR | HOLD | CONTRAINDICATED | INSUFFICIENT_DATA
+  reason_rule_id
+  required_confirmation[]
+4.15 Cut-off / Severity Rules ยังต้อง ratify ก่อนเรียก “TSPI Biological Cut-off”
+Physician report ใช้ 5-level cut-offs และ critical/value labels อย่าง authoritative ทั้งที่ clinical cut-off registry ใน project gap ยังต้อง ratification. ต้องแยก rule type และ source:
+STANDARD_CLINICAL_CRITICAL_VALUE
+TSPI_BIOLOGICAL_SEVERITY_THRESHOLD
+RESEARCH_FOLLOWUP_TARGET
+PHYSICIAN_CONFIGURED_THRESHOLD
+ทุก threshold ต้องมี rule_id, source_id, version, authority_status, patient_context, approved_by. ถ้ายัง provisional ต้องแสดง provisional และห้ามใช้เป็น official TSPI severity band
+5. Comment แยกตามรายงานทั้ง 3 ฉบับ
+5.1 Physician Edition — จุดแข็งและสิ่งที่ต้องแก้
+Physician Edition เป็นฉบับที่มีโครงสร้างดีที่สุดและควรเป็น “decision workspace” หลักของแพทย์ แต่ยังมี narrative inference ปะปนกับ deterministic state มากเกินไป
+สิ่งที่ควรเก็บ: Reasoning Ledger, Evidence Chain, Contradiction Analysis, Not Assessed, Safety section, Physician sign-off, Final Disease Translation Layer
+สิ่งที่ต้องแก้:
+    • เอาคะแนน HYPOTHESIS ออกจาก Top 10 priorities และ Axis score tables
+    • Key score ให้เป็น DERIVED พร้อม coverage/formula version
+    • แก้ canonical 9 Steps ไม่ให้ reorder ตามคนไข้
+    • ห้ามเรียก ad-hoc organ groups ว่า TSPI Domains
+    • แก้ Axis contradictions โดยเฉพาะ A22/A29/A30/A35/A37/A38
+    • แยก severity / urgency / driver / treatment priority
+    • ถ้า Network Registry ยังไม่ approved ให้ causal cycles เป็น hypothesis เท่านั้น
+    • เอา provisional module candidates ออกจาก clinical main body; หากจำเป็นให้ QA appendix
+    • ทุก clinical statement ควร click-through ไป evidence_id/rule_id/registry version
+    • หน้า monitoring/referral thresholds ต้องอ่านจาก approved rule registry ไม่ใช่ static narrative
+5.2 Patient Edition — ต้อง “simplify” และตัด internal mechanics
+Patient Edition ดีขึ้นด้านภาษาและ empathy แต่ยัง technical เกินไป 21 หน้า และยังมี Axis codes, evidence tags, Module status, internal registry language และ technical calculations. จุดประสงค์ของ Patient View ควรเป็น shared decision communication ไม่ใช่ debug report
+โครงสร้างที่แนะนำ 6–10 หน้าแบบ dynamic:
+    • สิ่งที่เราทราบแน่ชัด
+    • สิ่งที่เป็นไปได้แต่ยังต้องยืนยัน
+    • สิ่งที่ยังไม่มีข้อมูล
+    • สิ่งที่ต้องระวัง/แจ้งทีมแพทย์ทันที
+    • สิ่งที่ทีมจะติดตาม
+    • การตรวจที่อาจช่วยตอบคำถามและเหตุผล
+    • แผนที่แพทย์อนุมัติแล้ว
+    • ผู้ติดต่อ/Red Flags
+ต้องแก้ footer เพราะ Patient Edition ปัจจุบันระบุ “This document is intended for healthcare professionals only” ซึ่งขัดกับ report type. นอกจากนี้ หากใช้คำ terminal phase/end-of-life ต้องเป็น physician-approved communication state ไม่ใช่ข้อความที่ AI ปล่อยเอง
+ห้าม Patient Edition แสดง provisional module names หรือ internal development status
+5.3 Multi‑Omics Edition — ปรับบทบาทจาก “missing data report” เป็น “information value report”
+ฉบับใหม่ดีขึ้นมากเพราะไม่สร้าง Omics values ปลอมและแสดง NOT_AVAILABLE ชัด. แต่ยังมีแนวคิดว่าไม่มี Omics = วิเคราะห์ TSPI ไม่ได้ลึกพอ. ใน TSPI symptoms/history/exam/imaging/pathology/routine labs เป็น first-class biological evidence; Omics ใช้เพิ่ม resolution/confidence และลด uncertainty ไม่ใช่ prerequisite
+ทุก test recommendation ต้องผ่าน Clinical Utility Gate:
+clinical_question
+current_uncertainty
+expected_information_gain
+will_change_management
+action_if_positive
+action_if_negative
+patient_burden
+risk
+turnaround_time
+goal_concordance
+urgency
+physician_decision
+อย่าแนะนำ Omics เพียงเพราะ “missing”. ถ้าผลไม่เปลี่ยนการตัดสินใจในเคสปัจจุบัน ให้ DEFER. PGx / Liquid biopsy / BAL+NGS / Microbiome ต้องอ่านจาก approved clinical utility / PGx rule registry ไม่ให้ LLM สร้าง priority เอง
+มี internal inconsistency ที่ควรใช้เป็น QA case เช่น “Temp 36.8°C” ถูกเรียกว่าไข้ต่ำในตาราง infectious workup — report compiler ต้องมี semantic validation ของค่ากับคำบรรยาย
+6. Confidence, Red Flags, Monitoring และ Safety — ต้องสร้างเป็น Engine ไม่ใช่ Prose
+6.1 Confidence 72%, 68%, 65%, 83%, 87%, 45% ต้องมีสูตรหรือเอาตัวเลขออก
+ถ้าเป็น deterministic score จริง ต้องมี formula_version, inputs, missingness, contradiction penalty, completeness และ uncertainty. ถ้ายังไม่มี validated formula ให้ใช้ HIGH/MODERATE/LOW แทนตัวเลข เพื่อหลีกเลี่ยง false precision
+6.2 Red Flag rendering ต้อง event-driven
+รายงานแสดง headache red-flag checklist ทั้งที่ headache ไม่ใช่อาการนำ ในขณะที่มี hypoxemia, K สูง, altered orientation, hypotension และ coagulation abnormalities. Engine ควร render ตาม relevance:
+TRIGGERED_CRITICAL
+TRIGGERED_URGENT
+RELEVANT_NEGATIVE
+NOT_ASSESSED
+ไม่ควรให้ generic checklist ที่ไม่สัมพันธ์กับเคสกินพื้นที่รายงานหลัก
+6.3 Safety ต้องทำ 2 ชั้น
+ชั้น 1 Pre-ranking eligibility: absolute contraindication, allergy, renal/hepatic restriction, pregnancy, major interactions, essential safety data. ชั้น 2 Regimen safety: ingredient/mechanism duplication, additive bleeding/glucose/BP effect, organ burden, pill burden, schedule complexity
+6.4 Monitoring Plan ต้องใช้ Approved Rules
+Monitoring interval, follow-up target, stopping criteria และ referral thresholds ต้องไม่ hard-code จาก prose. ทุก rule ต้องมี context/version/authority และ physician override. หาก registry ยัง provisional ให้ label PROVISIONAL และห้ามเรียกเป็น official TSPI standard
+7. Target Architecture ที่ควรให้ Developer ล็อก
+กุญแจสำคัญคือ “หนึ่ง analysis record — หลาย views”. PDF ไม่ควรเป็นแหล่งความจริง แต่เป็น renderer ของ structured state
+analysis_record_id
+framework_version
+axis_master_version
+network_registry_version
+module_registry_version
+marker_registry_version
+cutoff_registry_version
+safety_registry_version
+
+evidence[]
+  evidence_id
+  source_type
+  source_record_id
+  timestamp
+  raw_value
+  unit
+  evidence_status
+  evidence_grade
+  provenance_verified
+
+axis_assessments[]
+  axis_code
+  assessment_status
+  severity_score
+  severity_band
+  clinical_role
+  evidence_ids[]
+  data_completeness
+  confidence
+  biological_uncertainty
+  scoring_formula_version
+
+network_assessments[]
+  network_code
+  assessment_status
+  evidence_ids[]
+  edge_ids[]
+  edge_approval_status
+  confidence
+
+restoration_steps[]
+  canonical_step_no
+  canonical_step_name
+  current_clinical_priority_rank
+  assessment_status
+
+module_candidates[]
+  module_id
+  h_code
+  target_axes[]
+  target_networks[]
+  approved_claim_ids[]
+  safety_status
+  match_status
+  match_score
+  reason_selected[]
+  reason_not_selected[]
+  physician_decision
+8. Developer Invariants — กฎ Hard Fail ที่ควรเขียนเป็น Automated Tests
+    1. Axis status = HYPOTHESIS -> severity_score ต้อง null
+    2. Key score ห้าม evidence_status=MEASURED เว้นแต่เป็น raw instrument measurement (ซึ่งปกติไม่ใช่)
+    3. Canonical Step no/name ห้ามเปลี่ยนตาม patient priority
+    4. Canonical Domain name ต้องมาจาก Domain Registry เท่านั้น
+    5. Same evidence_id ต้องมี value/unit/status เหมือนกันทุก report edition
+    6. NOT_AVAILABLE ใน report หนึ่ง ห้ามเป็น MEASURED ในอีก report ที่ timepoint เดียวกัน
+    7. Module Registry != APPROVED -> ห้าม Patient Report มี module recommendation
+    8. Report module target_axes / mechanisms ต้องเท่ากับ approved registry records
+    9. Network edge != APPROVED -> ห้าม label เป็น canonical Network Propagation / Root Driver
+    10. Provisional cut-off -> ห้ามสร้าง official severity band
+    11. Null, 0, false, NOT_APPLICABLE, NOT_ASSESSED ต้องไม่ถูก cast แทนกัน
+    12. หนึ่ง evidence item ห้าม contribution เต็มซ้ำหลาย Axis โดยไม่มี independence rule
+    13. ทุก score ต้องมี score_contract + formula_version + inputs + coverage
+    14. ทุก clinical claim ต้องมี source_data_ids / rule_id / registry ids หรือถูก label HYPOTHESIS non-scoring
+    15. Patient-facing release ต้อง fail closed ถ้า source registry ใดที่เป็น dependency ถูก withdrawn/deprecated
+9. Roadmap การแก้ไข — P0 / P1 / P2
+องค์ประกอบ	สถานะปัจจุบัน	คำตัดสิน/สิ่งที่ต้องทำ
+P0 ก่อน Physician Pilot	ต้องเสร็จทั้งหมด	Hypothesis no-score; cross-report invariants; canonical Steps/Domains; Axis corrections; marker relation types; cut-off authority; Mentzer provenance; module removal; network hypothesis labelling
+P1 ก่อน Patient-facing Pilot	ต้องผ่าน QA/clinician review	Key score formula+coverage; patient simplification; relevant red flags; multi-omics utility gate; intervention-specific safety; statement provenance; terminology
+P2 หลัง Core Stable	พัฒนาเพิ่ม	Approved 180-network edges, research intelligence, case intelligence, longitudinal outcome model, population learning, simulation/digital twin
+10. Definition of Done — เกณฑ์ที่ควรใช้ก่อนเปลี่ยนสถานะเป็น “พร้อมใช้”
+    • สาม reports ผ่าน cross-report invariants 100% จาก analysis record เดียวกัน
+    • ไม่มี HYPOTHESIS ใดมี numeric severity score
+    • Canonical 3 Keys / 9 Steps / 12 Domains / 39 Axes ไม่ถูก override โดย report logic
+    • Axis scoring ทุกตัวที่มีคะแนนต้องผ่าน minimum-evidence rule และ approved cut-off/scoring rule
+    • 180 Network crosswalk/edge ที่ใช้ในการ causal reasoning มี approved IDs + version + provenance
+    • Module identity + Module-to-Axis + Claim + Safety Registry สำหรับ pilot subset = APPROVED
+    • Patient report ไม่มี provisional module / internal debug content และ physician-approved communication state ถูกบังคับ
+    • Multi-Omics recommendations แสดง clinical utility / burden / management-change logic
+    • Clinician-authored regression cases ผ่านครบ: incomplete data, conflicting evidence, red flag, critical lab, no omics, renal/hepatic impairment, module contraindication, legacy mapping conflict
+    • มี rollback/withdrawal mechanism เมื่อ registry/rule ถูกแก้หรือถอน
+    • Physician shadow pilot ผ่านก่อน patient release และ production remains fail-closed
+11. Comment ที่ควรส่งตรงให้ Developer
+สารสำคัญ
+อย่าแก้ 3 PDF แยกกัน. แก้ “structured semantics” ของ Reasoning Ledger และ Analysis Record ก่อน แล้วให้ทั้งสามรายงาน render จากความจริงชุดเดียวกัน. หาก underlying record ถูกต้อง รายงานจะถูกต้องตามโดยอัตโนมัติ
+
+คำสั่งหลักสำหรับทีม Developer:
+    • แยก Canonical Ontology ออกจาก Patient-specific Assessment อย่างเด็ดขาด
+    • แยก Evidence availability ออกจาก Scoring availability; มี evidence แต่ยังไม่มี scoring rule ≠ NOT_AVAILABLE
+    • แยก Severity, Urgency, Driver, Axis Role, Restoration Priority และ Treatment Priority
+    • HYPOTHESIS ไม่ให้คะแนนและไม่เข้าระบบ Match
+    • LLM เป็น explanation/presentation layer เท่านั้น ไม่สร้าง Module/Axis/Network/edge/score
+    • Network causal narrative ก่อน edge approval ต้องเป็น hypothesis
+    • Module candidate ก่อน registry approval ไม่ควรเข้ารายงาน clinical; QA information ต้องแยก appendix
+    • ทุก statement/score ต้อง trace back ถึง evidence_id + rule_id + registry_version
+    • เพิ่ม hard invariant tests แล้ว block generation เมื่อ semantic contradiction เกิดขึ้น
+    • ใช้ clinician review เพื่อ ratify cutoffs, evidence grades, network edges, safety rules และ pilot subset ก่อน production
+12. Canonical Lock ที่ห้าม Developer ตีความใหม่
+Code	Canonical Meaning	Developer Note
+A10	Proteostasis–Autophagy–Lysosome	Protein quality / UPR / Autophagy / Proteotoxic burden อยู่ตรงนี้
+A26	Stem Cell & Hematopoiesis	Hematopoietic axis
+A27	Glycation / Carbonyl Stress	ไม่ใช่ legacy Metabolic Balance
+A29	Bone Remodeling	แกนหลักเรื่อง bone remodeling / resorption
+A30	Connective Tissue Integrity	ไม่ใช่ชื่อรวมของ bone metastasis
+A34	Neuro–Sleep–Stress–Brain Clearance	CELA อยู่ใต้ A34
+A35	Visceral Organ Functional Reserve	liver/kidney/heart/lung reserve
+A37	Oncologic Cell Fate	Oncology
+A38	Tumor Microenvironment & Metastatic Dynamics	Metastasis/TME
+A39	Genomic Regulation Homeostasis	ไม่ใช่ CELA
+N120	Cognitive–Emotional Loop Architecture (CELA)	Primary Axis A34 — APPROVED
+13. แหล่งอ้างอิงภายในโครงการที่ใช้ในการ Review
+    • Physician Edition v2.0: หน้า 2–6 (Keys, Steps, priorities, safety), หน้า 7–17 (marker/evidence/contradiction), หน้า 18–23 (39 Axes + network propagation), หน้า 24–25 (module matrix), หน้า 31 และ 38 (monitoring/limitations)
+    • Patient Edition v2.0: หน้า 2–6 (confirmed/unknowns), หน้า 7–9 (keys/axis priorities/network propagation), หน้า 10–17 (investigations/lifestyle/modules/safety), หน้า 19–21 (monitoring/footer)
+    • Multi‑Omics Edition v2.0: หน้า 2–10 (readiness/clinical utility/test prioritization), หน้า 11–17 (phenotype/axis assessment/keys/steps/module-network status)
+    • Master “39 แกน 12 โดเมน กุญแจ 3 ดอก”: canonical 39 Axes, 180 Living Biological Networks, final architecture, CELA context
+    • TSPI Open Questions / Gap Analysis: deterministic engine, NOT_ASSESSED, HYPOTHESIS never scores, safety, module/network blockers
+    • TSPI Candidate Module Registry Remap: provisional/non-authoritative module mappings และข้อจำกัด identity/mapping ที่ยังต้อง review
+คำตัดสินสุดท้าย
+Direction ของ Developer = ถูกทาง แต่ Physician Pilot ต้อง HOLD จน P0 แก้ครบ. Production และ Patient-facing Release = NOT READY. เป้าหมายถัดไปคือ “single auditable TSPI Analysis Record” ไม่ใช่ “rewrite report prose”

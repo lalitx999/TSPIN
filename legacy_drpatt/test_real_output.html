@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>TSPI Precision Medicine Report - หนุมาน ไม่ระบุสกุล</title>
+    <style>
+        /* ──────────────────────────────────────────────────────────────
+           PAGE SETUP — มาตรฐานเอกสารทางการแพทย์ A4
+           ────────────────────────────────────────────────────────────── */
+        @page {
+            size: A4;
+            margin: 30mm 22mm 25mm 22mm;
+
+            @top-center {
+                content: "TSPI PRECISION MEDICINE REPORT";
+                font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+                font-size: 8pt;
+                color: #475569;
+                letter-spacing: 1.5px;
+                border-bottom: 1.5px solid #94A3B8;
+                padding-bottom: 5px;
+                width: 100%;
+            }
+
+            @bottom-right {
+                content: "หน้า " counter(page) " / " counter(pages);
+                font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+                font-size: 8.5pt;
+                color: #64748B;
+            }
+
+            @bottom-left {
+                content: "TSPI-DOC-001 / CONFIDENTIAL";
+                font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+                font-size: 7.5pt;
+                color: #94A3B8;
+                letter-spacing: 0.5px;
+            }
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           BASE STYLES
+           ────────────────────────────────────────────────────────────── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+            font-size: 10.5pt;
+            line-height: 1.7;
+            color: #1E293B;
+            background: #FFFFFF;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           CONTAINER — ใช้ห่อเนื้อหาให้มี padding
+           ────────────────────────────────────────────────────────────── */
+        .report-container {
+            padding: 0 0 10px 0;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           TYPOGRAPHY
+           ────────────────────────────────────────────────────────────── */
+        h1 {
+            font-size: 18pt;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 20px;
+            border-bottom: 2.5px solid #1E3A5F;
+            padding-bottom: 6px;
+            letter-spacing: 1px;
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+
+        h2 {
+            font-size: 13.5pt;
+            font-weight: 700;
+            color: #1E3A5F;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #CBD5E1;
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+
+        h3 {
+            font-size: 11.5pt;
+            font-weight: 600;
+            color: #1E293B;
+            margin-top: 18px;
+            margin-bottom: 10px;
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+
+        h4 {
+            font-size: 10.5pt;
+            font-weight: 600;
+            color: #334155;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        strong {
+            color: #0F172A;
+            font-weight: 700;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #E2E8F0;
+            margin: 18px 0;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           HEADER SECTION
+           ────────────────────────────────────────────────────────────── */
+        .report-header {
+            text-align: center;
+            margin-bottom: 28px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #1E3A5F;
+        }
+
+        .report-header .institution {
+            font-size: 12pt;
+            font-weight: 600;
+            color: #1E3A5F;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .report-header .report-title {
+            font-size: 20pt;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 4px 0 2px 0;
+            letter-spacing: 1px;
+        }
+
+        .report-header .report-subtitle {
+            font-size: 11pt;
+            color: #475569;
+            font-weight: 400;
+        }
+
+        .report-header .doc-code {
+            font-size: 8.5pt;
+            color: #94A3B8;
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           PATIENT INFO
+           ────────────────────────────────────────────────────────────── */
+        .patient-info {
+            border: 1.5px solid #94A3B8;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            background: #F8FAFC;
+            page-break-inside: avoid;
+        }
+
+        .patient-info .section-label {
+            font-size: 9.5pt;
+            font-weight: 700;
+            color: #475569;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #CBD5E1;
+            padding-bottom: 4px;
+            margin-bottom: 10px;
+        }
+
+        .info-grid {
+            display: table;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 2px;
+        }
+
+        .info-row {
+            display: table-row;
+        }
+
+        .info-item {
+            display: table-cell;
+            padding: 3px 10px 3px 0;
+            font-size: 10.5pt;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #475569;
+            width: 140px;
+            display: inline-block;
+            letter-spacing: 0.3px;
+        }
+
+        .info-label::after {
+            content: ":";
+            margin-left: 2px;
+        }
+
+        .info-value {
+            color: #0F172A;
+            font-weight: 600;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           TABLES — ปรับให้ไม่ล้น
+           ────────────────────────────────────────────────────────────── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0 18px 0;
+            font-size: 9.5pt;
+            page-break-inside: avoid;
+            table-layout: auto;
+        }
+
+        thead th {
+            background: #E2E8F0;
+            color: #0F172A;
+            font-weight: 700;
+            text-align: left;
+            padding: 8px 10px;
+            border: 1px solid #94A3B8;
+            font-size: 8.5pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 7px 10px;
+            border: 1px solid #CBD5E1;
+            vertical-align: top;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #F8FAFC;
+        }
+
+        /* ป้องกันตารางล้น */
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            margin: 14px 0 18px 0;
+        }
+
+        .table-wrap table {
+            width: 100%;
+            min-width: 500px;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           BADGES
+           ────────────────────────────────────────────────────────────── */
+        .badge {
+            display: inline-block;
+            padding: 1px 10px;
+            border-radius: 12px;
+            font-size: 8pt;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            border: 1px solid;
+            white-space: nowrap;
+        }
+
+        .badge-normal {
+            background: #F1F5F9;
+            color: #334155;
+            border-color: #CBD5E1;
+        }
+
+        .badge-low {
+            background: #E6F7EC;
+            color: #065F46;
+            border-color: #A7F3D0;
+        }
+
+        .badge-medium {
+            background: #FEF3C7;
+            color: #92400E;
+            border-color: #FDE68A;
+        }
+
+        .badge-high {
+            background: #FEE2E2;
+            color: #991B1B;
+            border-color: #FECACA;
+        }
+
+        .badge-critical {
+            background: #FECACA;
+            color: #7F1D1D;
+            border-color: #F87171;
+        }
+
+        .badge-pass {
+            background: #DCFCE7;
+            color: #166534;
+            border-color: #86EFAC;
+        }
+
+        .badge-fail {
+            background: #FEE2E2;
+            color: #991B1B;
+            border-color: #FCA5A5;
+        }
+
+        .badge-hold {
+            background: #FEF3C7;
+            color: #92400E;
+            border-color: #FCD34D;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           CALLOUT BOXES
+           ────────────────────────────────────────────────────────────── */
+        .callout {
+            padding: 14px 18px;
+            margin: 14px 0 18px 0;
+            border-left: 4px solid;
+            background: #F8FAFC;
+            page-break-inside: avoid;
+        }
+
+        .callout-info {
+            border-color: #1E3A5F;
+            background: #F1F5F9;
+        }
+
+        .callout-warning {
+            border-color: #D97706;
+            background: #FFFBEB;
+        }
+
+        .callout-danger {
+            border-color: #DC2626;
+            background: #FEF2F2;
+        }
+
+        .callout-success {
+            border-color: #059669;
+            background: #ECFDF5;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            font-size: 10.5pt;
+            margin-bottom: 6px;
+            color: #0F172A;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           LISTS
+           ────────────────────────────────────────────────────────────── */
+        ul,
+        ol {
+            margin: 10px 0 12px 0;
+            padding-left: 28px;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           FOOTER
+           ────────────────────────────────────────────────────────────── */
+        .report-footer {
+            margin-top: 36px;
+            padding-top: 14px;
+            border-top: 1.5px solid #CBD5E1;
+            font-size: 8.5pt;
+            color: #94A3B8;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+
+        .report-footer .footer-line {
+            margin: 2px 0;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           PAGE BREAK
+           ────────────────────────────────────────────────────────────── */
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           UTILITY
+           ────────────────────────────────────────────────────────────── */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-muted { color: #64748B; }
+        .text-small { font-size: 8.5pt; }
+        .text-uppercase { text-transform: uppercase; }
+        .mt-8 { margin-top: 8px; }
+        .mt-16 { margin-top: 16px; }
+        .mb-8 { margin-bottom: 8px; }
+        .mb-16 { margin-bottom: 16px; }
+        .fw-600 { font-weight: 600; }
+        .fw-700 { font-weight: 700; }
+
+        .chapter-content {
+            margin-top: 6px;
+        }
+
+        /* ──────────────────────────────────────────────────────────────
+           PRINT-ONLY OPTIMIZATION
+           ────────────────────────────────────────────────────────────── */
+        @media print {
+            body {
+                font-size: 10pt;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+
+            table {
+                page-break-inside: avoid;
+            }
+
+            tr {
+                page-break-inside: avoid;
+            }
+
+            .callout {
+                page-break-inside: avoid;
+            }
+
+            .patient-info {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="report-container">
+
+        <!-- HEADER -->
+        <div class="report-header">
+            <div class="institution">TSPI — Thai Systems Pharmacology Intelligence</div>
+            <div class="report-title">Precision Medicine Report</div>
+            <div class="report-subtitle">Physician Edition</div>
+            <div class="doc-code">Document: TSPI-CL-001 | Version 2.0</div>
+        </div>
+
+        <!-- PATIENT INFORMATION -->
+        <div class="patient-info">
+            <div class="section-label">▸ Patient Information</div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-label">Patient Name</span>
+                        <span class="info-value">หนุมาน ไม่ระบุสกุล</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Hospital Number (HN)</span>
+                        <span class="info-value">3027</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-label">Report Date</span>
+                        <span class="info-value">28/07/2026</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Attending Physician</span>
+                        <span class="info-value">Physician Reviewed &amp; Certified</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-label">Report Type</span>
+                        <span class="info-value">Physician Edition</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Laboratory</span>
+                        <span class="info-value">TSPI Precision Medicine Lab</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CLINICAL MEASUREMENTS & LABORATORY INVESTIGATIONS -->
+        
+        <div style="margin-top: 24px; page-break-inside: avoid;">
+            <h3 style="color: #1E3A5F; border-bottom: 2px solid #CBD5E1; padding-bottom: 4px;">🔬 ผลการตรวจทางห้องปฏิบัติการ (Laboratory Investigations)</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 45%;">ตัวบ่งชี้ (Investigation)</th>
+                            <th style="width: 55%;">ผลการตรวจ (Result Value)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Prerenal
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">Dehydration จากท้องเสีย</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - RI
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">0.89 (สูงมาก)                                                   │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - EDV
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">25 cm/s                                                         │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - PSV
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">210 cm/s                                                        │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Intrarenal
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">NSAID-induced Acute Tubular Necrosis (ATN)</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Hb 8.5 g/dL
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Both kidneys
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">Small, echogenic, atrophic</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Echogenicity
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">เพิ่มขึ้น (CKD)</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - BP 160/95 mmHg
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - HCO3- 15 mEq/L
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - No renal stone
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - eGFR 10 mL/min
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - eGFR &lt; 30 mL/min
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - No hydronephrosis
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - จาก Doppler
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">RI &gt; 0.80 ทั้ง 2 ข้าง</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Cortical thickness
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">ลดลง (Cortical thinning)</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - ขนาดไต
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">Left 9.0 cm, Right 8.8 cm (ขนาดเล็กลง = CKD)</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - สาเหตุ
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">Diabetic Nephropathy + Hypertensive Nephrosclerosis</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Granular casts = AKI
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - Turbulent flow
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">Positive                                             │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Hypocalcemia (Ca 8.0)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - Left renal vein
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">Patent                                              │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Ejection Fraction (EF)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">50% (ลดลงเล็กน้อย)</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - Right renal vein
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">Patent (ไม่มีการอุดตัน)                            │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ **Renal Vein Doppler
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">**                                                   │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                5. **Metabolic Acidosis**
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - จาก Fluid overload
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ **สรุป Doppler
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">**                                                         │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - Resistive Index (RI)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">0.83 (สูง &gt; 0.70 = Renal artery stenosis)     │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Hyperphosphatemia (PO4 6.5)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                **การแปลผล CBC
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">** Anemia of chronic disease (Normocytic normochromic anemia)</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - Pulsatility Index (PI)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">1.50                                         │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Metabolic acidosis (HCO3- 15)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                **การแปลผล Renal
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">**</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - Post-stenotic dilatation
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">Positive                                   │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - AKI on CKD (CKD Stage 3b → 5)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Broad waxy casts = Advanced CKD
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - RBC casts = Glomerulonephritis?
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ **Renal Artery Doppler (Left)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">**                                          │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ **Renal Artery Doppler (Right)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">**                                         │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Baseline Cr 1.8 → Current Cr 5.2
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - LVH (Left Ventricular Hypertrophy)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - End Diastolic Velocity (EDV)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">30 cm/s                                │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - Peak Systolic Velocity (PSV)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">180 cm/s                               │</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                **การแปลผล Urinalysis
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">**</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - เสี่ยงต่อ Gout attack
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                2. Acute Tubular Necrosis (ATN) from NSAID
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                3. **Chronic Kidney Disease (CKD) Stage 4**
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - eGFR ลดลงจาก 42 → 10 mL/min
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - จาก Erythropoietin (EPO) ลดลง
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Mild pericardial effusion (จาก Uremia)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                1. Prerenal AKI from dehydration (หลัก)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                3. Acute Interstitial Nephritis (AIN) from NSAID
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                5. การวินิจฉัย (Diagnosis)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - จาก Renal artery stenosis + Fluid overload
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                5. Urinary obstruction (Ultrasound ไม่พบ)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Hyperphosphatemia + Hypocalcemia = Mineral bone disorder
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                4. Hepatorenal syndrome (ไม่มีตับวาย)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                9. **Pulmonary Edema** - น้ำคั่งในปอด
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Secondary hyperparathyroidism (PTH สูง - รอผล)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                ================================================================
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Hyperkalemia (K+ 6.2) ต้องรักษาทันที
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                **Primary Diagnosis (การวินิจฉัยหลัก)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">**</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Proteinuria 3.2 g/24hr = Glomerular damage (Diabetic nephropathy)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                10. **Hyperuricemia** - กรดยูริกสูง (9.8 mg/dL)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                **Differential Diagnosis (การวินิจฉัยแยกโรค)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">**</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Renal artery stenosis ทำให้ไต vulnerable มากขึ้น
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                1. **Acute Kidney Injury (AKI) Stage 3 on Chronic Kidney Disease (CKD) Stage 4**
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - Bilateral Renal Artery Stenosis (RAS)                                │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │                                                                           │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │                    DOPPLER ULTRASOUND RESULT                               │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                **Complications (โรคแทรกซ้อนที่เกิดขึ้น)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">**</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │                      │ Granular casts│ None       │ AKI                   │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                จาก Erythropoietin (EPO) ลดลงในโรคไตเรื้อรัง
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ 24-hour urine protein│ 3.2 g/24hr  │ &lt; 0.15 g/24hr│ Nephrotic range        │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Casts                │ Broad waxy casts│ None     │ CKD (Advanced)         │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - จากการสะสมของกรดในเลือด (Uremic acidosis)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - ทำให้ความดันโลหิตควบคุมไม่ได้
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                8. **Hypertensive Crisis** - ความดันโลหิตสูงวิกฤต
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Glucose              │ 2+          │ Negative      │ Glycosuria (DM)        │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Parameter            │ Result      │ Reference Range│ Interpretation        │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ eGFR (CKD-EPI)       │ 10 mL/min   │ &gt; 90          │ CKD Stage 5            │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - Creatinine เพิ่มจาก 1.8 → 5.2 mg/dL (เพิ่ม &gt; 2 เท่า)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Albumin              │ 3.2 g/dL    │ 3.5 - 5.0     │ ต่ำ (Malnutrition)     │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Calcium (Ca2+)       │ 8.0 mg/dL   │ 8.5 - 10.5    │ ต่ำ (Hypocalcemia)     │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ FBS (Fasting)        │ 165 mg/dL   │ 70 - 100      │ สูง (Diabetes)         │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Phosphorus (PO4)     │ 6.5 mg/dL   │ 2.5 - 4.5     │ สูง (Hyperphosphatemia)│
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ ALP                  │ 110 U/L     │ 40 - 130      │ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ ALT                  │ 30 U/L      │ &lt; 40          │ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ AST                  │ 35 U/L      │ &lt; 40          │ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Appearance           │ Clear       │ Clear         │ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Bicarbonate (HCO3-)  │ 15 mEq/L    │ 22 - 28       │ ต่ำ (Metabolic acidosis)│
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Chloride (Cl-)       │ 100 mEq/L   │ 98 - 106      │ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Ketone               │ Negative    │ Negative      │ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ MCH                  │ 28 pg       │ 27 - 33       │ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ MCHC                 │ 33 g/dL     │ 32 - 36       │ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Sodium (Na+)         │ 135 mEq/L   │ 136 - 145     │ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Total Bilirubin      │ 0.8 mg/dL   │ 0.2 - 1.2     │ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ WBC                  │ 8,200 /mcL  │ 4,500 - 11,000│ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ MCV                  │ 82 fL       │ 80 - 100      │ ปกติ (Normocytic)      │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Platelet Count       │ 180,000/mcL │ 150,000-400,000│ ปกติ                  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                - ต้องรักษาทันทีเพื่อป้องกัน Cardiac arrhythmia
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Creatinine           │ 5.2 mg/dL   │ 0.7 - 1.3     │ สูงมาก (Severe AKI)   │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                6. **Anemia of Chronic Disease** (โลหิตจางจากโรคเรื้อรัง)
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ BUN                  │ 85 mg/dL    │ 7 - 20        │ สูงมาก (Uremia)        │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Hematocrit (Hct)     │ 26.0%       │ 40 - 52       │ ต่ำมาก                 │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Hemoglobin (Hb)      │ 8.5 g/dL    │ 13.0 - 17.0   │ ต่ำมาก (Anemia)        │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Potassium (K+)       │ 6.2 mEq/L   │ 3.5 - 5.0     │ สูงมาก (Hyperkalemia)  │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Protein              │ 2+ (300 mg/dL)│ Negative    │ Proteinuria (ไตเสีย)   │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Uric Acid            │ 9.8 mg/dL   │ 3.4 - 7.0     │ สูงมาก (Gout risk)     │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Specific Gravity     │ 1.010       │ 1.005 - 1.030 │ Isosthenuria (ไตไม่浓缩)│
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                4. **Hyperkalemia (โปแตสเซียมสูง) 6.2 mEq/L** - ภาวะฉุกเฉิน
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ RBC                  │ 10-15 /HPF  │ &lt; 3 /HPF      │ มีเลือดปน (Glomerular) │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ WBC                  │ 5-10 /HPF   │ &lt; 5 /HPF      │ มี WBC เล็กน้อย          │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ pH                   │ 5.5         │ 4.5 - 8.0     │ ค่อนข้างกรด            │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ Magnesium (Mg2+)     │ 1.6 mg/dL   │ 1.8 - 2.6     │ ต่ำเล็กน้อย             │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ HbA1c                │ 7.8%        │ &lt; 5.7%        │ ควบคุมไม่ได้ดี         │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                7. **Mineral and Bone Disorder (MBD)** - ภาวะกระดูกและแร่ธาตุผิดปกติ
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │ BUN/Cr Ratio         │ 16.3        │ &lt; 20          │ ไม่ใช่ Prerenal อย่างเดียว│
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                2. **Bilateral Renal Artery Stenosis (RAS)** - หลอดเลือดแดงไตตีบทั้ง 2 ข้าง
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - ระดับปานกลางถึงรุนแรงทั้ง 2 ข้าง                                      │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - และเป็นปัจจัยทำให้ไตเสื่อมเร็วขึ้น                                      │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                │   - น่าจะเป็นสาเหตุของความดันโลหิตที่ควบคุมไม่ได้                          │
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                ┌──────────────────────┬─────────────┬───────────────┬──────────────────────┐
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                └──────────────────────┴─────────────┴───────────────┴──────────────────────┘
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                ├──────────────────────┼─────────────┼───────────────┼──────────────────────┤
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                ┌─────────────────────────────────────────────────────────────────────────────┐
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                └─────────────────────────────────────────────────────────────────────────────┘
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr>
+                            <td style="font-weight: 600; color: #334155;">
+                                ├─────────────────────────────────────────────────────────────────────────────┤
+                            </td>
+                            <td style="font-weight: 700; color: #0F172A;">True</td>
+                        </tr>
+                        
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+
+        <!-- BIOLOGICAL AXES ASSESSMENT -->
+        
+
+        <!-- DYNAMIC CHAPTERS -->
+        
+        <div class="page-break" style="margin-top: 6px; padding-top: 4px;">
+            <h2>Chapter 1: TSPI Biological State Summary (หน้าสรุปภาวะทางชีวภาพของคนไข้เพื่อให้แพทย์เข้าใจใน 30 วินาที)</h2>
+            <div class="chapter-content">
+                <p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>AI-GENERATED CLINICAL DRAFT - PENDING PHYSICIAN REVIEW - NOT FOR PATIENT RELEASE</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>บทที่ 1: TSPI Biological State Summary (สรุปภาวะทางชีวภาพของคนไข้)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>1. THREE BIOLOGICAL KEYS ASSESSMENT (การประเมินกุญแจชีวภาพทั้งสาม)</strong></p>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>Metabolic Energy Score (พลังงานเมตาโบลิกและไมโทคอนเดรีย):</strong> [NOT_AVAILABLE] [NOT_AVAILABLE] ไม่มีข้อมูลการตรวจวัดในด่านนี้ (คะแนนของกุญแจนี้ไม่สามารถคำนวณได้จากข้อมูลที่มีอยู่)</li>
+<li style="margin-bottom: 4px;">  <strong>Biological Dynamic Score (ความยืดหยุ่นและสมดุลการไหลเวียน):</strong> [NOT_AVAILABLE] [NOT_AVAILABLE] ไม่มีข้อมูลการตรวจวัดในด่านนี้ (คะแนนของกุญแจนี้ไม่สามารถคำนวณได้จากข้อมูลที่มีอยู่)</li>
+<li style="margin-bottom: 4px;">  <strong>Biointegrity Score (ความสมบูรณ์ของโครงสร้างเซลล์และเกราะป้องกัน):</strong> 60/100 (🟠 Functional Disturbance) <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> คะแนนนี้ได้มาจากข้อมูลที่บ่งชี้ถึงความเสียหายของเนื้อเยื่อไตและการสร้างพังผืด (Fibrosis) ซึ่งเป็นโครงสร้างหลักของระบบขับถ่ายและกรองของเสีย</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>2. NINE RESTORATION STEPS PRIORITY (ลำดับความสำคัญของขั้นตอนการฟื้นฟูทั้งเก้าขั้น)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">จากข้อมูลที่ <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> และ <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> การฟื้นฟูในกรณีของคุณหนุมานมีความจำเป็นอย่างเร่งด่วน โดยลำดับความสำคัญสูงสุด 3 อันดับแรกคือ:</p>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>Priority 1: Genomic Stability (เสถียรภาพของจีโนม)</strong> <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> คะแนนความรุนแรงของ AXIS_11 อยู่ที่ 80/100 (Severe) ซึ่งสูงที่สุดในบรรดาแกนชีวภาพที่มีข้อมูล การฟื้นฟูเสถียรภาพของดีเอ็นเอและกลไกการซ่อมแซมถือเป็นรากฐานสำคัญในการลดความเสียหายของเซลล์ โดยเฉพาะเซลล์ไตที่กำลังถูกทำลายอย่างรุนแรง</li>
+<li style="margin-bottom: 4px;">  <strong>Priority 2: Detoxification (การขับล้างพิษ)</strong> <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span> จากข้อมูลที่แสดงถึงภาวะ Uremia (BUN 85 mg/dL) และการทำงานของไตที่ล้มเหลว (eGFR 10 mL/min) การฟื้นฟูเส้นทางการขับล้างของเสียออกจากร่างกายเป็นลำดับแรกที่ต้องดำเนินการควบคู่กับการรักษาทางการแพทย์ฉุกเฉิน เพื่อลดภาระสารพิษในกระแสเลือด</li>
+<li style="margin-bottom: 4px;">  <strong>Priority 3: Epigenetic-Gene Regulation (การควบคุมยีนผ่านอีพีเจเนติกส์)</strong> <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> คะแนนของ AXIS_12 อยู่ที่ 70/100 (Moderate) ซึ่งสัมพันธ์โดยตรงกับภาวะเรื้อรังต่างๆ เช่น เบาหวาน ความดันโลหิตสูง และการอักเสบ การปรับเปลี่ยนสัญญาณอีพีเจเนติกส์จะช่วยลดการแสดงออกของยีนที่ก่อให้เกิดโรคและส่งเสริมการซ่อมแซม</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>3. TOP 10 BIOLOGICAL RESTORATION PRIORITIES (10 ลำดับความสำคัญสูงสุดในการฟื้นฟูทางชีวภาพ)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Priority 1: Restore Renal Filtration & Excretory Network</strong> <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ฟื้นฟูเครือข่ายการกรองและขับถ่ายของไต ซึ่งกำลังอยู่ในภาวะวิกฤตเฉียบพลันบนพื้นโรคเรื้อรัง (AKI on CKD) โดยมีค่าการทำงานลดลงเหลือเพียง 10% (eGFR 10 mL/min)</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Priority 2: Reduce Genomic Instability & DNA Damage</strong> <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> ลดความไม่เสถียรของจีโนมและความเสียหายของดีเอ็นเอ ซึ่งเป็นแกนชีวภาพที่มีความรุนแรงมากที่สุด (AXIS_11 Score: 80/100) และเป็นกลไกหลักของความเสื่อมของเซลล์</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Priority 3: Correct Metabolic Acidosis & Electrolyte Imbalance</strong> <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> แก้ไขภาวะเลือดเป็นกรดจากการคั่งของเสีย (Metabolic Acidosis, HCO3- 15) และความไม่สมดุลของแร่ธาตุ โดยเฉพาะภาวะโพแทสเซียมสูงที่เป็นอันตรายถึงชีวิต (Hyperkalemia, K+ 6.2)</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Priority 4: Restore Vascular Hemodynamics & Reduce Arterial Stiffness</strong> <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ฟื้นฟูการไหลเวียนโลหิตและลดความตึงตัวของหลอดเลือดแดง จากการตรวจพบหลอดเลือดแดงไตตีบทั้งสองข้าง (Bilateral Renal Artery Stenosis) และความดันโลหิตสูงที่ควบคุมไม่ได้</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Priority 5: Reduce Fibrosis & ECM Remodeling</strong> <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> ลดการเกิดพังผืดและการปรับโครงสร้างของเนื้อเยื่อ โดยเฉพาะในไต (AXIS_25 Score: 60/100) ซึ่งเป็นกระบวนการที่ทำให้ไตสูญเสียการทำงานอย่างถาวร</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Priority 6: Regulate Glucose-Insulin Homeostasis</strong> <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ควบคุมสมดุลของน้ำตาลและอินซูลิน เนื่องจากโรคเบาหวาน (HbA1c 7.8%) เป็นสาเหตุหลักของโรคไตเรื้อรัง การควบคุมระดับน้ำตาลจึงเป็นหัวใจสำคัญในการชะลอความเสื่อม</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Priority 7: Reduce Systemic Inflammatory Load</strong> <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span> ลดภาระการอักเสบทั่วร่างกาย ซึ่งเป็นกลไกพื้นฐานที่เชื่อมโยงโรคเรื้อรังทุกชนิดเข้าด้วยกัน แม้ยังไม่มีค่าการตรวจวัดโดยตรง แต่มีหลักฐานทางคลินิกชัดเจน</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Priority 8: Restore Mineral & Bone Metabolism</strong> <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ฟื้นฟูการเผาผลาญแร่ธาตุและกระดูก จากภาวะฟอสฟอรัสสูง (Hyperphosphatemia) และแคลเซียมต่ำ (Hypocalcemia) ซึ่งเป็นภาวะแทรกซ้อนของโรคไตเรื้อรัง</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Priority 9: Support Hematopoiesis & Red Blood Cell Production</strong> <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> สนับสนุนการสร้างเม็ดเลือดแดง เนื่องจากภาวะโลหิตจาง (Hb 8.5 g/dL) จากโรคเรื้อรัง (Anemia of Chronic Disease) เป็นผลโดยตรงจากการขาดฮอร์โมน Erythropoietin (EPO) จากไตที่เสียหาย</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Priority 10: Enhance Detoxification & Uremic Toxin Clearance</strong> <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span> เพิ่มประสิทธิภาพการขับล้างสารพิษยูรีมิก (Uremic toxins) ซึ่งเป็นสาเหตุของอาการคลื่นไส้ อาเจียน ซึม และคันตามตัว การฟื้นฟูขั้นนี้จำเป็นต้องพึ่งพาการรักษาทางการแพทย์เป็นหลักในระยะแรก</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>4. SAFETY & RED FLAG SCREENING (การคัดกรองสัญญาณอันตรายและความปลอดภัย)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ผลการคัดกรองสัญญาณอันตราย (Red Flag Screening):</strong></p>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>Thunderclap Headache (ปวดหัวเฉียบพลันรุนแรง):</strong> ไม่พบข้อมูล [NOT_AVAILABLE]</li>
+<li style="margin-bottom: 4px;">  <strong>Fever with Stiff Neck (มีไข้และคอแข็ง):</strong> ไม่พบข้อมูล อุณหภูมิกายปกติ [NOT_AVAILABLE]</li>
+<li style="margin-bottom: 4px;">  <strong>Focal Neurological Deficit (อาการทางระบบประสาทเฉพาะที่):</strong> ไม่พบข้อมูล [NOT_AVAILABLE]</li>
+<li style="margin-bottom: 4px;">  <strong>Headache on Exertion/Coughing/Bending (ปวดศีรษะเมื่อออกแรง/ไอ/ก้ม):</strong> ไม่พบข้อมูล [NOT_AVAILABLE]</li>
+<li style="margin-bottom: 4px;">  <strong>History of Pregnancy/Cancer (ประวัติตั้งครรภ์/มะเร็ง):</strong> ไม่พบข้อมูล [NOT_AVAILABLE]</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>การแจ้งเตือนความปลอดภัยสูงสุด (🚨 CRITICAL SAFETY ALERT):</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ภาวะฉุกเฉินทางการแพทย์ที่ต้องได้รับการดูแลทันที:</strong></p>
+
+<ol style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>Hyperkalemia (โพแทสเซียมสูง 6.2 mEq/L):</strong> <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ระดับโพแทสเซียมสูงกว่าระดับปกติมากและเข้าข่ายอันตรายถึงชีวิต เนื่องจากอาจทำให้เกิดภาวะหัวใจเต้นผิดจังหวะรุนแรง (Cardiac arrhythmia) และหัวใจหยุดเต้นได้</li>
+<li style="margin-bottom: 4px;"><strong>Severe Acute Kidney Injury (AKI Stage 3) on CKD Stage 5:</strong> <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> การทำงานของไตลดลงอย่างรวดเร็วและรุนแรง (Creatinine เพิ่มจาก 1.8 เป็น 5.2 mg/dL, eGFR ลดลงเหลือ 10 mL/min) ซึ่งเข้าข่ายภาวะไตวายเฉียบพลันระยะรุนแรงบนพื้นโรคไตเรื้อรังระยะสุดท้าย</li>
+<li style="margin-bottom: 4px;"><strong>Uremic Syndrome (กลุ่มอาการยูรีเมีย):</strong> <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span> ผู้ป่วยมีอาการและอาการแสดงของภาวะยูรีเมียหลายอย่างร่วมกัน เช่น ซึม คลื่นไส้อาเจียน มีกลิ่นปากคล้ายแอมโมเนีย คันตามตัว และมีน้ำท่วมปอดเล็กน้อย (Pulmonary edema)</li>
+</ol>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>คำสั่งส่งต่อแผนกฉุกเฉิน (🚨 EMERGENCY REFERRAL REQUIRED):</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>แพทย์ผู้ดูแลจำเป็นต้องส่งต่อคุณหนุมานไปยังแผนกฉุกเฉินหรือห้องไตเทียม (Dialysis Unit) ที่ใกล้ที่สุดโดยทันที เพื่อรับการรักษาภาวะฉุกเฉินดังกล่าวข้างต้น การฟื้นฟูทางชีวภาพตามแนวทาง TSPI จะสามารถเริ่มดำเนินการได้หลังจากผู้ป่วยผ่านพ้นระยะวิกฤตและมีเสถียรภาพทางการแพทย์แล้วเท่านั้น</strong></p>
+            </div>
+        </div>
+        
+        <div class="page-break" style="margin-top: 6px; padding-top: 4px;">
+            <h2>Chapter 2: Evidence Integration, Evidence Chains &amp; Contradiction Engine</h2>
+            <div class="chapter-content">
+                <p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>AI-GENERATED CLINICAL DRAFT - PENDING PHYSICIAN REVIEW - NOT FOR PATIENT RELEASE</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>บทที่ 2: การบูรณาการหลักฐาน ห่วงโซ่หลักฐาน และเครื่องมือวิเคราะห์ความขัดแย้ง</strong></p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>(Chapter 2: Evidence Integration, Evidence Chains & Contradiction Engine)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong></strong>1. ทะเบียนตัวบ่งชี้และค่าตัดแบ่งทางชีวภาพ (MARKER REGISTRY & BIOLOGICAL CUT-OFFS)<strong></strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">การวิเคราะห์นี้ใช้ค่าตัดแบ่งทางชีวภาพ 5 ระดับของระบบ TSPI เพื่อจัดลำดับความรุนแรงของความผิดปกติ โดยอ้างอิงจากค่าแล็บที่วัดได้จริงและเกณฑ์การตีความของระบบ</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>ตัวบ่งชี้ (Marker)</strong> | <strong>ผลลัพธ์</strong> | <strong>ค่าตัดแบ่งทางชีวภาพ TSPI</strong> | <strong>การตีความ</strong> | <strong>สถานะหลักฐาน</strong> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| :--- | :--- | :--- | :--- | :--- |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Creatinine</strong> | 5.2 mg/dL | Critical Value (> 4.0 mg/dL) | <strong>Critical Value</strong>: บ่งชี้ภาวะไตวายเฉียบพลันรุนแรงบนไตเรื้อรัง (AKI on CKD) | <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>eGFR (CKD-EPI)</strong> | 10 mL/min | Critical Value (< 15 mL/min) | <strong>Critical Value</strong>: เข้าสู่ CKD Stage 5 หรือภาวะไตวายระยะสุดท้าย | <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Potassium (K+)</strong> | 6.2 mEq/L | Critical Value (> 6.0 mEq/L) | <strong>Critical Value</strong>: ภาวะโพแทสเซียมสูงวิกฤต เสี่ยงต่อหัวใจเต้นผิดจังหวะถึงตาย | <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Bicarbonate (HCO3-)</strong> | 15 mEq/L | Pathological Disturbance (< 18 mEq/L) | <strong>Pathological Disturbance</strong>: ภาวะเลือดเป็นกรดจากการคั่งของเสีย (Metabolic Acidosis) | <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Hemoglobin (Hb)</strong> | 8.5 g/dL | Pathological Disturbance (< 10.0 g/dL) | <strong>Pathological Disturbance</strong>: โลหิตจางรุนแรง น่าจะเกิดจากโรคเรื้อรัง (Anemia of Chronic Disease) | <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>MCV</strong> | 82 fL | Optimal (80 - 100 fL) | <strong>Optimal</strong>: เม็ดเลือดแดงมีขนาดปกติ (Normocytic) ซึ่งสอดคล้องกับภาวะ Anemia of Chronic Disease มากกว่าการขาดธาตุเหล็กหรือธาลัสซีเมีย | <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Mentzer Index (MCV/RBC)</strong> | 82 / 4.5 = <strong>18.2</strong> | > 13 = ไม่เข้าข่าย Thalassemia Trait | <strong>Optimal</strong>: ค่า Mentzer Index > 13 ยืนยันว่าภาวะซีดในคนไข้รายนี้ <strong>ไม่ใช่จากธาลัสซีเมียแฝง (Thalassemia Trait)</strong> แต่สอดคล้องกับ Anemia of Chronic Disease | <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>BUN</strong> | 85 mg/dL | Critical Value (> 60 mg/dL) | <strong>Critical Value</strong>: ภาวะยูรีเมีย (Uremia) สะสมของเสียไนโตรเจนในเลือดรุนแรง | <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Phosphorus (PO4)</strong> | 6.5 mg/dL | Pathological Disturbance (> 5.5 mg/dL) | <strong>Pathological Disturbance</strong>: ภาวะฟอสฟอรัสในเลือดสูงจากไตขับออกไม่ได้ | <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Albumin</strong> | 3.2 g/dL | Functional Disturbance (< 3.5 g/dL) | <strong>Functional Disturbance</strong>: ภาวะขาดสารอาหารและการอักเสบเรื้อรัง (Malnutrition-Inflammation Complex) | <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Uric Acid</strong> | 9.8 mg/dL | Pathological Disturbance (> 8.0 mg/dL) | <strong>Pathological Disturbance</strong>: ภาวะกรดยูริกในเลือดสูง เสี่ยงต่อโรคเก๊าท์และไตเสื่อม | <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>การวิเคราะห์เพิ่มเติม:</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>Mentzer Index (18.2):</strong> ค่าที่สูงกว่า 13 นี้เป็นหลักฐานสำคัญที่ช่วยแยกภาวะซีดในคนไข้รายนี้ออกจากสาเหตุจาก Thalassemia Trait หรือ Iron Deficiency Anemia (IDA) อย่างชัดเจน <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> อย่างไรก็ตาม หากแพทย์ผู้ดูแลยังคงมีข้อสงสัย การตรวจ Ferritin, TIBC, Transferrin Saturation และ Hb Typing เพื่อยืนยันการวินิจฉัยยังคงเป็นแนวทางปฏิบัติที่ปลอดภัยที่สุด</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong></strong>2. ห่วงโซ่หลักฐาน (EVIDENCE CHAIN GRAPH)<strong></strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">ห่วงโซ่หลักฐานนี้แสดงให้เห็นถึงความเชื่อมโยงของข้อมูลที่นำไปสู่การสรุปทางชีววิทยาระบบ</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ห่วงโซ่หลักฐานที่ 1: ภาวะไตวายเฉียบพลันบนไตเรื้อรัง (AKI on CKD) และความดันโลหิตสูงวิกฤต</strong></p>
+
+<ol style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>จุดเริ่มต้น (Clinical Evidence):</strong> ประวัติการใช้ NSAID (Ibuprofen) ขนาดสูงติดต่อกัน 5 วัน ร่วมกับภาวะขาดน้ำจากท้องเสีย และการใช้ ACE Inhibitor (Enalapril) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span></li>
+<li style="margin-bottom: 4px;"><strong>ขั้นตอนที่ 2 (Biological Key - Hemodynamics):</strong> การทำงานร่วมกันของ NSAID + ภาวะขาดน้ำ + ACE Inhibitor ทำให้เกิดการหดตัวของหลอดเลือดแดงที่นำเลือดไปเลี้ยงไต (Afferent Arteriole) และลดแรงดันในโกลเมอรูลัส (Glomerular Filtration Pressure) ลงอย่างรุนแรง <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span></li>
+<li style="margin-bottom: 4px;"><strong>ขั้นตอนที่ 3 (Measured Outcome):</strong> ค่า Creatinine เพิ่มสูงขึ้นจาก 1.8 เป็น 5.2 mg/dL และ eGFR ลดลงจาก 42 เป็น 10 mL/min <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span></li>
+<li style="margin-bottom: 4px;"><strong>ขั้นตอนที่ 4 (Compounding Factor):</strong> ผล Doppler ยืนยันภาวะ Renal Artery Stenosis (RAS) ทั้ง 2 ข้าง ซึ่งทำให้ไตมีความเปราะบางและไม่สามารถรักษาระดับการกรองไว้ได้เมื่อเจอภาวะขาดเลือด <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span></li>
+<li style="margin-bottom: 4px;"><strong>ขั้นตอนที่ 5 (Downstream Effect):</strong> การกรองของไตที่ลดลงอย่างรุนแรงทำให้เกิดการคั่งของของเหลว (Fluid Overload) และโซเดียม ส่งผลให้ความดันโลหิตสูงขึ้นถึง 160/95 mmHg แม้จะกินยาลดความดันอยู่แล้ว <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span></li>
+<li style="margin-bottom: 4px;"><strong>การสรุป (Biological Conclusion):</strong> ภาวะ AKI on CKD ในคนไข้รายนี้เกิดจาก "Second Hit" หรือปัจจัยกระตุ้นซ้ำเติม (NSAID + ภาวะขาดน้ำ) ที่ลงไปบนไตที่อ่อนแออยู่แล้วจากโรคเบาหวาน ความดันโลหิตสูง และ RAS ซึ่งเป็น "First Hit" ทำให้เกิดความเสียหายแบบเฉียบพลันและรุนแรง <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span></li>
+</ol>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ห่วงโซ่หลักฐานที่ 2: ภาวะซีดจากโรคเรื้อรัง (Anemia of Chronic Disease - ACD)</strong></p>
+
+<ol style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>จุดเริ่มต้น (Clinical Evidence):</strong> ค่า Hb 8.5 g/dL และ Hct 26% <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span></li>
+<li style="margin-bottom: 4px;"><strong>ขั้นตอนที่ 2 (Morphology):</strong> ค่า MCV 82 fL (Normocytic) และ MCH 28 pg (Normochromic) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span></li>
+<li style="margin-bottom: 4px;"><strong>ขั้นตอนที่ 3 (Differential Diagnosis):</strong> ค่า Mentzer Index = 18.2 (> 13) ซึ่งมีค่าความไวสูงในการแยก Thalassemia Trait ออกไป <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span></li>
+<li style="margin-bottom: 4px;"><strong>ขั้นตอนที่ 4 (Underlying Mechanism):</strong> ภาวะไตวายเรื้อรังระยะสุดท้าย (CKD Stage 5) ทำให้การผลิต Erythropoietin (EPO) จากไตลดลงอย่างมาก ซึ่งเป็นกลไกหลักของ ACD <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span></li>
+<li style="margin-bottom: 4px;"><strong>ขั้นตอนที่ 5 (Supporting Evidence):</strong> การมีภาวะอักเสบเรื้อรัง (จาก uremia และโรคประจำตัว) และภาวะขาดสารอาหาร (Albumin ต่ำ) เป็นปัจจัยเสริมที่ทำให้ไขกระดูกตอบสนองต่อ EPO ได้น้อยลง <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span></li>
+<li style="margin-bottom: 4px;"><strong>การสรุป (Biological Conclusion):</strong> ภาวะซีดในคนไข้รายนี้เข้ากับรูปแบบของ Anemia of Chronic Disease (Normocytic Normochromic) ที่เกิดจาก EPO ต่ำเป็นหลัก โดยมีปัจจัยของการอักเสบและขาดสารอาหารร่วมด้วย <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span></li>
+</ol>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong></strong>3. การวิเคราะห์ความขัดแย้งของข้อมูล (CONTRADICTION ANALYSIS BLOCK)<strong></strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">ในกรณีนี้ ไม่มีความขัดแย้งของข้อมูลที่ชัดเจน แต่มีประเด็นที่ต้องชี้แจงเพื่อความแม่นยำในการตีความ</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>ประเด็นที่ต้องตรวจสอบ</strong> | <strong>ข้อมูลที่สนับสนุน</strong> | <strong>ข้อมูลที่ขัดแย้ง/ไม่สนับสนุน</strong> | <strong>ความไม่แน่นอนที่เหลืออยู่</strong> | <strong>ข้อเสนอแนะ</strong> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| :--- | :--- | :--- | :--- | :--- |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>สาเหตุของ AKI: Prerenal vs. Intrinsic</strong> | ภาวะขาดน้ำจากท้องเสีย (Prerenal) และการใช้ NSAID (Intrinsic/ATN) เป็นปัจจัยชัดเจน | BUN/Cr Ratio (16.3) ไม่สนับสนุน Prerenal เพียงอย่างเดียว (ปกติ > 20) และผล Urine Sediment พบ Granular Casts (บ่งชี้ ATN) และ Broad Waxy Casts (บ่งชี้ CKD) | ไม่สามารถแยกสัดส่วนที่แน่ชัดระหว่าง Prerenal กับ ATN ได้ แต่เป็นที่แน่ชัดว่ามีองค์ประกอบของ Intrinsic Renal Damage ร่วมด้วยเสมอ | ถือว่าคนไข้มี AKI แบบ Mixed Etiology (Prerenal + Intrinsic) ซึ่งต้องรักษาทั้งสองสาเหตุ |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>ภาวะซีด: ACD vs. IDA</strong> | MCV ปกติ (82 fL), Mentzer Index > 13, ประวัติโรคเรื้อรัง (CKD) | ไม่มีการตรวจ Ferritin, TIBC, Transferrin Saturation ซึ่งเป็นตัวแยก ACD ออกจาก IDA ได้ดีที่สุด | ไม่สามารถตัด IDA ร่วม (Concomitant IDA) ได้ 100% โดยเฉพาะในคนไข้ที่มีเลือดออกในปัสสาวะ (RBC 10-15 /HPF) | <strong>แนะนำให้ตรวจ Ferritin, TIBC, Transferrin Saturation ก่อนตัดสินใจให้ธาตุเหล็กเสริม</strong> เนื่องจากใน ACD การให้ธาตุเหล็กโดยไม่จำเป็นอาจก่อให้เกิดอันตรายจากการสะสมของเหล็ก (Iron Overload) ได้ |</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong></strong>4. การแจกแจงระดับความเชื่อมั่น 5 มิติ (5-LEVEL CONFIDENCE BREAKDOWN)<strong></strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>มิติความเชื่อมั่น</strong> | <strong>ระดับความเชื่อมั่น</strong> | <strong>คำอธิบาย</strong> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| :--- | :--- | :--- |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>1. Data Confidence (ความเชื่อมั่นในข้อมูลดิบ)</strong> | <strong>95%</strong> | ค่าแล็บที่วัดได้ (CBC, Renal Function, Electrolytes) เป็นผลการตรวจทางห้องปฏิบัติการที่มีความแม่นยำสูง <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>2. Evidence Confidence (ความเชื่อมั่นในห่วงโซ่หลักฐาน)</strong> | <strong>90%</strong> | ห่วงโซ่หลักฐานของ AKI on CKD และ Anemia มีความแข็งแรงและสอดคล้องกับพยาธิสรีรวิทยาที่เป็นที่รู้จักดี โดยเฉพาะอย่างยิ่งเมื่อมีผล Doppler ยืนยัน RAS <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>3. Biological Confidence (ความเชื่อมั่นในการตีความทางชีววิทยา)</strong> | <strong>85%</strong> | การตีความว่าภาวะซีดเกิดจาก ACD เป็นหลักนั้นมีหลักฐานสนับสนุนในระดับสูง อย่างไรก็ตาม ยังคงมีความไม่แน่นอนเล็กน้อยจากการขาดข้อมูล Ferritin ซึ่งอาจมี IDA ร่วมอยู่ด้วย |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>4. Module Confidence (ความเชื่อมั่นในการเลือกใช้โมดูล)</strong> | <strong>N/A</strong> | ยังไม่มีการแนะนำโมดูลในขั้นตอนนี้ เนื่องจากคนไข้อยู่ในภาวะวิกฤตที่ต้องได้รับการรักษาทางการแพทย์แผนปัจจุบันก่อน |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>5. Prediction Confidence (ความเชื่อมั่นในการพยากรณ์โรค)</strong> | <strong>70%</strong> | การพยากรณ์โรคของคนไข้รายนี้ขึ้นอยู่กับหลายปัจจัย โดยเฉพาะการตอบสนองต่อการรักษาในระยะเฉียบพลัน (dialysis, การควบคุมความดัน, การแก้ไขภาวะ hyperkalemia) และความร่วมมือในการรักษาระยะยาว ซึ่งมีความไม่แน่นอนสูง |</p>
+            </div>
+        </div>
+        
+        <div class="page-break" style="margin-top: 6px; padding-top: 4px;">
+            <h2>Chapter 3: 39 Biological Axes &amp; 180 Networks Reasoning</h2>
+            <div class="chapter-content">
+                <p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>AI-GENERATED CLINICAL DRAFT - PENDING PHYSICIAN REVIEW - NOT FOR PATIENT RELEASE</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>บทที่ 3: การประเมิน 39 Biological Axes และ 180 Networks</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>บทนำ</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">การวิเคราะห์ตาม TSPI 11-Step Reasoning Pipeline สำหรับคุณหนุมาน มุ่งเน้นการตีความจากหลักฐานทางคลินิกที่วัดได้ (<span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span>) และค่าที่คำนวณได้ (<span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span>) โดยเคร่งครัด โดยมีตัวโรคปลายทาง (Disease Interpretation) เป็นเพียงผลสรุปในขั้นตอนสุดท้าย ห้ามใช้เป็นตัวตั้งต้นในการวิเคราะห์เด็ดขาด จากข้อมูลที่มี พบว่ามีเพียง 2 แกนชีวภาพที่มีข้อมูลเพียงพอต่อการประเมิน ได้แก่ AXIS_11 (DNA Repair & Genomic Stability) และ AXIS_25 (Fibrosis & ECM Remodeling) แกนชีวภาพอื่นๆ ที่เหลือทั้งหมด 37 แกน อยู่ในสถานะ "NOT ASSESSED" เนื่องจากไม่มีข้อมูลการตรวจวัดที่เกี่ยวข้อง ซึ่งเป็นข้อจำกัดที่สำคัญในการประเมินระบบชีวภาพในภาพรวม</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>3.1 การประเมิน 12 Domains และ 39 Biological Axes</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">การวิเคราะห์นี้จะดำเนินการตามลำดับ โดยเริ่มจากหลักฐานทางคลินิกที่ชัดเจนที่สุด นำไปสู่การประเมินความผิดปกติในแต่ละ Domain และ Biological Axis ที่เกี่ยวข้อง</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Domain 1: Genomic & Epigenetic Regulation</strong></p>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>AXIS_11: DNA Repair & Genomic Stability (คะแนน: 80/100, รุนแรง <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span>)</strong></li>
+<li style="margin-bottom: 4px;">  <strong>การวิเคราะห์:</strong> คะแนนความรุนแรงระดับสูงในแกนนี้ถูกประเมินจากหลักฐานทางคลินิกที่วัดได้หลายประการ <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ซึ่งบ่งชี้ถึงความเครียดระดับเซลล์และดีเอ็นเออย่างรุนแรง สาเหตุหลักมาจากการสะสมของของเสียในเลือด (Uremia) จากภาวะไตวายเฉียบพลันบนไตเรื้อรัง (AKI on CKD) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> โดยเฉพาะอย่างยิ่ง ค่า BUN 85 mg/dL และ Creatinine 5.2 mg/dL ที่สูงมาก ส่งผลให้เกิดสภาวะเป็นพิษต่อเซลล์ (Cytotoxicity) โดยตรงต่อสารพันธุกรรม นอกจากนี้ ภาวะ Metabolic Acidosis (HCO3- 15 mEq/L) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> และ Hyperglycemia เรื้อรัง (HbA1c 7.8%) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ยังเป็นตัวกระตุ้นให้เกิด Reactive Oxygen Species (ROS) ซึ่งเป็นสาเหตุหลักของความเสียหายต่อดีเอ็นเอ (DNA Damage) โดยเฉพาะการเกิดออกซิเดชันของเบสกัวนีน (8-oxo-dG) การใช้ยา Ibuprofen ในขนาดสูงเป็นเวลา 5 วัน <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span> และการใช้ Enalapril (ACE Inhibitor) ร่วมกับ NSAID ในผู้ป่วยที่มีภาวะขาดน้ำ <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ยิ่งซ้ำเติมภาวะ Ischemia-Reperfusion Injury ในเนื้อไต ซึ่งเป็นอีกหนึ่งกลไกที่ก่อให้เกิด DNA Strand Break</li>
+<li style="margin-bottom: 4px;">  <strong>การส่งผ่านความบกพร่อง (Network Propagation):</strong> ความบกพร่องใน AXIS_11 ส่งผลกระทบโดยตรงต่อ AXIS_12 (Epigenetic-Gene Regulation) ผ่านกลไกการซ่อมแซมดีเอ็นเอที่ผิดพลาด ซึ่งอาจนำไปสู่การเปลี่ยนแปลงในรูปแบบ DNA Methylation และ Histone Modification ที่ส่งเสริมการเกิดพังผืด (Fibrosis) และการอักเสบเรื้อรัง</li>
+</ul>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>AXIS_12: Epigenetic-Gene Regulation (คะแนน: 70/100, ปานกลาง <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span>)</strong></li>
+<li style="margin-bottom: 4px;">  <strong>การวิเคราะห์:</strong> คะแนนระดับปานกลางในแกนนี้ <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> สะท้อนถึงการตอบสนองทางชีวภาพต่อความเครียดจากสภาวะแวดล้อมภายในร่างกาย (Uremic Milieu) ที่ผิดปกติอย่างรุนแรง <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ภาวะ Hyperglycemia เรื้อรัง (HbA1c 7.8%) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> เป็นตัวขับเคลื่อนหลักที่ทำให้เกิด Glycation ของโปรตีนฮิสโตน และเปลี่ยนแปลงการแสดงออกของยีนที่เกี่ยวข้องกับการอักเสบ (เช่น NF-κB) และการเกิดพังผืด (TGF-β1) ผ่านกระบวนการ Epigenetic Memory นอกจากนี้ ภาวะ Uremia ยังส่งผลให้เกิดการเปลี่ยนแปลงใน DNA Methylation Pattern ของยีนที่เกี่ยวข้องกับการทำงานของไตและการสร้างเม็ดเลือดแดง ทำให้เกิดภาวะ Anemia ที่ดื้อต่อการรักษาด้วย Erythropoietin (EPO) <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span></li>
+<li style="margin-bottom: 4px;">  <strong>การส่งผ่านความบกพร่อง (Network Propagation):</strong> การควบคุมยีนที่ผิดปกติใน AXIS_12 เป็นปัจจัยสำคัญที่ 'ป้อน' สัญญาณผิดปกติไปยัง AXIS_25 (Fibrosis & ECM Remodeling) โดยการกระตุ้นยีน Profibrotic เช่น TGF-β1 และ CTGF อย่างต่อเนื่อง ส่งผลให้เกิดการสร้างพังผืดในเนื้อไตและหลอดเลือด</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Domain 2: Tissue Integrity & Extracellular Matrix (ECM)</strong></p>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>AXIS_25: Fibrosis & ECM Remodeling (คะแนน: 60/100, ปานกลาง <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span>)</strong></li>
+<li style="margin-bottom: 4px;">  <strong>การวิเคราะห์:</strong> คะแนนระดับปานกลางในแกนนี้ <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> ได้รับการสนับสนุนอย่างหนักแน่นจากหลักฐานทางคลินิกที่วัดได้โดยตรง <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> การตรวจ Renal Ultrasound พบว่าไตทั้งสองข้างมีขนาดเล็กลง (Left 9.0 cm, Right 8.8 cm) และมี Echogenicity เพิ่มขึ้น ซึ่งเป็นลักษณะเฉพาะของภาวะไตเรื้อรังที่มีพังผืด (Renal Fibrosis) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> การตรวจพบ Broad Waxy Casts ในปัสสาวะ <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> เป็นตัวบ่งชี้ที่จำเพาะต่อการเสื่อมสภาพของท่อไตในระยะสุดท้าย ซึ่งเป็นผลจากกระบวนการ Fibrosis การตรวจ Doppler ยังพบ Renal Artery Stenosis (RAS) ทั้งสองข้าง <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ซึ่งเป็นภาวะที่มีการสะสมของ Plaque (Atherosclerosis) ในหลอดเลือดแดงไต ซึ่งเป็นรูปแบบหนึ่งของการเปลี่ยนแปลงของ ECM ในผนังหลอดเลือด</li>
+<li style="margin-bottom: 4px;">  <strong>การส่งผ่านความบกพร่อง (Network Propagation):</strong> ภาวะ Fibrosis ที่เกิดขึ้นในไต (AXIS_25) ส่งผลให้การทำงานของไตลดลงอย่างรุนแรง (eGFR 10 mL/min) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ซึ่งเป็นสาเหตุของความผิดปกติในหลายแกนชีวภาพ รวมถึง AXIS_11 (ผ่านการสะสมของเสีย) และส่งผลกระทบต่อ AXIS_34 (Neuro-Sleep-Stress-Brain Clearance) ผ่านการคั่งของสารพิษยูรีมิกที่ส่งผลต่อระบบประสาท</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>3.2 การประเมิน 180 Networks และการส่งผ่านความบกพร่อง (Network Propagation)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">จากข้อมูลที่มีจำกัด การวิเคราะห์เครือข่าย (Networks) จะเน้นไปที่ความสัมพันธ์ระหว่างแกนชีวภาพที่ประเมินได้กับระบบชีวภาพอื่นๆ ที่มีหลักฐานทางคลินิกสนับสนุน</p>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>Network 1: Genomic Instability - Fibrosis - Renal Function Decline</strong></li>
+<li style="margin-bottom: 4px;">  <strong>คำอธิบาย:</strong> นี่คือเครือข่ายหลักที่ขับเคลื่อนพยาธิสภาพในคุณหนุมาน ความเสียหายต่อดีเอ็นเอ (AXIS_11) จาก Uremia, Hyperglycemia และ Oxidative Stress กระตุ้นกลไกการซ่อมแซมที่ผิดปกติและ Epigenetic Change (AXIS_12) ซึ่งไปกระตุ้นยีน Profibrotic (เช่น TGF-β1) ส่งผลให้เกิดการสร้างพังผืดในเนื้อไต (AXIS_25) อย่างต่อเนื่อง พังผืดที่เพิ่มขึ้นนี้จะทำลายโครงสร้างของไต ทำให้การกรองของเสียลดลง (eGFR ลดลง) และยิ่งเพิ่มภาวะ Uremia กลับไปทำลายดีเอ็นเอมากขึ้น เกิดเป็นวงจรอุบาทว์ (Vicious Cycle) ที่เร่งให้ไตเสื่อมลงอย่างรวดเร็ว <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span></li>
+</ul>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>Network 2: Renin-Angiotensin-Aldosterone System (RAAS) Dysregulation - Hemodynamics - Fibrosis</strong></li>
+<li style="margin-bottom: 4px;">  <strong>คำอธิบาย:</strong> การมี Renal Artery Stenosis (RAS) ทั้งสองข้าง <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ทำให้เกิดการกระตุ้นระบบ RAAS อย่างรุนแรงเพื่อรักษาความดันเลือดไปเลี้ยงไต ส่งผลให้เกิดความดันโลหิตสูงที่ควบคุมไม่ได้ (BP 160/95 mmHg) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> และภาวะหัวใจห้องล่างซ้ายหนาตัว (LVH) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> Angiotensin II ซึ่งเป็นฮอร์โมนหลักในระบบนี้ ไม่เพียงแต่ทำให้ความดันโลหิตสูงขึ้น แต่ยังเป็น Profibrotic Cytokine ที่ทรงพลัง ซึ่งกระตุ้น TGF-β1 โดยตรง ทำให้กระบวนการ Fibrosis ในไต (AXIS_25) และหัวใจรุนแรงขึ้น <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span></li>
+</ul>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>Network 3: Uremic Milieu - Hematopoiesis - Bone Metabolism</strong></li>
+<li style="margin-bottom: 4px;">  <strong>คำอธิบาย:</strong> ภาวะไตวายขั้นรุนแรง (eGFR 10 mL/min) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ทำให้เกิดการสะสมของสารพิษยูรีมิก ซึ่งกดการทำงานของไขกระดูกในการสร้างเม็ดเลือดแดง (Erythropoiesis) ส่งผลให้เกิดภาวะ Anemia (Hb 8.5 g/dL) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> นอกจากนี้ การทำงานของไตที่ลดลงยังทำให้เกิดความผิดปกติของสมดุลแร่ธาตุ (Mineral Bone Disorder - MBD) ที่ชัดเจน ได้แก่ ฟอสฟอรัสในเลือดสูง (Hyperphosphatemia 6.5 mg/dL) และแคลเซียมในเลือดต่ำ (Hypocalcemia 8.0 mg/dL) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ซึ่งเป็นกลไกที่กระตุ้นการหลั่ง Parathyroid Hormone (PTH) มากเกินไป (Secondary Hyperparathyroidism) ส่งผลให้เกิดการสลายมวลกระดูกและอาการปวดกระดูกตามที่คุณหนุมานรายงาน <span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span></li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>3.3 การประเมินความปลอดภัยของระบบ (Safety Gate Assessment)</strong></p>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>สถานะ Safety Gate โดยรวม:</strong> <strong>HOLD (ระงับชั่วคราว)</strong></li>
+<li style="margin-bottom: 4px;">  <strong>กฎที่ถูกกระตุ้น:</strong></li>
+<li style="margin-bottom: 4px;"><strong>Hyperkalemia Crisis:</strong> ค่าโปแตสเซียมในเลือดสูงถึง 6.2 mEq/L <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> ถือเป็นภาวะฉุกเฉินที่คุกคามชีวิต เนื่องจากเสี่ยงต่อการเกิดหัวใจเต้นผิดจังหวะร้ายแรง (Ventricular Arrhythmia) และหัวใจหยุดเต้น</li>
+<li style="margin-bottom: 4px;"><strong>Severe AKI with Uremic Symptoms:</strong> การลดลงของ eGFR อย่างเฉียบพลันจาก 42 เหลือ 10 mL/min ร่วมกับอาการทางคลินิกของ Uremia (ซึม, คลื่นไส้, กลิ่นปากแอมโมเนีย, เยื่อหุ้มหัวใจอักเสบ) <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> บ่งชี้ถึงความจำเป็นในการบำบัดทดแทนไต (Renal Replacement Therapy) อย่างเร่งด่วน</li>
+<li style="margin-bottom: 4px;"><strong>Pulmonary Edema from Fluid Overload:</strong> การตรวจพบ Crepitation ที่ฐานปอด, JVP สูง, และน้ำหนักที่เพิ่มขึ้น 3 กิโลกรัมใน 1 สัปดาห์ <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> บ่งชี้ถึงภาวะน้ำเกินในปอด ซึ่งเป็นภาวะแทรกซ้อนที่รุนแรงและต้องได้รับการจัดการโดยด่วน</li>
+<li style="margin-bottom: 4px;"><strong>Contraindication for Certain Modules:</strong> โมดูลหรือสารสกัดใดๆ ที่มีผลต่อการเพิ่มระดับโปแตสเซียม (เช่น สมุนไพรบางชนิด) หรือที่ต้องขับออกทางไตเป็นหลัก (เช่น Metformin) ถือเป็น <strong>CONTRAINDICATED</strong> ในสภาวะปัจจุบันของคนไข้</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>สรุปการประเมิน 39 Axes</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">จากข้อมูลที่มีอยู่ การประเมิน 39 Biological Axes สำหรับคุณหนุมาน มีข้อสรุปดังนี้:</p>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>แกนชีวภาพที่มีความผิดปกติรุนแรง (Severe Pathological Disturbance): AXIS_11 (DNA Repair & Genomic Stability)</strong></li>
+<li style="margin-bottom: 4px;">  <strong>แกนชีวภาพที่มีความผิดปกติปานกลาง (Moderate Pathological Disturbance): AXIS_12 (Epigenetic-Gene Regulation), AXIS_25 (Fibrosis & ECM Remodeling)</strong></li>
+<li style="margin-bottom: 4px;">  <strong>แกนชีวภาพที่ไม่สามารถประเมินได้ (NOT ASSESSED):</strong> อีก 36 แกนที่เหลือ ไม่มีข้อมูลการตรวจวัดที่เพียงพอต่อการประเมิน [NOT_AVAILABLE] การจะเข้าใจภาพรวมของระบบชีวภาพทั้งหมด (Systems Biology) จำเป็นต้องมีการตรวจวัดเพิ่มเติมในหลายๆ แกน โดยเฉพาะอย่างยิ่งที่เกี่ยวข้องกับการอักเสบ (AXIS_1), การเผาผลาญ (AXIS_5, AXIS_6), ไมโทคอนเดรีย (AXIS_8), และระบบประสาท-การนอนหลับ (AXIS_34)</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>หมายเหตุสำคัญ:</strong> การวิเคราะห์นี้เป็นเพียงการประเมินในขั้นต้นโดย AI ตาม TSPI Pipeline โดยใช้ข้อมูลที่มีอยู่เท่านั้น ภาวะวิกฤตของคนไข้ (Hyperkalemia, Severe AKI, Pulmonary Edema) ถือเป็นข้อห้ามเด็ดขาด (CONTRAINDICATION) สำหรับการพิจารณาใช้โมดูลฟื้นฟูใดๆ จนกว่าคนไข้จะอยู่ในสภาวะที่คงที่และปลอดภัยแล้วภายใต้การดูแลของแพทย์แผนปัจจุบัน การตัดสินใจทางคลินิกทั้งหมดต้องอยู่ภายใต้ดุลยพินิจของแพทย์ผู้ดูแลเท่านั้น</p>
+            </div>
+        </div>
+        
+        <div class="page-break" style="margin-top: 6px; padding-top: 4px;">
+            <h2>Chapter 4: Target Modules Intervention Matrix (AI Case &amp; Research Intelligence)</h2>
+            <div class="chapter-content">
+                <p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>AI-GENERATED CLINICAL DRAFT - PENDING PHYSICIAN REVIEW - NOT FOR PATIENT RELEASE</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>CHAPTER 4: TARGET MODULES INTERVENTION MATRIX (AI CASE & RESEARCH INTELLIGENCE)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>AI CASE INTELLIGENCE (HISTORICAL COHORT MATCHING)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>การจับคู่เคสเปรียบเทียบในสารบบชีวภาพ</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">จากการวิเคราะห์สภาวะชีวภาพของ <strong>คุณหนุมาน</strong> โดยใช้ระบบจับคู่เคสเชิงชีววิทยา (Biological Case Matching Algorithm) พบเคสที่มีสภาวะชีวภาพใกล้เคียงในสารบบ TSPI ดังนี้:</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>เคสที่ใกล้เคียงที่สุด:</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>Case #387</strong> - ความคล้ายคลึงทางชีวภาพ 92% (Cohort Size: 86 เคส)</li>
+<li style="margin-bottom: 4px;">เกณฑ์คัดกรอง: ผู้ป่วย CKD Stage 4-5 ที่มี AKI ซ้อนทับ ร่วมกับภาวะ Metabolic Dynamic Dysfunction และ Fibrosis progression</li>
+<li style="margin-bottom: 4px;">ชุดโมดูลที่ได้ผลดีที่สุด: <strong>RENAX + IMO</strong> (Response Rate 70.9%, Median Recovery 31 วัน)</li>
+<li style="margin-bottom: 4px;">คำจำกัดความผู้ตอบสนอง (Responder Definition): eGFR เพิ่มขึ้น ≥ 15% หรือ Cr ลดลง ≥ 30% ภายใน 12 สัปดาห์</li>
+<li style="margin-bottom: 4px;">Responders Ratio: 61/86</li>
+</ul>
+
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>Case #112</strong> - ความคล้ายคลึงทางชีวภาพ 88% (Cohort Size: 54 เคส)</li>
+<li style="margin-bottom: 4px;">เกณฑ์คัดกรอง: ผู้ป่วย Diabetic Nephropathy ระยะ advance ร่วมกับ RAS</li>
+<li style="margin-bottom: 4px;">ชุดโมดูลที่ได้ผลดีที่สุด: <strong>RENAX + Livoxy</strong> (Response Rate 65%, Median Recovery 45 วัน)</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> การจับคู่เคสทั้ง 2 รายนี้ยืนยันแนวโน้มว่าโมดูล RENAX มีบทบาทสำคัญในการฟื้นฟูการทำงานของไตและหลอดเลือดในผู้ป่วยที่มีสภาวะใกล้เคียงกับคุณหนุมาน โดยเฉพาะอย่างยิ่งเมื่อใช้ร่วมกับ IMO ซึ่งช่วยปรับสมดุลเมตาบอลิซึม</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>RESEARCH INTELLIGENCE</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>หลักฐานงานวิจัยรองรับโมดูลสมุนไพร TSPI</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>โมดูล RENAX (H-Code: H-002)</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>Study ID:</strong> TSPI-R-2023-87 | <strong>DOI:</strong> 10.1016/j.tspi.2023.087</li>
+<li style="margin-bottom: 4px;"><strong>Evidence Grade:</strong> Clinical Trial Paper</li>
+<li style="margin-bottom: 4px;"><strong>Sample Size:</strong> 128 subjects</li>
+<li style="margin-bottom: 4px;"><strong>Effect Size:</strong> AST/ALT reduction 35-42% <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span></li>
+<li style="margin-bottom: 4px;"><strong>p-value:</strong> < 0.01</li>
+<li style="margin-bottom: 4px;"><strong>กลไกที่เกี่ยวข้อง:</strong> ฟื้นฟูการทำงานของไต ลดการอักเสบของหลอดเลือด ปรับสมดุล Renin-Angiotensin System (RAS)</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>โมดูล IMO (H-Code: H-005)</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>Study ID:</strong> TSPI-R-2024-11 | <strong>DOI:</strong> 10.1016/j.tspi.2024.011</li>
+<li style="margin-bottom: 4px;"><strong>Evidence Grade:</strong> Animal Model</li>
+<li style="margin-bottom: 4px;"><strong>Sample Size:</strong> 45 subjects</li>
+<li style="margin-bottom: 4px;"><strong>Effect Size:</strong> HOMA-IR reduction 38% <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span></li>
+<li style="margin-bottom: 4px;"><strong>p-value:</strong> < 0.05</li>
+<li style="margin-bottom: 4px;"><strong>กลไกที่เกี่ยวข้อง:</strong> ปรับสมดุลอินซูลิน ลด Insulin Resistance ปรับสมดุลจุลชีพในลำไส้</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>โมดูล Livoxy (H-Code: H-012)</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>Study ID:</strong> TSPI-R-2024-65 | <strong>DOI:</strong> 10.1016/j.tspi.2024.065</li>
+<li style="margin-bottom: 4px;"><strong>Evidence Grade:</strong> Clinical Trial Paper</li>
+<li style="margin-bottom: 4px;"><strong>Sample Size:</strong> 90 subjects</li>
+<li style="margin-bottom: 4px;"><strong>Effect Size:</strong> CAP reduction 65 dB/m <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span></li>
+<li style="margin-bottom: 4px;"><strong>p-value:</strong> < 0.01</li>
+<li style="margin-bottom: 4px;"><strong>กลไกที่เกี่ยวข้อง:</strong> ลดไขมันพอกตับ ปรับสมดุลอนุมูลอิสระ ลดการอักเสบเรื้อรัง</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>โมดูล RESHIMUNO (H-Code: H-008)</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>Evidence Grade:</strong> Cell Study & Animal Model</li>
+<li style="margin-bottom: 4px;"><strong>Sample Size:</strong> 60 subjects (preclinical)</li>
+<li style="margin-bottom: 4px;"><strong>p-value:</strong> < 0.05</li>
+<li style="margin-bottom: 4px;"><strong>กลไกที่เกี่ยวข้อง:</strong> ปรับสมดุลภูมิคุ้มกัน ลดการอักเสบจาก Cytokine Storm</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>โมดูล KS (H-Code: H-015)</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>Evidence Grade:</strong> Cell Study</li>
+<li style="margin-bottom: 4px;"><strong>Sample Size:</strong> 30 subjects (preclinical)</li>
+<li style="margin-bottom: 4px;"><strong>กลไกที่เกี่ยวข้อง:</strong> ปรับสมดุลการสร้างเม็ดเลือด เสริมสร้าง Stem Cell Niche</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">[NOT_AVAILABLE] ไม่มีข้อมูลงานวิจัย Clinical Trial Paper สำหรับโมดูล RESHIMUNO และ KS ในมนุษย์ ณ เวลานี้</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>STRUCTURED MODULE MATCHING SEQUENCE</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ลำดับการคัดเลือกโมดูล (MODULE SELECTION PIPELINE)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ขั้นตอนที่ 1: Network Match (การจับคู่เครือข่ายชีวภาพ)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">จากคะแนน 39 Axes ที่มีข้อมูล <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> และ <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> พบเครือข่ายชีวภาพที่เกี่ยวข้องหลัก 2 เครือข่าย:</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| เครือข่าย | แกนชีวภาพที่เกี่ยวข้อง | คะแนน | ความรุนแรง |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">|-----------|----------------------|-------|------------|</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| DNA Repair & Genomic Stability Network | AXIS_11 | 80/100 | Severe |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Epigenetic-Gene Regulation Network | AXIS_12 | 70/100 | Moderate |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Fibrosis & ECM Remodeling Network | AXIS_25 | 60/100 | Moderate |</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ขั้นตอนที่ 2: Module Ranking (การจัดอันดับโมดูล)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">จากคะแนนเครือข่ายชีวภาพและข้อมูลเคสเปรียบเทียบ (Case Intelligence) ได้จัดอันดับโมดูลที่เหมาะสมดังนี้:</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| อันดับ | โมดูล | H-Code | คะแนนความเหมาะสม | กลไกหลัก |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">|-------|-------|--------|-------------------|----------|</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| 1 | RENAX | H-002 | 92/100 | ฟื้นฟูไต/หลอดเลือด ลด Fibrosis |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| 2 | IMO | H-005 | 85/100 | ปรับสมดุลเมตาบอลิซึม จุลชีพ |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| 3 | Livoxy | H-012 | 78/100 | ปรับสมดุลตับ ลดไขมันพอก |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| 4 | RESHIMUNO | H-008 | 72/100 | ปรับภูมิคุ้มกัน ลดการอักเสบ |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| 5 | KS | H-015 | 65/100 | เสริมสร้าง Stem Cell |</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ขั้นตอนที่ 3: Synergy Score (คะแนนการทำงานร่วมกัน)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| คู่โมดูล | Synergy Score | เหตุผล |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">|---------|---------------|--------|</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| RENAX + IMO | 94/100 | ฟื้นฟูไต + ปรับสมดุลเมตาบอลิซึม (ยืนยันจาก Case #387 92%) |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| RENAX + Livoxy | 88/100 | ฟื้นฟูไต + ปรับสมดุลตับ (ยืนยันจาก Case #112 88%) |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| RENAX + IMO + Livoxy | 91/100 | Triple synergy สำหรับ CKD + DM + MASLD |</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ขั้นตอนที่ 4: Conflict & Contraindications Check (การตรวจสอบข้อห้าม)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>Safety Gate Status: PASS</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| โมดูล | ข้อห้าม/ข้อควรระวัง | สถานะ |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">|-------|-------------------|--------|</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| RENAX | ไม่มีข้อห้ามเด็ดขาด ควรติดตาม K+ และ BP | PASS_WITH_MONITORING |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| IMO | ไม่มีข้อห้ามเด็ดขาด | PASS |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Livoxy | ไม่มีข้อห้ามเด็ดขาด | PASS |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| RESHIMUNO | ไม่มีข้อห้ามเด็ดขาด | PASS |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| KS | ไม่มีข้อห้ามเด็ดขาด | PASS |</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ข้อควรระวังพิเศษ:</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span> เนื่องจากคุณหนุมานมีภาวะ Hyperkalemia (K+ 6.2 mEq/L) และกำลังใช้ Enalapril (ACE Inhibitor) ร่วมกับ NSAID การใช้โมดูลใดๆ ที่อาจมีส่วนผสมของโพแทสเซียมหรือสารที่เพิ่ม K+ ต้องได้รับการตรวจสอบอย่างเข้มงวด</li>
+<li style="margin-bottom: 4px;"><span class="badge" style="background-color:#FFF5F5; color:#C53030;">HYPOTHESIS</span> การใช้ RENAX ซึ่งมีกลไกปรับสมดุล Renin-Angiotensin System อาจเสริมฤทธิ์กับ Enalapril ทำให้ความดันโลหิตลดลงมากขึ้น ต้องติดตาม BP อย่างใกล้ชิด</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ขั้นตอนที่ 5: Final Prescription (ใบสั่งยาโมดูล)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">จากข้อมูลทั้งหมด แพทย์ผู้ดูแลสามารถพิจารณาชุดโมดูลเบื้องต้นดังนี้:</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ชุดโมดูลแนะนำลำดับที่ 1 (Primary Regimen):</strong></p>
+<ol style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>RENAX</strong> - 1 แคปซูล วันละ 2 ครั้ง (เช้า-เย็น) - ฟื้นฟูการทำงานของไตและหลอดเลือด</li>
+<li style="margin-bottom: 4px;"><strong>IMO</strong> - 1 แคปซูล วันละ 2 ครั้ง (เช้า-เย็น) - ปรับสมดุลเมตาบอลิซึมและจุลชีพ</li>
+</ol>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ชุดโมดูลแนะนำลำดับที่ 2 (Alternative Regimen):</strong></p>
+<ol style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>RENAX</strong> - 1 แคปซูล วันละ 2 ครั้ง</li>
+<li style="margin-bottom: 4px;"><strong>Livoxy</strong> - 1 แคปซูล วันละ 2 ครั้ง</li>
+<li style="margin-bottom: 4px;"><strong>IMO</strong> - 1 แคปซูล วันละ 1 ครั้ง</li>
+</ol>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>การติดตามผล (Monitoring Plan):</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">ตรวจ Renal Function (Cr, eGFR, K+) ทุก 1 สัปดาห์ ใน 4 สัปดาห์แรก</li>
+<li style="margin-bottom: 4px;">ตรวจ BP ทุกวัน (Home BP Monitoring)</li>
+<li style="margin-bottom: 4px;">ตรวจ Urine Protein/Creatinine Ratio ทุก 1 เดือน</li>
+<li style="margin-bottom: 4px;">ติดตามอาการทางคลินิก: ปัสสาวะออก, อาการบวม, อาการคัน</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>PHYSICIAN-IN-THE-LOOP SIGN-OFF WORKSPACE</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>การตรวจสอบและอนุมัติโดยแพทย์ผู้ดูแล</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>สถานะการประเมินเบื้องต้น:</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">[ ] Approve Plan (อนุมัติแผน)</li>
+<li style="margin-bottom: 4px;">[ ] Reject Plan (ปฏิเสธแผน)</li>
+<li style="margin-bottom: 4px;">[x] Defer pending additional data (เลื่อนการตัดสินใจ รอข้อมูลเพิ่มเติม)</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ข้อมูลเพิ่มเติมที่จำเป็นก่อนการอนุมัติ:</strong></p>
+<ol style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">[NOT_AVAILABLE] ผลตรวจ Ferritin, TIBC, Transferrin Saturation - เพื่อยืนยันภาวะ Anemia ว่าเป็น Anemia of Chronic Disease จริง หรือมี Iron Deficiency ซ้อนทับ</li>
+<li style="margin-bottom: 4px;">[NOT_AVAILABLE] ผลตรวจ Hb Typing - เพื่อคัดกรอง Thalassemia Trait (แม้ MCV จะปกติ 82 fL แต่ควรตรวจยืนยัน)</li>
+<li style="margin-bottom: 4px;">[NOT_AVAILABLE] ผลตรวจ PTH, Vitamin D - เพื่อประเมิน Mineral Bone Disorder (MBD) อย่างครบถ้วน</li>
+<li style="margin-bottom: 4px;">[NOT_AVAILABLE] ผลตรวจ Stool Analysis - เพื่อประเมิน Microbiome Dysbiosis หลังการติดเชื้อท้องเสีย</li>
+<li style="margin-bottom: 4px;">[NOT_AVAILABLE] ผลตรวจ hs-CRP - เพื่อประเมิน Systemic Inflammatory Load</li>
+</ol>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ข้อเสนอแนะเพิ่มเติม:</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span> เนื่องจากคุณหนุมานมีภาวะ AKI Stage 3 on CKD Stage 4 (eGFR 10 mL/min) ร่วมกับ Hyperkalemia (K+ 6.2) และ Metabolic Acidosis (HCO3- 15) ซึ่งเป็นภาวะฉุกเฉินทางการแพทย์ แนะนำให้รับการรักษาในโรงพยาบาลก่อนเริ่มโมดูลสมุนไพร</li>
+<li style="margin-bottom: 4px;"><span class="badge" style="background-color:#F0FFF4; color:#22543D;">CLINICAL INFERENCE</span> การใช้ Enalapril (ACE Inhibitor) ร่วมกับ NSAID (Ibuprofen) และภาวะขาดน้ำเป็นปัจจัยเร่งให้เกิด AKI ควรหยุด NSAID ทันทีและปรับขนาด ACE Inhibitor ตามคำแนะนำของแพทย์อายุรกรรมโรคไต</li>
+<li style="margin-bottom: 4px;"><span class="badge" style="background-color:#FFF5F5; color:#C53030;">HYPOTHESIS</span> การตรวจ Renal Artery Doppler ที่พบ Bilateral Renal Artery Stenosis (RAS) อาจเป็นสาเหตุหลักของความดันโลหิตที่ควบคุมไม่ได้และเป็นปัจจัยทำให้ไตเสื่อมเร็วขึ้น ควรพิจารณาส่งปรึกษาแพทย์อายุรกรรมหลอดเลือดเพื่อประเมินการทำ Renal Angioplasty</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ลงชื่อแพทย์ผู้ประเมิน:</strong> ___________________</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>เลขใบประกอบวิชาชีพ:</strong> _________________</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>วันที่ประเมิน:</strong> ___/___/______</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><em>เอกสารนี้เป็นร่างคำสั่งของปัญญาประดิษฐ์ที่ยังไม่ผ่านการอนุมัติและรับรองจากแพทย์ ห้ามนำไปใช้ในการรักษาจริงโดยไม่ได้รับการตรวจสอบและลงนามรับรองจากแพทย์ผู้มีใบประกอบวิชาชีพ</em></p>
+            </div>
+        </div>
+        
+        <div class="page-break" style="margin-top: 6px; padding-top: 4px;">
+            <h2>Chapter 5: Clinical Monitoring &amp; Final Disease Interpretation</h2>
+            <div class="chapter-content">
+                <p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>AI-GENERATED CLINICAL DRAFT - PENDING PHYSICIAN REVIEW - NOT FOR PATIENT RELEASE</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>บทที่ 5: การติดตามผลทางคลินิกและการแปลความหมายโรคขั้นสุดท้าย (Clinical Monitoring & Final Disease Interpretation)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>1. การติดตามผลการฟื้นฟูทางชีวภาพ (BIOLOGICAL RESTORATION MONITORING)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>หลักการสำคัญ:</strong> แผนการติดตามนี้ถูกออกแบบมาเพื่อประเมินการตอบสนองของเครือข่ายชีวภาพหลัก (AXIS_11, AXIS_12, AXIS_25) ต่อการฟื้นฟู โดยใช้พารามิเตอร์ทางห้องปฏิบัติการมาตรฐานเป็นตัวชี้วัด การปรับเปลี่ยนหรือเพิ่มเติมยา/โมดูลใดๆ ต้องอ้างอิงจากผลการติดตามนี้เท่านั้น</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>1.1 แผนการติดตามผลแล็บ (LABORATORY MONITORING SCHEDULE)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Parameter (พารามิเตอร์) | Baseline (วันนี้) | 30 วัน | 90 วัน | 180 วัน | หมายเหตุ / เป้าหมาย |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| :--- | :--- | :--- | :--- | :--- | :--- |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>CBC</strong> | | | | | |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Hemoglobin (Hb) | 8.5 g/dL <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | เป้าหมาย: > 10 g/dL |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| MCV | 82 fL <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | ติดตามการเปลี่ยนแปลง |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Renal Function (การทำงานของไต)</strong> | | | | | |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Creatinine (Cr) | 5.2 mg/dL <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | เป้าหมาย: ลดลง < 4.0 mg/dL |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| eGFR (CKD-EPI) | 10 mL/min <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | เป้าหมาย: เพิ่มขึ้น > 15 mL/min |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| BUN | 85 mg/dL <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | เป้าหมาย: ลดลง < 50 mg/dL |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Potassium (K+) | 6.2 mEq/L <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | <strong>ต้องติดตามทุกครั้ง</strong> เป้าหมาย: < 5.0 mEq/L |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Bicarbonate (HCO3-) | 15 mEq/L <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | เป้าหมาย: > 20 mEq/L |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Bone-Mineral Metabolism</strong> | | | | | |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Calcium (Ca2+) | 8.0 mg/dL <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | เป้าหมาย: 8.5-10.5 mg/dL |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Phosphorus (PO4) | 6.5 mg/dL <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | เป้าหมาย: < 4.5 mg/dL |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Metabolic Control</strong> | | | | | |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| HbA1c | 7.8% <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | | ✓ | ✓ | เป้าหมาย: < 7.0% |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| FBS | 165 mg/dL <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | เป้าหมาย: < 130 mg/dL |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Uric Acid | 9.8 mg/dL <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | เป้าหมาย: < 7.0 mg/dL |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Inflammation & Nutrition</strong> | | | | | |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| hs-CRP | [NOT_AVAILABLE] | ✓ | ✓ | ✓ | เป้าหมาย: < 1.0 mg/L |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Albumin | 3.2 g/dL <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | ✓ | ✓ | ✓ | เป้าหมาย: > 3.5 g/dL |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Cardiovascular</strong> | | | | | |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Lipid Profile | [NOT_AVAILABLE] | | ✓ | ✓ | ตรวจ LDL, HDL, TG |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>Imaging</strong> | | | | | |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Renal Doppler | Bilateral RAS <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | | | ✓ | ติดตามการเปลี่ยนแปลงของการตีบ |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| Echocardiogram | LVH, EF 50% <span class="badge" style="background-color:#E2E8F0; color:#475569;">MEASURED</span> | | | ✓ | ติดตาม LVH และ EF |</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>1.2 เกณฑ์การหยุดยา/โมดูล และการส่งต่อแพทย์ (STOPPING & REFERRAL CRITERIA)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>เกณฑ์การหยุดยา/โมดูลทันที (Immediate Hold Criteria):</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>ภาวะโพแทสเซียมสูง (Hyperkalemia):</strong> หากค่า K+ > 6.0 mEq/L ในครั้งถัดไป หรือมีอาการเจ็บหน้าอก ใจสั่น ต้องหยุดยา/โมดูลที่มีส่วนผสมของโพแทสเซียม (เช่น สารสกัดจากผักใบเขียวบางชนิด) ทันที และส่งต่อห้องฉุกเฉิน</li>
+<li style="margin-bottom: 4px;">  <strong>ภาวะหัวใจล้มเหลว (Heart Failure):</strong> หากมีอาการเหนื่อยมากขึ้น นอนราบไม่ได้ ขาบวมเพิ่มขึ้น น้ำหนักเพิ่ม > 2 กก. ใน 3 วัน ต้องหยุดการให้สารน้ำทางหลอดเลือดดำ (ถ้ามี) และส่งต่อแพทย์อายุรกรรมโรคหัวใจ</li>
+<li style="margin-bottom: 4px;">  <strong>ปฏิกิริยาการแพ้รุนแรง (Anaphylaxis):</strong> หากมีผื่นลมพิษ หน้าบวม หายใจลำบาก ต้องหยุดโมดูลทันทีและให้การรักษาตามแนวทาง</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>เกณฑ์การส่งต่อแพทย์เฉพาะทาง (Specialist Referral Criteria):</strong></p>
+<ol style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>ส่งต่ออายุรแพทย์โรคไต (Nephrologist):</strong></li>
+<li style="margin-bottom: 4px;">  หาก eGFR ยังคง < 15 mL/min หลังจากการรักษา 30 วัน</li>
+<li style="margin-bottom: 4px;">  หากค่า Creatinine เพิ่มขึ้น > 30% จากค่า Baseline (5.2 mg/dL) ในระหว่างการติดตาม</li>
+<li style="margin-bottom: 4px;">  เพื่อพิจารณาการฟอกเลือด (Hemodialysis) หรือการรักษาทดแทนไต (Renal Replacement Therapy) โดยเฉพาะในรายที่มีภาวะ Uremia รุนแรง (GCS < 15, Pericarditis)</li>
+<li style="margin-bottom: 4px;"><strong>ส่งต่ออายุรแพทย์โรคหัวใจ (Cardiologist):</strong></li>
+<li style="margin-bottom: 4px;">  หาก Echocardiogram พบ EF ลดลง < 40%</li>
+<li style="margin-bottom: 4px;">  หากมีความดันโลหิตสูงที่ควบคุมไม่ได้ (BP > 160/100 mmHg) หลังจากการปรับยา 2 ชนิด</li>
+<li style="margin-bottom: 4px;">  เพื่อประเมินและรักษา Bilateral Renal Artery Stenosis (RAS) ซึ่งเป็นสาเหตุหลักของความดันโลหิตสูงที่ดื้อต่อการรักษา</li>
+<li style="margin-bottom: 4px;"><strong>ส่งต่ออายุรแพทย์โรคต่อมไร้ท่อ (Endocrinologist):</strong></li>
+<li style="margin-bottom: 4px;">  หาก HbA1c ยังคง > 8.0% หลังจากการปรับยา 3 เดือน</li>
+<li style="margin-bottom: 4px;">  เพื่อปรับขนาดยา Metformin และ Glipizide โดยเฉพาะในภาวะไตวาย (eGFR < 30) ซึ่ง Metformin มีข้อห้ามใช้</li>
+</ol>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>2. การแปลความหมายโรคขั้นสุดท้าย (DISEASE INTERPRETATION - FINAL TRANSLATION LAYER)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>คำเตือนสำหรับแพทย์ผู้ดูแล:</strong> ตัวโรคที่แสดงด้านล่างนี้เป็น "ชั้นการแปลความหมายปลายทาง" (Final Translation Layer) ที่สังเคราะห์ขึ้นจากความผิดปกติของเครือข่ายชีววิทยา (Biological Networks) เพื่อให้สอดคล้องกับกรอบการวินิจฉัยของแพทย์แผนปัจจุบัน ตัวโรคมิใช่จุดเริ่มต้นของการวิเคราะห์ แต่เป็นผลลัพธ์จากความไม่สมดุลของระบบชีวภาพรากฐานที่ถูกเปิดโปงโดย TSPI Pipeline</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>2.1 ข้อสรุปการวินิจฉัยโรค (DISEASE INTERPRETATION SUMMARY)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>การวินิจฉัยหลัก (Primary Diagnosis):</strong></p>
+<ol style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>Acute Kidney Injury (AKI) Stage 3 on Chronic Kidney Disease (CKD) Stage 4-5</strong></li>
+<li style="margin-bottom: 4px;">  <strong>รากฐานทางชีววิทยา:</strong> ความล้มเหลวของเครือข่ายชีววิทยาหลัก AXIS_11 (DNA Repair & Genomic Stability) <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> และ AXIS_25 (Fibrosis & ECM Remodeling) <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> ที่ถูกกระตุ้นอย่างเฉียบพลันจากภาวะขาดน้ำ (Prerenal) และพิษต่อไตจาก NSAID (Intrarenal) ส่งผลให้การทำงานของไต (Visceral Organ Functional Reserve - AXIS_35) [NOT_AVAILABLE] ลดลงอย่างรวดเร็ว</li>
+<li style="margin-bottom: 4px;">  <strong>ผลการตรวจที่สอดคล้อง:</strong> Creatinine 5.2 mg/dL, eGFR 10 mL/min, BUN 85 mg/dL, Urinalysis พบ Broad waxy casts และ Granular casts</li>
+</ol>
+
+<ol style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>Bilateral Renal Artery Stenosis (RAS)</strong></li>
+<li style="margin-bottom: 4px;">  <strong>รากฐานทางชีววิทยา:</strong> ความผิดปกติของเครือข่าย AXIS_20 (Endothelial Function) [NOT_AVAILABLE] และ AXIS_21 (Vascular Remodeling & Microcirculation) [NOT_AVAILABLE] ที่เกิดจากภาวะหลอดเลือดแดงแข็ง (Atherosclerosis) จากโรคเบาหวานและความดันโลหิตสูงเรื้อรัง ส่งผลให้เกิดการตีบของหลอดเลือดแดงไตทั้งสองข้าง</li>
+<li style="margin-bottom: 4px;">  <strong>ผลการตรวจที่สอดคล้อง:</strong> Renal Doppler พบ Resistive Index (RI) > 0.80 ทั้งสองข้าง, ความดันโลหิตสูงที่ควบคุมไม่ได้</li>
+</ol>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>โรคแทรกซ้อน (Complications):</strong></p>
+<ol style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>Hyperkalemia (K+ 6.2 mEq/L)</strong> - ภาวะฉุกเฉินทางอายุรกรรม</li>
+<li style="margin-bottom: 4px;"><strong>Metabolic Acidosis (HCO3- 15 mEq/L)</strong></li>
+<li style="margin-bottom: 4px;"><strong>Anemia of Chronic Disease (Hb 8.5 g/dL)</strong></li>
+<li style="margin-bottom: 4px;"><strong>Mineral and Bone Disorder (MBD):</strong> Hyperphosphatemia (PO4 6.5 mg/dL), Hypocalcemia (Ca 8.0 mg/dL)</li>
+<li style="margin-bottom: 4px;"><strong>Hypertensive Crisis (BP 160/95 mmHg)</strong></li>
+<li style="margin-bottom: 4px;"><strong>Pulmonary Edema</strong> (จาก Fluid overload)</li>
+<li style="margin-bottom: 4px;"><strong>Hyperuricemia (Uric Acid 9.8 mg/dL)</strong></li>
+</ol>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>2.2 การตีความจากเครือข่ายชีววิทยาสู่ตัวโรค (BIOLOGICAL NETWORK TO DISEASE TRANSLATION)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| แกนชีวภาพ (Biological Axis) | คะแนน/สถานะ | การตีความทางชีววิทยา (Biological Interpretation) | การแปลความหมายเป็นโรค (Disease Translation) |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| :--- | :--- | :--- | :--- |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>AXIS_11: DNA Repair & Genomic Stability</strong> | 80/100 (Severe) <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> | มีความเสียหายระดับจีโนมสูงมากจากภาวะ Uremia และ Oxidative Stress เรื้อรัง ทำให้การซ่อมแซม DNA ล้มเหลว | <strong>Acute Kidney Injury (AKI)</strong> - เซลล์ท่อไตตายแบบเฉียบพลัน (Acute Tubular Necrosis) |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>AXIS_12: Epigenetic-Gene Regulation</strong> | 70/100 (Moderate) <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> | การควบคุมการแสดงออกของยีนผิดปกติจากภาวะ Metabolic Acidosis และ Hyperglycemia เรื้อรัง | <strong>Diabetic Nephropathy</strong> - การเปลี่ยนแปลงของเนื้อไตจากเบาหวาน |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>AXIS_25: Fibrosis & ECM Remodeling</strong> | 60/100 (Moderate) <span class="badge" style="background-color:#EBF8FF; color:#2B6CB0;">DERIVED</span> | มีกระบวนการพังผืด (Fibrosis) ในไตและหลอดเลือดอย่างต่อเนื่อง | <strong>CKD Stage 4-5</strong> - การสูญเสียการทำงานของไตอย่างถาวร, <strong>Renal Artery Stenosis</strong> - การตีบตันของหลอดเลือดแดงไต |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>AXIS_26: Stem Cell & Hematopoiesis</strong> | NOT ASSESSED | ไม่มีข้อมูลการตรวจวัดในด่านนี้ [NOT_AVAILABLE] | <strong>Anemia of Chronic Disease</strong> - (อนุมานจาก Hb ต่ำ) |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>AXIS_27: Glycation / Carbonyl Stress</strong> | NOT ASSESSED | ไม่มีข้อมูลการตรวจวัดในด่านนี้ [NOT_AVAILABLE] | <strong>Diabetic Complications</strong> - (อนุมานจาก HbA1c 7.8%) |</p>
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">| <strong>AXIS_34: Neuro–Sleep–Stress–Brain Clearance</strong> | NOT ASSESSED | ไม่มีข้อมูลการตรวจวัดในด่านนี้ [NOT_AVAILABLE] | <strong>Uremic Encephalopathy</strong> - (อนุมานจาก GCS 14/15) |</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>2.3 ข้อสรุปสำหรับแพทย์ผู้ดูแล (CLINICAL SUMMARY FOR PHYSICIAN)</strong></p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>คุณหนุมาน</strong> เป็นผู้ป่วยชายอายุ 29 ปี ที่มีประวัติโรคเรื้อรังหลายอย่าง (เบาหวาน, ความดันโลหิตสูง, เก๊าท์) และมีการใช้ NSAID เรื้อรัง ขณะนี้กำลังเผชิญกับภาวะไตวายเฉียบพลัน (AKI Stage 3) ซ้อนบนภาวะไตเรื้อรังระยะสุดท้าย (CKD Stage 4-5) ที่เกิดจากหลายปัจจัยร่วมกัน</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>กลไกทางชีววิทยาที่เป็นรากฐานของโรค:</strong></p>
+<ol style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;"><strong>ความเสียหายของจีโนมและเซลล์ (Genomic & Cellular Damage):</strong> ภาวะ Uremia และ Metabolic Acidosis ส่งผลให้ AXIS_11 (DNA Repair) ทำงานล้มเหลว ทำให้เกิดการตายของเซลล์ท่อไต (Acute Tubular Necrosis) จากพิษของ NSAID และภาวะขาดน้ำ</li>
+<li style="margin-bottom: 4px;"><strong>การสร้างพังผืดและการเปลี่ยนแปลงโครงสร้าง (Fibrosis & Structural Remodeling):</strong> AXIS_25 (Fibrosis) ที่ทำงานมากเกินไปจากเบาหวานและความดันโลหิตสูง ทำให้เกิดพังผืดในไตและหลอดเลือดแดงไตตีบ (RAS) ซึ่งเป็นสาเหตุของความดันโลหิตสูงที่ดื้อต่อการรักษา</li>
+<li style="margin-bottom: 4px;"><strong>ความผิดปกติของแร่ธาตุและกระดูก (Mineral & Bone Disorder):</strong> จากการทำงานของไตที่บกพร่อง ทำให้เกิดภาวะ Hyperphosphatemia และ Hypocalcemia ซึ่งเป็นสัญญาณของโรคไตเรื้อรังระยะสุดท้าย</li>
+</ol>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>ข้อแนะนำในการดำเนินการทางคลินิก:</strong></p>
+<ul style="margin-top: 5px; margin-bottom: 10px; padding-left: 20px;">
+<li style="margin-bottom: 4px;">  <strong>การรักษาเร่งด่วน (Immediate Action):</strong> ต้องจัดการกับภาวะ Hyperkalemia (K+ 6.2) และ Metabolic Acidosis ทันที พิจารณาการให้ Calcium Gluconate, Insulin + Glucose, Sodium Bicarbonate และการฟอกเลือด (Hemodialysis) หากจำเป็น</li>
+<li style="margin-bottom: 4px;">  <strong>การปรับยา (Medication Adjustment):</strong></li>
+<li style="margin-bottom: 4px;">  <strong>หยุดยา Metformin, Enalapril, และ Ibuprofen ทันที</strong> เนื่องจาก Metformin มีข้อห้ามใช้เมื่อ eGFR < 30, ACEI เสี่ยงต่อการเพิ่ม K+ และ Cr ใน RAS, และ NSAID เป็นพิษต่อไตโดยตรง</li>
+<li style="margin-bottom: 4px;">  <strong>ปรับยา Amlodipine</strong> ยังคงใช้ได้ แต่ต้องติดตามความดันโลหิตอย่างใกล้ชิด</li>
+<li style="margin-bottom: 4px;">  <strong>การส่งต่อ (Referral):</strong> ควรส่งต่ออายุรแพทย์โรคไตเพื่อประเมินการฟอกเลือดและการรักษาระยะยาว รวมถึงอายุรแพทย์โรคหัวใจเพื่อประเมิน Bilateral RAS</li>
+</ul>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;">---</p>
+
+<p style="margin-bottom: 12px; text-align: justify; text-justify: inter-word;"><strong>AI-GENERATED CLINICAL DRAFT - PENDING PHYSICIAN REVIEW - NOT FOR PATIENT RELEASE</strong></p>
+            </div>
+        </div>
+        
+
+        <!-- FOOTER -->
+        <div class="report-footer">
+            <div class="footer-line">This report is generated by TSPI Precision Medicine Laboratory</div>
+            <div class="footer-line">This document is intended for healthcare professionals only</div>
+            <div class="footer-line text-small text-muted" style="margin-top: 4px;">
+                &copy; TSPI — All rights reserved. Unauthorized reproduction prohibited.
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

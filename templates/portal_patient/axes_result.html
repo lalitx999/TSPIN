@@ -1,0 +1,47 @@
+{% extends 'layouts/patient_base.html' %}
+
+{% block title %}ผลวิเคราะห์คะแนน 38 แกนชีววิทยา | TSPI Health{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-6">
+
+    <div class="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 mb-1">
+                <i class="fas fa-chart-pie mr-1"></i> Personalized Bio-Axes Scorecard
+            </span>
+            <h1 class="text-2xl font-bold text-gray-900">ผลการวิเคราะห์คะแนน 38 แกนชีววิทยาของคุณ</h1>
+            <p class="text-xs text-gray-500 mt-1">ประเมินจากผลตรวจแล็บล่าสุดและการซักประวัติอาการเชิงลึก</p>
+        </div>
+        <a href="{% url 'portal_patient:patient_download' %}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-medium rounded-xl transition-all flex items-center gap-1.5 self-start sm:self-auto">
+            <i class="fas fa-download"></i> ดาวน์โหลดรายงานฉบับเต็ม
+        </a>
+    </div>
+
+    <!-- Axes Cards Grid -->
+    <div class="space-y-4">
+        {% for ax in axes_data %}
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-1.5 max-w-xl">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded text-xs font-mono font-bold {% if ax.status == 'critical' %}bg-red-100 text-red-700{% elif ax.status == 'warning' %}bg-amber-100 text-amber-700{% else %}bg-green-100 text-green-700{% endif %}">
+                            {{ ax.code }}
+                        </span>
+                        <h3 class="text-base font-semibold text-gray-900">{{ ax.name }}</h3>
+                    </div>
+                    <p class="text-xs text-gray-600 leading-relaxed">{{ ax.desc }}</p>
+                </div>
+                <div class="flex items-center gap-4 self-end md:self-auto">
+                    <div class="text-right">
+                        <span class="text-xs text-gray-400 block">Risk Score</span>
+                        <span class="text-2xl font-bold {% if ax.score >= 75 %}text-red-600{% elif ax.score >= 55 %}text-amber-600{% else %}text-green-600{% endif %}">
+                            {{ ax.score }}/100
+                        </span>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

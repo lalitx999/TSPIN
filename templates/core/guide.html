@@ -1,0 +1,80 @@
+{% extends 'layouts/public_base.html' %}
+
+{% block title %}คู่มือการใช้งานและเตรียมตัวก่อนพบแพทย์ - TSPI CLINIC{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+
+    <!-- Header -->
+    <div class="text-center max-w-2xl mx-auto space-y-3">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+            Patient Journey Guide
+        </span>
+        <h1 class="text-3xl font-bold text-gray-900 leading-tight">
+            คู่มือการใช้งานและขั้นตอนการรับบริการ
+        </h1>
+        <p class="text-sm text-gray-600 leading-relaxed">
+            ขั้นตอนการลงทะเบียน ซักประวัติอาการกับ AI การอ่านผล 38 แกน และการเข้าพบแพทย์
+        </p>
+    </div>
+
+    <!-- 4 Steps Flow Cards -->
+    <div class="space-y-4">
+        <!-- Step 1 -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs flex items-start gap-5">
+            <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-lg shrink-0">
+                01
+            </div>
+            <div class="space-y-1 flex-1">
+                <h3 class="text-base font-semibold text-gray-900">ลงทะเบียนเข้าสู่ระบบคนไข้</h3>
+                <p class="text-xs text-gray-600 leading-relaxed">
+                    สมัครสมาชิกด้วยเลขบัตรประชาชน ชื่อ-นามสกุล และเบอร์โทรศัพท์ ระบบจะออกหมายเลขประจำตัวผู้ป่วย (HN) อัตโนมัติ
+                </p>
+                <div class="pt-2">
+                    <a href="{% url 'accounts:patient_register' %}" class="text-xs text-primary font-medium hover:underline">ลงทะเบียนทันที &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs flex items-start gap-5">
+            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-lg shrink-0">
+                02
+            </div>
+            <div class="space-y-1 flex-1">
+                <h3 class="text-base font-semibold text-gray-900">ซักประวัติอาการล่วงหน้ากับ AI</h3>
+                <p class="text-xs text-gray-600 leading-relaxed">
+                    ตอบคำถามอาการที่รู้สึก อาหารการกิน และอัปโหลดผลตรวจเลือดที่มี AI จะประมวลผลจัดกลุ่มเข้าสู่ 38 แกนชีววิทยา
+                </p>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs flex items-start gap-5">
+            <div class="w-12 h-12 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center font-bold text-lg shrink-0">
+                03
+            </div>
+            <div class="space-y-1 flex-1">
+                <h3 class="text-base font-semibold text-gray-900">รับผลวิเคราะห์ 38 แกนชีววิทยา</h3>
+                <p class="text-xs text-gray-600 leading-relaxed">
+                    ดูภาพรวมสุขภาพผ่านกราฟ Digital Twin จุดใดที่ร่างกายกำลังส่งสัญญาณเตือน พร้อมคำอธิบายภาษาไทยที่เข้าใจง่าย
+                </p>
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs flex items-start gap-5">
+            <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg shrink-0">
+                04
+            </div>
+            <div class="space-y-1 flex-1">
+                <h3 class="text-base font-semibold text-gray-900">นัดหมายแพทย์และเริ่มโปรโตคอลการรักษา</h3>
+                <p class="text-xs text-gray-600 leading-relaxed">
+                    แพทย์ตรวจร่างกาย ยืนยันการวินิจฉัย และจ่ายโมดูลตำรับสมุนไพรตรงตามระยะของโปรโตคอล 9-Step
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

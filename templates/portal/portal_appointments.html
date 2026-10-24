@@ -1,0 +1,80 @@
+{% extends 'portal/base_portal.html' %}
+
+{% block title %}ตารางนัดหมายแพทย์ - TSPI Patient Portal{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'portal_patient:portal_dashboard' %}" class="btn-portal-secondary" style="font-size: 0.85rem; padding: 6px 12px;">
+        <i class="fas fa-arrow-left"></i> กลับหน้าหลัก
+    </a>
+</div>
+
+<div class="portal-card" style="border-radius: 16px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+            <h1 style="font-size: 1.3rem; font-weight: 700; color: #0f172a;">
+                ตารางนัดหมายแพทย์ของคุณ{{ patient.full_name }}
+            </h1>
+            <p style="font-size: 0.85rem; color: #64748b; margin-top: 2px;">
+                ประวัติการนัดหมายและการติดตามอาการ (HN: {{ patient.hn }})
+            </p>
+        </div>
+        <div>
+            <span class="badge-portal badge-portal-info">
+                รวมทั้งหมด {{ appointments.count }} รายการ
+            </span>
+        </div>
+    </div>
+
+    {% if appointments %}
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+        {% for appt in appointments %}
+        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; background: {% if appt.status in 'scheduled,confirmed' %}#f8fafc{% else %}#ffffff{% endif %};">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; gap: 14px; align-items: center;">
+                    <div style="width: 44px; height: 44px; background: #e0f2fe; color: #0284c7; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.05rem; font-weight: 700; color: #0f172a;">
+                            {{ appt.appointment_date|date:"l ที่ d F Y" }}
+                        </div>
+                        <div style="font-size: 0.85rem; color: #475569; margin-top: 2px;">
+                            เวลา <strong>{{ appt.appointment_time|time:"H:i" }} น.</strong> &bull; {{ appt.doctor.get_full_name|default:"แพทย์ผู้เชี่ยวชาญ TSPI" }}
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    {% if appt.status == 'scheduled' %}
+                    <span class="badge-portal badge-portal-info">นัดหมายล่วงหน้า</span>
+                    {% elif appt.status == 'confirmed' %}
+                    <span class="badge-portal badge-portal-success">ยืนยันแล้ว</span>
+                    {% elif appt.status == 'completed' %}
+                    <span class="badge-portal" style="background: #f1f5f9; color: #64748b;">เข้าพบแพทย์แล้ว</span>
+                    {% elif appt.status == 'cancelled' %}
+                    <span class="badge-portal" style="background: #fee2e2; color: #991b1b;">ยกเลิก</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if appt.notes %}
+            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed #e2e8f0; font-size: 0.85rem; color: #64748b;">
+                <i class="fas fa-info-circle mr-1 text-primary"></i> <strong>รายละเอียดการนัดหมาย:</strong> {{ appt.notes }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px 16px; color: #94a3b8;">
+        <i class="far fa-calendar-alt fa-3x" style="margin-bottom: 12px; display: block; opacity: 0.4;"></i>
+        ท่านยังไม่มีประวัตินัดหมายในระบบ
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9; font-size: 0.8rem; color: #64748b;">
+        <i class="fas fa-phone-alt mr-1"></i> หากต้องการเลื่อนวันหรือเวลานัดหมาย กรุณาติดต่อเจ้าหน้าที่ล่วงหน้าอย่างน้อย 1 วัน ที่เบอร์ <strong>02-123-4567</strong>
+    </div>
+</div>
+{% endblock %}

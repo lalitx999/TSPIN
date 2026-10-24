@@ -121,18 +121,33 @@ def report_preview_html_view(request, analysis_id):
     })
 
 
-@clinical_staff_required
-def report_download_pdf_view(request, analysis_id):
+def report_download_pdf_view(request, analysis_id=None, pk=None):
     """
     เรนเดอร์และสตรีมไฟล์ PDF 300 DPI ผ่าน WeasyPrint
+    ความปลอดภัย: อนุญาตเฉพาะบุคลากรทางการแพทย์ หรือคนไข้เจ้าของรายงาน (ฉบับอนุมัติแล้วเท่านั้น)
     """
-    analysis = get_object_or_404(AnalysisRecord.objects.select_related('patient', 'physician'), pk=analysis_id)
-    edition = request.GET.get('edition', 'physician')
+    report_id = analysis_id or pk
+    analysis = get_object_or_404(AnalysisRecord.objects.select_related('patient', 'physician'), pk=report_id)
+    
+    is_staff = request.user.is_authenticated and request.user.role in ['doctor', 'nurse', 'staff', 'admin']
+    portal_patient_id = request.session.get('portal_patient_id')
+    is_patient_owner = (
+        (portal_patient_id and portal_patient_id == analysis.patient_id) or
+        (request.user.is_authenticated and getattr(request.user, 'patient_record', None) and request.user.patient_record.pk == analysis.patient_id)
+    )
+
+    if not (is_staff or is_patient_owner):
+        return HttpResponseForbidden("ไม่มีสิทธิ์เข้าถึงรายงานนี้")
+
+    if is_patient_owner and not is_staff and analysis.status not in ['approved', 'released']:
+        return HttpResponseForbidden("รายงานฉบับนี้ยังไม่ได้รับการอนุมัติโดยแพทย์")
+
+    edition = request.GET.get('edition', 'patient' if is_patient_owner else 'physician')
 
     pdf_bytes = PrecisionReportGenerator.generate_pdf(analysis, edition=edition)
 
     AuditLog.objects.create(
-        user=request.user,
+        user=request.user if request.user.is_authenticated else None,
         action="REPORT_PDF_DOWNLOADED",
         model="AnalysisRecord",
         object_id=str(analysis.pk),

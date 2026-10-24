@@ -1,0 +1,151 @@
+{% extends 'portal/base_portal.html' %}
+
+{% block title %}รายงานสุขภาพของคุณ {{ patient.full_name }} - TSPI Patient Portal{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+    <div>
+        <a href="{% url 'portal_patient:portal_dashboard' %}" class="btn-portal-secondary" style="font-size: 0.85rem; padding: 6px 12px;">
+            <i class="fas fa-arrow-left"></i> กลับหน้าหลัก
+        </a>
+    </div>
+    <div style="display: flex; gap: 8px;">
+        <a href="{% url 'clinical:report_download_pdf' pk=analysis.pk %}?edition=patient" class="btn-portal-primary" style="font-size: 0.85rem; padding: 6px 14px;" target="_blank">
+            <i class="fas fa-download"></i> ดาวน์โหลด PDF ฉบับพิมพ์
+        </a>
+    </div>
+</div>
+
+<!-- Report Container -->
+<div class="portal-card" style="padding: 28px; border-radius: 16px;">
+    <!-- Report Header -->
+    <div style="border-bottom: 2px solid #0284c7; padding-bottom: 16px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+            <div>
+                <span style="font-size: 0.8rem; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.05em;">
+                    TSPI CLINIC PRECISION MEDICINE REPORT
+                </span>
+                <h1 style="font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-top: 4px;">
+                    รายงานการแพทย์แม่นยำและการฟื้นฟูสุขภาพเฉพาะบุคคล
+                </h1>
+                <p style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">
+                    ฉบับสำหรับผู้รับบริการ (Patient Edition) &bull; วิเคราะห์เชิงลึกตามกลไก 39 แกนชีววิทยา
+                </p>
+            </div>
+            <div style="text-align: right;">
+                <span class="badge-portal badge-portal-success" style="font-size: 0.85rem; padding: 6px 12px;">
+                    <i class="fas fa-certificate mr-1"></i> ได้รับการรับรองโดยแพทย์
+                </span>
+                <div style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">
+                    วันที่ออกรายงาน: {{ analysis.created_at|date:"d F Y" }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Meta Box -->
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 18px; margin-bottom: 28px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; font-size: 0.85rem;">
+            <div><strong style="color: #64748b;">ชื่อ-นามสกุล:</strong> <span style="color: #0f172a; font-weight: 600;">คุณ{{ patient.full_name }}</span></div>
+            <div><strong style="color: #64748b;">หมายเลขประจำตัว:</strong> <span style="color: #0284c7; font-weight: 600;">{{ patient.hn }}</span></div>
+            <div><strong style="color: #64748b;">เพศ / อายุ:</strong> <span style="color: #0f172a;">{{ patient.get_gender_display }} / {{ patient.age|default:"-" }} ปี</span></div>
+            <div><strong style="color: #64748b;">กลุ่มเลือด:</strong> <span style="color: #0f172a;">{{ patient.blood_type }}</span></div>
+        </div>
+    </div>
+
+    <!-- Section 1: 12 Biological Domains Summary -->
+    <div style="margin-bottom: 32px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-layer-group text-primary"></i> 1. ผลประเมินสมดุล 12 โดเมนชีววิทยา (Biological Balance)
+        </h3>
+        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">
+            ระดับคะแนน 0-39 หมายถึงสภาวะสมดุลสมบูรณ์, 40-59 สภาวะเริ่มเสียสมดุล, และ 60 ขึ้นไปควรได้รับการฟื้นฟูอย่างต่อเนื่อง
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+            {% for dom in report_context.domain_scores %}
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 0.85rem; font-weight: 600; color: #334155;">{{ dom.title }}</span>
+                    <strong style="font-size: 0.9rem; {% if dom.avg_score >= 60 %}color: #dc2626;{% elif dom.avg_score >= 40 %}color: #d97706;{% else %}color: #16a34a;{% endif %}">
+                        {{ dom.avg_score }}
+                    </strong>
+                </div>
+                <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div style="width: {{ dom.avg_score }}%; height: 100%; {% if dom.avg_score >= 60 %}background: #ef4444;{% elif dom.avg_score >= 40 %}background: #f59e0b;{% else %}background: #10b981;{% endif %} border-radius: 4px;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Section 2: Priority Focus Areas -->
+    <div style="margin-bottom: 32px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-exclamation-circle text-danger"></i> 2. จุดที่ควรให้ความสำคัญเป็นพิเศษ (Priority Health Focus)
+        </h3>
+
+        {% if report_context.dysfunctional_axes %}
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            {% for ax in report_context.dysfunctional_axes|slice:":5" %}
+            <div style="background: #fff1f2; border-left: 4px solid #f43f5e; padding: 12px 16px; border-radius: 6px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="font-size: 0.9rem; color: #9f1239;">
+                        แกนที่ {{ ax.axis_id }}: {{ ax.name }}
+                    </strong>
+                    <span style="font-size: 0.8rem; font-weight: 700; background: #ffe4e6; color: #be123c; padding: 2px 8px; border-radius: 4px;">
+                        คะแนน {{ ax.score }}/100
+                    </span>
+                </div>
+                <div style="font-size: 0.8rem; color: #881337; margin-top: 4px;">
+                    กลุ่มชีววิทยา: {{ ax.domain_title }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 14px; color: #166534; font-size: 0.85rem;">
+            <i class="fas fa-check-circle mr-1"></i> ระบบชีววิทยาทั้งหมดอยู่ในเกณฑ์สมดุลดีเยี่ยม ไม่มีแกนที่ต้องเฝ้าระวังวิกฤต
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Section 3: Personalized Recommendations -->
+    <div style="margin-bottom: 24px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-seedling text-success"></i> 3. คำแนะนำการบำบัดและดูแลตนเอง (Personalized Plan)
+        </h3>
+
+        {% if report_context.recommendations %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+            {% for mod in report_context.recommendations %}
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px;">
+                <div style="font-weight: 700; font-size: 0.95rem; color: #166534;">
+                    [{{ mod.code|default:"PROTOCOL" }}] {{ mod.name }}
+                </div>
+                <div style="font-size: 0.8rem; color: #15803d; margin-top: 4px; line-height: 1.4;">
+                    {{ mod.description|truncatewords:20 }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="font-size: 0.85rem; color: #64748b;">
+            ปฏิบัติตามคำแนะนำโภชนาการและการใช้ชีวิตพื้นฐานเพื่อรักษาสภาวะสมดุล
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Doctor Note -->
+    {% if report_context.latest_soap and report_context.latest_soap.plan %}
+    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 16px; margin-top: 24px;">
+        <strong style="color: #1e40af; font-size: 0.9rem; display: block; margin-bottom: 6px;">
+            <i class="fas fa-user-md mr-1"></i> ข้อแนะนำเพิ่มเติมจากแพทย์ผู้ตรวจ:
+        </strong>
+        <p style="font-size: 0.85rem; color: #1e3a8a; line-height: 1.5; white-space: pre-line;">
+            {{ report_context.latest_soap.plan }}
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

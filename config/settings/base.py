@@ -180,3 +180,10 @@ AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesStandaloneBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+# ==============================================================================
+# 10. LINE OFFICIAL ACCOUNT (Pillars 8, 14)
+# ==============================================================================
+LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
+LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', '')
+

@@ -1,0 +1,42 @@
+{% extends 'portal/base_portal.html' %}
+
+{% block title %}ยืนยันการเชื่อมต่อ LINE OA - TSPI Clinic{% endblock %}
+
+{% block content %}
+<div class="portal-card" style="max-width: 500px; margin: 40px auto; border-radius: 16px; padding: 28px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <i class="fab fa-line fa-3x" style="color: #06c755; margin-bottom: 12px; display: inline-block;"></i>
+        <h1 style="font-size: 1.35rem; font-weight: 700; color: #0f172a;">ยืนยันการเชื่อมต่อ LINE กับเวชระเบียน</h1>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">
+            กรุณาตรวจสอบข้อมูลก่อนผูกบัญชีอย่างปลอดภัย
+        </p>
+    </div>
+
+    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px;">
+        <div style="font-size: 0.9rem; color: #166534; margin-bottom: 4px;">
+            <strong>ผู้ป่วย:</strong> คุณ{{ patient.full_name }}
+        </div>
+        <div style="font-size: 0.85rem; color: #15803d;">
+            <strong>หมายเลข HN:</strong> {{ patient.hn }}
+        </div>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                LINE User ID (ระบุอัตโนมัติหรือกรอกยืนยัน)
+            </label>
+            <input type="text" name="line_user_id" value="{{ request.GET.line_user_id|default:'' }}" placeholder="Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" required
+                   style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; font-family: monospace;">
+            <small style="color: #64748b; font-size: 0.75rem; margin-top: 4px; display: block;">
+                LINE User ID ประจำตัวบัญชีของท่านในระบบ LINE Developers
+            </small>
+        </div>
+
+        <button type="submit" class="btn-portal-primary" style="width: 100%; justify-content: center; padding: 12px; background: #06c755; font-size: 0.95rem;">
+            <i class="fas fa-link"></i> ยืนยันการผูกบัญชีเวชระเบียน
+        </button>
+    </form>
+</div>
+{% endblock %}

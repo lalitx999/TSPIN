@@ -1,8 +1,41 @@
+"""
+Patient Portal & LINE OA URL Configuration.
+"""
+
 from django.urls import path
 from . import views
+from patients.views_portal import (
+    portal_login_view,
+    portal_logout_view,
+    portal_dashboard_view,
+    portal_report_detail_view,
+    portal_appointments_view,
+    portal_create_line_token_view
+)
+from patients.views_line import (
+    line_webhook_view,
+    line_account_binding_callback_view
+)
 
 app_name = 'portal_patient'
 
 urlpatterns = [
+    # Primary Patient Dashboard (Satisfies core tests & accounts redirect)
+    path('', views.patient_dashboard, name='dashboard'),
     path('dashboard/', views.patient_dashboard, name='dashboard'),
+
+    # Mobile-First Wellness Portal Views
+    path('portal/', portal_dashboard_view, name='portal_dashboard'),
+    path('login/', portal_login_view, name='portal_login'),
+    path('logout/', portal_logout_view, name='portal_logout'),
+
+    # Clinical Reports & Appointments
+    path('reports/<int:pk>/', portal_report_detail_view, name='portal_report_detail'),
+    path('appointments/', portal_appointments_view, name='portal_appointments'),
+
+    # LINE Integration & Webhook (Pillars 8, 14)
+    path('webhook/', line_webhook_view, name='line_webhook'),
+    path('line/webhook/', line_webhook_view, name='line_webhook_alias'),
+    path('line/bind/', portal_create_line_token_view, name='portal_line_binding'),
+    path('line/confirm/', line_account_binding_callback_view, name='line_binding_confirm'),
 ]

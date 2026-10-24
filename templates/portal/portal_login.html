@@ -1,0 +1,140 @@
+{% extends 'portal/base_portal.html' %}
+
+{% block title %}เข้าสู่ระบบ - TSPI Patient Portal{% endblock %}
+
+{% block content %}
+<div style="max-width: 440px; margin: 40px auto;">
+    <div class="portal-card" style="box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); border-radius: 16px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div style="width: 56px; height: 56px; background: #e0f2fe; color: #0284c7; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px;">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <h2 style="font-size: 1.35rem; font-weight: 700; color: #0f172a;">เข้าสู่ระบบผู้ป่วย</h2>
+            <p style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">TSPI Precision Medicine Clinic Portal</p>
+        </div>
+
+        {% if messages %}
+        <div style="margin-bottom: 16px;">
+            {% for message in messages %}
+            <div style="background: #fee2e2; border-left: 4px solid #ef4444; color: #991b1b; padding: 10px 14px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 8px;">
+                <i class="fas fa-exclamation-circle mr-1"></i> {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Tab Selector -->
+        <div style="display: flex; background: #f1f5f9; border-radius: 8px; padding: 3px; margin-bottom: 20px;">
+            <button type="button" id="tab-btn-hn" onclick="switchTab('hn')" style="flex: 1; padding: 8px; border: none; background: #ffffff; color: #0f172a; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                เลขผู้ป่วย (HN)
+            </button>
+            <button type="button" id="tab-btn-cred" onclick="switchTab('cred')" style="flex: 1; padding: 8px; border: none; background: transparent; color: #64748b; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+                ชื่อผู้ใช้ / รหัสผ่าน
+            </button>
+        </div>
+
+        <!-- Form 1: HN + Phone -->
+        <form method="POST" id="form-hn">
+            {% csrf_token %}
+            <input type="hidden" name="auth_mode" value="hn_phone">
+            
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    หมายเลขประจำตัวผู้ป่วย (HN)
+                </label>
+                <div style="position: relative;">
+                    <i class="fas fa-id-card" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i>
+                    <input type="text" name="hn" placeholder="เช่น HN-2026-001" required
+                           style="width: 100%; padding: 10px 12px 10px 38px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; text-transform: uppercase;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    เบอร์โทรศัพท์ที่ลงทะเบียนไว้
+                </label>
+                <div style="position: relative;">
+                    <i class="fas fa-phone" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i>
+                    <input type="tel" name="phone" placeholder="เช่น 0812345678" required
+                           style="width: 100%; padding: 10px 12px 10px 38px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
+                </div>
+                <small style="color: #64748b; font-size: 0.75rem; margin-top: 4px; display: block;">
+                    กรุณากรอกเบอร์โทรศัพท์ที่เคยแจ้งไว้กับเจ้าหน้าที่เวชระเบียน
+                </small>
+            </div>
+
+            <button type="submit" class="btn-portal-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;">
+                <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบข้อมูลสุขภาพ
+            </button>
+        </form>
+
+        <!-- Form 2: Username / Password -->
+        <form method="POST" id="form-cred" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="auth_mode" value="credentials">
+
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    ชื่อผู้ใช้ (Username)
+                </label>
+                <div style="position: relative;">
+                    <i class="fas fa-user" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i>
+                    <input type="text" name="username" placeholder="ชื่อผู้ใช้งานในระบบ"
+                           style="width: 100%; padding: 10px 12px 10px 38px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    รหัสผ่าน (Password)
+                </label>
+                <div style="position: relative;">
+                    <i class="fas fa-lock" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i>
+                    <input type="password" name="password" placeholder="••••••••"
+                           style="width: 100%; padding: 10px 12px 10px 38px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-portal-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;">
+                <i class="fas fa-sign-in-alt"></i> ยืนยันรหัสผ่านเพื่อเข้าใช้งาน
+            </button>
+        </form>
+
+        <div style="margin-top: 24px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+            <p style="font-size: 0.8rem; color: #64748b;">
+                หากลืมหมายเลข HN หรือต้องการความช่วยเหลือ<br>
+                โทรติดต่อคลินิก TSPI ได้ที่ <strong>02-123-4567</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(mode) {
+    const formHn = document.getElementById('form-hn');
+    const formCred = document.getElementById('form-cred');
+    const btnHn = document.getElementById('tab-btn-hn');
+    const btnCred = document.getElementById('tab-btn-cred');
+
+    if (mode === 'hn') {
+        formHn.style.display = 'block';
+        formCred.style.display = 'none';
+        btnHn.style.background = '#ffffff';
+        btnHn.style.color = '#0f172a';
+        btnHn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        btnCred.style.background = 'transparent';
+        btnCred.style.color = '#64748b';
+        btnCred.style.boxShadow = 'none';
+    } else {
+        formHn.style.display = 'none';
+        formCred.style.display = 'block';
+        btnCred.style.background = '#ffffff';
+        btnCred.style.color = '#0f172a';
+        btnCred.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        btnHn.style.background = 'transparent';
+        btnHn.style.color = '#64748b';
+        btnHn.style.boxShadow = 'none';
+    }
+}
+</script>
+{% endblock %}

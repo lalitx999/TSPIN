@@ -1,0 +1,245 @@
+{% extends 'portal/base_portal.html' %}
+
+{% block title %}หน้าหลักผู้ป่วย - TSPI Patient Portal{% endblock %}
+
+{% block content %}
+<!-- Patient Header Banner -->
+<div class="portal-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; border: none; border-radius: 16px;">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 52px; height: 52px; background: rgba(2, 132, 199, 0.25); border: 2px solid #0284c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #38bdf8;">
+                <i class="fas fa-user"></i>
+            </div>
+            <div>
+                <h1 style="font-size: 1.3rem; font-weight: 700; color: #ffffff;">คุณ{{ patient.full_name }}</h1>
+                <div style="font-size: 0.85rem; color: #94a3b8; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                    <span><strong style="color: #cbd5e1;">HN:</strong> {{ patient.hn }}</span>
+                    <span>&bull;</span>
+                    <span><strong style="color: #cbd5e1;">เพศ:</strong> {{ patient.get_gender_display }}</span>
+                    <span>&bull;</span>
+                    <span><strong style="color: #cbd5e1;">อายุ:</strong> {{ patient.age|default:"-" }} ปี</span>
+                    <span>&bull;</span>
+                    <span><strong style="color: #cbd5e1;">กลุ่มเลือด:</strong> {{ patient.blood_type }}</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <span class="badge-portal badge-portal-success" style="font-size: 0.8rem; padding: 6px 12px;">
+                <i class="fas fa-shield-alt mr-1"></i> เวชระเบียนยืนยันตัวตนแล้ว
+            </span>
+        </div>
+    </div>
+
+    {% if patient.allergies %}
+    <div style="margin-top: 16px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; color: #fca5a5;">
+        <i class="fas fa-exclamation-triangle mr-1"></i> <strong>ประวัติการแพ้/ข้อควรระวัง:</strong> {{ patient.allergies }}
+    </div>
+    {% endif %}
+</div>
+
+<!-- LINE OA Connection Banner -->
+<div class="portal-card" style="padding: 14px 20px; background: {% if is_line_bound %}#f0fdf4; border-color: #bbf7d0;{% else %}#f0f9ff; border-color: #bae6fd;{% endif %}">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <i class="fab fa-line fa-2x" style="color: #06c755;"></i>
+            <div>
+                <strong style="font-size: 0.95rem; color: #0f172a;">
+                    {% if is_line_bound %}
+                    บัญชีเชื่อมต่อกับ LINE Official Account เรียบร้อยแล้ว
+                    {% else %}
+                    เชื่อมต่อ LINE Official Account เพื่อรับการแจ้งเตือน
+                    {% endif %}
+                </strong>
+                <p style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">
+                    {% if is_line_bound %}
+                    ท่านจะได้รับใบนัดหมายแพทย์และแจ้งเตือนผลตรวจสุขภาพผ่าน LINE อัตโนมัติ
+                    {% else %}
+                    รับผลตรวจสุขภาพ ใบนัดหมายแพทย์ และคำแนะนำการดูแลตนเองผ่านแอป LINE บนมือถือ
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        <div>
+            {% if is_line_bound %}
+            <span class="badge-portal badge-portal-success">
+                <i class="fas fa-check-circle mr-1"></i> เชื่อมต่อแล้ว
+            </span>
+            {% else %}
+            <a href="{% url 'portal_patient:portal_line_binding' %}" class="btn-portal-primary" style="background-color: #06c755; padding: 6px 14px; font-size: 0.85rem;">
+                <i class="fab fa-line"></i> เชื่อมต่อ LINE OA
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+    <!-- Column 1: Appointments & Health Domains -->
+    <div>
+        <!-- Next Appointment Card -->
+        <div class="portal-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                <h3 style="font-size: 1rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-calendar-check text-primary"></i> นัดหมายแพทย์ที่กำลังจะมาถึง
+                </h3>
+                <a href="{% url 'portal_patient:portal_appointments' %}" style="font-size: 0.8rem; color: #0284c7; text-decoration: none; font-weight: 600;">
+                    ดูทั้งหมด &rarr;
+                </a>
+            </div>
+
+            {% if upcoming_appointments %}
+                {% with appt=upcoming_appointments.0 %}
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <div style="font-size: 1.05rem; font-weight: 700; color: #0284c7;">
+                                {{ appt.appointment_date|date:"d F Y" }}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #334155; margin-top: 2px;">
+                                เวลา {{ appt.appointment_time|time:"H:i" }} น.
+                            </div>
+                            <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">
+                                <i class="fas fa-user-md mr-1"></i> {{ appt.doctor.get_full_name|default:"แพทย์ผู้เชี่ยวชาญ TSPI" }}
+                            </div>
+                        </div>
+                        <span class="badge-portal badge-portal-info">
+                            {{ appt.get_status_display }}
+                        </span>
+                    </div>
+                    {% if appt.notes %}
+                    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #cbd5e1; font-size: 0.8rem; color: #475569;">
+                        <strong>บันทึก:</strong> {{ appt.notes }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endwith %}
+            {% else %}
+                <div style="text-align: center; padding: 24px 12px; color: #94a3b8; font-size: 0.85rem;">
+                    <i class="far fa-calendar-times fa-2x" style="margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+                    ยังไม่มีนัดหมายแพทย์ล่วงหน้าในขณะนี้
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- 12 Domains Health Balance -->
+        <div class="portal-card">
+            <h3 style="font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-dna text-info"></i> ภาพรวมสมดุล 12 โดเมนชีววิทยา
+            </h3>
+
+            {% if domain_scores %}
+            <div style="height: 240px; position: relative;">
+                <canvas id="domainRadarChart"></canvas>
+            </div>
+            <div style="margin-top: 14px; display: flex; justify-content: space-around; font-size: 0.75rem; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                <span><i class="fas fa-circle text-success" style="color: #10b981;"></i> 0-39: สมบูรณ์</span>
+                <span><i class="fas fa-circle text-warning" style="color: #f59e0b;"></i> 40-59: เริ่มเสียสมดุล</span>
+                <span><i class="fas fa-circle text-danger" style="color: #ef4444;"></i> 60+: ต้องฟื้นฟู</span>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 24px 12px; color: #94a3b8; font-size: 0.85rem;">
+                <i class="fas fa-wave-square fa-2x" style="margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+                อยู่ระหว่างประมวลผลข้อมูล 39 แกนชีววิทยาจากผลแล็บ
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Column 2: Approved Precision Reports -->
+    <div>
+        <div class="portal-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                <h3 style="font-size: 1rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-file-medical-alt text-success"></i> รายงานการแพทย์แม่นยำที่อนุมัติแล้ว
+                </h3>
+            </div>
+
+            {% if approved_reports %}
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for rep in approved_reports %}
+                <div style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; background: #ffffff; transition: transform 0.15s ease, box-shadow 0.15s ease;"
+                     onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.05)'"
+                     onmouseout="this.style.boxShadow='none'">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a;">
+                                รายงานการแพทย์แม่นยำ 39 แกนชีววิทยา
+                            </div>
+                            <div style="font-size: 0.8rem; color: #64748b; margin-top: 3px;">
+                                <i class="far fa-clock mr-1"></i> วันที่: {{ rep.created_at|date:"d M Y, H:i" }} น.
+                            </div>
+                            <div style="font-size: 0.8rem; color: #0369a1; margin-top: 2px;">
+                                <i class="fas fa-user-check mr-1"></i> แพทย์ลงนามอนุมัติแล้ว
+                            </div>
+                        </div>
+                        <span class="badge-portal badge-portal-success">
+                            ฉบับสมบูรณ์
+                        </span>
+                    </div>
+
+                    <div style="margin-top: 14px; display: flex; gap: 8px;">
+                        <a href="{% url 'portal_patient:portal_report_detail' pk=rep.pk %}" class="btn-portal-primary" style="flex: 1; justify-content: center; font-size: 0.85rem; padding: 7px 12px;">
+                            <i class="fas fa-eye"></i> เปิดดูรายงานสุขภาพ
+                        </a>
+                        <a href="{% url 'clinical:report_download_pdf' pk=rep.pk %}?edition=patient" class="btn-portal-secondary" style="font-size: 0.85rem; padding: 7px 12px;" target="_blank">
+                            <i class="fas fa-file-pdf text-danger"></i> PDF
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 32px 16px; color: #94a3b8; font-size: 0.85rem;">
+                <i class="fas fa-notes-medical fa-2x" style="margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+                ยังไม่มีรายงานที่เผยแพร่<br>
+                เมื่อแพทย์ทำการวิเคราะห์และลงนามอนุมัติ รายงานจะปรากฏที่นี่ทันที
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if domain_scores %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('domainRadarChart');
+    if (!ctx) return;
+
+    const labels = [{% for d in domain_scores %}"{{ d.title|slice:':10' }}",{% endfor %}];
+    const dataValues = [{% for d in domain_scores %}{{ d.avg_score }},{% endfor %}];
+
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'ระดับความเสียสมดุล',
+                data: dataValues,
+                backgroundColor: 'rgba(2, 132, 199, 0.2)',
+                borderColor: '#0284c7',
+                borderWidth: 2,
+                pointBackgroundColor: '#0284c7',
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    min: 0,
+                    max: 100,
+                    ticks: { stepSize: 25, display: false },
+                    pointLabels: { font: { size: 9, family: 'Sarabun' } },
+                    grid: { color: '#e2e8f0' }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

@@ -55,6 +55,16 @@ class Patient(models.Model):
     birth_date = models.DateField(null=True, blank=True)
     blood_type = models.CharField(max_length=10, choices=BLOOD_CHOICES, default='UNKNOWN')
 
+    # User Account Linking (Pillar 2)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='patient_record',
+        help_text="บัญชีผู้ใช้เข้าสู่ระบบ Patient Portal"
+    )
+
     # Contact Details
     phone = models.CharField(max_length=30, db_index=True)
     email = models.EmailField(blank=True, null=True)
@@ -169,3 +179,74 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"Appt: {self.patient.full_name} on {self.appointment_date} at {self.appointment_time}"
+
+from datetime import date, timedelta
+from django.utils import timezone
+import secrets
+
+class PatientLinkingToken(models.Model):
+    """
+    โทเค็นสำหรับเชื่อมโยงบัญชี LINE OA หรือลงทะเบียน Patient Portal แบบปลอดภัย (Pillars 1, 14)
+    ป้องกันการสวมรอยบัญชีด้วย One-time Nonce และระบบหมดอายุตามเวลาที่กำหนด
+    """
+    ACTION_CHOICES = [
+        ('line_binding', 'เชื่อมต่อบัญชี LINE OA'),
+        ('portal_access', 'ยืนยันตัวตนเข้าใช้งาน Patient Portal'),
+    ]
+
+    patient = models.ForeignKey(
+        Patient,
+        on_delete=models.CASCADE,
+        related_name='linking_tokens',
+        help_text="ผู้ป่วยเจ้าของคำขอเชื่อมโยงบัญชี"
+    )
+    token = models.CharField(
+        max_length=64,
+        unique=True,
+        db_index=True,
+        help_text="โทเค็นสุ่มความปลอดภัยสูง"
+    )
+    nonce = models.CharField(
+        max_length=32,
+        db_index=True,
+        help_text="One-time Nonce สำหรับป้องกัน Replay Attack"
+    )
+    action_type = models.CharField(
+        max_length=30,
+        choices=ACTION_CHOICES,
+        default='line_binding'
+    )
+    is_used = models.BooleanField(
+        default=False,
+        help_text="ถูกใช้งานแล้วหรือไม่ (ใช้ได้ครั้งเดียวเท่านั้น)"
+    )
+    expires_at = models.DateTimeField(
+        db_index=True,
+        help_text="เวลาหมดอายุของโทเค็น"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        app_label = 'patients'
+        db_table = 'emr_patient_linking_tokens'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Token({self.action_type}) for {self.patient.hn} - Used: {self.is_used}"
+
+    @property
+    def is_valid(self) -> bool:
+        """ตรวจสอบความถูกต้อง: ยังไม่ถูกใช้และยังไม่หมดอายุ"""
+        return not self.is_used and timezone.now() < self.expires_at
+
+    @classmethod
+    def create_token(cls, patient: Patient, action_type: str = 'line_binding', expires_in_minutes: int = 15) -> 'PatientLinkingToken':
+        """สร้างโทเค็นใหม่ที่ปลอดภัยสูงและมีอายุการใช้งานจำกัด"""
+        return cls.objects.create(
+            patient=patient,
+            token=secrets.token_urlsafe(32),
+            nonce=secrets.token_hex(16),
+            action_type=action_type,
+            expires_at=timezone.now() + timedelta(minutes=expires_in_minutes)
+        )
+

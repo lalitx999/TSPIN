@@ -1,0 +1,35 @@
+{% extends 'portal/base_portal.html' %}
+
+{% block title %}ผลการเชื่อมต่อ LINE OA - TSPI Clinic{% endblock %}
+
+{% block content %}
+<div class="portal-card" style="max-width: 500px; margin: 40px auto; border-radius: 16px; padding: 32px; text-align: center;">
+    {% if success %}
+    <div style="width: 64px; height: 64px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 16px;">
+        <i class="fas fa-check"></i>
+    </div>
+    <h1 style="font-size: 1.35rem; font-weight: 700; color: #0f172a; margin-bottom: 8px;">
+        เชื่อมต่อบัญชีสำเร็จเรียบร้อย
+    </h1>
+    <p style="font-size: 0.9rem; color: #475569; margin-bottom: 24px; line-height: 1.5;">
+        {{ message }}
+    </p>
+    {% else %}
+    <div style="width: 64px; height: 64px; background: #fee2e2; color: #ef4444; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 16px;">
+        <i class="fas fa-times"></i>
+    </div>
+    <h1 style="font-size: 1.35rem; font-weight: 700; color: #991b1b; margin-bottom: 8px;">
+        ไม่สามารถเชื่อมต่อบัญชีได้
+    </h1>
+    <p style="font-size: 0.9rem; color: #7f1d1d; margin-bottom: 24px; line-height: 1.5;">
+        {{ message }}
+    </p>
+    {% endif %}
+
+    <div>
+        <a href="{% url 'portal_patient:portal_dashboard' %}" class="btn-portal-primary" style="padding: 10px 24px; font-size: 0.9rem;">
+            <i class="fas fa-home"></i> กลับสู่พอร์ทัลผู้ป่วย
+        </a>
+    </div>
+</div>
+{% endblock %}

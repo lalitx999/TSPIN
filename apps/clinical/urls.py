@@ -17,6 +17,7 @@ urlpatterns = [
     path('reports/create/<int:patient_id>/', views_report.report_create_view, name='report_create'),
     path('reports/<int:analysis_id>/preview/', views_report.report_preview_html_view, name='report_preview'),
     path('reports/<int:analysis_id>/pdf/', views_report.report_download_pdf_view, name='report_pdf'),
+    path('reports/<int:pk>/download-pdf/', views_report.report_download_pdf_view, name='report_download_pdf'),
     path('reports/<int:analysis_id>/signoff/', views_report.report_signoff_action_view, name='report_signoff'),
 ]
 

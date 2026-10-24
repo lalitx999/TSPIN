@@ -1,0 +1,215 @@
+{% extends 'layouts/doctor_base.html' %}
+{% load static %}
+
+{% block title %}สแกนและวิเคราะห์ผลแล็บ (Lab OCR Parser) | Dr. Patt EMR{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2" style="border-bottom: 1px solid #1e293b;">
+        <div>
+            <h2 class="font-weight-bold text-white mb-1" style="font-size: 1.6rem;">
+                <i class="fas fa-file-medical-alt text-cyan mr-2"></i>สแกนและวิเคราะห์ผลแล็บ (Deterministic Lab OCR)
+            </h2>
+            <p class="text-muted mb-0 font-sm">
+                ระบบสกัดค่า Biomarkers อัตโนมัติและเชื่อมโยงสู่ 39 แกนชีววิทยาอย่างแม่นยำ ปราศจากความผิดเพี้ยน
+            </p>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            <a href="{% url 'intelligence:artifact_review' %}" class="btn btn-outline-warning shadow-sm">
+                <i class="fas fa-tasks mr-1"></i>ไปยังคิวตรวจทาน (Artifact Review Gate)
+            </a>
+        </div>
+    </div>
+
+    <!-- Active Patient Banner (if selected) -->
+    {% if patient %}
+    <div class="card shadow-sm mb-4" style="background: #0f172a; border: 1px solid #0284c7; border-radius: 12px;">
+        <div class="card-body p-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <div style="width: 44px; height: 44px; border-radius: 50%; background: #0284c7; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;" class="mr-3">
+                    {{ patient.first_name|slice:":1" }}
+                </div>
+                <div>
+                    <h5 class="text-white font-weight-bold mb-0">
+                        {{ patient.full_name }}
+                        <span class="badge badge-dark text-cyan font-mono ml-2">HN: {{ patient.hn }}</span>
+                    </h5>
+                    <small class="text-muted">อายุ: {{ patient.age|default:"-" }} ปี &bull; กรุ๊ปเลือด: {{ patient.blood_type }}</small>
+                </div>
+            </div>
+            <div>
+                <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left mr-1"></i>กลับแฟ้มคนไข้
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Left: Input Form -->
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; overflow: hidden;">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+                    <h5 class="card-title text-white font-weight-bold mb-0" style="font-size: 1rem;">
+                        <i class="fas fa-paste text-cyan mr-2"></i>ข้อความดิบผลตรวจแล็บ (Lab Report Text)
+                    </h5>
+                    <button type="button" class="btn btn-xs btn-outline-info" onclick="loadSampleText()">
+                        <i class="fas fa-magic mr-1"></i>ใช้ตัวอย่างแล็บ
+                    </button>
+                </div>
+
+                <div class="card-body p-3">
+                    <form method="post" action="{% url 'intelligence:lab_ocr' %}{% if patient %}?patient_id={{ patient.pk }}{% endif %}">
+                        {% csrf_token %}
+                        {% if patient %}
+                            <input type="hidden" name="patient_id" value="{{ patient.pk }}">
+                        {% endif %}
+
+                        <div class="form-group mb-3">
+                            <label class="text-light text-sm font-weight-bold">
+                                วางข้อความผลตรวจแล็บที่ได้จากการสแกน OCR หรือพิมพ์ระบุ:
+                            </label>
+                            <textarea id="lab-textarea" 
+                                      name="lab_text" 
+                                      rows="12" 
+                                      class="form-control bg-dark text-white border-secondary font-mono text-sm" 
+                                      placeholder="เช่น Fasting Blood Sugar: 120 mg/dL&#10;HbA1c: 6.5 %&#10;hs-CRP: 3.2 mg/L&#10;Cholesterol: 230 mg/dL..." 
+                                      required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="submit" class="btn btn-primary btn-block shadow" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: none;">
+                                <i class="fas fa-search mr-1"></i>วิเคราะห์และสกัดค่า Biomarkers
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Extracted Results & Biological Axes Impact -->
+        <div class="col-lg-7 mb-4">
+            {% if parse_result %}
+            <div class="card shadow" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; overflow: hidden;">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+                    <h5 class="card-title text-white font-weight-bold mb-0" style="font-size: 1rem;">
+                        <i class="fas fa-clipboard-check text-success mr-2"></i>ผลลัพธ์การสกัดค่าแล็บและแกนเป้าหมาย
+                    </h5>
+                    <div>
+                        <span class="badge badge-info px-2 py-1 mr-1">พบ {{ parse_result.total_biomarkers_found }} รายการ</span>
+                        {% if parse_result.abnormal_count > 0 %}
+                            <span class="badge badge-danger px-2 py-1">{{ parse_result.abnormal_count }} ค่าผิดปกติ</span>
+                        {% else %}
+                            <span class="badge badge-success px-2 py-1">ค่าปกติทุกรายการ</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover mb-0" style="color: #cbd5e1;">
+                        <thead style="background: #090d16; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase;">
+                            <tr>
+                                <th>Biomarker</th>
+                                <th class="text-center">ค่าที่ตรวจพบ</th>
+                                <th class="text-center">เกณฑ์ปกติ</th>
+                                <th class="text-center">สถานะ</th>
+                                <th>แกนชีวภาพเป้าหมาย</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, item in parse_result.extracted_biomarkers.items %}
+                            <tr>
+                                <td class="font-weight-bold text-light text-sm">{{ item.name }}</td>
+                                <td class="text-center font-mono font-weight-bold text-cyan" style="font-size: 1rem;">
+                                    {{ item.value }} <small class="text-muted">{{ item.unit }}</small>
+                                </td>
+                                <td class="text-center font-mono text-muted text-xs">
+                                    &le; {{ item.normal_max }} {{ item.unit }}
+                                </td>
+                                <td class="text-center">
+                                    {% if item.is_abnormal %}
+                                        <span class="badge badge-danger px-2 py-1">
+                                            <i class="fas fa-arrow-up mr-1"></i>เกินเกณฑ์
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-success px-2 py-1">
+                                            <i class="fas fa-check mr-1"></i>ปกติ
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge badge-dark text-cyan font-mono px-2 py-1" style="border: 1px solid #0891b2;">
+                                        Axis {{ item.target_axis }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    ไม่พบค่า Biomarkers ที่ตรงกับคำนิยามในระบบ
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Submit as Artifact Footer -->
+                {% if patient %}
+                <div class="card-footer p-3 d-flex justify-content-between align-items-center" style="background: #131d35; border-top: 1px solid #1e293b;">
+                    <div class="text-xs text-muted">
+                        <i class="fas fa-shield-alt text-success mr-1"></i>Pillar 15: ผลลัพธ์จะถูกส่งเข้าคิวตรวจทาน (Artifact Review Gate) ก่อนนำเข้าเวชระเบียนจริง
+                    </div>
+                    <form method="post" action="{% url 'intelligence:lab_ocr' %}?patient_id={{ patient.pk }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="patient_id" value="{{ patient.pk }}">
+                        <input type="hidden" name="lab_text" value="{{ request.POST.lab_text }}">
+                        <input type="hidden" name="save_as_artifact" value="1">
+                        <button type="submit" class="btn btn-success shadow">
+                            <i class="fas fa-paper-plane mr-1"></i>สร้างเป็น Artifact เพื่อรอแพทย์ตรวจทาน
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="card-footer p-3 text-center" style="background: #131d35; border-top: 1px solid #1e293b;">
+                    <span class="text-muted text-xs mr-2">หากต้องการบันทึกเป็น Artifact โปรดเลือกคนไข้ก่อน</span>
+                    <a href="{% url 'patients:patient_list' %}" class="btn btn-xs btn-outline-primary">
+                        เลือกคนไข้จากเวชระเบียน
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="card shadow p-5 text-center" style="background: #0f172a; border: 1px dashed #334155; border-radius: 14px;">
+                <i class="fas fa-microscope fa-3x text-muted mb-3 d-block"></i>
+                <h5 class="text-white font-weight-normal mb-2">ยังไม่มีข้อมูลผลแล็บที่ถูกสกัด</h5>
+                <p class="text-muted text-sm mb-3">วางข้อความผลตรวจแล็บทางด้านซ้าย หรือคลิกปุ่ม "ใช้ตัวอย่างแล็บ" เพื่อทดสอบระบบสกัดค่า Biomarkers</p>
+                <div>
+                    <button class="btn btn-sm btn-outline-info" onclick="loadSampleText()">
+                        <i class="fas fa-magic mr-1"></i>โหลดตัวอย่างผลตรวจแล็บ
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function loadSampleText() {
+    const sample = `CBC and Chemistry Profile:
+Fasting Blood Sugar: 128 mg/dL
+HbA1c: 6.8 %
+hs-CRP: 3.4 mg/L
+Total Cholesterol: 245 mg/dL
+Triglycerides: 210 mg/dL
+LDL: 155 mg/dL
+SGPT (ALT): 48 U/L
+Creatinine: 1.1 mg/dL
+Uric Acid: 7.8 mg/dL`;
+    document.getElementById('lab-textarea').value = sample;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,294 @@
+{% extends 'layouts/doctor_base.html' %}
+{% load static %}
+
+{% block title %}ผู้ช่วยแพทย์ AI Physician Assistant | Dr. Patt EMR{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 pb-2" style="border-bottom: 1px solid #1e293b;">
+        <div>
+            <h2 class="font-weight-bold text-white mb-1" style="font-size: 1.5rem;">
+                <i class="fas fa-brain text-purple mr-2" style="color: #c084fc;"></i>ผู้ช่วยแพทย์ AI Physician Copilot (SSE Streaming)
+            </h2>
+            <p class="text-muted mb-0 font-sm">
+                ระบบให้คำปรึกษาทางคลินิกเชิงกลไก เชื่อมโยงบริบทเวชระเบียน และ 39 แกนชีววิทยาแบบ Real-time
+            </p>
+        </div>
+        <div class="mt-2 mt-md-0">
+            <span class="badge badge-clinical font-mono p-2">
+                <i class="fas fa-shield-alt mr-1"></i>Pillar 15: Grounded Safety Boundaries
+            </span>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column: Patient Context & Quick Tools -->
+        <div class="col-lg-4 mb-3">
+            <!-- Patient Context Card -->
+            <div class="card shadow-sm mb-3" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
+                <div class="card-header py-2" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+                    <h6 class="card-title text-white font-weight-bold mb-0 text-sm">
+                        <i class="fas fa-user-injured text-cyan mr-2"></i>บริบทคนไข้ปัจจุบัน (Patient Context)
+                    </h6>
+                </div>
+                <div class="card-body p-3">
+                    {% if patient %}
+                        <div class="d-flex align-items-center mb-2">
+                            <div style="width: 42px; height: 42px; border-radius: 50%; background: #0284c7; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;" class="mr-2">
+                                {{ patient.first_name|slice:":1" }}
+                            </div>
+                            <div>
+                                <h6 class="text-white font-weight-bold mb-0">{{ patient.full_name }}</h6>
+                                <span class="badge badge-dark text-cyan font-mono text-xs">HN: {{ patient.hn }}</span>
+                                <small class="text-muted">อายุ: {{ patient.age|default:"-" }} ปี</small>
+                            </div>
+                        </div>
+
+                        {% if patient.allergies %}
+                        <div class="p-2 rounded mb-2" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4);">
+                            <small class="text-danger font-weight-bold d-block">⚠️ ประวัติแพ้ยา:</small>
+                            <span class="text-light text-xs">{{ patient.allergies }}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="pt-2 text-xs text-muted" style="border-top: 1px solid #1e293b;">
+                            <span class="d-block mb-1">
+                                <strong>อาการสำคัญ:</strong> {{ patient.chief_complaint|default:"-"|truncatewords:10 }}
+                            </span>
+                            <span class="d-block">
+                                <strong>โรคประจำตัว:</strong> {{ patient.medical_history|default:"-"|truncatewords:10 }}
+                            </span>
+                        </div>
+
+                        <div class="mt-3">
+                            <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-xs btn-outline-info btn-block">
+                                <i class="fas fa-folder-open mr-1"></i>เปิดแฟ้มเวชระเบียน EMR
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3 text-muted">
+                            <i class="fas fa-user-slash mb-2 d-block"></i>
+                            <span class="text-xs">ไม่ได้เลือกคนไข้ (โหมดปรึกษาเคสทั่วไป)</span>
+                            <div class="mt-2">
+                                <a href="{% url 'patients:patient_list' %}" class="btn btn-xs btn-outline-secondary">
+                                    <i class="fas fa-users mr-1"></i>เลือกคนไข้จากเวชระเบียน
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Suggested Quick Prompts -->
+            <div class="card shadow-sm" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;">
+                <div class="card-header py-2" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+                    <h6 class="card-title text-white font-weight-bold mb-0 text-sm">
+                        <i class="fas fa-lightbulb text-warning mr-2"></i>คำถามที่พบบ่อย (Quick Prompts)
+                    </h6>
+                </div>
+                <div class="card-body p-2">
+                    <button class="btn btn-sm btn-dark btn-block text-left mb-2 prompt-btn" style="border: 1px solid #1e293b; font-size: 0.8rem;" onclick="setPrompt('ช่วยวิเคราะห์แกนชีวภาพที่มีความผิดปกติหลักของผู้ป่วยรายนี้ และกลไกที่เชื่อมโยงกัน')">
+                        <i class="fas fa-arrow-circle-right text-cyan mr-1"></i>วิเคราะห์แกนชีวภาพที่มีปัญหา
+                    </button>
+                    <button class="btn btn-sm btn-dark btn-block text-left mb-2 prompt-btn" style="border: 1px solid #1e293b; font-size: 0.8rem;" onclick="setPrompt('แนะนำโมดูลสารพฤกษเคมีบำบัด 200 โมดูลที่เหมาะสมกับผลตรวจของผู้ป่วย')">
+                        <i class="fas fa-arrow-circle-right text-success mr-1"></i>แนะนำโมดูลสารอาหารบำบัด
+                    </button>
+                    <button class="btn btn-sm btn-dark btn-block text-left prompt-btn" style="border: 1px solid #1e293b; font-size: 0.8rem;" onclick="setPrompt('ตรวจสอบข้อควรระวังทางการแพทย์ ประวัติการแพ้ยา และภาวะแทรกซ้อนที่ต้องเฝ้าระวัง')">
+                        <i class="fas fa-arrow-circle-right text-danger mr-1"></i>ตรวจข้อควรระวังและประวัติแพ้ยา
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Chat Window with Streaming SSE -->
+        <div class="col-lg-8">
+            <div class="card shadow" style="background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; overflow: hidden; height: 680px; display: flex; flex-direction: column;">
+                
+                <!-- Chat Header -->
+                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: #131d35; border-bottom: 1px solid #1e293b;">
+                    <div class="d-flex align-items-center">
+                        <span class="badge badge-purple p-2 mr-2" style="background: rgba(192, 132, 252, 0.2); color: #c084fc; border: 1px solid #c084fc;">
+                            <i class="fas fa-robot"></i>
+                        </span>
+                        <div>
+                            <strong class="text-white font-sm d-block">{{ session.title }}</strong>
+                            <small class="text-success"><i class="fas fa-circle text-xs mr-1"></i>AI Physician พร้อมใช้งาน (SSE Realtime)</small>
+                        </div>
+                    </div>
+                    <span class="badge badge-secondary font-mono text-xs">
+                        Session #{{ session.pk }}
+                    </span>
+                </div>
+
+                <!-- Chat Messages Body (Scrollable) -->
+                <div id="chat-messages-container" class="card-body p-3" style="overflow-y: auto; flex: 1; background: #090d16;">
+                    
+                    <!-- Welcome AI Greeting -->
+                    <div class="d-flex mb-3">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: #c084fc; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; flex-shrink: 0;" class="mr-2">
+                            AI
+                        </div>
+                        <div class="p-3 rounded text-sm text-light" style="background: #0f172a; border: 1px solid #1e293b; max-width: 85%;">
+                            สวัสดีครับ นพ./พญ. {{ request.user.first_name|default:request.user.username }} ผมคือผู้ช่วยแพทย์ AI Clinical Copilot พร้อมช่วยวิเคราะห์ข้อมูลเชิงกลไก 39 แกนชีวภาพ ตรวจทานผลแล็บ และแนะนำสารพฤกษเคมีบำบัดสำหรับเคสนี้ครับ
+                        </div>
+                    </div>
+
+                    <!-- Past Messages -->
+                    {% for msg in past_messages %}
+                    <div class="d-flex mb-3 {% if msg.role == 'user' %}justify-content-end{% endif %}">
+                        {% if msg.role != 'user' %}
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: #c084fc; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; flex-shrink: 0;" class="mr-2">
+                            AI
+                        </div>
+                        {% endif %}
+                        <div class="p-3 rounded text-sm {% if msg.role == 'user' %}text-white bg-primary{% else %}text-light{% endif %}" style="{% if msg.role != 'user' %}background: #0f172a; border: 1px solid #1e293b;{% endif %} max-width: 85%; white-space: pre-line;">
+                            {{ msg.content }}
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Live Streaming Message Container (Hidden initially) -->
+                    <div id="streaming-box" class="d-flex mb-3" style="display: none !important;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: #c084fc; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; flex-shrink: 0;" class="mr-2">
+                            AI
+                        </div>
+                        <div id="streaming-content" class="p-3 rounded text-sm text-light" style="background: #0f172a; border: 1px solid #38bdf8; max-width: 85%; white-space: pre-line; box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);">
+                            <span class="text-muted"><i class="fas fa-spinner fa-spin mr-1"></i>กำลังประมวลผลข้อมูลทางคลินิก...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input Footer -->
+                <div class="card-footer p-3" style="background: #131d35; border-top: 1px solid #1e293b;">
+                    <form id="ai-chat-form" onsubmit="handleSendQuery(event)">
+                        <div class="input-group">
+                            <input type="text" 
+                                   id="query-input" 
+                                   class="form-control bg-dark text-white border-secondary" 
+                                   placeholder="พิมพ์คำถามทางการแพทย์ หรือประเด็นที่ต้องการให้ AI วิเคราะห์..." 
+                                   autocomplete="off" 
+                                   required>
+                            <div class="input-group-append">
+                                <button type="submit" id="send-btn" class="btn btn-primary px-4 shadow" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: none;">
+                                    <i class="fas fa-paper-plane mr-1"></i>ส่งคำถาม
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setPrompt(text) {
+    document.getElementById('query-input').value = text;
+    document.getElementById('query-input').focus();
+}
+
+function handleSendQuery(e) {
+    e.preventDefault();
+    const input = document.getElementById('query-input');
+    const query = input.value.trim();
+    if (!query) return;
+
+    const container = document.getElementById('chat-messages-container');
+    const sendBtn = document.getElementById('send-btn');
+    const sessionId = "{{ session.pk }}";
+
+    // 1. เพิ่มข้อความของคุณหมอลงหน้าต่างแชตทันที
+    const userMsgHtml = `
+        <div class="d-flex mb-3 justify-content-end">
+            <div class="p-3 rounded text-sm text-white bg-primary shadow-sm" style="max-width: 85%; white-space: pre-line;">
+                ${escapeHtml(query)}
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', userMsgHtml);
+    input.value = '';
+    input.disabled = true;
+    sendBtn.disabled = true;
+
+    // 2. แสดงกล่องสตรีมมิ่ง
+    const streamingBox = document.getElementById('streaming-box');
+    const streamingContent = document.getElementById('streaming-content');
+    streamingBox.style.setProperty('display', 'flex', 'important');
+    streamingContent.innerHTML = '<span class="text-cyan"><i class="fas fa-spinner fa-spin mr-1"></i>AI กำลังวิเคราะห์ข้อมูลระดับเซลล์...</span>';
+    container.scrollTop = container.scrollHeight;
+
+    // 3. เริ่มต้น Server-Sent Events (SSE)
+    const streamUrl = "{% url 'intelligence:ai_stream' %}?session_id=" + sessionId + "&q=" + encodeURIComponent(query);
+    const eventSource = new EventSource(streamUrl);
+    let fullResponse = '';
+
+    eventSource.onmessage = function (event) {
+        try {
+            const data = JSON.parse(event.data);
+            if (data.chunk) {
+                if (fullResponse === '') {
+                    streamingContent.innerHTML = '';
+                }
+                fullResponse += data.chunk;
+                streamingContent.innerHTML = formatMarkdown(fullResponse);
+                container.scrollTop = container.scrollHeight;
+            }
+            if (data.done) {
+                eventSource.close();
+                finalizeStreaming(fullResponse);
+            }
+        } catch (err) {
+            console.error("SSE parse error:", err);
+        }
+    };
+
+    eventSource.onerror = function (err) {
+        console.error("SSE connection error:", err);
+        eventSource.close();
+        if (fullResponse === '') {
+            streamingContent.innerHTML = '<span class="text-danger">เกิดข้อผิดพลาดในการเชื่อมต่อสตรีมมิ่ง กรุณาลองใหม่อีกครั้ง</span>';
+        }
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+    };
+
+    function finalizeStreaming(text) {
+        // ซ่อนกล่องสตรีมมิ่งแล้วแปลงเป็นการ์ดข้อความถาวร
+        streamingBox.style.setProperty('display', 'none', 'important');
+        const aiMsgHtml = `
+            <div class="d-flex mb-3">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #c084fc; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; flex-shrink: 0;" class="mr-2">
+                    AI
+                </div>
+                <div class="p-3 rounded text-sm text-light shadow-sm" style="background: #0f172a; border: 1px solid #1e293b; max-width: 85%;">
+                    ${formatMarkdown(text)}
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', aiMsgHtml);
+        container.scrollTop = container.scrollHeight;
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.innerText = text;
+    return div.innerHTML;
+}
+
+function formatMarkdown(text) {
+    return text
+        .replace(/### (.*?)\n/g, '<h5 class="text-cyan font-weight-bold mb-1 mt-2">$1</h5>')
+        .replace(/#### (.*?)\n/g, '<h6 class="text-light font-weight-bold mb-1 mt-2">$1</h6>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/> ⚠️ (.*?)\n/g, '<div class="p-2 rounded my-2 text-warning" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.8rem;">⚠️ $1</div>')
+        .replace(/\n/g, '<br>');
+}
+</script>
+{% endblock %}

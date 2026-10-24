@@ -193,25 +193,19 @@
                     <!-- หมวดที่ 3: ปัญญาประดิษฐ์ทางการแพทย์ -->
                     <li class="nav-header">ปัญญาประดิษฐ์การแพทย์</li>
                     <li class="nav-item">
-                        <a href="/doctor/ai-physician/" class="nav-link">
+                        <a href="{% url 'intelligence:ai_physician' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_physician' %}active{% endif %}">
                             <i class="nav-icon fas fa-brain"></i>
                             <p>ผู้ช่วยแพทย์ AI Physician</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/doctor/lab-ocr/" class="nav-link">
+                        <a href="{% url 'intelligence:lab_ocr' %}" class="nav-link {% if request.resolver_match.url_name == 'lab_ocr' %}active{% endif %}">
                             <i class="nav-icon fas fa-file-medical-alt"></i>
                             <p>สแกนแล็บ (Lab OCR)</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/doctor/voice-form/" class="nav-link">
-                            <i class="nav-icon fas fa-microphone-alt"></i>
-                            <p>ถอดเสียงตรวจ (Voice SOAP)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/doctor/artifact-review/" class="nav-link">
+                        <a href="{% url 'intelligence:artifact_review' %}" class="nav-link {% if request.resolver_match.url_name == 'artifact_review' %}active{% endif %}">
                             <i class="nav-icon fas fa-tasks"></i>
                             <p>ตรวจทานผล AI (Artifact Review)</p>
                         </a>

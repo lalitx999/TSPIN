@@ -23,6 +23,9 @@ urlpatterns = [
     # 39-Axis Clinical Engine & Reports
     path('clinical/', include('clinical.urls')),
 
+    # AI Physician & Streaming Copilot
+    path('ai/', include('intelligence.urls')),
+
     # Patient Portal & Self-service
     path('patient/', include('portal_patient.urls')),
 ]

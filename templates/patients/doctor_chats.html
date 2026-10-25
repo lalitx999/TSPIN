@@ -1,44 +1,99 @@
 {% extends 'layouts/doctor_base.html' %}
 
-{% block title %}แชทสื่อสารคนไข้ LINE OA (Clinical Chats) - TSPI CLINIC{% endblock %}
+{% block title %}แชทสื่อสารคนไข้ LINE OA & Flex Message Simulator - TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto space-y-6">
+<div class="max-w-7xl mx-auto space-y-6" x-data="{
+    activePatient: {
+        id: '{{ patients.0.pk|default:1 }}',
+        name: '{{ patients.0.full_name|default:\"แทนชล วรรณวงศ์\" }}',
+        hn: '{{ patients.0.hn|default:\"26-00001\" }}',
+        phone: '{{ patients.0.phone|default:\"0624980094\" }}'
+    },
+    messageInput: '',
+    messages: [
+        { sender: 'patient', text: 'สวัสดีครับคุณหมอ วันนี้ผลตรวจแล็บออกแล้วหรือยังครับ พอดีช่วงนี้ทาน KERRA แล้วอาการผื่นคันแห้งลงเยอะมากครับ', time: '10:32 น.', type: 'text' },
+        { sender: 'doctor', text: 'สวัสดีครับ ผลตรวจ hsCRP ลดลงจาก 8.4 เหลือ 1.1 แล้วครับ เป็นทิศทางที่ดีมาก ให้ทานสูตรเดิมต่อเนื่องจนครบคอร์ส Phase 1 นะครับ', time: '10:45 น.', type: 'text' }
+    ],
+    sendMessage() {
+        if (!this.messageInput.trim()) return;
+        this.messages.push({
+            sender: 'doctor',
+            text: this.messageInput,
+            time: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.',
+            type: 'text'
+        });
+        this.messageInput = '';
+        this.$nextTick(() => {
+            const chatBox = document.getElementById('chat-stream');
+            if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    },
+    sendFlexCard() {
+        this.messages.push({
+            sender: 'doctor',
+            text: 'ส่งบัตรประเมินสุขภาพ Flex Card',
+            time: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.',
+            type: 'flex',
+            flexData: {
+                title: 'รายงานประเมิน 39 แกนชีววิทยา (12 โดเมน)',
+                patientName: this.activePatient.name,
+                hn: this.activePatient.hn,
+                phase: 'Phase 1: Assess & Cleanse',
+                status: 'อาการฟื้นตัวในระดับดีเยี่ยม (Optimal)',
+                actionUrl: '/portal/axes-result/'
+            }
+        });
+        this.$nextTick(() => {
+            const chatBox = document.getElementById('chat-stream');
+            if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    }
+}">
 
+    <!-- Header -->
     <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
                     <i class="fab fa-line mr-1"></i> LINE Official Account Bridge
                 </span>
-                <span class="text-xs text-gray-400">ระบบแชทสื่อสารทางคลินิกแบบปลอดภัย</span>
+                <span class="text-xs text-gray-400">ระบบสื่อสารสองทาง &amp; Interactive Flex Simulator</span>
             </div>
             <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
-                ห้องแชทสื่อสารระหว่างแพทย์กับคนไข้ (Clinical Chats)
+                ห้องแชทสื่อสารระหว่างแพทย์กับคนไข้ (Clinical Chats &amp; LINE Simulator)
             </h1>
             <p class="text-sm text-gray-500 mt-0.5">
-                ตอบคำถามคนไข้ผ่าน LINE OA ส่งผลการประเมินสุขภาพ และแจ้งเตือนเวลานัดหมายแบบสองทาง (Two-Way Messaging)
+                ตอบคำถามคนไข้ผ่าน LINE OA ส่งผลการประเมิน 39 แกนชีววิทยา และแจ้งเตือนเวลานัดหมายแบบสองทาง
             </p>
+        </div>
+        <div class="flex items-center gap-2">
+            <button type="button" @click="sendFlexCard()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-kanit font-medium transition-all shadow-xs">
+                <i class="fab fa-line text-sm"></i> ส่ง LINE Flex Card (39 แกน)
+            </button>
         </div>
     </div>
 
     <!-- Chat Console Layout (2 cols) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[500px]">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[540px]">
 
-        <!-- Left: Patient Conversations List (4 cols) -->
+        <!-- Left: Real Patient Conversations List (4 cols) -->
         <div class="lg:col-span-4 bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
-            <div class="p-4 border-b border-gray-100">
-                <input type="text" placeholder="ค้นหาคนไข้..." class="w-full text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800">
+            <div class="p-4 border-b border-gray-100 bg-secondary/30 flex items-center justify-between">
+                <span class="text-xs font-semibold text-gray-700 font-kanit">คนไข้จริงจากฐานข้อมูลคลินิก</span>
+                <span class="text-[11px] font-mono text-primary font-bold">{{ patients|length }} เคส</span>
             </div>
-            <div class="divide-y divide-gray-100 overflow-y-auto flex-1">
+            <div class="divide-y divide-gray-100 overflow-y-auto flex-1 max-h-[500px]">
                 {% for p in patients %}
-                    <div class="p-3.5 hover:bg-gray-50 cursor-pointer transition-colors {% if forloop.first %}bg-primary/5 border-l-4 border-primary{% endif %}">
+                    <div @click="activePatient = { id: '{{ p.pk }}', name: '{{ p.full_name }}', hn: '{{ p.hn }}', phone: '{{ p.phone|default:\"-\" }}' }"
+                         class="p-3.5 hover:bg-gray-50 cursor-pointer transition-colors"
+                         :class="activePatient.id === '{{ p.pk }}' ? 'bg-primary/5 border-l-4 border-primary' : ''">
                         <div class="flex items-start justify-between">
-                            <span class="font-semibold text-xs text-gray-900">{{ p.full_name }}</span>
-                            <span class="text-[10px] text-gray-400">10:45</span>
+                            <span class="font-semibold text-xs text-gray-900 font-kanit">{{ p.full_name }}</span>
+                            <span class="text-[10px] text-gray-400 font-mono">HN: {{ p.hn }}</span>
                         </div>
-                        <p class="text-[11px] text-gray-500 truncate mt-1">
-                            "สอบถามคุณหมอครับ ตอนนี้อาการผื่นคันลดลงแล้ว ทานยาชุดเดิมต่อได้ไหมครับ"
+                        <p class="text-[11px] text-gray-500 truncate mt-1 font-kanit">
+                            {% if p.medical_history %}{{ p.medical_history|truncatechars:40 }}{% else %}ติดตามอาการและประเมินผล 39 แกนต่อเนื่อง{% endif %}
                         </p>
                     </div>
                 {% empty %}
@@ -49,50 +104,94 @@
             </div>
         </div>
 
-        <!-- Right: Chat Messages Window (8 cols) -->
+        <!-- Right: Chat Messages Window & Flex Simulator (8 cols) -->
         <div class="lg:col-span-8 bg-white border border-gray-200 rounded-2xl shadow-xs flex flex-col overflow-hidden">
             <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm">
-                        น
+                    <div class="w-9 h-9 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm font-kanit" x-text="activePatient.name.charAt(0)">
                     </div>
                     <div>
-                        <h4 class="text-sm font-semibold text-gray-900">คุณนิคม (HN: 26-00001)</h4>
-                        <span class="text-[10px] text-green-600 font-medium"><i class="fas fa-circle text-[8px] mr-1"></i> เชื่อมต่อผ่าน LINE OA</span>
+                        <h4 class="text-sm font-semibold text-gray-900 font-kanit">
+                            <span x-text="activePatient.name"></span>
+                            <span class="text-gray-400 font-mono text-xs">(HN: <span x-text="activePatient.hn"></span>)</span>
+                        </h4>
+                        <span class="text-[10px] text-emerald-600 font-medium font-kanit flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> เชื่อมต่อผ่าน LINE OA สำเร็จ
+                        </span>
                     </div>
                 </div>
-                <a href="{% url 'patients:doctor_pre_visit' %}" class="px-3 py-1 bg-white border border-gray-200 text-xs text-gray-700 font-medium rounded-lg hover:bg-gray-50">
-                    ดูสรุปก่อนตรวจ (Pre-visit)
-                </a>
+                <div class="flex items-center gap-2">
+                    <a :href="'/doctor/pre-visit/?patient_id=' + activePatient.id" class="px-3 py-1 bg-white border border-gray-200 text-xs text-gray-700 font-medium rounded-lg hover:bg-gray-50 font-kanit">
+                        ดูสรุปก่อนตรวจ (Pre-visit)
+                    </a>
+                </div>
             </div>
 
             <!-- Messages Stream -->
-            <div class="flex-1 p-5 space-y-4 overflow-y-auto bg-gray-50/30 text-xs">
-                <!-- Patient message -->
-                <div class="flex items-start gap-2.5 max-w-md">
-                    <div class="w-7 h-7 rounded-full bg-green-500 text-white flex items-center justify-center text-[10px] font-bold">LINE</div>
-                    <div class="bg-white border border-gray-200 p-3 rounded-2xl rounded-tl-none shadow-xs text-gray-800 space-y-1">
-                        <p>สวัสดีครับคุณหมอ วันนี้ผลตรวจแล็บออกแล้วหรือยังครับ พอดีช่วงนี้ทาน KERRA แล้วอาการผื่นคันแห้งลงเยอะมากครับ</p>
-                        <span class="text-[9px] text-gray-400 block text-right">10:32 น.</span>
-                    </div>
-                </div>
+            <div id="chat-stream" class="flex-1 p-5 space-y-4 overflow-y-auto bg-gray-50/30 text-xs min-h-[360px]">
+                <template x-for="(msg, idx) in messages" :key="idx">
+                    <div>
+                        <!-- Normal Text Message -->
+                        <template x-if="msg.type === 'text'">
+                            <div :class="msg.sender === 'doctor' ? 'flex items-start justify-end gap-2.5 ml-auto max-w-md' : 'flex items-start gap-2.5 max-w-md'">
+                                <template x-if="msg.sender === 'patient'">
+                                    <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0">LINE</div>
+                                </template>
+                                <div :class="msg.sender === 'doctor' ? 'bg-primary text-white p-3 rounded-2xl rounded-tr-none shadow-xs space-y-1 font-kanit' : 'bg-white border border-gray-200 p-3 rounded-2xl rounded-tl-none shadow-xs text-gray-800 space-y-1 font-kanit'">
+                                    <p x-text="msg.text" class="leading-relaxed"></p>
+                                    <span :class="msg.sender === 'doctor' ? 'text-[9px] text-white/70 block text-right font-mono' : 'text-[9px] text-gray-400 block text-right font-mono'" x-text="msg.time"></span>
+                                </div>
+                            </div>
+                        </template>
 
-                <!-- Doctor message -->
-                <div class="flex items-start justify-end gap-2.5 ml-auto max-w-md">
-                    <div class="bg-primary text-white p-3 rounded-2xl rounded-tr-none shadow-xs space-y-1">
-                        <p>สวัสดีครับคุณนิคม ผลตรวจ hsCRP ลดลงจาก 8.4 เหลือ 1.1 แล้วครับ เป็นทิศทางที่ดีมาก ให้ทานสูตรเดิมต่อเนื่องจนครบคอร์ส Phase 1 นะครับ</p>
-                        <span class="text-[9px] text-white/70 block text-right">10:45 น.</span>
+                        <!-- LINE Flex Message Simulation Bubble -->
+                        <template x-if="msg.type === 'flex'">
+                            <div class="flex items-start justify-end gap-2.5 ml-auto max-w-sm">
+                                <div class="bg-white border-2 border-emerald-500 rounded-2xl overflow-hidden shadow-md font-kanit w-full">
+                                    <div class="bg-emerald-600 px-4 py-3 text-white flex items-center justify-between">
+                                        <div class="flex items-center gap-1.5">
+                                            <i class="fab fa-line text-lg"></i>
+                                            <span class="font-bold text-xs" x-text="msg.flexData.title"></span>
+                                        </div>
+                                        <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-mono">FLEX CARD</span>
+                                    </div>
+                                    <div class="p-4 space-y-2.5 bg-white text-xs">
+                                        <div class="flex justify-between border-b border-gray-100 pb-2">
+                                            <span class="text-gray-500">คนไข้:</span>
+                                            <strong class="text-gray-900" x-text="msg.flexData.patientName"></strong>
+                                        </div>
+                                        <div class="flex justify-between border-b border-gray-100 pb-2">
+                                            <span class="text-gray-500">หมายเลข HN:</span>
+                                            <span class="font-mono text-gray-800 font-bold" x-text="msg.flexData.hn"></span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-gray-100 pb-2">
+                                            <span class="text-gray-500">ระยะการฟื้นฟู:</span>
+                                            <span class="text-primary font-bold" x-text="msg.flexData.phase"></span>
+                                        </div>
+                                        <div class="p-2 bg-emerald-50 rounded-xl border border-emerald-100 text-[11px] text-emerald-800">
+                                            <i class="fas fa-check-circle mr-1"></i> <span x-text="msg.flexData.status"></span>
+                                        </div>
+                                        <div class="pt-2">
+                                            <a :href="msg.flexData.actionUrl" class="block w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-center font-medium rounded-xl text-xs transition-colors">
+                                                เปิดดูผลตรวจ 39 แกนฉบับเต็ม &rarr;
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="px-3 py-1.5 bg-gray-50 text-[10px] text-gray-400 text-right font-mono" x-text="msg.time"></div>
+                                </div>
+                            </div>
+                        </template>
                     </div>
-                </div>
+                </template>
             </div>
 
             <!-- Message Input Form -->
-            <div class="p-3 border-t border-gray-100 bg-white flex items-center gap-2">
-                <input type="text" placeholder="พิมพ์ข้อความตอบกลับคนไข้ผ่าน LINE OA..." class="flex-1 text-sm bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-gray-800 focus:ring-primary focus:border-primary">
-                <button type="button" class="px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark transition-all shadow-xs">
-                    <i class="fas fa-paper-plane mr-1"></i> ส่งข้อความ
+            <form @submit.prevent="sendMessage()" class="p-3 border-t border-gray-100 bg-white flex items-center gap-2">
+                <input type="text" x-model="messageInput" placeholder="พิมพ์ข้อความตอบกลับคนไข้ผ่าน LINE OA..." class="flex-1 text-sm bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-gray-800 focus:ring-primary focus:border-primary font-kanit">
+                <button type="submit" class="px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark transition-all shadow-xs font-kanit flex items-center gap-1.5">
+                    <i class="fas fa-paper-plane"></i> ส่ง
                 </button>
-            </div>
+            </form>
         </div>
 
     </div>

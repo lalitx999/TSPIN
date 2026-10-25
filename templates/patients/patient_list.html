@@ -106,6 +106,38 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination Controls -->
+        {% if page_obj and page_obj.paginator.num_pages > 1 %}
+        <div class="px-5 py-3.5 bg-secondary/30 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3 font-kanit text-xs text-gray-600">
+            <div>
+                แสดง <span class="font-mono font-bold text-gray-900">{{ page_obj.start_index }} - {{ page_obj.end_index }}</span> จากทั้งหมด <span class="font-mono font-bold text-primary">{{ page_obj.paginator.count }}</span> คนไข้จริง
+            </div>
+            <div class="flex items-center gap-1.5">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-secondary text-gray-700 transition-colors">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-secondary text-gray-700 transition-colors">
+                        &larr; ก่อนหน้า
+                    </a>
+                {% endif %}
+
+                <span class="px-3 py-1.5 rounded-lg bg-primary text-white font-mono font-bold">
+                    หน้า {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-secondary text-gray-700 transition-colors">
+                        ถัดไป &rarr;
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-secondary text-gray-700 transition-colors">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

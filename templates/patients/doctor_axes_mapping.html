@@ -1,29 +1,37 @@
 {% extends 'layouts/doctor_base.html' %}
 
-{% block title %}แมปค่าแล็บและอาการสู่ 38 แกนชีววิทยา (Axes Mapping) - TSPI CLINIC{% endblock %}
+{% block title %}แมปค่าแล็บและอาการสู่ 39 แกนชีววิทยา (Axes Mapping) - TSPI CLINIC{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto space-y-6" x-data="{
     search: '',
     selectedCategory: 'all',
     mappings: [
-        { biomarker: 'hsCRP', domain: 'Immune-Infection', axis: 'A01: Systemic Inflammatory Load', threshold: '> 3.0 mg/L', weight: 'High' },
-        { biomarker: 'IL-6', domain: 'Immune-Infection', axis: 'A01: Systemic Inflammatory Load', threshold: '> 5.0 pg/mL', weight: 'High' },
-        { biomarker: 'Fasting Insulin', domain: 'Metabolic-Energy', axis: 'A05: Glucose-Insulin Regulation', threshold: '> 10.0 uIU/mL', weight: 'High' },
-        { biomarker: 'HOMA-IR', domain: 'Metabolic-Energy', axis: 'A05: Glucose-Insulin Regulation', threshold: '> 2.0', weight: 'Critical' },
-        { biomarker: 'HbA1c', domain: 'Metabolic-Energy', axis: 'A05: Glucose-Insulin Regulation', threshold: '> 5.7 %', weight: 'Moderate' },
-        { biomarker: 'Triglyceride/HDL Ratio', domain: 'Metabolic-Energy', axis: 'A06: Lipid-Lipotoxicity', threshold: '> 2.5', weight: 'Moderate' },
-        { biomarker: 'Zonulin', domain: 'Gastrointestinal', axis: 'A19: Gut Barrier Integrity', threshold: '> 38 ng/mL', weight: 'Critical' },
-        { biomarker: 'Calprotectin', domain: 'Gastrointestinal', axis: 'A19: Gut Barrier Integrity', threshold: '> 50 ug/g', weight: 'High' },
-        { biomarker: '8-OHdG', domain: 'Cellular-Redox', axis: 'A09: Oxidative Stress', threshold: '> 5.0 ng/mg', weight: 'High' },
-        { biomarker: 'Cortisol (Morning)', domain: 'Neuroendocrine', axis: 'A04: HPA Axis Dysfunction', threshold: 'Out of 10-20 ug/dL', weight: 'Moderate' },
-        { biomarker: 'eGFR', domain: 'Renal-Fluid', axis: 'A20: Renal-Endothelial Axis', threshold: '< 90 mL/min', weight: 'High' },
-        { biomarker: 'ALT / AST', domain: 'Hepatic-Detox', axis: 'A16: Hepatic Detoxification', threshold: '> 35 U/L', weight: 'High' }
+        { biomarker: 'hsCRP', domain: 'Immune–Infection Governance', axis: 'Axis 1: Systemic Inflammatory Load', threshold: '> 3.0 mg/L', weight: 'High' },
+        { biomarker: 'IL-6', domain: 'Immune–Infection Governance', axis: 'Axis 1: Systemic Inflammatory Load', threshold: '> 5.0 pg/mL', weight: 'High' },
+        { biomarker: 'Fasting Insulin', domain: 'Metabolic–Energy Core', axis: 'Axis 5: Glucose–Insulin Regulation', threshold: '> 10.0 uIU/mL', weight: 'High' },
+        { biomarker: 'HOMA-IR', domain: 'Metabolic–Energy Core', axis: 'Axis 5: Glucose–Insulin Regulation', threshold: '> 2.0', weight: 'Critical' },
+        { biomarker: 'HbA1c', domain: 'Metabolic–Energy Core', axis: 'Axis 5: Glucose–Insulin Regulation', threshold: '> 5.7 %', weight: 'Moderate' },
+        { biomarker: 'TG / HDL Ratio', domain: 'Metabolic–Energy Core', axis: 'Axis 6: Lipid–Lipotoxicity', threshold: '> 2.5', weight: 'Moderate' },
+        { biomarker: '8-OHdG', domain: 'Genomic Programming', axis: 'Axis 11: DNA Repair & Genomic Stability', threshold: '> 5.0 ng/mg', weight: 'High' },
+        { biomarker: 'ALT / AST', domain: 'Detoxification & Cellular Clearance', axis: 'Axis 15: Detoxification & Cellular Defense', threshold: '> 35 U/L', weight: 'High' },
+        { biomarker: 'Zonulin', domain: 'Digestive–Gut Ecosystem', axis: 'Axis 16: Digestive–Absorptive & Mucosa', threshold: '> 38 ng/mL', weight: 'Critical' },
+        { biomarker: 'Calprotectin', domain: 'Digestive–Gut Ecosystem', axis: 'Axis 16: Digestive–Absorptive & Mucosa', threshold: '> 50 ug/g', weight: 'High' },
+        { biomarker: 'Endothelin-1', domain: 'Vascular–Circulation', axis: 'Axis 20: Endothelial Function', threshold: '> 2.0 pg/mL', weight: 'Moderate' },
+        { biomarker: 'TGF-beta 1', domain: 'Repair–Regeneration', axis: 'Axis 24: Wound Healing (Internal/External)', threshold: '> 35 ng/mL', weight: 'High' },
+        { biomarker: 'CK-MB / Troponin', domain: 'Musculoskeletal & Structural', axis: 'Axis 28: Muscle Protein Turnover', threshold: 'Elevated', weight: 'Critical' },
+        { biomarker: 'Estradiol / Progesterone', domain: 'Endocrine Network', axis: 'Axis 31: Female Hormone Network', threshold: 'Ratio Imbalance', weight: 'Moderate' },
+        { biomarker: 'Cortisol (Morning)', domain: 'Neurological Regulation', axis: 'Axis 34: Neuro–Sleep–Stress–Brain Clearance', threshold: 'Out of 10-20 ug/dL', weight: 'Moderate' },
+        { biomarker: 'eGFR / BUN / Creatinine', domain: 'Organ Axis', axis: 'Axis 35: Organ Resilience (Kidney/Liver)', threshold: 'eGFR < 90 mL/min', weight: 'High' },
+        { biomarker: 'CEA / CA-19-9 / AFP', domain: 'Oncology & System-Level', axis: 'Axis 37: Oncologic Cell Fate', threshold: 'Above Cut-off', weight: 'Critical' },
+        { biomarker: 'VEGF / MMP-9', domain: 'Oncology & System-Level', axis: 'Axis 38: Tumor Microenvironment & Metastatic Dynamics', threshold: 'Elevated', weight: 'Critical' },
+        { biomarker: 'Circulating Tumor DNA', domain: 'Oncology & System-Level', axis: 'Axis 39: Genomic Regulation Homeostasis', threshold: 'Positive Signal', weight: 'Critical' }
     ],
     filteredMappings() {
         return this.mappings.filter(item => {
             const matchesSearch = item.biomarker.toLowerCase().includes(this.search.toLowerCase()) ||
-                                  item.axis.toLowerCase().includes(this.search.toLowerCase());
+                                  item.axis.toLowerCase().includes(this.search.toLowerCase()) ||
+                                  item.domain.toLowerCase().includes(this.search.toLowerCase());
             return matchesSearch;
         });
     }
@@ -35,13 +43,13 @@
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                     <i class="fas fa-sitemap mr-1"></i> Diagnostic Ontology
                 </span>
-                <span class="text-xs text-gray-400">ระบบแมปตัวชี้วัดสู่กลไกชีววิทยาเชิงระบบ</span>
+                <span class="text-xs text-gray-400">ระบบแมปตัวชี้วัดสู่กลไก 39 แกน 12 โดเมน</span>
             </div>
             <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
-                การแมปตัวชี้วัดแล็บและอาการ (Biomarker to Axes Mapping)
+                การแมปตัวชี้วัดแล็บและอาการ (Biomarker to 39 Axes Mapping)
             </h1>
             <p class="text-sm text-gray-500 mt-0.5">
-                กำหนดเกณฑ์ความผิดปกติและค่าน้ำหนักผลกระทบของค่าชีวเคมีต่อทั้ง 38 แกนชีววิทยา
+                กำหนดเกณฑ์ความผิดปกติและค่าน้ำหนักผลกระทบของค่าชีวเคมีต่อทั้ง 39 แกนชีววิทยา ใน 12 โดเมน
             </p>
         </div>
 

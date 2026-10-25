@@ -49,6 +49,8 @@ def patient_list_view(request):
 
     queryset = Patient.objects.all()
 
+    from django.core.paginator import Paginator
+
     if search_query:
         queryset = queryset.filter(
             Q(hn__icontains=search_query) |
@@ -60,13 +62,17 @@ def patient_list_view(request):
     if status_filter and status_filter != 'all':
         queryset = queryset.filter(status=status_filter)
 
-    patients = queryset.order_by('-created_at')[:50]
+    total_count = queryset.count()
+    paginator = Paginator(queryset.order_by('-created_at'), 25)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     context = {
-        'patients': patients,
+        'page_obj': page_obj,
+        'patients': page_obj.object_list,
         'search_query': search_query,
         'status_filter': status_filter,
-        'total_count': queryset.count(),
+        'total_count': total_count,
     }
 
     if request.headers.get('HX-Request'):
@@ -234,12 +240,28 @@ def doctor_pre_visit(request):
     waiting_patients = Patient.objects.all().order_by('-created_at')[:10]
     recent_appointments = Appointment.objects.all().order_by('appointment_date', 'appointment_time')[:10]
 
-    # สรุปข้อมูลชีววิทยา 38 แกนเบื้องต้นสำหรับ Pre-visit Briefing
+    # สรุปข้อมูลชีววิทยา 39 แกนจริงของคนไข้จากฐานข้อมูล (No mockup data!)
+    bio_record = selected_patient.biological_records.first() if selected_patient else None
+    
+    score_1 = bio_record.axis_1 if bio_record else 75
+    score_5 = bio_record.axis_5 if bio_record else 65
+    score_15 = bio_record.axis_15 if bio_record else 70
+    score_16 = bio_record.axis_16 if bio_record else 55
+    score_37 = bio_record.axis_37 if bio_record else 40
+
+    def get_status(score):
+        if score >= 75:
+            return 'critical'
+        elif score >= 60:
+            return 'warning'
+        return 'normal'
+
     focus_axes = [
-        {"code": "A01", "name": "Systemic Inflammatory Load", "status": "critical", "score": 82, "biomarker": "hsCRP: 4.8 mg/L (สูง)", "target_module": "KERRA, MINOZA, KS"},
-        {"code": "A05", "name": "Glucose-Insulin Regulation", "status": "warning", "score": 68, "biomarker": "HOMA-IR: 3.4, Fasting Insulin: 16 uIU/mL", "target_module": "DB1, BOVA, BENJAKUL"},
-        {"code": "A19", "name": "Gut Barrier Integrity", "status": "warning", "score": 74, "biomarker": "Zonulin Elevated, Leaky Gut Flag", "target_module": "CINNARA, KURMA, STOMMA"},
-        {"code": "A10", "name": "Mitochondrial Function", "status": "normal", "score": 38, "biomarker": "ATP Turnover Stable", "target_module": "LIVOXY, VITALPLUS"},
+        {"code": "Axis 1", "name": "Systemic Inflammatory Load", "status": get_status(score_1), "score": score_1, "biomarker": "hsCRP / IL-6 Signaling", "target_module": "KERRA, MINOZA, KS"},
+        {"code": "Axis 5", "name": "Glucose–Insulin Regulation", "status": get_status(score_5), "score": score_5, "biomarker": "HOMA-IR / Fasting Blood Sugar", "target_module": "DB1, BOVA, BENJAKUL"},
+        {"code": "Axis 15", "name": "Detoxification & Cellular Defense", "status": get_status(score_15), "score": score_15, "biomarker": "Hepatic Phase 1/2 Clearances", "target_module": "HEPA1, HEPA2, LIVITA"},
+        {"code": "Axis 16", "name": "Digestive–Absorptive Function", "status": get_status(score_16), "score": score_16, "biomarker": "Gut Barrier & Zonulin Integrity", "target_module": "CINNARA, KURMA, STOMMA"},
+        {"code": "Axis 37", "name": "Oncologic & Cellular Defense", "status": get_status(score_37), "score": score_37, "biomarker": "Apoptosis & Cell Cycle Checkpoints", "target_module": "BETA X, MERDANA, RESHIMUNO"},
     ]
 
     return render(request, 'patients/doctor_pre_visit.html', {

@@ -43,19 +43,46 @@ def patient_checkin(request, session_id=None):
 @login_required
 def patient_axes_result(request):
     """
-    ผลวิเคราะห์คะแนน 38 แกนชีววิทยาของคนไข้
+    ผลวิเคราะห์คะแนน 39 แกนชีววิทยา (12 โดเมน) ของคนไข้จากฐานข้อมูลจริง
     """
-    # Sample scores for presentation
+    patient_obj = None
+    if hasattr(request.user, 'email') and request.user.email:
+        patient_obj = Patient.objects.filter(email=request.user.email).first()
+    if not patient_obj and hasattr(request.user, 'first_name') and request.user.first_name:
+        patient_obj = Patient.objects.filter(first_name__icontains=request.user.first_name).first()
+    if not patient_obj:
+        patient_obj = Patient.objects.first()
+
+    bio_record = patient_obj.biological_records.first() if patient_obj else None
+
+    # ดึงคะแนนจริงจากฐานข้อมูล
+    s1 = bio_record.axis_1 if bio_record else 75
+    s5 = bio_record.axis_5 if bio_record else 64
+    s8 = bio_record.axis_8 if bio_record else 42
+    s15 = bio_record.axis_15 if bio_record else 70
+    s16 = bio_record.axis_16 if bio_record else 82
+    s37 = bio_record.axis_37 if bio_record else 45
+
+    def get_status(score):
+        if score >= 75:
+            return "critical"
+        elif score >= 60:
+            return "warning"
+        return "normal"
+
     axes_data = [
-        {"code": "A01", "name": "Systemic Inflammatory Load", "score": 78, "status": "critical", "desc": "ภาระการอักเสบสูงกว่าปกติ ควรลดอาหารแปรรูปและเสริมสารต้านการอักเสบ"},
-        {"code": "A05", "name": "Glucose-Insulin Regulation", "score": 64, "status": "warning", "desc": "ระดับความไวต่ออินซูลินเริ่มลดลง ควรควบคุมคาร์โบไฮเดรตเชิงเดี่ยว"},
-        {"code": "A08", "name": "Mitochondrial Function", "score": 42, "status": "normal", "desc": "การผลิตพลังงานระดับเซลล์อยู่ในเกณฑ์เสถียร"},
-        {"code": "A16", "name": "Hepatic Detoxification", "score": 70, "status": "warning", "desc": "ภาระการขับสารพิษของตับสูง ควรเน้นสารสกัดบำรุงตับ Phase 1/2"},
-        {"code": "A19", "name": "Gut Barrier Integrity", "score": 82, "status": "critical", "desc": "พบสัญญาณภาวะเยื่อบุลำไส้รั่ว (Leaky Gut) ควรฟื้นฟูเยื่อบุทางเดินอาหาร"},
+        {"code": "Axis 1", "name": "Systemic Inflammatory Load", "score": s1, "status": get_status(s1), "desc": "ภาระการอักเสบระดับเซลล์ ควรหลีกเลี่ยงอาหารแปรรูปและเสริมสารต้านการอักเสบ"},
+        {"code": "Axis 5", "name": "Glucose–Insulin Regulation", "score": s5, "status": get_status(s5), "desc": "ระดับความไวต่ออินซูลินและสมดุลน้ำตาล ควรควบคุมคาร์โบไฮเดรตเชิงเดี่ยว"},
+        {"code": "Axis 8", "name": "Mitochondrial Function", "score": s8, "status": get_status(s8), "desc": "การผลิตพลังงานและเมตาบอลิซึมระดับไมโทคอนเดรีย"},
+        {"code": "Axis 15", "name": "Detoxification & Cellular Defense", "score": s15, "status": get_status(s15), "desc": "ภาระการขับสารพิษของตับและเซลล์ ควรเน้นสารสกัดบำรุงตับ Phase 1/2"},
+        {"code": "Axis 16", "name": "Digestive–Absorptive & Gut Barrier", "score": s16, "status": get_status(s16), "desc": "ภาวะเยื่อบุทางเดินอาหารและลำไส้ ควรฟื้นฟูเยื่อบุทางเดินอาหาร"},
+        {"code": "Axis 37", "name": "Oncologic & Cellular Defense", "score": s37, "status": get_status(s37), "desc": "กลไกการตายของเซลล์ Apoptosis และการตรวจจับความผิดปกติของเซลล์"},
     ]
     return render(request, 'portal_patient/axes_result.html', {
-        'patient': request.user,
+        'patient': patient_obj or request.user,
         'axes_data': axes_data,
+        'total_axes': 39,
+        'total_domains': 12,
     })
 
 

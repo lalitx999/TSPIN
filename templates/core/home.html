@@ -1,7 +1,7 @@
 {% extends 'layouts/public_base.html' %}
 {% load static %}
 
-{% block title %}TSPI CLINIC - ระบบปัญญาประดิษฐ์การแพทย์แม่นยำและการฟื้นฟูสุขภาพ 38 แกนชีววิทยา{% endblock %}
+{% block title %}TSPI CLINIC - ระบบปัญญาประดิษฐ์การแพทย์แม่นยำและการฟื้นฟูสุขภาพ 39 แกนชีววิทยา (12 โดเมน){% endblock %}
 
 {% block extra_public_head %}
 <!-- Three.js CDN for 3D Biological Matrix Sphere -->
@@ -21,7 +21,7 @@
             <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium">
                     <i class="fas fa-sparkles"></i>
-                    <span>Next-Generation Healthcare AI &bull; Systems Biology</span>
+                    <span>Next-Generation Healthcare AI &bull; 12 Domains 39 Axes</span>
                 </div>
 
                 <h1 class="text-3xl sm:text-4xl lg:text-5xl font-semibold text-gray-900 tracking-tight leading-tight">
@@ -30,7 +30,7 @@
                 </h1>
 
                 <p class="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                    ยินดีต้อนรับสู่นวัตกรรมการรักษายุคใหม่ วิเคราะห์สุขภาพเชิงลึกผ่าน <strong>กลไกชีววิทยา 38 แกน (38 Biological Axes)</strong> 
+                    ยินดีต้อนรับสู่นวัตกรรมการรักษายุคใหม่ วิเคราะห์สุขภาพเชิงลึกผ่าน <strong>กลไกชีววิทยา 39 แกน ใน 12 โดเมน (39 Biological Axes)</strong> 
                     และสูตรตำรับไฟโตเคมีคอลมาตรฐาน 200 โมดูล เพื่อผลลัพธ์การฟื้นฟูระดับเซลล์ที่แม่นยำและตรงจุดที่สุด
                 </p>
 
@@ -86,7 +86,7 @@
 
                     <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
                         <span><i class="fas fa-hand-pointer text-primary mr-1"></i> เลื่อนเมาส์เพื่อหมุนดูแกนชีววิทยา</span>
-                        <a href="{% url 'core:platform' %}" class="text-primary font-medium hover:underline">เจาะลึก 38 แกน &rarr;</a>
+                        <a href="{% url 'core:platform' %}" class="text-primary font-medium hover:underline">เจาะลึก 39 แกน (12 โดเมน) &rarr;</a>
                     </div>
                 </div>
             </div>
@@ -128,7 +128,7 @@
                     </div>
                     <h4 class="text-base font-semibold text-gray-900">Deep Assessment</h4>
                     <p class="text-xs text-gray-600 leading-relaxed">
-                        วิเคราะห์เชิงลึกด้วย AI 38 แกนชีววิทยา ซักประวัติอาการ อาหาร ไลฟ์สไตล์ และบูรณาการผลตรวจแล็บ
+                        วิเคราะห์เชิงลึกด้วย AI 39 แกนชีววิทยา (12 โดเมน) ซักประวัติอาการ อาหาร ไลฟ์สไตล์ และบูรณาการผลตรวจแล็บ
                     </p>
                 </div>
 
@@ -327,7 +327,7 @@
                 พร้อมเริ่มต้นการฟื้นฟูสุขภาพระดับเซลล์แล้วหรือยัง?
             </h2>
             <p class="text-sm text-gray-600 max-w-xl mx-auto leading-relaxed">
-                ลงทะเบียนเพื่อรับการประเมิน 38 แกนชีววิทยาเบื้องต้น หรือเข้าสู่ระบบเพื่อพบแพทย์ผู้เชี่ยวชาญ
+                ลงทะเบียนเพื่อรับการประเมิน 39 แกนชีววิทยา (12 โดเมน) เบื้องต้น หรือเข้าสู่ระบบเพื่อพบแพทย์ผู้เชี่ยวชาญ
             </p>
             <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
                 <a href="{% url 'accounts:patient_login' %}" class="px-6 py-3.5 bg-primary text-white font-medium text-sm rounded-xl hover:bg-primary-dark transition-all shadow-md">
@@ -363,8 +363,8 @@ document.addEventListener('DOMContentLoaded', function () {
     renderer.setSize(width, height);
     renderer.setPixelRatio(window.devicePixelRatio);
 
-    // Create 38 Nodes (Fibonacci sphere distribution)
-    const nodeCount = 38;
+    // Create 39 Nodes (Fibonacci sphere distribution across 12 Domains)
+    const nodeCount = 39;
     const radius = 70;
     const nodes = [];
     const sphereGroup = new THREE.Group();
@@ -376,19 +376,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const phi = Math.PI * (3 - Math.sqrt(5)); // Golden angle
 
     const axisNames = [
-        "A01: Inflammatory Load", "A02: Immune Dysregulation", "A03: Autonomic Nervous Tone",
-        "A04: HPA Axis Dysfunction", "A05: Thyroid Function", "A06: Sex Hormone Balance",
-        "A07: Insulin Signaling", "A08: Leptin / Adipokine", "A09: Oxidative Stress",
-        "A10: Mitochondrial Function", "A11: Cellular Energy Metabolism", "A12: DNA Repair",
-        "A13: Epigenetic Regulation", "A14: mTOR / Autophagy", "A15: Apoptosis Regulation",
-        "A16: Hepatic Detoxification", "A17: Digestive Function", "A18: Microbiome Ecology",
-        "A19: Gut Barrier Integrity", "A20: Bile Acid Metabolism", "A21: Endothelial Function",
-        "A22: Coagulation Dynamics", "A23: Lipid Metabolism", "A24: Cardiovascular Tone",
-        "A25: Tissue Remodeling", "A26: Bone & Mineral", "A27: Carbohydrate Balance",
-        "A28: Mast Cell Reactivity", "A29: Histamine Clearance", "A30: Circadian Clock Rhythm",
-        "A31: Neuromuscular Tone", "A32: Renal Filtration", "A33: Lymphatic Clearance",
-        "A34: Collagen & Matrix", "A35: Neuroinflammation", "A36: Synaptic Plasticity",
-        "A37: Senescence Burden", "A38: Systemic Longevity Index"
+        "A01: Systemic Inflammatory Load", "A02: Immune Homeostasis", "A03: Pathogen Defense",
+        "A04: Post-Infectious Persistence", "A05: Glucose-Insulin Regulation", "A06: Lipid-Lipotoxicity",
+        "A07: Nutrient Sensing (AMPK-mTOR)", "A08: Mitochondrial Network", "A09: Oxidative Stress & Redox",
+        "A10: Autophagy & Proteostasis", "A11: DNA Repair & Genomic Stability", "A12: Telomere Dynamics",
+        "A13: Epigenetic Maintenance", "A14: Cellular Senescence", "A15: Detoxification & Cellular Defense",
+        "A16: Digestive-Absorptive", "A17: Microbiome Ecosystem", "A18: Bile & Liver-Gut Axis",
+        "A19: Gut Barrier Integrity", "A20: Endothelial Function", "A21: Microcirculation & Tissue Perfusion",
+        "A22: Coagulation-Fibrinolysis", "A23: Lymphatic Flow & Drainage", "A24: Wound Healing",
+        "A25: Extracellular Matrix (ECM)", "A26: Bone Remodeling", "A27: Cartilage & Joint Homeostasis",
+        "A28: Muscle Protein Turnover", "A29: Fascial & Structural Integrity", "A30: Tendon & Ligament Resilience",
+        "A31: Female Hormone Network", "A32: Male Androgen Network", "A33: Thyroid-Adrenal-Growth",
+        "A34: Neuro-Sleep-Stress-Brain Clearance", "A35: Organ Resilience & Functional Reserve", "A36: Local Organ Interface",
+        "A37: Oncologic Cell Fate", "A38: Tumor Microenvironment & Metastasis", "A39: Genomic Regulation Homeostasis"
     ];
 
     for (let i = 0; i < nodeCount; i++) {

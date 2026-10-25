@@ -2,364 +2,334 @@
 {% load static %}
 
 {% block extra_head %}
-<!-- AdminLTE 4 Core (Structure only, Styled via Tailwind & Custom Clean CSS) -->
-<link rel="stylesheet" href="{% static 'vendor/adminlte/dist/css/adminlte.min.css' %}">
-<link rel="stylesheet" href="{% static 'vendor/adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
-
 <style>
-    /* Clean Medical Theme - No Dark Mode, No Dark Gradients */
-    body {
-        background-color: #F2F2F2 !important;
-        color: #111827 !important;
-        font-family: 'Kanit', sans-serif !important;
+    /* Clean Modern Medical Palette (Tailwind CSS Authentic 2026) */
+    .nav-pill-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.55rem 0.85rem;
+        border-radius: 0.75rem;
+        font-size: 0.8125rem;
+        font-weight: 400;
+        color: #4B5563;
+        transition: all 0.15s ease-in-out;
     }
-    .main-header {
-        background-color: #FFFFFF !important;
-        border-bottom: 1px solid #E5E7EB !important;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    .nav-pill-item:hover {
+        background-color: rgba(104, 157, 75, 0.08);
+        color: #689D4B;
     }
-    .main-sidebar {
-        background-color: #FFFFFF !important;
-        border-right: 1px solid #E5E7EB !important;
-        box-shadow: none !important;
-    }
-    .content-wrapper {
-        background-color: #F2F2F2 !important;
-    }
-    .brand-link {
-        border-bottom: 1px solid #E5E7EB !important;
-        background-color: #FFFFFF !important;
-        padding: 0.85rem 1rem !important;
-    }
-    .nav-sidebar .nav-link {
-        color: #4B5563 !important;
-        font-size: 0.875rem !important;
-        font-weight: 400 !important;
-        border-radius: 8px !important;
-        margin: 2px 8px !important;
-        transition: all 0.15s ease-in-out !important;
-    }
-    .nav-sidebar .nav-link:hover {
-        background-color: #F3F4F6 !important;
-        color: #689D4B !important;
-    }
-    .nav-sidebar .nav-link.active {
-        background-color: #689D4B !important;
+    .nav-pill-item.active {
+        background-color: #689D4B;
         color: #FFFFFF !important;
-        font-weight: 500 !important;
-        box-shadow: 0 2px 6px rgba(104, 157, 75, 0.25) !important;
-    }
-    .nav-sidebar .nav-link.active i {
-        color: #FFFFFF !important;
-    }
-    .nav-header {
-        color: #9CA3AF !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.05em;
-        font-size: 0.725rem !important;
-        padding: 0.75rem 1.25rem 0.25rem !important;
-        text-transform: uppercase;
-    }
-    .badge-clinical {
-        background-color: #E8F5E4;
-        color: #528238;
-        border: 1px solid #CFE3C4;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 0.75rem;
         font-weight: 500;
+        box-shadow: 0 4px 12px -2px rgba(104, 157, 75, 0.35);
     }
-    .card {
-        background-color: #FFFFFF;
-        border: 1px solid #E5E7EB;
-        border-radius: 12px;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+    .nav-pill-item.active i {
+        color: #FFFFFF !important;
     }
 </style>
 {% block extra_doctor_head %}{% endblock %}
 {% endblock %}
 
-{% block body_class %}sidebar-mini layout-fixed layout-navbar-fixed{% endblock %}
+{% block body_class %}bg-[#F8FAF6]{% endblock %}
 
 {% block layout %}
-<div class="wrapper">
+<div class="min-h-screen flex flex-col lg:flex-row antialiased font-kanit" x-data="{ sidebarOpen: false }">
 
-    <!-- Top Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-        <!-- Left navbar links -->
-        <ul class="navbar-nav align-items-center">
-            <li class="nav-item">
-                <a class="nav-link text-gray-700" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block ml-2">
-                <span class="inline-flex items-center gap-2">
-                    <span class="badge-clinical"><i class="fas fa-dna mr-1"></i> TSPI CLINICAL OS</span>
-                    <span class="text-xs text-gray-500 font-normal">ระบบเวชระเบียนและความฉลาดทางการแพทย์ 38 แกนชีววิทยา</span>
-                </span>
-            </li>
-        </ul>
+    <!-- Mobile Sidebar Backdrop -->
+    <div x-show="sidebarOpen" 
+         x-cloak
+         @click="sidebarOpen = false" 
+         class="fixed inset-0 z-40 bg-black/30 backdrop-blur-xs lg:hidden transition-opacity"></div>
 
-        <!-- Right navbar links -->
-        <ul class="navbar-nav ml-auto align-items-center">
-            <!-- Doctor Profile Dropdown -->
-            <li class="nav-item dropdown">
-                <a class="nav-link d-flex align-items-center text-gray-800" data-toggle="dropdown" href="#">
-                    <div class="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 text-primary flex items-center justify-center mr-2 text-sm">
-                        <i class="fas fa-user-md"></i>
-                    </div>
-                    <span class="d-none d-md-inline font-medium text-sm">{{ request.user.get_full_name|default:request.user.username }}</span>
-                    <span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary font-medium">{{ request.user.get_role_display }}</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right rounded-xl shadow-lg border border-gray-200 mt-2 p-2">
-                    <div class="px-3 py-2 text-xs text-gray-500 font-medium">
-                        บัญชีแพทย์ผู้รักษา (Active Session)
-                    </div>
-                    <div class="dropdown-divider"></div>
-                    <a href="{% url 'patients:dashboard' %}" class="dropdown-item rounded-lg py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <i class="fas fa-tachometer-alt mr-2 text-primary"></i> หน้าหลัก Dashboard
-                    </a>
-                    <a href="{% url 'patients:doctor_settings' %}" class="dropdown-item rounded-lg py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <i class="fas fa-user-cog mr-2 text-primary"></i> ตั้งค่าบัญชีและคลินิก
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="{% url 'accounts:logout' %}" class="dropdown-item rounded-lg py-2 text-sm text-red-600 hover:bg-red-50">
-                        <i class="fas fa-sign-out-alt mr-2"></i> ออกจากระบบอย่างปลอดภัย
-                    </a>
+    <!-- Sidebar (Pure Tailwind CSS) -->
+    <aside class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-200/80 flex flex-col transition-transform duration-300 ease-in-out lg:static lg:translate-x-0"
+           :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
+        
+        <!-- Brand Header -->
+        <div class="h-16 px-6 border-b border-gray-100 flex items-center justify-between shrink-0">
+            <a href="{% url 'patients:dashboard' %}" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-lg font-bold group-hover:scale-105 transition-transform shadow-xs">
+                    <i class="fas fa-leaf"></i>
                 </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-gray-600" data-widget="fullscreen" href="#" role="button">
-                    <i class="fas fa-expand-arrows-alt"></i>
-                </a>
-            </li>
-        </ul>
-    </nav>
-
-    <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-light-primary elevation-0">
-        <!-- Brand Logo -->
-        <a href="{% url 'patients:dashboard' %}" class="brand-link flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary text-base font-bold">
-                <i class="fas fa-leaf"></i>
-            </div>
-            <div>
-                <span class="brand-text font-semibold text-gray-900 text-base leading-tight block">
-                    TSPI <span class="text-primary">CLINIC</span>
-                </span>
-                <span class="text-[10px] text-gray-400 font-normal block">DR. PATT EMR &bull; Physician Clinical Portal</span>
-            </div>
-        </a>
-
-        <!-- Sidebar Navigation -->
-        <div class="sidebar px-1">
-            <nav class="mt-3">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    
-                    <!-- หมวดที่ 1: เวชระเบียนผู้ป่วยและคิวตรวจ -->
-                    <li class="nav-header">เวชระเบียนและการรักษา</li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                            <i class="nav-icon fas fa-chart-line text-sm"></i>
-                            <p>Dashboard ภาพรวม</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:patient_list' %}" class="nav-link {% if 'patient' in request.resolver_match.url_name and request.resolver_match.url_name != 'dashboard' %}active{% endif %}">
-                            <i class="nav-icon fas fa-user-injured text-sm"></i>
-                            <p>แฟ้มคนไข้ (EMR Roster)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_pre_visit' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_pre_visit' %}active{% endif %}">
-                            <i class="nav-icon fas fa-clipboard-check text-sm"></i>
-                            <p>ซักประวัติล่วงหน้า (Pre-visit)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_appointments' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_appointments' %}active{% endif %}">
-                            <i class="nav-icon fas fa-calendar-alt text-sm"></i>
-                            <p>ปฏิทินนัดหมายแพทย์</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_clinical_review' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_clinical_review' %}active{% endif %}">
-                            <i class="nav-icon fas fa-stethoscope text-sm"></i>
-                            <p>ตรวจทานเคส (Clinical Review)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_outcomes' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_outcomes' %}active{% endif %}">
-                            <i class="nav-icon fas fa-heartbeat text-sm"></i>
-                            <p>ติดตามผล (Outcomes)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_voice_form' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_voice_form' %}active{% endif %}">
-                            <i class="nav-icon fas fa-microphone-alt text-sm"></i>
-                            <p>บันทึกเสียง Voice SOAP</p>
-                        </a>
-                    </li>
-
-                    <!-- หมวดที่ 2: กลไก 38 แกนชีววิทยา & โมดูล -->
-                    <li class="nav-header">38 แกนชีววิทยา & โมดูล</li>
-                    <li class="nav-item">
-                        <a href="{% url 'clinical:axes_explorer' %}" class="nav-link {% if request.resolver_match.url_name == 'axes_explorer' %}active{% endif %}">
-                            <i class="nav-icon fas fa-project-diagram text-sm"></i>
-                            <p>38 Biological Axes</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_axes_mapping' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_axes_mapping' %}active{% endif %}">
-                            <i class="nav-icon fas fa-sitemap text-sm"></i>
-                            <p>แมปแล็บและอาการ (Mapping)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'clinical:axis_graph' %}" class="nav-link {% if request.resolver_match.url_name == 'axis_graph' %}active{% endif %}">
-                            <i class="nav-icon fas fa-network-wired text-sm"></i>
-                            <p>เครือข่ายชีวภาพ (Topology)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'clinical:axis_timeline' %}" class="nav-link {% if request.resolver_match.url_name == 'axis_timeline' %}active{% endif %}">
-                            <i class="nav-icon fas fa-history text-sm"></i>
-                            <p>เส้นเวลาสุขภาพ (Timeline)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_modules' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_modules' %}active{% endif %}">
-                            <i class="nav-icon fas fa-seedling text-sm"></i>
-                            <p>200 โมดูลสมุนไพร (Modules)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'clinical:therapeutic_matrix' %}" class="nav-link {% if request.resolver_match.url_name == 'therapeutic_matrix' %}active{% endif %}">
-                            <i class="nav-icon fas fa-capsules text-sm"></i>
-                            <p>เมทริกซ์รักษา (Therapeutic)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_digital_twin' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_digital_twin' %}active{% endif %}">
-                            <i class="nav-icon fas fa-child text-sm"></i>
-                            <p>แบบจำลอง Digital Twin</p>
-                        </a>
-                    </li>
-
-                    <!-- หมวดที่ 3: ปัญญาประดิษฐ์ทางการแพทย์ -->
-                    <li class="nav-header">ปัญญาประดิษฐ์การแพทย์</li>
-                    <li class="nav-item">
-                        <a href="{% url 'intelligence:ai_physician' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_physician' %}active{% endif %}">
-                            <i class="nav-icon fas fa-robot text-sm"></i>
-                            <p>AI Physician Copilot</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'intelligence:lab_ocr' %}" class="nav-link {% if request.resolver_match.url_name == 'lab_ocr' %}active{% endif %}">
-                            <i class="nav-icon fas fa-file-medical-alt text-sm"></i>
-                            <p>สแกนแล็บ (Lab OCR)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_lab_review' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_lab_review' %}active{% endif %}">
-                            <i class="nav-icon fas fa-vials text-sm"></i>
-                            <p>ตรวจทานผลแล็บ (Review)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_knowledge_rag' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_knowledge_rag' %}active{% endif %}">
-                            <i class="nav-icon fas fa-book-medical text-sm"></i>
-                            <p>สืบค้นงานวิจัย (RAG)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_tspi_brain' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_tspi_brain' %}active{% endif %}">
-                            <i class="nav-icon fas fa-brain text-sm"></i>
-                            <p>TSPI Brain Engine</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'intelligence:artifact_review' %}" class="nav-link {% if request.resolver_match.url_name == 'artifact_review' %}active{% endif %}">
-                            <i class="nav-icon fas fa-tasks text-sm"></i>
-                            <p>ตรวจทานผล AI (Artifact Review)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_chats' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_chats' %}active{% endif %}">
-                            <i class="nav-icon fas fa-comments text-sm"></i>
-                            <p>แชทคนไข้ LINE (Chats)</p>
-                        </a>
-                    </li>
-
-                    <!-- หมวดที่ 4: รายงานและการกำกับดูแล -->
-                    <li class="nav-header">รายงานและการกำกับดูแล</li>
-                    <li class="nav-item">
-                        <a href="{% url 'clinical:report_dashboard' %}" class="nav-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
-                            <i class="nav-icon fas fa-file-pdf text-sm"></i>
-                            <p>ออกรายงาน Precision Report</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_audit' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_audit' %}active{% endif %}">
-                            <i class="nav-icon fas fa-shield-alt text-sm"></i>
-                            <p>ประวัติเข้าถึง (Audit Trail)</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'patients:doctor_settings' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_settings' %}active{% endif %}">
-                            <i class="nav-icon fas fa-cog text-sm"></i>
-                            <p>ตั้งค่าคลินิก (Settings)</p>
-                        </a>
-                    </li>
-
-                    <!-- ปุ่มออกจากระบบ -->
-                    <li class="nav-item mt-4 mb-4">
-                        <a href="{% url 'accounts:logout' %}" class="nav-link text-red-600 hover:bg-red-50">
-                            <i class="nav-icon fas fa-power-off text-sm"></i>
-                            <p>ออกจากระบบ (Logout)</p>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+                <div>
+                    <span class="font-bold text-gray-900 text-base leading-tight block tracking-tight">
+                        TSPI <span class="text-primary">CLINIC</span>
+                    </span>
+                    <span class="text-[10px] text-gray-400 font-medium block">
+                        DR. PATT EMR &bull; Physician Portal
+                    </span>
+                </div>
+            </a>
+            <button type="button" @click="sidebarOpen = false" class="lg:hidden text-gray-400 hover:text-gray-600 p-1">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
+
+        <!-- Sidebar Navigation Links (Scrollable) -->
+        <div class="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+
+            <!-- หมวดที่ 1: เวชระเบียนผู้ป่วยและคิวตรวจ -->
+            <div>
+                <span class="px-3 text-[11px] font-semibold tracking-wider text-gray-400 uppercase block mb-1.5 font-kanit">
+                    เวชระเบียนและการรักษา
+                </span>
+                <nav class="space-y-1">
+                    <a href="{% url 'patients:dashboard' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <i class="fas fa-chart-line w-4 text-center text-xs opacity-80"></i>
+                        <span>Dashboard ภาพรวม</span>
+                    </a>
+                    <a href="{% url 'patients:patient_list' %}" class="nav-pill-item {% if 'patient' in request.resolver_match.url_name and request.resolver_match.url_name != 'dashboard' %}active{% endif %}">
+                        <i class="fas fa-user-injured w-4 text-center text-xs opacity-80"></i>
+                        <span>แฟ้มคนไข้ (EMR Roster)</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_pre_visit' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_pre_visit' %}active{% endif %}">
+                        <i class="fas fa-clipboard-check w-4 text-center text-xs opacity-80"></i>
+                        <span>ซักประวัติล่วงหน้า (Pre-visit)</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_appointments' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_appointments' %}active{% endif %}">
+                        <i class="fas fa-calendar-alt w-4 text-center text-xs opacity-80"></i>
+                        <span>ปฏิทินนัดหมายแพทย์</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_clinical_review' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_clinical_review' %}active{% endif %}">
+                        <i class="fas fa-stethoscope w-4 text-center text-xs opacity-80"></i>
+                        <span>ตรวจทานเคส (Clinical Review)</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_outcomes' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_outcomes' %}active{% endif %}">
+                        <i class="fas fa-heartbeat w-4 text-center text-xs opacity-80"></i>
+                        <span>ติดตามผล (Outcomes)</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_voice_form' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_voice_form' %}active{% endif %}">
+                        <i class="fas fa-microphone-alt w-4 text-center text-xs opacity-80"></i>
+                        <span>บันทึกเสียง Voice SOAP</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- หมวดที่ 2: กลไก 38 แกนชีววิทยา & โมดูล -->
+            <div>
+                <span class="px-3 text-[11px] font-semibold tracking-wider text-gray-400 uppercase block mb-1.5 font-kanit">
+                    38 แกนชีววิทยา & โมดูล
+                </span>
+                <nav class="space-y-1">
+                    <a href="{% url 'clinical:axes_explorer' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'axes_explorer' %}active{% endif %}">
+                        <i class="fas fa-project-diagram w-4 text-center text-xs opacity-80"></i>
+                        <span>38 Biological Axes</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_axes_mapping' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_axes_mapping' %}active{% endif %}">
+                        <i class="fas fa-sitemap w-4 text-center text-xs opacity-80"></i>
+                        <span>แมปแล็บและอาการ (Mapping)</span>
+                    </a>
+                    <a href="{% url 'clinical:axis_graph' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'axis_graph' %}active{% endif %}">
+                        <i class="fas fa-network-wired w-4 text-center text-xs opacity-80"></i>
+                        <span>เครือข่ายชีวภาพ (Topology)</span>
+                    </a>
+                    <a href="{% url 'clinical:axis_timeline' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'axis_timeline' %}active{% endif %}">
+                        <i class="fas fa-history w-4 text-center text-xs opacity-80"></i>
+                        <span>เส้นเวลาสุขภาพ (Timeline)</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_modules' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_modules' %}active{% endif %}">
+                        <i class="fas fa-seedling w-4 text-center text-xs opacity-80"></i>
+                        <span>200 โมดูลสมุนไพร (Modules)</span>
+                    </a>
+                    <a href="{% url 'clinical:therapeutic_matrix' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'therapeutic_matrix' %}active{% endif %}">
+                        <i class="fas fa-capsules w-4 text-center text-xs opacity-80"></i>
+                        <span>เมทริกซ์รักษา (Therapeutic)</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_digital_twin' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_digital_twin' %}active{% endif %}">
+                        <i class="fas fa-child w-4 text-center text-xs opacity-80"></i>
+                        <span>แบบจำลอง Digital Twin</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- หมวดที่ 3: ปัญญาประดิษฐ์ทางการแพทย์ -->
+            <div>
+                <span class="px-3 text-[11px] font-semibold tracking-wider text-gray-400 uppercase block mb-1.5 font-kanit">
+                    ปัญญาประดิษฐ์การแพทย์
+                </span>
+                <nav class="space-y-1">
+                    <a href="{% url 'intelligence:ai_physician' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'ai_physician' %}active{% endif %}">
+                        <i class="fas fa-robot w-4 text-center text-xs opacity-80"></i>
+                        <span>AI Physician Copilot</span>
+                    </a>
+                    <a href="{% url 'intelligence:lab_ocr' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'lab_ocr' %}active{% endif %}">
+                        <i class="fas fa-file-medical-alt w-4 text-center text-xs opacity-80"></i>
+                        <span>สแกนแล็บ (Lab OCR)</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_lab_review' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_lab_review' %}active{% endif %}">
+                        <i class="fas fa-vials w-4 text-center text-xs opacity-80"></i>
+                        <span>ตรวจทานผลแล็บ (Review)</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_knowledge_rag' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_knowledge_rag' %}active{% endif %}">
+                        <i class="fas fa-book-medical w-4 text-center text-xs opacity-80"></i>
+                        <span>สืบค้นงานวิจัย (RAG)</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_tspi_brain' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_tspi_brain' %}active{% endif %}">
+                        <i class="fas fa-brain w-4 text-center text-xs opacity-80"></i>
+                        <span>TSPI Brain Engine</span>
+                    </a>
+                    <a href="{% url 'intelligence:artifact_review' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'artifact_review' %}active{% endif %}">
+                        <i class="fas fa-tasks w-4 text-center text-xs opacity-80"></i>
+                        <span>ตรวจทานผล AI (Artifact Review)</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_chats' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_chats' %}active{% endif %}">
+                        <i class="fas fa-comments w-4 text-center text-xs opacity-80"></i>
+                        <span>แชทคนไข้ LINE (Chats)</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- หมวดที่ 4: รายงานและการกำกับดูแล -->
+            <div>
+                <span class="px-3 text-[11px] font-semibold tracking-wider text-gray-400 uppercase block mb-1.5 font-kanit">
+                    รายงานและการกำกับดูแล
+                </span>
+                <nav class="space-y-1">
+                    <a href="{% url 'clinical:report_dashboard' %}" class="nav-pill-item {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-file-pdf w-4 text-center text-xs opacity-80"></i>
+                        <span>ออกรายงาน Precision Report</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_audit' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_audit' %}active{% endif %}">
+                        <i class="fas fa-shield-alt w-4 text-center text-xs opacity-80"></i>
+                        <span>ประวัติเข้าถึง (Audit Trail)</span>
+                    </a>
+                    <a href="{% url 'patients:doctor_settings' %}" class="nav-pill-item {% if request.resolver_match.url_name == 'doctor_settings' %}active{% endif %}">
+                        <i class="fas fa-cog w-4 text-center text-xs opacity-80"></i>
+                        <span>ตั้งค่าคลินิก (Settings)</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Logout Link -->
+            <div class="pt-2 border-t border-gray-100">
+                <a href="{% url 'accounts:logout' %}" class="nav-pill-item text-red-600 hover:bg-red-50 hover:text-red-700">
+                    <i class="fas fa-power-off w-4 text-center text-xs"></i>
+                    <span>ออกจากระบบ (Logout)</span>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Sidebar User Footer Chip -->
+        <div class="p-4 border-t border-gray-100 bg-secondary/30 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-xs">
+                    {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-xs font-bold text-gray-900 block truncate font-kanit">
+                        {{ request.user.get_full_name|default:request.user.username }}
+                    </span>
+                    <span class="text-[10px] text-gray-400 font-medium block">
+                        {{ request.user.get_role_display|default:"Physician" }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
     </aside>
 
-    <!-- Content Wrapper -->
-    <div class="content-wrapper min-h-screen">
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 flex flex-col min-w-0 min-h-screen">
+
+        <!-- Modern Glassmorphism Sticky Navbar -->
+        <header class="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur-md border-b border-gray-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-shadow">
+            
+            <!-- Left: Mobile Menu Toggle & Title Badge -->
+            <div class="flex items-center gap-3">
+                <button type="button" @click="sidebarOpen = true" class="lg:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-bars text-base"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                        <i class="fas fa-dna text-[10px]"></i> TSPI CLINICAL OS
+                    </span>
+                    <span class="hidden sm:inline text-xs text-gray-400 font-kanit">
+                        ระบบเวชระเบียนและความฉลาดทางการแพทย์ 38 แกนชีววิทยา
+                    </span>
+                </div>
+            </div>
+
+            <!-- Right: User Avatar & Quick Actions -->
+            <div class="flex items-center gap-3" x-data="{ userMenuOpen: false }">
+                
+                <!-- Quick Link to EMR Roster -->
+                <a href="{% url 'patients:patient_list' %}" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-gray-700 bg-secondary hover:bg-gray-200 transition-colors font-kanit">
+                    <i class="fas fa-users text-primary"></i> คนไข้ทั้งหมด
+                </a>
+
+                <!-- User Dropdown Menu (Alpine.js) -->
+                <div class="relative">
+                    <button type="button" @click="userMenuOpen = !userMenuOpen" class="flex items-center gap-2 p-1.5 pr-3 rounded-full hover:bg-gray-100 transition-colors">
+                        <div class="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 text-primary flex items-center justify-center text-xs font-bold">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-800 hidden md:inline font-kanit">
+                            {{ request.user.get_full_name|default:request.user.username }}
+                        </span>
+                        <i class="fas fa-chevron-down text-[10px] text-gray-400 ml-0.5"></i>
+                    </button>
+
+                    <div x-show="userMenuOpen" 
+                         @click.outside="userMenuOpen = false" 
+                         x-cloak
+                         class="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-gray-200 shadow-xl py-2 z-50 text-xs font-kanit space-y-1">
+                        <div class="px-4 py-2 border-b border-gray-100">
+                            <span class="text-gray-400 block text-[10px]">บัญชีแพทย์ที่เข้าสู่ระบบ:</span>
+                            <span class="font-bold text-gray-900 block truncate">{{ request.user.get_full_name|default:request.user.username }}</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-primary/10 text-primary font-medium mt-1 inline-block">
+                                {{ request.user.get_role_display|default:"Physician" }}
+                            </span>
+                        </div>
+                        <a href="{% url 'patients:dashboard' %}" class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-secondary transition-colors">
+                            <i class="fas fa-tachometer-alt text-primary w-4"></i> Dashboard ภาพรวม
+                        </a>
+                        <a href="{% url 'patients:doctor_settings' %}" class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-secondary transition-colors">
+                            <i class="fas fa-user-cog text-primary w-4"></i> ตั้งค่าระบบและคลินิก
+                        </a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="{% url 'accounts:logout' %}" class="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
+                            <i class="fas fa-sign-out-alt w-4"></i> ออกจากระบบ
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
         <!-- Flash Messages -->
         {% if messages %}
-            <div class="p-3 max-w-7xl mx-auto">
-                {% for message in messages %}
-                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show bg-white border border-gray-200 text-gray-800 rounded-xl shadow-xs" role="alert">
-                        {{ message }}
-                        <button type="button" class="close text-gray-400" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                {% endfor %}
+        <div class="px-4 sm:px-6 lg:px-8 pt-4">
+            {% for message in messages %}
+            <div x-data="{ show: true }" x-show="show" class="p-3.5 rounded-xl border flex items-center justify-between text-xs font-kanit shadow-xs {% if message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% elif message.tags == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
+                <span>{{ message }}</span>
+                <button type="button" @click="show = false" class="text-gray-400 hover:text-gray-600 ml-3">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            {% endfor %}
+        </div>
         {% endif %}
 
-        <!-- Main Content -->
-        <section class="content p-4" id="main-content">
+        <!-- Main Content Area -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8">
             {% block content %}{% endblock %}
-        </section>
+        </main>
+
+        <!-- Modern Footer -->
+        <footer class="bg-white border-t border-gray-200/80 py-4 px-4 sm:px-6 lg:px-8 text-xs text-gray-400 flex flex-col sm:flex-row items-center justify-between gap-2 font-kanit">
+            <div>
+                <strong>DR. PATT EMR</strong> &bull; Systems Biology Precision Medicine Operating System &copy; 2026
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-primary inline-block"></span>
+                <span>PostgreSQL 16 &bull; Verified 38 Biological Axes</span>
+            </div>
+        </footer>
+
     </div>
 
-    <!-- Main Footer -->
-    <footer class="main-footer bg-white border-t border-gray-200 text-xs text-gray-500 py-3">
-        <div class="float-right d-none d-sm-inline">
-            <span class="inline-flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-primary inline-block"></span>
-                TSPI Engine v4.0 &bull; PostgreSQL Protected
-            </span>
-        </div>
-        <strong>TSPI CLINIC &copy; 2026</strong> &bull; Systems Biology Precision Medicine Operating System.
-    </footer>
 </div>
-
-<!-- AdminLTE JS Scripts -->
-<script src="{% static 'vendor/adminlte/plugins/jquery/jquery.min.js' %}"></script>
-<script src="{% static 'vendor/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'vendor/adminlte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
-<script src="{% static 'vendor/adminlte/dist/js/adminlte.min.js' %}"></script>
 {% endblock %}

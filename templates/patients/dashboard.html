@@ -1,168 +1,250 @@
 {% extends 'layouts/doctor_base.html' %}
+{% load static %}
 
 {% block title %}Doctor Dashboard | TSPI Clinical EMR{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="space-y-6">
     <!-- Page Header -->
-    <div class="row mb-3">
-        <div class="col-sm-6">
-            <h1 class="m-0 text-light font-weight-bold" style="font-size: 1.75rem;">
-                <i class="fas fa-tachometer-alt mr-2 text-info"></i>Clinical Overview Dashboard
-            </h1>
-            <p class="text-muted text-sm mt-1">ภาพรวมการรักษาและสถิติคนไข้ประจำวันคลินิก TSPI</p>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200/80">
+        <div>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-xs">
+                    <i class="fas fa-tachometer-alt text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 font-kanit flex items-center gap-2">
+                        Clinical Overview Dashboard
+                    </h1>
+                    <p class="text-xs text-gray-500 font-kanit">
+                        ภาพรวมการรักษาและสถิติคนไข้ประจำวันคลินิก TSPI Systems Biology EMR
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="col-sm-6 text-right">
-            <span class="badge badge-clinical p-2">
-                <i class="fas fa-lock mr-1"></i> เซสชันได้รับการปกป้องด้วย Argon2 &amp; Session Isolation
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200 font-kanit">
+                <i class="fas fa-lock text-emerald-600"></i> เซสชันได้รับการปกป้องด้วย Argon2 &amp; Session Isolation
             </span>
         </div>
     </div>
 
     <!-- Quick Stat Cards -->
-    <div class="row">
-        <!-- Card 1 -->
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #1e293b; border-radius: 14px;">
-                <span class="info-box-icon elevation-1" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-radius: 10px;">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- Card 1: Total Patients -->
+        <div class="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-xs hover:shadow-md transition-all">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-medium text-gray-500 font-kanit">คนไข้ทั้งหมดในระบบ</span>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
                     <i class="fas fa-users"></i>
-                </span>
-                <div class="info-box-content">
-                    <span class="info-box-text text-muted">คนไข้ทั้งหมดในระบบ</span>
-                    <span class="info-box-number text-light font-weight-bold" style="font-size: 1.4rem;">{{ total_patients }} เคส</span>
                 </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-bold text-gray-900 font-mono tracking-tight">{{ total_patients }}</span>
+                <span class="text-xs text-gray-400 font-kanit">เคส</span>
+            </div>
+            <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500 font-kanit">
+                <a href="{% url 'patients:patient_list' %}" class="text-primary hover:underline font-medium">ดูรายชื่อคนไข้ &rarr;</a>
+                <span>เวชระเบียน Active</span>
             </div>
         </div>
 
-        <!-- Card 2 -->
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #1e293b; border-radius: 14px;">
-                <span class="info-box-icon elevation-1" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border-radius: 10px;">
+        <!-- Card 2: Urgent Cases -->
+        <div class="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-xs hover:shadow-md transition-all">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-medium text-gray-500 font-kanit">เคสด่วนเฝ้าระวัง</span>
+                <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-base">
                     <i class="fas fa-exclamation-triangle"></i>
-                </span>
-                <div class="info-box-content">
-                    <span class="info-box-text text-muted">เคสด่วนเฝ้าระวัง</span>
-                    <span class="info-box-number text-danger font-weight-bold" style="font-size: 1.4rem;">{{ urgent_cases }} เคส</span>
                 </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-bold text-red-600 font-mono tracking-tight">{{ urgent_cases }}</span>
+                <span class="text-xs text-red-500 font-kanit">เคสวิกฤต</span>
+            </div>
+            <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500 font-kanit">
+                <a href="{% url 'patients:patient_list' %}?status=urgent" class="text-red-600 hover:underline font-medium">ตรวจเคสด่วน &rarr;</a>
+                <span class="text-red-500">ต้องดูแลทันที</span>
             </div>
         </div>
 
-        <!-- Card 3 -->
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #1e293b; border-radius: 14px;">
-                <span class="info-box-icon elevation-1" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-radius: 10px;">
+        <!-- Card 3: Today Appointments -->
+        <div class="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-xs hover:shadow-md transition-all">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-medium text-gray-500 font-kanit">นัดหมายวันนี้</span>
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-primary flex items-center justify-center text-base">
                     <i class="fas fa-calendar-day"></i>
-                </span>
-                <div class="info-box-content">
-                    <span class="info-box-text text-muted">นัดหมายวันนี้</span>
-                    <span class="info-box-number text-success font-weight-bold" style="font-size: 1.4rem;">{{ today_appointments }} รายการ</span>
                 </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-bold text-primary font-mono tracking-tight">{{ today_appointments }}</span>
+                <span class="text-xs text-gray-400 font-kanit">รายการ</span>
+            </div>
+            <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500 font-kanit">
+                <a href="{% url 'patients:doctor_appointments' %}" class="text-primary hover:underline font-medium">เปิดปฏิทินนัด &rarr;</a>
+                <span>ตารางคลินิก</span>
             </div>
         </div>
 
-        <!-- Card 4 -->
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #1e293b; border-radius: 14px;">
-                <span class="info-box-icon elevation-1" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-radius: 10px;">
+        <!-- Card 4: 38 Biological Axes -->
+        <div class="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-xs hover:shadow-md transition-all">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-medium text-gray-500 font-kanit">ระบบแกนชีวภาพ</span>
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base">
                     <i class="fas fa-dna"></i>
-                </span>
-                <div class="info-box-content">
-                    <span class="info-box-text text-muted">ระบบแกนชีวภาพ</span>
-                    <span class="info-box-number text-warning font-weight-bold" style="font-size: 1.4rem;">39 แกน</span>
                 </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-bold text-amber-600 font-mono tracking-tight">38</span>
+                <span class="text-xs text-gray-400 font-kanit">แกนกลไก</span>
+            </div>
+            <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500 font-kanit">
+                <a href="{% url 'clinical:axes_explorer' %}" class="text-amber-600 hover:underline font-medium">สำรวจ 38 แกน &rarr;</a>
+                <span>TSPI Topology</span>
             </div>
         </div>
     </div>
 
     <!-- Main Working Grid -->
-    <div class="row mt-2">
-        <!-- Left: Quick Navigation -->
-        <div class="col-lg-8">
-            <div class="card" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #1e293b; border-radius: 16px;">
-                <div class="card-header border-0 d-flex justify-content-between align-items-center">
-                    <h3 class="card-title text-light font-weight-bold">
-                        <i class="fas fa-clinic-medical mr-2 text-info"></i>ศูนย์บัญชาการตรวจรักษาแพทย์
-                    </h3>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left: Quick Navigation Actions (8 cols) -->
+        <div class="lg:col-span-8">
+            <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden">
+                <div class="px-6 py-4 bg-secondary/40 border-b border-gray-100 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-clinic-medical text-primary"></i>
+                        <h2 class="text-sm font-bold text-gray-900 font-kanit">ศูนย์บัญชาการตรวจรักษาแพทย์ (Clinical Operations)</h2>
+                    </div>
+                    <span class="text-[11px] text-gray-400 font-mono">TSPI Operating Core</span>
                 </div>
-                <div class="card-body pt-0">
-                    <p class="text-muted text-sm">เลือกโมดูลที่ต้องการดำเนินการต่อ:</p>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <a href="/doctor/patients/" style="text-decoration: none;">
-                                <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.25rem; transition: all 0.2s;" onmouseover="this.style.borderColor='#38bdf8';" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.08)';">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-user-injured fa-lg text-info mr-3"></i>
-                                        <h5 class="text-light m-0 font-weight-bold">แฟ้มเวชระเบียนคนไข้ (EMR)</h5>
-                                    </div>
-                                    <p class="text-muted text-xs mb-0">ค้นหาประวัติ, บันทึกผลแล็บ, บันทึกการตรวจรักษา (SOAP)</p>
+                <div class="p-6">
+                    <p class="text-xs text-gray-500 mb-4 font-kanit">เลือกโมดูลที่ต้องการดำเนินการทางคลินิก:</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        
+                        <!-- Action 1: EMR -->
+                        <a href="{% url 'patients:patient_list' %}" class="group p-5 rounded-2xl bg-secondary/30 hover:bg-white border border-gray-200/80 hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-base mb-3 group-hover:scale-105 transition-transform">
+                                    <i class="fas fa-user-injured"></i>
                                 </div>
-                            </a>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <a href="/doctor/axes/" style="text-decoration: none;">
-                                <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.25rem; transition: all 0.2s;" onmouseover="this.style.borderColor='#10b981';" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.08)';">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-project-diagram fa-lg text-success mr-3"></i>
-                                        <h5 class="text-light m-0 font-weight-bold">39 Biological Axes Engine</h5>
-                                    </div>
-                                    <p class="text-muted text-xs mb-0">วิเคราะห์เครือข่ายความผิดปกติเชิงสรีรวิทยาและคะแนนชีวภาพ</p>
+                                <h3 class="font-bold text-gray-900 text-sm font-kanit group-hover:text-primary transition-colors mb-1">
+                                    แฟ้มเวชระเบียนคนไข้ (EMR)
+                                </h3>
+                                <p class="text-xs text-gray-500 font-kanit leading-relaxed">
+                                    ค้นหาประวัติ, บันทึกผลแล็บ, บันทึกการตรวจรักษา (SOAP)
+                                </p>
+                            </div>
+                            <span class="text-xs text-primary font-medium mt-3 inline-flex items-center gap-1 font-kanit">
+                                เข้าสู่เวชระเบียน &rarr;
+                            </span>
+                        </a>
+
+                        <!-- Action 2: 38 Axes Engine -->
+                        <a href="{% url 'clinical:axes_explorer' %}" class="group p-5 rounded-2xl bg-secondary/30 hover:bg-white border border-gray-200/80 hover:border-emerald-500/40 hover:shadow-md transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base mb-3 group-hover:scale-105 transition-transform">
+                                    <i class="fas fa-project-diagram"></i>
                                 </div>
-                            </a>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <a href="/doctor/ai-physician/" style="text-decoration: none;">
-                                <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.25rem; transition: all 0.2s;" onmouseover="this.style.borderColor='#a855f7';" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.08)';">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-brain fa-lg text-purple mr-3" style="color: #c084fc;"></i>
-                                        <h5 class="text-light m-0 font-weight-bold">AI Clinical Assistant</h5>
-                                    </div>
-                                    <p class="text-muted text-xs mb-0">ผู้ช่วยถอดรหัสความเสี่ยงอาการและแนวทางบำบัดฟื้นฟู</p>
+                                <h3 class="font-bold text-gray-900 text-sm font-kanit group-hover:text-emerald-700 transition-colors mb-1">
+                                    38 Biological Axes Engine
+                                </h3>
+                                <p class="text-xs text-gray-500 font-kanit leading-relaxed">
+                                    วิเคราะห์เครือข่ายความผิดปกติเชิงสรีรวิทยาและคะแนนชีวภาพ
+                                </p>
+                            </div>
+                            <span class="text-xs text-emerald-600 font-medium mt-3 inline-flex items-center gap-1 font-kanit">
+                                วิเคราะห์แกนชีวภาพ &rarr;
+                            </span>
+                        </a>
+
+                        <!-- Action 3: AI Copilot -->
+                        <a href="{% url 'intelligence:ai_physician' %}" class="group p-5 rounded-2xl bg-secondary/30 hover:bg-white border border-gray-200/80 hover:border-purple-400 hover:shadow-md transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-base mb-3 group-hover:scale-105 transition-transform">
+                                    <i class="fas fa-brain"></i>
                                 </div>
-                            </a>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <a href="/doctor/precision-report/" style="text-decoration: none;">
-                                <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.25rem; transition: all 0.2s;" onmouseover="this.style.borderColor='#f59e0b';" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.08)';">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-file-pdf fa-lg text-warning mr-3"></i>
-                                        <h5 class="text-light m-0 font-weight-bold">Precision Medicine Report</h5>
-                                    </div>
-                                    <p class="text-muted text-xs mb-0">สร้างและดาวน์โหลดรายงานการแพทย์ฉบับเต็ม 30 หน้า</p>
+                                <h3 class="font-bold text-gray-900 text-sm font-kanit group-hover:text-purple-700 transition-colors mb-1">
+                                    AI Clinical Assistant (Copilot)
+                                </h3>
+                                <p class="text-xs text-gray-500 font-kanit leading-relaxed">
+                                    ผู้ช่วยถอดรหัสความเสี่ยงอาการและแนวทางบำบัดฟื้นฟูด้วย FastAPI SSE
+                                </p>
+                            </div>
+                            <span class="text-xs text-purple-600 font-medium mt-3 inline-flex items-center gap-1 font-kanit">
+                                เปิด AI Copilot &rarr;
+                            </span>
+                        </a>
+
+                        <!-- Action 4: Precision Report -->
+                        <a href="{% url 'clinical:report_dashboard' %}" class="group p-5 rounded-2xl bg-secondary/30 hover:bg-white border border-gray-200/80 hover:border-amber-400 hover:shadow-md transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base mb-3 group-hover:scale-105 transition-transform">
+                                    <i class="fas fa-file-pdf"></i>
                                 </div>
-                            </a>
-                        </div>
+                                <h3 class="font-bold text-gray-900 text-sm font-kanit group-hover:text-amber-700 transition-colors mb-1">
+                                    Precision Medicine Report
+                                </h3>
+                                <p class="text-xs text-gray-500 font-kanit leading-relaxed">
+                                    สร้างและดาวน์โหลดรายงานการแพทย์แม่นยำฉบับเต็ม 30 หน้า
+                                </p>
+                            </div>
+                            <span class="text-xs text-amber-600 font-medium mt-3 inline-flex items-center gap-1 font-kanit">
+                                จัดการรายงาน &rarr;
+                            </span>
+                        </a>
+
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right: System & Security Status -->
-        <div class="col-lg-4">
-            <div class="card" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #1e293b; border-radius: 16px;">
-                <div class="card-header border-0">
-                    <h3 class="card-title text-light font-weight-bold">
-                        <i class="fas fa-shield-alt mr-2 text-success"></i>สถานะความปลอดภัยระบบ
-                    </h3>
+        <!-- Right: Security & Health Status (4 cols) -->
+        <div class="lg:col-span-4 space-y-6">
+            <!-- Security Card -->
+            <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden">
+                <div class="px-5 py-4 bg-secondary/40 border-b border-gray-100 flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-wider font-kanit flex items-center gap-2">
+                        <i class="fas fa-shield-alt text-primary"></i> สถานะความปลอดภัยระบบ
+                    </span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 </div>
-                <div class="card-body pt-0">
-                    <ul class="list-group list-group-flush" style="background: transparent;">
-                        <li class="list-group-item d-flex justify-content-between align-items-center" style="background: transparent; border-color: #1e293b; padding: 0.75rem 0;">
-                            <span class="text-muted text-sm">การเข้ารหัสรหัสผ่าน</span>
-                            <span class="badge badge-success">Argon2 Active</span>
+                <div class="p-5">
+                    <ul class="divide-y divide-gray-100 text-xs font-kanit">
+                        <li class="py-2.5 flex items-center justify-between">
+                            <span class="text-gray-500">การเข้ารหัสรหัสผ่าน</span>
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-emerald-100 text-emerald-800">Argon2 Active</span>
                         </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center" style="background: transparent; border-color: #1e293b; padding: 0.75rem 0;">
-                            <span class="text-muted text-sm">การป้องกัน Brute-Force</span>
-                            <span class="badge badge-info">Axes 5 Trials / 15m</span>
+                        <li class="py-2.5 flex items-center justify-between">
+                            <span class="text-gray-500">การป้องกัน Brute-Force</span>
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-blue-100 text-blue-800">5 Trials / 15m</span>
                         </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center" style="background: transparent; border-color: #1e293b; padding: 0.75rem 0;">
-                            <span class="text-muted text-sm">Session Idle Timeout</span>
-                            <span class="badge badge-warning">30 Minutes</span>
+                        <li class="py-2.5 flex items-center justify-between">
+                            <span class="text-gray-500">Session Idle Timeout</span>
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-amber-100 text-amber-800">30 Minutes</span>
                         </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center" style="background: transparent; border-color: #1e293b; padding: 0.75rem 0;">
-                            <span class="text-muted text-sm">สถาปัตยกรรมระบบ</span>
-                            <span class="badge badge-primary">Pure Django Monolith</span>
+                        <li class="py-2.5 flex items-center justify-between">
+                            <span class="text-gray-500">ฐานข้อมูลคลินิก</span>
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-primary/10 text-primary">PostgreSQL 16</span>
+                        </li>
+                        <li class="py-2.5 flex items-center justify-between">
+                            <span class="text-gray-500">AI Microservice</span>
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-emerald-100 text-emerald-800">FastAPI Port 8088</span>
                         </li>
                     </ul>
+                </div>
+            </div>
+
+            <!-- Quick Tip Card -->
+            <div class="bg-primary/5 rounded-2xl border border-primary/20 p-5">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 text-sm mt-0.5">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900 font-kanit mb-1">คำแนะนำการใช้งาน EMR</h4>
+                        <p class="text-xs text-gray-600 font-kanit leading-relaxed">
+                            สามารถใช้ระบบสแกนผลแล็บ (Lab OCR) เพื่อสกัดค่า Biomarkers เข้าสู่ 39 แกนได้อัตโนมัติ โดยข้อมูลจะผ่านเกตตรวจทานของแพทย์ (Artifact Review) ก่อนเสมอ
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

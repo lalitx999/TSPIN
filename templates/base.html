@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 
     <!-- TailwindCSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -35,14 +35,14 @@
                             dark: '#E5E5E5',
                         },
                         surface: '#FFFFFF',
-                        slate: {
-                            850: '#151f32',
-                            900: '#0f172a',
-                        }
                     },
                     fontFamily: {
                         kanit: ['Kanit', 'sans-serif'],
                         sans: ['Kanit', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
+                        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
                     }
                 }
             }
@@ -65,18 +65,60 @@
         body {
             font-family: 'Kanit', sans-serif;
             font-weight: 400;
-            background-color: #F2F2F2;
+            background-color: #F8FAF6;
             color: #111827;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Kanit', sans-serif;
             font-weight: 500;
             color: #111827;
+            letter-spacing: -0.01em;
+        }
+
+        /* Modern Tailwind 2026 Form Controls (Overrides outdated Bootstrap form-control) */
+        .form-control, input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%;
+            border-radius: 0.75rem !important; /* rounded-xl */
+            border: 1px solid #E5E7EB !important; /* border-gray-200 */
+            background-color: #FFFFFF !important;
+            padding: 0.625rem 0.875rem !important;
+            font-size: 0.875rem !important;
+            line-height: 1.25rem !important;
+            color: #111827 !important;
+            font-family: 'Kanit', sans-serif !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        .form-control:focus, input:focus, select:focus, textarea:focus {
+            outline: none !important;
+            border-color: #689D4B !important;
+            box-shadow: 0 0 0 3px rgba(104, 157, 75, 0.18) !important;
+        }
+        .form-control::placeholder, input::placeholder, textarea::placeholder {
+            color: #9CA3AF !important;
+            font-weight: 300 !important;
+        }
+
+        /* Custom Sleek Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F2F2F2;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
         }
     </style>
 

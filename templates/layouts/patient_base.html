@@ -3,9 +3,9 @@
 
 {% block extra_head %}
 <style>
-    /* Clean Medical Patient Portal */
+    /* Clean Medical Patient Portal (Tailwind 2026) */
     body {
-        background-color: #F2F2F2 !important;
+        background-color: #F8FAF6 !important;
         color: #111827 !important;
         font-family: 'Kanit', sans-serif !important;
     }
@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block layout %}
-<div class="min-h-screen flex flex-col bg-[#F2F2F2]">
+<div class="min-h-screen flex flex-col bg-[#F8FAF6]">
     <!-- Top Patient Header -->
     <header class="bg-white/95 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -56,7 +56,7 @@
             </div>
         </div>
     </header>
-
+                
     <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
         {% block content %}{% endblock %}

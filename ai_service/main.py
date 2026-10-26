@@ -19,6 +19,10 @@ from sse_starlette.sse import EventSourceResponse
 from .config import config
 from .sanitizer import MediaSanitizer, TextDeidentifier, PolicyGuard, DataClassification
 from .gateway import gateway
+from .library import library_engine
+from .soap import soap_structurer
+from .reasoning import biological_reasoner
+from .guardrail import ClinicalGuardrail
 
 logger = logging.getLogger("tspi.ai_service")
 
@@ -349,6 +353,140 @@ async def intake_video_endpoint(
             "model_used": config.GEMINI_PRO_MODEL,
             "zero_retention": config.ZERO_RETENTION_ENABLED
         }
+    }
+
+
+# =========================================================================
+# PHASE 3: DUAL-CORE AI & LIBRARY RAG (M4, M6, M7, M8)
+# =========================================================================
+
+class SOAPGenerateRequest(BaseModel):
+    complaint: str = Field(..., description="ข้อความบอกเล่าอาการของคนไข้")
+    lab_markers: Optional[List[Dict[str, Any]]] = Field(default=[], description="ผลแล็บที่สกัดได้จาก M2")
+    video_observations: Optional[str] = Field(default=None, description="ข้อสังเกตจากคลิปวิดีโอ M3")
+
+
+@app.post("/api/ai/soap")
+async def generate_soap_endpoint(
+    req: SOAPGenerateRequest,
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token")
+):
+    """
+    M4: SOAP Clinical Structurer (Groq Llama-3.3-70B).
+    Synthesizes clinical evidence into Subjective, Objective, Assessment, Plan format.
+    Passes output through M8 Guardrail to verify absence of direct diagnosis.
+    """
+    # 1. Search relevant biological axes
+    relevant_axes = library_engine.search_axes(req.complaint, top_k=3)
+
+    # 2. Generate structured SOAP
+    soap_res = await soap_structurer.generate_soap(
+        patient_complaint=req.complaint,
+        lab_markers=req.lab_markers,
+        video_observations=req.video_observations,
+        relevant_axes=relevant_axes
+    )
+
+    soap_dict = soap_res.get("soap", {})
+
+    # 3. Guardrail Assertion Check on Assessment
+    assessment_text = soap_dict.get("assessment", "")
+    guarded_assessment = ClinicalGuardrail.sanitize_and_guard(assessment_text)
+    soap_dict["assessment"] = guarded_assessment["safe_text"]
+
+    return {
+        "success": True,
+        "soap": soap_dict,
+        "relevant_axes": relevant_axes,
+        "guardrail": {
+            "status": guarded_assessment["guardrail_status"],
+            "redacted_violations": guarded_assessment["violated_patterns"]
+        },
+        "gateway": soap_res.get("gateway", "groq")
+    }
+
+
+class LibrarySearchRequest(BaseModel):
+    query: str = Field(..., description="คำค้นหาอาการหรือแกนชีวภาพ")
+    lab_markers: Optional[List[Dict[str, Any]]] = Field(default=[], description="ผลแล็บเพื่อแมปกับแกน")
+    top_k: int = Field(default=5, description="จำนวนผลลัพธ์ที่ต้องการ")
+
+
+@app.post("/api/library/search")
+async def library_search_endpoint(
+    req: LibrarySearchRequest,
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token")
+):
+    """
+    M6: TSPI Library 39 Axes RAG Search Endpoint.
+    Returns matched axes with canonical compendium page citations and lab correlations.
+    """
+    matched_axes = library_engine.search_axes(req.query, top_k=req.top_k)
+    lab_correlations = library_engine.evaluate_lab_markers_against_axes(req.lab_markers) if req.lab_markers else []
+
+    return {
+        "success": True,
+        "query": req.query,
+        "total_matches": len(matched_axes),
+        "results": matched_axes,
+        "lab_correlations": lab_correlations
+    }
+
+
+class DeepReasoningRequest(BaseModel):
+    soap: Dict[str, Any] = Field(..., description="ข้อมูล SOAP ของคนไข้")
+    lab_markers: Optional[List[Dict[str, Any]]] = Field(default=[], description="ผลแล็บตัวเลข")
+
+
+@app.post("/api/ai/reasoning/39axes")
+async def deep_reasoning_endpoint(
+    req: DeepReasoningRequest,
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token")
+):
+    """
+    M7: Deep Biological Reasoning Endpoint (DeepSeek-R1-671B).
+    Computes multi-factorial strain scores (0-100) across 39 biological axes.
+    """
+    reasoning_res = await biological_reasoner.evaluate_39_axes(
+        soap_data=req.soap,
+        lab_markers=req.lab_markers
+    )
+    return {
+        "success": True,
+        "analysis": reasoning_res.get("analysis", {}),
+        "deepseek_thinking": reasoning_res.get("deepseek_thinking", ""),
+        "gateway": reasoning_res.get("gateway", "deepseek-r1")
+    }
+
+
+class GuardrailVerifyRequest(BaseModel):
+    claim: str = Field(..., description="ข้อความที่ต้องการตรวจสอบการอ้างอิง")
+    source_text: str = Field(..., description="ข้อความจริงจากหน้าตำราอ้างอิง")
+    threshold: Optional[float] = Field(default=0.70, description="เกณฑ์สอบเทียบความเหมือน (Calibrated Threshold)")
+
+
+@app.post("/api/guardrail/verify")
+async def guardrail_verify_endpoint(
+    req: GuardrailVerifyRequest,
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token")
+):
+    """
+    M8: Guardrail Verification Endpoint.
+    Validates semantic citation grounding against the Medical Board calibrated threshold.
+    """
+    forbidden_check, violated = ClinicalGuardrail.check_forbidden_assertions(req.claim)
+    grounding_res = ClinicalGuardrail.verify_citation_grounding(
+        claim=req.claim,
+        source_text=req.source_text,
+        threshold=req.threshold
+    )
+
+    return {
+        "success": True,
+        "has_forbidden_assertions": forbidden_check,
+        "violated_patterns": violated,
+        "grounding": grounding_res,
+        "verdict": "REJECT" if forbidden_check or not grounding_res["grounded"] else "APPROVE"
     }
 
 

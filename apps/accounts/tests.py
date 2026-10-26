@@ -382,3 +382,119 @@ class BotanyEnginePhase2Tests(TestCase):
         self.assertIn("observations", data)
 
 
+class BotanyEnginePhase3Tests(TestCase):
+    """
+    Test suite for TSPI Botany-Engine Phase 3 (Dual-Core AI & Library RAG):
+    1. M4: SOAP Structurer via Groq Llama-3.3-70B with Anti-diagnosis Guardrail
+    2. M6: TSPI Library 39 Axes RAG Search & Lab Correlation
+    3. M7: Deep Biological Reasoning via DeepSeek-R1-671B
+    4. M8: Clinical Guardrail (Forbidden Diagnostic Assertions & Citation Grounding)
+    """
+
+    def setUp(self):
+        from starlette.testclient import TestClient
+        from ai_service.main import app as fastapi_app
+        self.api_client = TestClient(fastapi_app)
+
+    def test_m4_soap_generation_and_guardrail(self):
+        """[M4 SOAP]: สร้างโครงสร้าง SOAP และผ่านการตรวจสอบ Guardrail ห้ามวินิจฉัย"""
+        response = self.api_client.post(
+            "/api/ai/soap",
+            json={
+                "complaint": "คนไข้แจ้งว่ามีอาการปวดกล้ามเนื้อเรื้อรัง นอนไม่ค่อยหลับ",
+                "lab_markers": [{"marker": "FBS", "value": 115, "unit": "mg/dL", "flag": "High"}]
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertIn("soap", data)
+        self.assertIn("subjective", data["soap"])
+        self.assertIn("objective", data["soap"])
+        self.assertIn("assessment", data["soap"])
+        self.assertIn("plan", data["soap"])
+        self.assertEqual(data["guardrail"]["status"], "PASS")
+
+    def test_m6_library_search_and_lab_mapping(self):
+        """[M6 Library]: ค้นหาแกนชีวภาพ 39 แกน และจับคู่ค่าแล็บ CRP กับ แกน 1 (Inflammation)"""
+        response = self.api_client.post(
+            "/api/library/search",
+            json={
+                "query": "อักเสบ ปวดข้อ",
+                "lab_markers": [{"marker": "CRP", "value": 7.5, "unit": "mg/L", "flag": "High"}],
+                "top_k": 3
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertGreaterEqual(data["total_matches"], 1)
+        self.assertTrue(any(res["axis_id"] == 1 for res in data["results"]))
+        self.assertTrue(any(corr["marker"] == "CRP" for corr in data["lab_correlations"]))
+
+    def test_m7_deep_biological_reasoning(self):
+        """[M7 Reasoning]: รันการประเมินความตึงเครียดของระบบชีวภาพ 39 แกน (DeepSeek-R1)"""
+        response = self.api_client.post(
+            "/api/ai/reasoning/39axes",
+            json={
+                "soap": {
+                    "subjective": "เหนื่อยง่าย นอนไม่หลับ",
+                    "assessment": "มีภาวะความเครียดของระบบเมแทบอลิซึม"
+                },
+                "lab_markers": [{"marker": "HbA1c", "value": 6.8, "unit": "%", "flag": "High"}]
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertIn("analysis", data)
+        self.assertIn("primary_axes_strained", data["analysis"])
+
+    def test_m8_guardrail_rejection_of_forbidden_diagnosis(self):
+        """[M8 Guardrail]: ต้องปฏิเสธ (REJECT) ข้อความที่ฟันธงโรค หรือวินิจฉัยโรคเอง"""
+        response = self.api_client.post(
+            "/api/guardrail/verify",
+            json={
+                "claim": "แพทย์วินิจฉัยว่าเป็นโรคข้ออักเสบรูมาตอยด์ระยะรุนแรง",
+                "source_text": "การอักเสบระดับเซลล์ส่งผลต่อเนื้อเยื่อเกี่ยวพัน",
+                "threshold": 0.70
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["has_forbidden_assertions"])
+        self.assertEqual(data["verdict"], "REJECT")
+
+    def test_m8_guardrail_citation_grounding_calibrated_threshold(self):
+        """[M8 Guardrail]: ตรวจสอบการอ้างอิงตำราจริงตาม Calibrated Threshold (>= 0.70)"""
+        # 1. ข้อความที่ตรงกับตำรา
+        valid_response = self.api_client.post(
+            "/api/guardrail/verify",
+            json={
+                "claim": "การอักเสบระดับเซลล์และไซโตไคน์เชื่อมโยงกับภาวะ metabolic stress",
+                "source_text": "การอักเสบระดับเซลล์และไซโตไคน์เชื่อมโยงกับภาวะ metabolic stress และโรค NCDs",
+                "threshold": 0.70
+            }
+        )
+        self.assertEqual(valid_response.status_code, 200)
+        valid_data = valid_response.json()
+        self.assertFalse(valid_data["has_forbidden_assertions"])
+        self.assertTrue(valid_data["grounding"]["grounded"])
+        self.assertEqual(valid_data["verdict"], "APPROVE")
+
+        # 2. ข้อความที่หลอน/มั่ว ไม่ตรงกับตำรา
+        fake_response = self.api_client.post(
+            "/api/guardrail/verify",
+            json={
+                "claim": "วิตามินบีสิบเจ็ดสามารถทำลายเซลล์มะเร็งได้ในสามวัน",
+                "source_text": "การอักเสบระดับเซลล์และไซโตไคน์เชื่อมโยงกับภาวะ metabolic stress",
+                "threshold": 0.70
+            }
+        )
+        self.assertEqual(fake_response.status_code, 200)
+        fake_data = fake_response.json()
+        self.assertFalse(fake_data["grounding"]["grounded"])
+        self.assertEqual(fake_data["verdict"], "REJECT")
+
+
+

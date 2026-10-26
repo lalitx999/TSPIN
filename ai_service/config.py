@@ -36,11 +36,11 @@ class BotanyConfig:
     INTERNAL_API_TOKEN: str = os.getenv("INTERNAL_API_TOKEN", "tspi-internal-secret-token").strip()
     STORAGE_ENCRYPTION_KEY: str = os.getenv("STORAGE_ENCRYPTION_KEY", "").strip()
 
-    # Model Versioning Standards
+    # Model Versioning Standards (Configured as requested by user)
     DEEPSEEK_MODEL: str = os.getenv("DEEPSEEK_MODEL", "deepseek-reasoner").strip()
-    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
-    GEMINI_FLASH_MODEL: str = os.getenv("GEMINI_FLASH_MODEL", "gemini-1.5-flash").strip()
-    GEMINI_PRO_MODEL: str = os.getenv("GEMINI_PRO_MODEL", "gemini-1.5-pro").strip()
+    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b").strip()
+    GEMINI_FLASH_MODEL: str = os.getenv("GEMINI_FLASH_MODEL", "gemini-2.5-flash").strip()
+    GEMINI_PRO_MODEL: str = os.getenv("GEMINI_PRO_MODEL", "gemini-2.5-pro").strip()
 
     # Zero-Retention & Privacy Compliance Headers
     ZERO_RETENTION_ENABLED: bool = os.getenv("ZERO_RETENTION_ENABLED", "True").lower() in ("true", "1", "yes")

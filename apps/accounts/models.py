@@ -5,6 +5,7 @@ Enforces Custom User with RBAC, 2FA readiness, and Full AuditLog (Pillars 1, 2, 
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.hashers import make_password, check_password
 
 class User(AbstractUser):
     """
@@ -55,6 +56,17 @@ class User(AbstractUser):
         help_text="IP Address ล่าสุดที่ทำการล็อกอิน"
     )
 
+    box_password_hash = models.CharField(
+        max_length=128,
+        blank=True,
+        help_text="Cryptographic Hash (bcrypt/argon2) สำหรับปลดล็อกกล่องประวัติคนไข้ส่วนตัว"
+    )
+
+    must_change_password = models.BooleanField(
+        default=True,
+        help_text="บังคับเปลี่ยนรหัสผ่านในการเข้าใช้งานครั้งแรก"
+    )
+
     class Meta:
         app_label = 'accounts'
         db_table = 'auth_users'
@@ -73,6 +85,25 @@ class User(AbstractUser):
     @property
     def is_doctor(self):
         return self.role == self.Role.DOCTOR
+
+    @property
+    def has_box_password(self) -> bool:
+        """ตรวจสอบว่าแพทย์/เจ้าหน้าที่ได้ตั้งรหัสผ่านสำหรับเปิดกล่องแล้วหรือไม่"""
+        return bool(self.box_password_hash)
+
+    def set_box_password(self, raw_box_password: str, save: bool = True):
+        """ตั้งค่ารหัสผ่านเปิดกล่องส่วนตัว (เข้ารหัส bcrypt/argon2 ตาม Django Hashers)"""
+        if not raw_box_password or len(raw_box_password.strip()) < 6:
+            raise ValueError("รหัสผ่านเปิดกล่องต้องมีความยาวอย่างน้อย 6 ตัวอักษร")
+        self.box_password_hash = make_password(raw_box_password.strip())
+        if save:
+            self.save(update_fields=['box_password_hash'])
+
+    def check_box_password(self, raw_box_password: str) -> bool:
+        """ตรวจสอบรหัสผ่านเปิดกล่องส่วนตัว"""
+        if not self.box_password_hash or not raw_box_password:
+            return False
+        return check_password(raw_box_password.strip(), self.box_password_hash)
 
 
 class AuditLog(models.Model):

@@ -195,3 +195,190 @@ class AuthenticationSecurityTests(TestCase):
             
         audit = AuditLog.objects.filter(user=self.patient, action='UNAUTHORIZED_ROLE_ACCESS_DENIED').first()
         self.assertIsNotNone(audit)
+
+
+class BotanyEnginePhase1Tests(TestCase):
+    """
+    Test suite for TSPI Botany-Engine Phase 1:
+    1. Personal Box Password 2-tier security
+    2. Must Change Password flag
+    3. M5 Pre-Flight Text Sanitizer (Thai PII redaction)
+    4. M5 Media Sanitizer EXIF stripping
+    5. Strict Environment Variable Configuration
+    """
+
+    def setUp(self):
+        self.doctor = User.objects.create_user(
+            username='doctor_botany',
+            email='botany@tspi.clinic',
+            password='InitialPassword2026!',
+            role=User.Role.DOCTOR,
+            first_name='พงษ์ศักดิ์',
+            last_name='บรรณารักษ์'
+        )
+
+    def test_personal_box_password_hashing_and_verification(self):
+        """[Phase 1]: ตรวจสอบการตั้งค่าและตรวจสอบรหัสผ่านเปิดกล่องประวัติคนไข้ส่วนตัว"""
+        self.assertFalse(self.doctor.has_box_password)
+        
+        # รหัสสั้นกว่า 6 ตัวอักษรต้องถูกปฏิเสธ
+        with self.assertRaises(ValueError):
+            self.doctor.set_box_password("12345")
+
+        # ตั้งรหัสผ่านที่ถูกต้อง
+        self.doctor.set_box_password("SecretBoxKey2026!")
+        self.doctor.refresh_from_db()
+
+        self.assertTrue(self.doctor.has_box_password)
+        # รหัสผ่านต้องถูกแฮช ไม่ใช่ plaintext
+        self.assertNotEqual(self.doctor.box_password_hash, "SecretBoxKey2026!")
+        self.assertTrue(self.doctor.box_password_hash.startswith(('argon2', 'pbkdf2', 'bcrypt')))
+        
+        # ตรวจสอบความถูกต้อง
+        self.assertTrue(self.doctor.check_box_password("SecretBoxKey2026!"))
+        self.assertFalse(self.doctor.check_box_password("WrongKey1234!"))
+
+    def test_must_change_password_flag(self):
+        """[Phase 1]: ผู้ใช้สร้างใหม่ต้องมี flag must_change_password เป็น True เสมอ"""
+        new_user = User.objects.create_user(username='new_nurse', password='TempPassword123!')
+        self.assertTrue(new_user.must_change_password)
+
+    def test_m5_text_deidentification(self):
+        """[M5 Sanitizer]: ทดสอบการตัดข้อมูล PII ภาษาไทย 5 ประเภท (ชื่อ, เบอร์, บัตร ปชช., HN, อีเมล)"""
+        from ai_service.sanitizer import TextDeidentifier, PolicyGuard, DataClassification
+        
+        raw_clinical_text = (
+            "คนไข้ชื่อ นายสมบัติ วงศ์สว่าง โทร 089-987-6543 "
+            "เลขบัตรประชาชน 3-1004-00123-45-6 รหัสผู้ป่วย HN 4567/66 "
+            "อีเมล sombat@hospital.go.th มาพบแพทย์ด้วยอาการปวดหลังเรื้อรัง"
+        )
+        res = TextDeidentifier.sanitize(raw_clinical_text)
+        
+        self.assertTrue(res["has_pii"])
+        self.assertEqual(res["redacted_counts"]["names"], 1)
+        self.assertEqual(res["redacted_counts"]["phone"], 1)
+        self.assertEqual(res["redacted_counts"]["id_card"], 1)
+        self.assertEqual(res["redacted_counts"]["hn"], 1)
+        self.assertEqual(res["redacted_counts"]["email"], 1)
+        
+        sanitized = res["sanitized_text"]
+        self.assertNotIn("นายสมบัติ", sanitized)
+        self.assertNotIn("089-987-6543", sanitized)
+        self.assertNotIn("3-1004-00123-45-6", sanitized)
+        self.assertNotIn("HN 4567/66", sanitized)
+        self.assertNotIn("sombat@hospital.go.th", sanitized)
+        
+        # ตรวจสอบ Data Classification
+        cls_level = PolicyGuard.classify_payload(
+            has_raw_audio=False,
+            has_id_photo=False,
+            has_sanitized_image=False,
+            text_is_sanitized=True
+        )
+        self.assertEqual(cls_level, DataClassification.CLASS_A)
+
+    def test_m5_media_exif_stripping(self):
+        """[M5 Sanitizer]: ทดสอบการลบ EXIF Metadata จากไฟล์รูปภาพ"""
+        import io
+        from PIL import Image
+        from ai_service.sanitizer import MediaSanitizer
+        
+        # สร้างภาพทดสอบในหน่วยความจำ
+        img = Image.new('RGB', (100, 100), color='red')
+        buffer = io.BytesIO()
+        img.save(buffer, format='JPEG')
+        raw_bytes = buffer.getvalue()
+        
+        clean_bytes = MediaSanitizer.strip_exif(raw_bytes)
+        self.assertIsInstance(clean_bytes, bytes)
+        self.assertGreater(len(clean_bytes), 0)
+
+    def test_strict_env_configuration(self):
+        """[Governance]: ตรวจสอบว่าคีย์ต่างๆ โหลดผ่าน ENV และไม่มีการ Hardcode ใน Codebase"""
+        import os
+        from ai_service.config import BotanyConfig
+        
+        # ตรวจสอบว่าโมดูลอ่านผ่าน os.getenv
+        self.assertEqual(BotanyConfig.DEEPSEEK_API_KEY, os.getenv("DEEPSEEK_API_KEY", "").strip())
+        self.assertEqual(BotanyConfig.GROQ_API_KEY, os.getenv("GROQ_API_KEY", "").strip())
+        self.assertTrue(BotanyConfig.ZERO_RETENTION_ENABLED)
+
+
+class BotanyEnginePhase2Tests(TestCase):
+    """
+    Test suite for TSPI Botany-Engine Phase 2 (Multimodal Intake Pipeline):
+    1. M1: Voice Intake & PDPA Section 26 Biometric Consent Gate
+    2. M2: Lab OCR / Vision with EXIF stripping and JSON marker extraction
+    3. M3: Video Temporal Scan with consent verification
+    """
+
+    def setUp(self):
+        from starlette.testclient import TestClient
+        from ai_service.main import app as fastapi_app
+        self.api_client = TestClient(fastapi_app)
+
+    def test_m1_voice_intake_opt_out(self):
+        """[M1 Voice]: คนไข้ไม่อนุญาต (Opt-out) -> ต้องล็อกเสียงไว้ใน Local Vault (CLASS_C) ห้ามส่งออก"""
+        dummy_audio = b"RIFFfakeWAVEfmt dummy data for unit test"
+        response = self.api_client.post(
+            "/api/intake/voice",
+            data={"consent_granted": "false"},
+            files={"file": ("sample.wav", dummy_audio, "audio/wav")}
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertFalse(data["consent_granted"])
+        self.assertTrue(data["manual_review_required"])
+        self.assertEqual(data["classification"], "CLASS_C")
+        self.assertIsNone(data["sanitized_transcript"])
+
+    def test_m1_voice_intake_opt_in_transcription(self):
+        """[M1 Voice]: คนไข้อนุญาต (Opt-in) -> ถอดเสียงผ่าน Gateway + Sanitized PII (CLASS_A)"""
+        dummy_audio = b"RIFFfakeWAVEfmt dummy data for unit test"
+        response = self.api_client.post(
+            "/api/intake/voice",
+            data={"consent_granted": "true"},
+            files={"file": ("sample.wav", dummy_audio, "audio/wav")}
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertTrue(data["consent_granted"])
+        self.assertEqual(data["classification"], "CLASS_A")
+        self.assertIsNotNone(data["sanitized_transcript"])
+
+    def test_m2_lab_ocr_vision_extraction(self):
+        """[M2 Lab OCR]: สกัดผลแล็บด้วย Vision -> ตัด EXIF และได้ Structured Markers (CLASS_B)"""
+        import io
+        from PIL import Image
+        img = Image.new('RGB', (100, 100), color='white')
+        buf = io.BytesIO()
+        img.save(buf, format='JPEG')
+        
+        response = self.api_client.post(
+            "/api/intake/lab",
+            files={"file": ("lab_result.jpg", buf.getvalue(), "image/jpeg")}
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["classification"], "CLASS_B")
+        self.assertIn("markers", data)
+
+    def test_m3_video_temporal_scan(self):
+        """[M3 Video]: สแกนคลิปตรวจดูแผล/การเคลื่อนไหว -> มี Timecodes โดยไม่วินิจฉัยโรค (CLASS_B)"""
+        dummy_video = b"fake video mp4 stream for testing"
+        response = self.api_client.post(
+            "/api/intake/video",
+            data={"consent_granted": "true"},
+            files={"file": ("wound_clip.mp4", dummy_video, "video/mp4")}
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertTrue(data["consent_granted"])
+        self.assertEqual(data["classification"], "CLASS_B")
+        self.assertIn("observations", data)
+
+

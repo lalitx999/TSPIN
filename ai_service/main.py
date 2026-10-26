@@ -11,10 +11,14 @@ import asyncio
 import logging
 from pathlib import Path
 from typing import AsyncGenerator, Dict, List, Any, Optional
-from fastapi import FastAPI, Header, HTTPException, Query, Body, Request, BackgroundTasks, Response
+from fastapi import FastAPI, Header, HTTPException, Query, Body, Request, BackgroundTasks, Response, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
+
+from .config import config
+from .sanitizer import MediaSanitizer, TextDeidentifier, PolicyGuard, DataClassification
+from .gateway import gateway
 
 logger = logging.getLogger("tspi.ai_service")
 
@@ -93,9 +97,13 @@ class ChatRequest(BaseModel):
     role: str = "doctor"
 
 
+class SanitizeTextRequest(BaseModel):
+    text: str = Field(..., description="ข้อความดิบที่ต้องการกรองข้อมูลส่วนบุคคล")
+
+
 @app.get("/health")
 async def health_check():
-    """Healthcheck endpoint."""
+    """Healthcheck endpoint with Institutional Provider & Sanitizer Readiness."""
     return {
         "status": "healthy",
         "service": "tspi-ai-service",
@@ -103,7 +111,244 @@ async def health_check():
         "total_domains": len(KNOWLEDGE_STORE['domains']) or 12,
         "total_axes": len(KNOWLEDGE_STORE['axes']) or 39,
         "total_modules": len(KNOWLEDGE_STORE['modules']) or 200,
-        "engine": "FastAPI + SSE Streamer + RAG Knowledge Engine"
+        "engine": "FastAPI + SSE Streamer + RAG Knowledge Engine",
+        "botany_engine_v2_1": {
+            "m5_sanitizer_ready": True,
+            "zero_retention_enforced": config.ZERO_RETENTION_ENABLED,
+            "providers_configured": {
+                "groq": config.is_groq_available(),
+                "deepseek": config.is_deepseek_available(),
+                "gemini": config.is_gemini_available()
+            }
+        }
+    }
+
+
+@app.post("/api/sanitizer/text")
+async def sanitize_text_endpoint(
+    req: SanitizeTextRequest,
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token")
+):
+    """
+    M5 Pre-Flight Text Sanitizer Endpoint.
+    Redacts Thai National IDs, phone numbers, Hospital Numbers (HN), emails, and names.
+    """
+    res = TextDeidentifier.sanitize(req.text)
+    classification = PolicyGuard.classify_payload(
+        has_raw_audio=False,
+        has_id_photo=False,
+        has_sanitized_image=False,
+        text_is_sanitized=True
+    )
+    return {
+        "success": True,
+        "sanitized_text": res["sanitized_text"],
+        "has_pii": res["has_pii"],
+        "redacted_counts": res["redacted_counts"],
+        "classification": classification
+    }
+
+
+@app.post("/api/sanitizer/image")
+async def sanitize_image_endpoint(
+    file: UploadFile = File(...),
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token")
+):
+    """
+    M5 Pre-Flight Media Scrubber Endpoint.
+    Strips EXIF metadata and blurs detected human faces with a 25% safety margin.
+    """
+    raw_bytes = await file.read()
+    if not raw_bytes:
+        raise HTTPException(status_code=400, detail="Empty image payload")
+
+    sanitized_bytes, faces_detected = MediaSanitizer.blur_faces(raw_bytes, safety_margin=0.25)
+    classification = PolicyGuard.classify_payload(
+        has_raw_audio=False,
+        has_id_photo=False,
+        has_sanitized_image=True,
+        text_is_sanitized=True
+    )
+
+    import base64
+    return {
+        "success": True,
+        "filename": file.filename,
+        "faces_detected": faces_detected,
+        "classification": classification,
+        "sanitized_size_bytes": len(sanitized_bytes),
+        "sanitized_base64": base64.b64encode(sanitized_bytes).decode("utf-8")
+    }
+
+
+# =========================================================================
+# PHASE 2: MULTIMODAL INTAKE PIPELINE (M1, M2, M3)
+# =========================================================================
+
+@app.post("/api/intake/voice")
+async def intake_voice_endpoint(
+    file: UploadFile = File(...),
+    consent_granted: bool = Form(False),
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token")
+):
+    """
+    M1: Voice Intake Endpoint (Gemini 1.5 Flash Audio / Whisper API).
+    Enforces PDPA Section 26 Biometric Consent Gate.
+    De-identifies transcript before returning to callers.
+    """
+    raw_audio_bytes = await file.read()
+    if not raw_audio_bytes:
+        raise HTTPException(status_code=400, detail="Empty audio payload")
+
+    # 1. PDPA Section 26 Consent Verification Gate
+    if not consent_granted:
+        logger.info("[Voice Intake] Patient opted out of cloud biometric processing. Storing in Local Vault.")
+        return {
+            "success": True,
+            "consent_granted": False,
+            "manual_review_required": True,
+            "classification": DataClassification.CLASS_C,
+            "message": "คนไข้ไม่อนุญาตส่งเสียงประมวลผลภายนอก ข้อมูลถูกล็อกไว้ใน Local Vault สำหรับแพทย์/พยาบาลฟังด้วยตนเอง",
+            "sanitized_transcript": None
+        }
+
+    # 2. Transcribe via Multimodal Audio Gateway
+    prompt = (
+        "คุณเป็นบรรณารักษ์การแพทย์ จงถอดความเสียงพูดภาษาไทยของคนไข้และคำศัพท์อาการอย่างครบถ้วน "
+        "ห้ามสรุปความ ห้ามเดา และห้ามทำการวินิจฉัยโรคเด็ดขาด"
+    )
+    mime_type = file.content_type or "audio/mp3"
+    gemini_res = await gateway.call_gemini_audio(prompt=prompt, audio_bytes=raw_audio_bytes, mime_type=mime_type)
+    
+    raw_transcript = gemini_res.get("content", "")
+
+    # 3. Post-Process Transcript with M5 Text Sanitizer
+    sanitized_res = TextDeidentifier.sanitize(raw_transcript)
+
+    return {
+        "success": True,
+        "consent_granted": True,
+        "sanitized_transcript": sanitized_res["sanitized_text"],
+        "has_pii": sanitized_res["has_pii"],
+        "redacted_counts": sanitized_res["redacted_counts"],
+        "classification": DataClassification.CLASS_A,
+        "gateway_info": {
+            "model_used": config.GEMINI_FLASH_MODEL,
+            "zero_retention": config.ZERO_RETENTION_ENABLED
+        }
+    }
+
+
+@app.post("/api/intake/lab")
+async def intake_lab_endpoint(
+    file: UploadFile = File(...),
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token")
+):
+    """
+    M2: Lab OCR & Image Vision Endpoint (Gemini 1.5 Flash Vision).
+    1. Strips EXIF metadata (GPS/Device info).
+    2. Blurs detected human faces with a 25% safety margin.
+    3. Extracts laboratory markers (CBC, FBS, HbA1c, Lipid, eGFR) into Structured JSON.
+    """
+    raw_bytes = await file.read()
+    if not raw_bytes:
+        raise HTTPException(status_code=400, detail="Empty lab image payload")
+
+    # 1. Media Scrubbing: Strip EXIF and Blur Faces
+    sanitized_bytes, faces_detected = MediaSanitizer.blur_faces(raw_bytes, safety_margin=0.25)
+
+    # 2. Call Gemini Vision for Structured Extraction
+    prompt = (
+        "คุณเป็นบรรณารักษ์ข้อมูลห้องปฏิบัติการทางการแพทย์ (Lab Information Specialist)\n"
+        "หน้าที่ของคุณ:\n"
+        "1. สกัดตัวเลขผลตรวจแล็บทั้งหมดที่พบในภาพ เช่น CBC, FBS, HbA1c, Lipid Profile, eGFR, BUN, Creatinine, AST, ALT\n"
+        "2. ตอบเป็น JSON Array ตามโครงสร้างนี้เท่านั้น:\n"
+        "[\n"
+        '  {"marker": "ชื่อตัวชี้วัด", "value": ตัวเลข, "unit": "หน่วย", "ref_range": "ช่วงอ้างอิง", "flag": "Normal/High/Low"}\n'
+        "]\n"
+        "3. ห้ามทำการวินิจฉัยโรค ห้ามระบุว่าคนไข้เป็นโรคอะไรเด็ดขาด\n"
+        "ตอบเฉพาะ JSON Array เท่านั้น"
+    )
+    mime_type = file.content_type or "image/jpeg"
+    res = await gateway.call_gemini_vision(prompt=prompt, image_bytes=sanitized_bytes, mime_type=mime_type)
+
+    raw_text = res.get("content", "[]")
+    
+    # Attempt parsing JSON array from response
+    import json
+    markers = []
+    try:
+        # Strip potential markdown code blocks
+        clean_json_str = raw_text.strip()
+        if clean_json_str.startswith("```json"):
+            clean_json_str = clean_json_str[7:]
+        if clean_json_str.startswith("```"):
+            clean_json_str = clean_json_str[3:]
+        if clean_json_str.endswith("```"):
+            clean_json_str = clean_json_str[:-3]
+        markers = json.loads(clean_json_str.strip())
+    except Exception:
+        # Fallback if raw text wasn't pure JSON
+        markers = [{"raw_extraction": raw_text}]
+
+    return {
+        "success": True,
+        "filename": file.filename,
+        "faces_detected": faces_detected,
+        "classification": DataClassification.CLASS_B,
+        "markers": markers,
+        "gateway_info": {
+            "model_used": config.GEMINI_FLASH_MODEL,
+            "zero_retention": config.ZERO_RETENTION_ENABLED
+        }
+    }
+
+
+@app.post("/api/intake/video")
+async def intake_video_endpoint(
+    file: UploadFile = File(...),
+    consent_granted: bool = Form(False),
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token")
+):
+    """
+    M3: Clinical Video Temporal Scan Endpoint (Gemini 1.5 Pro Video).
+    Generates timestamped visual observations without diagnostic assertions.
+    """
+    raw_video_bytes = await file.read()
+    if not raw_video_bytes:
+        raise HTTPException(status_code=400, detail="Empty video payload")
+
+    if not consent_granted:
+        logger.info("[Video Intake] Patient opted out. Storing in Local Vault.")
+        return {
+            "success": True,
+            "consent_granted": False,
+            "manual_review_required": True,
+            "classification": DataClassification.CLASS_C,
+            "message": "คนไข้ไม่อนุญาตส่งวิดีโอประมวลผลภายนอก ข้อมูลถูกล็อกไว้ใน Local Vault ให้แพทย์ตรวจดูด้วยตนเอง",
+            "observations": None
+        }
+
+    prompt = (
+        "คุณเป็นบรรณารักษ์ช่วยแพทย์บันทึกข้อมูลภาพเคลื่อนไหว (Clinical Video Observer)\n"
+        "หน้าที่ของคุณ:\n"
+        "1. สังเกตลักษณะทางกายภาพที่ปรากฏในคลิปวิดีโอ เช่น ขอบเขตแผล ผื่น ความแดง บวม การเคลื่อนไหว หรืออาการสั่น\n"
+        "2. บันทึกเป็น Timecode ข้อสังเกตชัดเจน เช่น [00:05] [00:15]\n"
+        "3. ห้ามวินิจฉัยโรคเด็ดขาด ไม่ระบุว่าคนไข้เป็นโรคอะไร ให้แพทย์ผู้ตรวจเป็นผู้ตัดสินใจ\n"
+    )
+    mime_type = file.content_type or "video/mp4"
+    res = await gateway.call_gemini_video(prompt=prompt, video_bytes=raw_video_bytes, mime_type=mime_type)
+
+    return {
+        "success": True,
+        "consent_granted": True,
+        "filename": file.filename,
+        "classification": DataClassification.CLASS_B,
+        "observations": res.get("content", ""),
+        "gateway_info": {
+            "model_used": config.GEMINI_PRO_MODEL,
+            "zero_retention": config.ZERO_RETENTION_ENABLED
+        }
     }
 
 

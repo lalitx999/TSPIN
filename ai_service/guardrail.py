@@ -63,16 +63,22 @@ class ClinicalGuardrail:
     @classmethod
     def _keyword_similarity(cls, text1: str, text2: str) -> float:
         """
-        Deterministic word-token overlap similarity for local calibration
-        when embedding models are running in offline/lightweight mode.
+        Calculates character tri-gram containment similarity for Thai & multilingual text.
+        Measures the extent to which the claim's semantic assertions (text1) are contained
+        within the cited reference text (text2).
         """
-        words1 = set(re.findall(r'[ก-๙a-zA-Z0-9]{3,}', text1.lower()))
-        words2 = set(re.findall(r'[ก-๙a-zA-Z0-9]{3,}', text2.lower()))
-        if not words1 or not words2:
+        def get_shingles(text: str, n: int = 3):
+            clean = re.sub(r'[\s\.,;:\-\(\)\[\]/]+', '', text.lower())
+            if len(clean) < n:
+                return {clean} if clean else set()
+            return {clean[i:i+n] for i in range(len(clean) - n + 1)}
+
+        s1 = get_shingles(text1)
+        s2 = get_shingles(text2)
+        if not s1 or not s2:
             return 0.0
-        intersection = words1.intersection(words2)
-        union = words1.union(words2)
-        return len(intersection) / len(union)
+        intersection = s1.intersection(s2)
+        return len(intersection) / len(s1)
 
     @classmethod
     def verify_citation_grounding(
@@ -95,17 +101,14 @@ class ClinicalGuardrail:
                 "reason": "EMPTY_CLAIM_OR_SOURCE"
             }
 
-        # Calculate semantic/lexical overlap score
+        # Calculate containment score (0.0 - 1.0)
         score = cls._keyword_similarity(claim, source_text)
 
-        # Scale score for realistic calibration (normalized 0.0 to 1.0)
-        normalized_score = min(1.0, score * 1.5) if score > 0.1 else score
-
-        is_grounded = normalized_score >= active_threshold
+        is_grounded = score >= active_threshold
 
         return {
             "grounded": is_grounded,
-            "score": round(normalized_score, 4),
+            "score": round(score, 4),
             "threshold": active_threshold,
             "status": "VERIFIED" if is_grounded else "REDACTED"
         }

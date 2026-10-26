@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}กล่องประวัติ {{ box.id|stringformat:".8s" }} — {{ box.patient.full_name }} — TSPI Doctor Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <!-- Breadcrumb & Top Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'clinical:box_dashboard' %}" class="text-decoration-none text-success"><i class="fas fa-boxes-stacked me-1"></i>กล่องประวัติคนไข้</a></li>
+                <li class="breadcrumb-item active text-truncate" style="max-width: 250px;">{{ box.patient.full_name }} ({{ box.id|stringformat:".8s" }})</li>
+            </ol>
+        </nav>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'clinical:box_dashboard' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="fas fa-arrow-left me-1"></i>กลับไปรายการกล่อง
+            </a>
+            {% if is_valid_hmac %}
+                <span class="badge bg-success-subtle text-success border border-success py-2 px-3 rounded-pill">
+                    <i class="fas fa-shield-check me-1"></i>HMAC-SHA256 ปิดผนึกถูกต้อง (Integrity Verified)
+                </span>
+            {% else %}
+                <span class="badge bg-danger-subtle text-danger border border-danger py-2 px-3 rounded-pill">
+                    <i class="fas fa-triangle-exclamation me-1"></i>HMAC ลายเซ็นไม่ตรง (Tamper Warning)
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Patient Header Card -->
+    <div class="card shadow-sm border-0 rounded-4 mb-4 bg-white">
+        <div class="card-body p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 58px; height: 58px;">
+                        <i class="fas fa-user-circle fa-2x"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <h4 class="fw-bold mb-0 text-dark">{{ box.patient.full_name }}</h4>
+                            <span class="badge bg-light text-dark border">HN: {{ box.patient.hn }}</span>
+                            {% if box.status == 'reviewed' %}
+                                <span class="badge bg-primary-subtle text-primary border border-primary"><i class="fas fa-check-circle me-1"></i>ตรวจแล้ว ({{ box.get_decision_display }})</span>
+                            {% elif box.status == 'done' %}
+                                <span class="badge bg-warning-subtle text-warning border border-warning"><i class="fas fa-lock me-1"></i>พร้อมตรวจ (Ready)</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary">{{ box.get_status_display }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted small mt-1">
+                            <span class="me-3"><i class="fas fa-id-badge me-1"></i>Box ID: <code>{{ box.id }}</code></span>
+                            <span class="me-3"><i class="fas fa-inbox me-1"></i>แหล่งที่มา: <strong>{{ box.get_source_display }}</strong></span>
+                            <span><i class="fas fa-calendar-alt me-1"></i>ปิดผนึกเมื่อ: {{ box.created_at|date:"d/m/Y H:i:s" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    {% if box.is_break_glass %}
+                        <div class="alert alert-danger py-2 px-3 mb-0 rounded-3 text-start small border-danger">
+                            <i class="fas fa-siren-on text-danger me-1"></i><strong>Emergency Break-Glass</strong>
+                            <div class="text-muted">เหตุผล: {{ box.break_glass_reason|truncatechars:60 }}</div>
+                            <div class="text-muted">โดย: {{ box.opened_by.username }} ({{ box.opened_at|date:"d/m/Y H:i" }})</div>
+                        </div>
+                    {% elif box.opened_at %}
+                        <div class="small text-muted">
+                            <div><i class="fas fa-user-doctor me-1 text-success"></i>เปิดตรวจโดย: <strong>{{ box.opened_by.get_full_name|default:box.opened_by.username }}</strong></div>
+                            <div><i class="fas fa-clock me-1"></i>เมื่อ: {{ box.opened_at|date:"d/m/Y H:i:s" }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if not is_unlocked %}
+        <!-- LOCKED STATE: Vault Lock Screen -->
+        <div class="row justify-content-center my-5">
+            <div class="col-lg-7 col-md-9">
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                    <div class="bg-dark text-white p-4 text-center position-relative" style="background: linear-gradient(135deg, #1b3a2f 0%, #0d2119 100%);">
+                        <div class="display-5 text-warning mb-2">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h4 class="fw-bold mb-1 text-white">กล่องเวชระเบียนปิดผนึกความปลอดภัย</h4>
+                        <p class="text-white-50 small mb-0">Encrypted Multimodal Clinical Vault (PDPA Sec 26 & HMAC-SHA256)</p>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5 bg-white">
+                        <div class="alert alert-secondary border-0 bg-light rounded-3 p-3 mb-4 small text-muted">
+                            <i class="fas fa-shield-halved text-success me-2 fa-lg"></i>
+                            ข้อมูลอาการ บันทึกเสียง ใบแล็บ และการวิเคราะห์ 39 แกนชีวภาพในกล่องนี้ ถูกปิดผนึกด้วยมาตรการความปลอดภัยขั้นสูง กรุณาป้อน <strong>รหัสผ่านเปิดกล่องส่วนตัว (Personal Box Password)</strong> ของแพทย์เพื่อยืนยันตัวตนก่อนเข้าตรวจ
+                        </div>
+
+                        {% if has_box_password %}
+                            <form method="POST" action="{% url 'clinical:box_unlock' box.id %}" class="mb-4">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="box_password" class="form-label fw-bold text-dark">
+                                        <i class="fas fa-key me-1 text-warning"></i>รหัสผ่านเปิดกล่องส่วนตัวของแพทย์
+                                    </label>
+                                    <div class="input-group input-group-lg">
+                                        <input type="password" id="box_password" name="box_password" class="form-control rounded-start-3" placeholder="กรอกรหัสผ่านเปิดกล่อง..." required autofocus>
+                                        <button class="btn btn-success px-4 rounded-end-3 fw-bold" type="submit">
+                                            <i class="fas fa-unlock me-2"></i>ปลดล็อกกล่อง
+                                        </button>
+                                    </div>
+                                    <div class="form-text small text-muted mt-2">
+                                        <i class="fas fa-circle-info me-1"></i>ระบบมีการจำกัดความถี่ (Rate Limit 5 ครั้ง/นาที) และบันทึก Immutable Audit Trail ทุกครั้ง
+                                    </div>
+                                </div>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-warning border-warning rounded-3 p-3 mb-4">
+                                <h6 class="fw-bold text-warning-emphasis mb-1"><i class="fas fa-triangle-exclamation me-2"></i>ท่านยังไม่ได้ตั้งรหัสผ่านเปิดกล่องส่วนตัว</h6>
+                                <p class="small text-muted mb-0">กรุณาตั้งค่า Personal Box Password ที่หน้าโปรไฟล์ของแพทย์ เพื่อใช้ปลดล็อกกล่องประวัติคนไข้</p>
+                            </div>
+                        {% endif %}
+
+                        <hr class="my-4">
+
+                        <!-- Break-Glass Trigger -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="fw-bold text-danger small"><i class="fas fa-triangle-exclamation me-1"></i>กรณีวิกฤต/ฉุกเฉินทางการแพทย์:</span>
+                                <div class="text-muted small">หากแพทย์เจ้าของไข้ไม่อยู่ สามารถใช้ Break-Glass Protocol ได้</div>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#breakGlassModal">
+                                <i class="fas fa-fire-extinguisher me-1"></i>Break-Glass Protocol
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Break-Glass Modal -->
+        <div class="modal fade" id="breakGlassModal" tabindex="-1" aria-labelledby="breakGlassModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <form method="POST" action="{% url 'clinical:box_break_glass' box.id %}">
+                        {% csrf_token %}
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title fw-bold" id="breakGlassModalLabel">
+                                <i class="fas fa-siren-on me-2"></i>ยืนยันการเปิดกล่องฉุกเฉิน (Break-Glass)
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="alert alert-danger-subtle text-danger border border-danger rounded-3 small mb-3">
+                                <strong>คำเตือนทางกฎหมายและความปลอดภัย:</strong> การใช้โปรโตคอล Break-Glass จะถูกบันทึกเป็น <strong>Critical Audit Trail</strong> แจ้งเตือนไปยังผู้อำนวยการฝ่ายการแพทย์และ DPO และไม่สามารถลบประวัติได้
+                            </div>
+                            <div class="mb-3">
+                                <label for="break_glass_reason" class="form-label fw-bold small text-dark">
+                                    เหตุผลความจำเป็นทางคลินิกอย่างละเอียด <span class="text-danger">*</span>
+                                </label>
+                                <textarea class="form-control" id="break_glass_reason" name="break_glass_reason" rows="3" required minlength="10" placeholder="เช่น คนไข้มีภาวะฉุกเฉิน หายใจลำบาก แพทย์เจ้าของไข้ติดเคสผ่าตัด..."></textarea>
+                                <div class="form-text small text-muted">ต้องระบุอย่างน้อย 10 ตัวอักษร</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-secondary rounded-pill px-3 btn-sm" data-bs-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-danger rounded-pill px-4 btn-sm fw-bold">
+                                <i class="fas fa-exclamation-triangle me-1"></i>ยืนยันปลดล็อกฉุกเฉิน
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- UNLOCKED STATE: Full Clinical Vault Dashboard -->
+
+        <!-- Section 1: Philosophy Banner -->
+        <div class="alert alert-success border-success-subtle bg-success-subtle text-success-emphasis rounded-4 p-3 mb-4 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <i class="fas fa-book-medical fa-2x text-success"></i>
+                <div>
+                    <h6 class="fw-bold mb-0">หลักการกำกับดูแลทางคลินิก (Clinical Governance)</h6>
+                    <small class="text-muted">
+                        <em>"AI เป็นเพียงบรรณารักษ์ผู้ช่วยค้นคว้า ไม่ใช่อาจารย์แพทย์ — แพทย์ผู้ตรวจคือผู้ตัดสินใจและรับผิดชอบการรักษารายบุคคล"</em>
+                    </small>
+                </div>
+            </div>
+            <span class="badge bg-success text-white px-3 py-2 rounded-pill small">
+                <i class="fas fa-lock-open me-1"></i>ปลดล็อกแล้ว (Active Session)
+            </span>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- Left Column: SOAP Note & Clinical Reasoning -->
+            <div class="col-lg-8">
+                <!-- Card: Groq Dual-Core SOAP Note -->
+                <div class="card shadow-sm border-0 rounded-4 mb-4 bg-white">
+                    <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary text-white rounded-pill px-2.5 py-1">Dual-Core</span>
+                            <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-clipboard-list me-2 text-primary"></i>แบบบันทึกเวชระเบียน SOAP (Librarian Draft)</h5>
+                        </div>
+                        <span class="text-muted small"><i class="fas fa-bolt text-warning me-1"></i>Groq Engine (High Speed)</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <!-- Subjective -->
+                            <div class="col-12">
+                                <div class="border rounded-3 p-3 bg-light-subtle">
+                                    <div class="d-flex align-items-center gap-2 mb-2 text-primary fw-bold">
+                                        <span class="badge bg-primary text-white rounded-circle">S</span>
+                                        <span>Subjective (อาการสำคัญ & ประวัติที่คนไข้แจ้ง)</span>
+                                    </div>
+                                    <div class="ps-4 text-dark" style="white-space: pre-wrap;">{{ soap.subjective|default:"ไม่มีข้อมูลอาการที่คนไข้แจ้ง" }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Objective -->
+                            <div class="col-12">
+                                <div class="border rounded-3 p-3 bg-light-subtle">
+                                    <div class="d-flex align-items-center gap-2 mb-2 text-success fw-bold">
+                                        <span class="badge bg-success text-white rounded-circle">O</span>
+                                        <span>Objective (ข้อมูลการตรวจร่างกายและผลตรวจวัตถุวิสัย)</span>
+                                    </div>
+                                    <div class="ps-4 text-dark" style="white-space: pre-wrap;">{{ soap.objective|default:"ไม่มีข้อมูลวัตถุวิสัย" }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Assessment -->
+                            <div class="col-12">
+                                <div class="border rounded-3 p-3 bg-light-subtle">
+                                    <div class="d-flex align-items-center gap-2 mb-2 text-warning fw-bold">
+                                        <span class="badge bg-warning text-dark rounded-circle">A</span>
+                                        <span>Assessment (การประเมินสภาวะทางคลินิกเบื้องต้นของ AI)</span>
+                                    </div>
+                                    <div class="ps-4 text-dark" style="white-space: pre-wrap;">{{ soap.assessment|default:"ไม่มีข้อมูลการประเมิน" }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Plan -->
+                            <div class="col-12">
+                                <div class="border rounded-3 p-3 bg-light-subtle">
+                                    <div class="d-flex align-items-center gap-2 mb-2 text-info fw-bold">
+                                        <span class="badge bg-info text-dark rounded-circle">P</span>
+                                        <span>Plan (ข้อเสนอแนะแนวทางการรักษาเบื้องต้น)</span>
+                                    </div>
+                                    <div class="ps-4 text-dark" style="white-space: pre-wrap;">{{ soap.plan|default:"ไม่มีข้อเสนอแนะแผนการรักษา" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: DeepSeek-R1 39 Biological Axes & Compendium Citations -->
+                <div class="card shadow-sm border-0 rounded-4 mb-4 bg-white">
+                    <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-purple text-white rounded-pill px-2.5 py-1" style="background-color: #6f42c1;">R1 Dual-Core</span>
+                            <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-dna me-2 text-purple" style="color: #6f42c1;"></i>การวิเคราะห์ 39 แกนชีวภาพ & คลังตำราอ้างอิง</h5>
+                        </div>
+                        <span class="text-muted small"><i class="fas fa-brain text-purple me-1" style="color: #6f42c1;"></i>DeepSeek-R1 CoT</span>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if relevant_axes %}
+                            <div class="row g-3">
+                                {% for ax in relevant_axes %}
+                                    <div class="col-md-6">
+                                        <div class="card h-100 border border-secondary-subtle rounded-3 shadow-none p-3 bg-light">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <span class="badge bg-dark rounded-pill">Axis {{ ax.axis_number|default:ax.id }}</span>
+                                                <span class="badge bg-info-subtle text-info border border-info rounded-pill small">{{ ax.domain|default:"Biological Domain" }}</span>
+                                            </div>
+                                            <h6 class="fw-bold text-dark mb-1">{{ ax.name|default:ax.title }}</h6>
+                                            <p class="text-muted small mb-2">{{ ax.clinical_significance|default:ax.description|truncatechars:120 }}</p>
+                                            
+                                            {% if ax.citations %}
+                                                <div class="mt-auto pt-2 border-top">
+                                                    <div class="small fw-semibold text-success mb-1"><i class="fas fa-bookmark me-1"></i>Compendium Citations:</div>
+                                                    <ul class="list-unstyled mb-0 small text-muted">
+                                                        {% for c in ax.citations %}
+                                                            <li><i class="fas fa-file-lines me-1 text-secondary"></i>{{ c.source|default:c }} ({{ c.page|default:"Vol 1" }})</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4 text-muted">
+                                <i class="fas fa-circle-nodes fa-2x mb-2 text-secondary"></i>
+                                <p class="mb-0 small">ไม่พบแกนชีวภาพที่มีความเครียดเด่นชัดสำหรับข้อมูลเคสนี้</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Card: Lab Extraction & Correlations (Gemini 2.5 Flash) -->
+                {% if lab_markers %}
+                <div class="card shadow-sm border-0 rounded-4 mb-4 bg-white">
+                    <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-warning text-dark rounded-pill px-2.5 py-1">Gemini Vision</span>
+                            <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-vial-virus me-2 text-warning"></i>ผลตรวจทางห้องปฏิบัติการ (Lab Extractions)</h5>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light small">
+                                    <tr>
+                                        <th>รายการตรวจ (Marker)</th>
+                                        <th>ผลตรวจ (Value)</th>
+                                        <th>หน่วย (Unit)</th>
+                                        <th>ค่าอ้างอิง (Ref Range)</th>
+                                        <th>สถานะ (Flag)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in lab_markers %}
+                                        <tr>
+                                            <td class="fw-bold">{{ item.marker_name }}</td>
+                                            <td><span class="badge bg-light text-dark border fs-6">{{ item.value }}</span></td>
+                                            <td class="text-muted small">{{ item.unit }}</td>
+                                            <td class="text-muted small">{{ item.reference_range }}</td>
+                                            <td>
+                                                {% if item.flag == 'HIGH' or item.flag == 'H' %}
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger"><i class="fas fa-arrow-up me-1"></i>สูงผิดปกติ</span>
+                                                {% elif item.flag == 'LOW' or item.flag == 'L' %}
+                                                    <span class="badge bg-primary-subtle text-primary border border-primary"><i class="fas fa-arrow-down me-1"></i>ต่ำกว่าเกณฑ์</span>
+                                                {% else %}
+                                                    <span class="badge bg-success-subtle text-success border border-success"><i class="fas fa-check me-1"></i>ปกติ</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Right Column: Media Vault & Doctor Decision Form -->
+            <div class="col-lg-4">
+                <!-- Card: Multimedia Vault (Audio & Video) -->
+                <div class="card shadow-sm border-0 rounded-4 mb-4 bg-white">
+                    <div class="card-header bg-white border-bottom py-3 px-4">
+                        <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-photo-film me-2 text-info"></i>คลังมัลติมีเดีย (Media Vault)</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Voice Intake Audio -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-dark d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-microphone me-1 text-danger"></i>บันทึกเสียงคนไข้ (Voice Intake)</span>
+                                <span class="badge bg-success-subtle text-success border border-success small"><i class="fas fa-shield-check me-1"></i>Consent Granted</span>
+                            </label>
+                            {% if box.audio_file %}
+                                <audio controls class="w-100 mt-1">
+                                    <source src="{{ box.audio_file.url }}" type="audio/mpeg">
+                                    Browser ของท่านไม่รองรับการเล่นไฟล์เสียง
+                                </audio>
+                            {% else %}
+                                <div class="p-3 bg-light rounded-3 text-center text-muted small">
+                                    <i class="fas fa-microphone-slash me-1"></i>ไม่มีไฟล์เสียงบันทึกในกล่องนี้
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Video Observations -->
+                        <div>
+                            <label class="form-label fw-bold small text-dark">
+                                <i class="fas fa-video me-1 text-primary"></i>ผลการวิเคราะห์วิดีโอ (Video Observations)
+                            </label>
+                            {% if video_observations %}
+                                <div class="p-3 bg-light rounded-3 small text-muted" style="white-space: pre-wrap; max-height: 200px; overflow-y: auto;">{{ video_observations }}</div>
+                            {% else %}
+                                <div class="p-3 bg-light rounded-3 text-center text-muted small">
+                                    <i class="fas fa-video-slash me-1"></i>ไม่มีข้อมูลวิดีโอสำหรับเคสนี้
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Doctor Clinical Decision & Order Form -->
+                <div class="card shadow-sm border-0 rounded-4 mb-4 bg-white border-top border-4 border-success">
+                    <div class="card-header bg-white border-bottom py-3 px-4">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-user-doctor me-2 text-success"></i>คำสั่งการรักษาของแพทย์ (Doctor Verdict)</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" action="{% url 'clinical:box_decision' box.id %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-dark">การตัดสินใจทางคลินิก (Clinical Decision) <span class="text-danger">*</span></label>
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="form-check p-2 border rounded-3 bg-light-subtle">
+                                        <input class="form-check-input ms-1" type="radio" name="decision" id="dec_approve" value="APPROVE" {% if box.decision == 'APPROVE' %}checked{% endif %} required>
+                                        <label class="form-check-label ms-2 fw-semibold text-success" for="dec_approve">
+                                            <i class="fas fa-check-circle me-1"></i>อนุมัติแผนการรักษา (Approve)
+                                        </label>
+                                    </div>
+                                    <div class="form-check p-2 border rounded-3 bg-light-subtle">
+                                        <input class="form-check-input ms-1" type="radio" name="decision" id="dec_modify" value="MODIFY" {% if box.decision == 'MODIFY' %}checked{% endif %}>
+                                        <label class="form-check-label ms-2 fw-semibold text-warning-emphasis" for="dec_modify">
+                                            <i class="fas fa-pen-to-square me-1"></i>ปรับแก้แผนการรักษา (Modify)
+                                        </label>
+                                    </div>
+                                    <div class="form-check p-2 border rounded-3 bg-light-subtle">
+                                        <input class="form-check-input ms-1" type="radio" name="decision" id="dec_reject" value="REJECT" {% if box.decision == 'REJECT' %}checked{% endif %}>
+                                        <label class="form-check-label ms-2 fw-semibold text-danger" for="dec_reject">
+                                            <i class="fas fa-ban me-1"></i>ปฏิเสธ / สั่งตรวจซ้ำ (Reject)
+                                        </label>
+                                    </div>
+                                    <div class="form-check p-2 border rounded-3 bg-light-subtle">
+                                        <input class="form-check-input ms-1" type="radio" name="decision" id="dec_refer" value="REFER" {% if box.decision == 'REFER' %}checked{% endif %}>
+                                        <label class="form-check-label ms-2 fw-semibold text-primary" for="dec_refer">
+                                            <i class="fas fa-share-from-square me-1"></i>ส่งต่อแพทย์เฉพาะทาง (Refer)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="doctor_notes" class="form-label fw-bold small text-dark">บันทึกความเห็นและคำสั่งยา/การรักษาเพิ่มเติม</label>
+                                <textarea class="form-control" id="doctor_notes" name="doctor_notes" rows="4" placeholder="ระบุเหตุผลการปรับแผน หรือคำสั่งยาเพิ่มเติม...">{{ box.doctor_notes }}</textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100 py-2 rounded-pill fw-bold">
+                                <i class="fas fa-signature me-1"></i>ลงนามและบันทึกการตัดสินใจ
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

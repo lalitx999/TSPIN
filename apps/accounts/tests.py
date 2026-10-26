@@ -540,5 +540,151 @@ class BotanyEnginePhase4Tests(TestCase):
         self.assertFalse(box.verify_integrity())
 
 
+class BotanyEnginePhase5Tests(TestCase):
+    """
+    Test suite for TSPI Botany-Engine Phase 5 (Doctor Box Portal & Break-Glass Protocol):
+    1. Dashboard display & RBAC gating
+    2. Locked state vs Unlocked state
+    3. Personal Box Password authentication & AuditLog failure recording
+    4. Successful unlock, session persistence, and timestamp recording
+    5. Clinical decision recording & status transition
+    6. Emergency Break-Glass protocol with critical audit trail
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.doctor = User.objects.create_user(
+            username='doctor_karn',
+            email='karn@tspi.clinic',
+            password='ComplexDoctorPassword2026!',
+            role=User.Role.DOCTOR,
+            first_name='กานต์',
+            last_name='แพทย์พัฒนา'
+        )
+        self.doctor.set_box_password("DoctorSecretBoxKey2026!")
+        self.doctor.save()
+
+        from clinical.services_box import BoxBuilderService
+        from clinical.models import Box
+
+        self.box = BoxBuilderService.assemble_box(
+            source=Box.Source.LINE,
+            raw_complaint="มีอาการอ่อนเพลียเรื้อรัง มึนศีรษะตอนบ่าย ตรวจพบน้ำตาลสูง",
+            lab_markers=[{"marker": "HbA1c", "value": 7.2, "unit": "%", "flag": "HIGH"}]
+        )
+
+    def test_box_dashboard_access_gated_by_role(self):
+        """[Phase 5 Portal]: เฉพาะบุคลากรทางการแพทย์เท่านั้นที่เข้าถึง Dashboard ได้"""
+        # ยังไม่ล็อกอิน
+        anon_resp = self.client.get(reverse('clinical:box_dashboard'))
+        self.assertEqual(anon_resp.status_code, 302)
+
+        # ล็อกอินเป็นแพทย์
+        self.client.force_login(self.doctor)
+        doc_resp = self.client.get(reverse('clinical:box_dashboard'))
+        self.assertEqual(doc_resp.status_code, 200)
+        self.assertContains(doc_resp, "กล่องประวัติคนไข้")
+
+    def test_box_detail_locked_initially(self):
+        """[Phase 5 Portal]: เข้าดูกล่องครั้งแรกต้องอยู่ในสถานะล็อก (is_unlocked = False)"""
+        self.client.force_login(self.doctor)
+        resp = self.client.get(reverse('clinical:box_detail', kwargs={'box_id': self.box.id}))
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(resp.context['is_unlocked'])
+        self.assertContains(resp, "กล่องเวชระเบียนปิดผนึกความปลอดภัย")
+        self.assertContains(resp, "รหัสผ่านเปิดกล่องส่วนตัวของแพทย์")
+
+    def test_box_unlock_with_incorrect_password(self):
+        """[Phase 5 Security]: ป้อนรหัสผ่านเปิดกล่องผิด ต้องปฏิเสธและบันทึก BOX_UNLOCK_FAILED AuditLog"""
+        self.client.force_login(self.doctor)
+        resp = self.client.post(
+            reverse('clinical:box_unlock', kwargs={'box_id': self.box.id}),
+            {'box_password': 'WrongPassword123!'},
+            follow=True
+        )
+        self.assertEqual(resp.status_code, 200)
+        # กล่องยังคงถูกล็อก
+        self.assertFalse(resp.context['is_unlocked'])
+        # ตรวจสอบ AuditLog
+        failed_log = AuditLog.objects.filter(action="BOX_UNLOCK_FAILED", object_id=str(self.box.id)).first()
+        self.assertIsNotNone(failed_log)
+        self.assertEqual(failed_log.user, self.doctor)
+
+    def test_box_unlock_with_correct_password(self):
+        """[Phase 5 Security]: ป้อนรหัสผ่านเปิดกล่องถูกต้อง ปลดล็อกสำเร็จ และบันทึก BOX_UNLOCKED AuditLog"""
+        self.client.force_login(self.doctor)
+        resp = self.client.post(
+            reverse('clinical:box_unlock', kwargs={'box_id': self.box.id}),
+            {'box_password': 'DoctorSecretBoxKey2026!'},
+            follow=True
+        )
+        self.assertEqual(resp.status_code, 200)
+        # ปลดล็อกสำเร็จ
+        self.assertTrue(resp.context['is_unlocked'])
+        self.assertContains(resp, "แบบบันทึกเวชระเบียน SOAP")
+        self.assertContains(resp, "การวิเคราะห์ 39 แกนชีวภาพ")
+
+        # ตรวจสอบการบันทึกสถานะเปิดกล่อง
+        self.box.refresh_from_db()
+        self.assertEqual(self.box.opened_by, self.doctor)
+        self.assertIsNotNone(self.box.opened_at)
+
+        # ตรวจสอบ AuditLog
+        success_log = AuditLog.objects.filter(action="BOX_UNLOCKED", object_id=str(self.box.id)).first()
+        self.assertIsNotNone(success_log)
+
+    def test_box_decision_recording(self):
+        """[Phase 5 Clinical]: บันทึกคำสั่งการรักษาของแพทย์ เปลี่ยนสถานะเป็น reviewed และบันทึก AuditLog"""
+        self.client.force_login(self.doctor)
+        from clinical.models import Box
+
+        resp = self.client.post(
+            reverse('clinical:box_decision', kwargs={'box_id': self.box.id}),
+            {
+                'decision': Box.Decision.APPROVE,
+                'doctor_notes': 'เห็นชอบตามข้อเสนอแนะ ให้เจาะเลือดซ้ำใน 4 สัปดาห์'
+            },
+            follow=True
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.box.refresh_from_db()
+        self.assertEqual(self.box.status, Box.Status.REVIEWED)
+        self.assertEqual(self.box.decision, Box.Decision.APPROVE)
+        self.assertIn("เจาะเลือดซ้ำ", self.box.doctor_notes)
+
+        # ตรวจสอบ AuditLog
+        decision_log = AuditLog.objects.filter(action="BOX_DECISION_RECORDED", object_id=str(self.box.id)).first()
+        self.assertIsNotNone(decision_log)
+
+    def test_break_glass_emergency_unlock(self):
+        """[Phase 5 Emergency]: เปิดกล่องฉุกเฉิน Break-Glass ต้องมีเหตุผล >= 10 ตัวอักษร และบันทึก Critical AuditLog"""
+        self.client.force_login(self.doctor)
+
+        # 1. ป้อนเหตุผลสั้นเกินไป (< 10 ตัวอักษร) ต้องปฏิเสธ
+        short_resp = self.client.post(
+            reverse('clinical:box_break_glass', kwargs={'box_id': self.box.id}),
+            {'break_glass_reason': 'ฉุกเฉิน'},
+            follow=True
+        )
+        self.assertFalse(short_resp.context['is_unlocked'])
+
+        # 2. ป้อนเหตุผลสมบูรณ์ (>= 10 ตัวอักษร) ปลดล็อกสำเร็จ
+        urgent_reason = "คนไข้หมดสติเฉียบพลัน ต้องดูประวัติยาด่วนที่สุด"
+        success_resp = self.client.post(
+            reverse('clinical:box_break_glass', kwargs={'box_id': self.box.id}),
+            {'break_glass_reason': urgent_reason},
+            follow=True
+        )
+        self.assertTrue(success_resp.context['is_unlocked'])
+        self.box.refresh_from_db()
+        self.assertTrue(self.box.is_break_glass)
+        self.assertEqual(self.box.break_glass_reason, urgent_reason)
+
+        # ตรวจสอบ Critical AuditLog
+        bg_log = AuditLog.objects.filter(action="BREAK_GLASS_UNLOCKED", object_id=str(self.box.id)).first()
+        self.assertIsNotNone(bg_log)
+        self.assertEqual(bg_log.changes.get("severity"), "CRITICAL")
+
+
 
 

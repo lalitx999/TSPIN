@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}กล่องประวัติคนไข้ (Intake Boxes) — TSPI Doctor Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <!-- Header & Statistics -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h3 class="fw-bold text-success mb-1">
+                <i class="fas fa-boxes-stacked me-2"></i>กล่องประวัติคนไข้ (Intake Boxes)
+            </h3>
+            <p class="text-muted mb-0 small">
+                กล่องข้อมูลความปลอดภัย (Encrypted Multimodal Vault) ปิดผนึกด้วยลายเซ็น HMAC-SHA256 ปลดล็อกด้วยรหัสผ่านส่วนตัวของแพทย์
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'clinical:report_dashboard' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="fas fa-file-medical me-1"></i>รายงานเวชระเบียน
+            </a>
+            <a href="{% url 'clinical:axes_explorer' %}" class="btn btn-outline-success btn-sm rounded-pill px-3">
+                <i class="fas fa-network-wired me-1"></i>39 แกนชีวภาพ
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 p-3 bg-white border-start border-4 border-success">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold">กล่องทั้งหมด</div>
+                        <h3 class="fw-bold mb-0 text-dark">{{ counts.all }}</h3>
+                    </div>
+                    <div class="bg-success-subtle text-success p-3 rounded-circle">
+                        <i class="fas fa-box-archive fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 p-3 bg-white border-start border-4 border-warning">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold">รอแพทย์เปิดตรวจ (Ready)</div>
+                        <h3 class="fw-bold mb-0 text-warning">{{ counts.done }}</h3>
+                    </div>
+                    <div class="bg-warning-subtle text-warning p-3 rounded-circle">
+                        <i class="fas fa-lock fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 p-3 bg-white border-start border-4 border-primary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold">แพทย์ตรวจแล้ว (Reviewed)</div>
+                        <h3 class="fw-bold mb-0 text-primary">{{ counts.reviewed }}</h3>
+                    </div>
+                    <div class="bg-primary-subtle text-primary p-3 rounded-circle">
+                        <i class="fas fa-user-doctor fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 p-3 bg-white border-start border-4 border-secondary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold">ฉบับร่าง (Drafts)</div>
+                        <h3 class="fw-bold mb-0 text-secondary">{{ counts.draft }}</h3>
+                    </div>
+                    <div class="bg-secondary-subtle text-secondary p-3 rounded-circle">
+                        <i class="fas fa-clock fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-body p-3">
+            <form method="GET" class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                        <input type="text" name="q" value="{{ query }}" class="form-control border-start-0 ps-0" placeholder="ค้นหาตามชื่อคนไข้ หรือ HN...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">-- สถานะทั้งหมด --</option>
+                        <option value="done" {% if status_filter == 'done' %}selected{% endif %}>พร้อมให้ตรวจ (Done)</option>
+                        <option value="reviewed" {% if status_filter == 'reviewed' %}selected{% endif %}>แพทย์ตรวจแล้ว (Reviewed)</option>
+                        <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>ฉบับร่าง (Draft)</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="source" class="form-select">
+                        <option value="">-- ช่องทางทั้งหมด --</option>
+                        <option value="LINE" {% if source_filter == 'LINE' %}selected{% endif %}>LINE Official Account</option>
+                        <option value="WEB" {% if source_filter == 'WEB' %}selected{% endif %}>Patient Web Portal</option>
+                        <option value="CLINIC" {% if source_filter == 'CLINIC' %}selected{% endif %}>Clinic Intake Terminal</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-success rounded-pill w-100">
+                        <i class="fas fa-filter me-1"></i>กรอง
+                    </button>
+                    {% if query or status_filter or source_filter %}
+                        <a href="{% url 'clinical:box_dashboard' %}" class="btn btn-outline-secondary rounded-pill" title="ล้างตัวกรอง">
+                            <i class="fas fa-rotate-left"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Boxes Table List -->
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted small text-uppercase">
+                    <tr>
+                        <th class="ps-4">รหัสกล่อง (Box ID)</th>
+                        <th>คนไข้ (HN)</th>
+                        <th>ช่องทาง (Source)</th>
+                        <th>การปิดผนึก (HMAC Seal)</th>
+                        <th>สถานะ (Status)</th>
+                        <th>วันที่ส่งเข้ามา</th>
+                        <th>แพทย์ผู้เปิดตรวจ</th>
+                        <th class="text-end pe-4">การจัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for box in boxes %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success-subtle text-success p-2 rounded-3 me-2">
+                                        <i class="fas fa-box"></i>
+                                    </div>
+                                    <div>
+                                        <span class="fw-bold font-monospace text-dark">{{ box.id|stringformat:"s"|slice:":8" }}</span>
+                                        <div class="text-muted x-small">UUID v7/v4</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if box.patient %}
+                                    <div class="fw-bold text-dark">{{ box.patient.full_name }}</div>
+                                    <div class="text-muted small font-monospace">HN: {{ box.patient.hn }}</div>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill">ไม่ระบุตัวตน (Guest)</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if box.source == 'LINE' %}
+                                    <span class="badge bg-success text-white rounded-pill px-3 py-1">
+                                        <i class="fab fa-line me-1"></i>LINE OA
+                                    </span>
+                                {% elif box.source == 'WEB' %}
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1">
+                                        <i class="fas fa-globe me-1"></i>Web
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-purple-subtle text-purple border rounded-pill px-3 py-1">
+                                        <i class="fas fa-hospital me-1"></i>Clinic
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if box.is_hmac_valid %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small" title="HMAC Signature: {{ box.signature }}">
+                                        <i class="fas fa-shield-halved me-1"></i>HMAC Valid
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger text-white rounded-pill px-2 py-1 small" title="Signature Mismatch">
+                                        <i class="fas fa-triangle-exclamation me-1"></i>Tampered!
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if box.status == 'done' %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1">
+                                        <i class="fas fa-hourglass-half me-1"></i>พร้อมตรวจ
+                                    </span>
+                                {% elif box.status == 'reviewed' %}
+                                    <span class="badge bg-success text-white rounded-pill px-3 py-1">
+                                        <i class="fas fa-check-double me-1"></i>ตรวจแล้ว
+                                    </span>
+                                {% elif box.status == 'processing' %}
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-3 py-1">
+                                        <i class="fas fa-spinner fa-spin me-1"></i>กำลังประมวลผล
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-1">ร่าง</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="small text-dark">{{ box.created_at|date:"d/m/Y H:i" }}</div>
+                                <div class="text-muted x-small">{{ box.created_at|timesince }} ที่แล้ว</div>
+                            </td>
+                            <td>
+                                {% if box.opened_by %}
+                                    <div class="small fw-semibold text-dark">
+                                        <i class="fas fa-user-doctor me-1 text-success"></i>{{ box.opened_by.get_full_name|default:box.opened_by.username }}
+                                    </div>
+                                    <div class="text-muted x-small">{{ box.opened_at|date:"d/m H:i" }}</div>
+                                {% else %}
+                                    <span class="text-muted small fst-italic">ยังไม่มีแพทย์เปิด</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="{% url 'clinical:box_detail' box_id=box.id %}" class="btn btn-outline-success btn-sm rounded-pill px-3">
+                                    <i class="fas fa-key me-1"></i>เปิดกล่องตรวจ
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <div class="p-4">
+                                    <i class="fas fa-box-open fa-3x mb-3 text-secondary-subtle"></i>
+                                    <h5>ไม่พบกล่องข้อมูลประวัติคนไข้ในระบบ</h5>
+                                    <p class="small">เมื่อมีคนไข้ส่งอาการหรือผลตรวจผ่าน LINE หรือ Web Portal ข้อมูลจะปรากฏที่นี่</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

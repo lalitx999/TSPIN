@@ -497,4 +497,48 @@ class BotanyEnginePhase3Tests(TestCase):
         self.assertEqual(fake_data["verdict"], "REJECT")
 
 
+class BotanyEnginePhase4Tests(TestCase):
+    """
+    Test suite for TSPI Botany-Engine Phase 4 (Box Builder & Integrity Verification):
+    1. Cryptographic HMAC-SHA256 Box sealing
+    2. Tamper-evident detection (modifying payload breaks signature)
+    3. Multimodal Box assembly with SOAP + 39 axes + citations
+    """
+
+    def test_box_sealing_and_hmac_integrity(self):
+        """[Phase 4 Box]: กล่องที่สร้างใหม่ต้องถูกปิดผนึกด้วยลายเซ็น HMAC-SHA256 ที่ถูกต้อง"""
+        from clinical.services_box import BoxBuilderService
+        from clinical.models import Box
+
+        box = BoxBuilderService.assemble_box(
+            source=Box.Source.WEB,
+            raw_complaint="คนไข้มีอาการปวดกล้ามเนื้อเรื้อรัง นอนไม่ค่อยหลับ",
+            lab_markers=[{"marker": "FBS", "value": 115, "unit": "mg/dL", "flag": "High"}]
+        )
+        self.assertIsNotNone(box.id)
+        self.assertTrue(len(box.signature) == 64)
+        self.assertEqual(box.status, Box.Status.DONE)
+        
+        # ยืนยันความสมบูรณ์ของกล่อง
+        self.assertTrue(box.verify_integrity())
+
+    def test_box_tampering_detection(self):
+        """[Phase 4 Box]: หากมีการแอบแก้ไขข้อมูลในกล่อง ลายเซ็น HMAC จะต้องล้มเหลวทันที (Tamper-Evident)"""
+        from clinical.services_box import BoxBuilderService
+
+        box = BoxBuilderService.assemble_box(
+            raw_complaint="อาการปกติ ไม่มีประเด็นร้ายแรง"
+        )
+        self.assertTrue(box.verify_integrity())
+
+        # จำลองการแอบแก้ข้อมูลใน Payload (Man-in-the-Middle or rogue DB edit)
+        tampered_contents = dict(box.contents)
+        tampered_contents["complaint"] = "แอบแก้ไข: คนไข้หัวใจวายเฉียบพลัน"
+        box.contents = tampered_contents
+        
+        # ตรวจสอบว่าระบบตรวจพบการดัดแปลงข้อมูล
+        self.assertFalse(box.verify_integrity())
+
+
+
 

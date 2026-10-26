@@ -15,7 +15,8 @@ from django.urls import reverse
 
 from accounts.models import AuditLog
 from patients.models import Patient, PatientLinkingToken, Appointment
-from clinical.models import AnalysisRecord
+from clinical.models import AnalysisRecord, Box
+from clinical.services_box import BoxBuilderService
 from patients.line_service import LineSecurity, LineFlexMessageBuilder, LineMessagingService
 
 logger = logging.getLogger(__name__)
@@ -144,6 +145,22 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
         msg = {
             "type": "text",
             "text": "TSPI Precision Medicine Clinic\nโทร: 02-123-4567\nเวลาทำการ: จันทร์ - ศุกร์ 09:00 - 18:00 น."
+        }
+        LineMessagingService.reply_message(reply_token, [msg])
+    elif any(s in text for s in ['อาการ', 'ปวด', 'เจ็บ', 'เหนื่อย', 'แน่น', 'แพ้', 'แสบ', 'บวม', 'ผื่น', 'คัน', 'นอนไม่หลับ', 'เพลีย']) or len(text) >= 15:
+        # Create a sealed intake Box for the doctor
+        box = BoxBuilderService.assemble_box(
+            patient=patient,
+            source=Box.Source.LINE,
+            raw_complaint=text
+        )
+        msg = {
+            "type": "text",
+            "text": (
+                f"🌿 คลินิก TSPI ได้รับบันทึกอาการของท่านเรียบร้อยแล้ว\n\n"
+                f"ระบบได้จัดทำสรุปประวัติและปิดผนึกข้อมูลลงกล่องความปลอดภัย (Box ID: {box.id.hex[:8]}) "
+                f"เพื่อให้แพทย์ผู้เชี่ยวชาญเปิดตรวจและวิเคราะห์ในการรักษาต่อไปครับ"
+            )
         }
         LineMessagingService.reply_message(reply_token, [msg])
     else:

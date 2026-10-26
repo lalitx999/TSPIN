@@ -4,6 +4,9 @@ Enforces Mechanistic Ontologies, Immutable Audit Snapshots, and Strict Doctor Ap
 """
 
 import uuid
+import hmac
+import hashlib
+import json
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -181,6 +184,105 @@ class AnalysisRecord(SoftDeleteModel):
     @property
     def status_label(self):
         return dict(self.STATUS_CHOICES).get(self.status, self.status)
+
+
+class Box(SoftDeleteModel):
+    """
+    Multimodal Medical Intake Box (Pillars 1, 2, 4, 8).
+    Encloses multimodal raw evidence + AI synthesized SOAP and 39 axes scores
+    with cryptographic HMAC-SHA256 signature sealing.
+    Unlocked only by a Doctor with their Personal Box Password.
+    """
+    class Source(models.TextChoices):
+        LINE = 'LINE', 'LINE Official Account'
+        WEB = 'WEB', 'Patient Web Portal'
+        CLINIC = 'CLINIC', 'Clinic Intake Terminal'
+
+    class Status(models.TextChoices):
+        DRAFT = 'draft', 'ฉบับร่าง (Draft)'
+        PROCESSING = 'processing', 'กำลังประมวลผล (Processing)'
+        DONE = 'done', 'พร้อมให้แพทย์ตรวจ (Done)'
+        REVIEWED = 'reviewed', 'แพทย์ตรวจแล้ว (Reviewed)'
+
+    class Decision(models.TextChoices):
+        APPROVE = 'APPROVE', 'อนุมัติตามที่เสนอ (Approve)'
+        MODIFY = 'MODIFY', 'แก้ไขปรับปรุง (Modify)'
+        REJECT = 'REJECT', 'ปฏิเสธ (Reject)'
+        REFER = 'REFER', 'ส่งต่อแพทย์เฉพาะทาง (Refer)'
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    signature = models.CharField(max_length=64, blank=True, help_text="HMAC-SHA256 Cryptographic Payload Signature")
+    source = models.CharField(max_length=20, choices=Source.choices, default=Source.WEB, db_index=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT, db_index=True)
+
+    patient = models.ForeignKey(
+        'patients.Patient',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='intake_boxes',
+        help_text="คนไข้เจ้าของกล่องข้อมูล"
+    )
+
+    # Local Encrypted Asset references
+    voice_file_path = models.CharField(max_length=500, blank=True)
+    video_file_path = models.CharField(max_length=500, blank=True)
+    lab_image_paths = models.JSONField(default=list, blank=True)
+
+    # AI Synthesized Payload (SOAP + 39 Axes + Citations + Lab Markers)
+    contents = models.JSONField(default=dict, help_text="SOAP + 39 Axes Scores + Citations + Lab Markers")
+
+    # Audit & Lifecycle Timestamps
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+    opened_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='opened_boxes',
+        help_text="แพทย์/บุคลากรที่เปิดกล่อง"
+    )
+    opened_at = models.DateTimeField(null=True, blank=True)
+
+    # Doctor Verdict
+    decision = models.CharField(max_length=20, choices=Decision.choices, blank=True)
+    doctor_notes = models.TextField(blank=True)
+
+    # Emergency Break-Glass Flag
+    is_break_glass = models.BooleanField(default=False)
+    break_glass_reason = models.TextField(blank=True)
+
+    class Meta:
+        app_label = 'clinical'
+        db_table = 'clinical_boxes'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status', '-created_at'], name='idx_box_status_created'),
+            models.Index(fields=['patient', '-created_at'], name='idx_box_pt_created'),
+        ]
+
+    def __str__(self):
+        pt_label = self.patient.hn if self.patient else "ANONYMOUS"
+        return f"Box [{self.id.hex[:8]}] - {pt_label} ({self.get_status_display()})"
+
+    def compute_hmac_signature(self, secret_key: str = None) -> str:
+        """Computes HMAC-SHA256 signature over sorted canonical contents JSON."""
+        key = (secret_key or getattr(settings, 'SECRET_KEY', 'tspi-box-fallback-secret')).encode('utf-8')
+        canonical_payload = json.dumps(self.contents, sort_keys=True, ensure_ascii=False).encode('utf-8')
+        return hmac.new(key, canonical_payload, hashlib.sha256).hexdigest()
+
+    def verify_integrity(self, secret_key: str = None) -> bool:
+        """Verifies that the Box contents have not been tampered with."""
+        if not self.signature:
+            return False
+        expected_sig = self.compute_hmac_signature(secret_key)
+        return hmac.compare_digest(self.signature, expected_sig)
+
+    def save(self, *args, **kwargs):
+        """Seals the box with cryptographic signature on save."""
+        self.signature = self.compute_hmac_signature()
+        super().save(*args, **kwargs)
 
 
 # Harmonized Product Catalog & 39 Axes Mappings (Phase 4)

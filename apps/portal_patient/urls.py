@@ -4,6 +4,7 @@ Patient Portal & LINE OA URL Configuration.
 
 from django.urls import path
 from . import views
+from . import views_onboarding
 from patients.views_portal import (
     portal_login_view,
     portal_logout_view,
@@ -26,9 +27,16 @@ from patients.views_liff import (
 app_name = 'portal_patient'
 
 urlpatterns = [
+    # Patient Onboarding Flow (Phase 2 & Master Blueprint)
+    path('onboarding/', views_onboarding.onboarding_wizard_view, name='onboarding'),
+    path('api/onboarding/lookup/', views_onboarding.onboarding_lookup_api, name='onboarding_lookup_api'),
+    path('api/onboarding/claim/', views_onboarding.onboarding_claim_account_api, name='onboarding_claim_account_api'),
+    path('api/onboarding/new-patient/', views_onboarding.onboarding_new_patient_api, name='onboarding_new_patient_api'),
+
     # Primary Patient Dashboard
     path('', views.patient_dashboard, name='dashboard'),
     path('dashboard/', views.patient_dashboard, name='dashboard'),
+
 
     # Patient Experience & AI Intake Routes (Prevent 404s)
     path('ai-intake/', views.patient_ai_intake, name='patient_ai_intake'),

@@ -34,21 +34,21 @@
                     และสูตรตำรับไฟโตเคมีคอลมาตรฐาน 200 โมดูล เพื่อผลลัพธ์การฟื้นฟูระดับเซลล์ที่แม่นยำและตรงจุดที่สุด
                 </p>
 
-                <!-- Action Buttons -->
+                <!-- Action Buttons (Single Primary CTA: เริ่มต้นใช้งาน) -->
                 <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start gap-3 mb-4">
-                    <a href="{% url 'accounts:patient_login' %}" class="btn btn-primary d-inline-flex align-items-center gap-2">
-                        <i class="fas fa-user-circle"></i>
-                        <span>เข้าสู่ระบบสำหรับคนไข้</span>
+                    <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-primary btn-lg d-inline-flex align-items-center gap-2 px-4 shadow" style="border-radius: 2.5rem; font-size: 1.15rem;">
+                        <i class="fas fa-play-circle fs-5"></i>
+                        <span class="fw-bold">เริ่มต้นใช้งาน</span>
                     </a>
-                    <a href="{% url 'accounts:patient_register' %}" class="btn btn-light d-inline-flex align-items-center gap-2 text-dark">
-                        <i class="fas fa-user-plus text-primary-clinic"></i>
-                        <span>ลงทะเบียนใหม่</span>
-                    </a>
-                    <a href="{% url 'core:protocol' %}" class="btn btn-outline-primary d-inline-flex align-items-center gap-2">
+                    <a href="{% url 'core:protocol' %}" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2">
                         <span>ดูโปรโตคอล 9 ขั้นตอน</span>
                         <i class="fas fa-arrow-right fs-6"></i>
                     </a>
+                    <a href="{% url 'accounts:patient_login' %}" class="btn btn-link text-muted text-decoration-none small">
+                        <i class="fas fa-sign-in-alt me-1"></i> เข้าสู่ระบบคนไข้เดิม
+                    </a>
                 </div>
+
 
                 <!-- Stats Highlights -->
                 <div class="row g-3 pt-3 border-top border-light-subtle justify-content-center justify-content-lg-start text-center text-lg-start">
@@ -396,26 +396,86 @@
     </section>
 
     <!-- ========================================== -->
+    <!-- 4.5. CLINICAL INSIGHTS & MEDICAL ARTICLES -->
+    <!-- ========================================== -->
+    {% if latest_articles %}
+    <section class="container-xl my-5 py-4">
+        <div class="d-flex flex-wrap align-items-end justify-content-between mb-4">
+            <div>
+                <div class="d-inline-flex align-items-center gap-2 badge-subtle-primary mb-2">
+                    <i class="fas fa-newspaper text-primary-clinic"></i>
+                    <span>Clinical Insights &amp; Research</span>
+                </div>
+                <h2 class="h3 fw-bold text-dark mb-1">
+                    สาระสุขภาพและ <span class="text-primary-clinic">การแพทย์แม่นยำ</span>
+                </h2>
+                <p class="text-muted small mb-0">บทความทางการแพทย์และงานวิจัยชีววิทยาระบบ 39 แกน โดยคณะแพทย์ TSPI</p>
+            </div>
+            <a href="{% url 'core:article_list' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 mt-3 mt-sm-0">
+                ดูบทความทั้งหมด &rarr;
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for art in latest_articles %}
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 card-hover border shadow-sm overflow-hidden d-flex flex-column" style="border-radius: 1rem;">
+                    {% if art.cover_image_url %}
+                    <div style="height: 160px; overflow: hidden;" class="position-relative">
+                        <img src="{{ art.cover_image_url }}" alt="{{ art.title }}" class="w-100 h-100" style="object-fit: cover;">
+                        <span class="badge bg-white text-primary-clinic position-absolute top-0 start-0 m-2 shadow-sm small fw-semibold">
+                            {{ art.get_category_display }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    <div class="card-body p-3 d-flex flex-column flex-grow-1">
+                        <div class="text-muted small mb-1" style="font-size: 11px;">
+                            <i class="far fa-clock text-primary-clinic me-1"></i> อ่าน {{ art.read_time_minutes }} นาที &bull; {{ art.published_at|date:"d M Y" }}
+                        </div>
+                        <h6 class="card-title fw-bold text-dark mb-2 lh-base" style="font-size: 0.95rem;">
+                            <a href="{% url 'core:article_detail' slug=art.slug %}" class="text-dark text-decoration-none hover-primary">
+                                {{ art.title }}
+                            </a>
+                        </h6>
+                        <p class="card-text text-muted small mb-3 flex-grow-1" style="font-size: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ art.excerpt }}
+                        </p>
+                        <div class="pt-2 border-top d-flex align-items-center justify-content-between mt-auto">
+                            <span class="text-muted small text-truncate pe-2" style="font-size: 11px;">{{ art.author_name }}</span>
+                            <a href="{% url 'core:article_detail' slug=art.slug %}" class="text-primary-clinic small text-decoration-none fw-semibold flex-shrink-0">
+                                อ่านต่อ &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- ========================================== -->
     <!-- 5. CALL TO ACTION BANNER                  -->
     <!-- ========================================== -->
     <section class="container-xl my-5 pb-4">
-        <div class="card p-5 text-center shadow-sm border border-2 border-success-subtle bg-white">
+        <div class="card p-5 text-center shadow-sm border border-2 border-success-subtle bg-white rounded-4">
             <h2 class="h3 fw-bold text-dark mb-2">พร้อมเริ่มต้นการฟื้นฟูสุขภาพระดับเซลล์แล้วหรือยัง?</h2>
-            <p class="text-muted small mx-auto mb-4" style="max-width: 500px;">
-                ลงทะเบียนเพื่อรับการประเมิน 39 แกนชีววิทยา (12 โดเมน) เบื้องต้น หรือเข้าสู่ระบบเพื่อพบแพทย์ผู้เชี่ยวชาญ
+            <p class="text-muted small mx-auto mb-4" style="max-width: 520px;">
+                เริ่มต้นวิเคราะห์ 39 แกนชีววิทยา (12 โดเมน) ด้วยระบบ AI Intake ของ TSPI คลินิก พร้อมประวัติสุขภาพและการประเมินเฉพาะบุคคล
             </p>
             <div class="d-flex flex-wrap justify-content-center gap-3">
-                <a href="{% url 'accounts:patient_login' %}" class="btn btn-primary d-inline-flex align-items-center gap-2">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>เข้าสู่ระบบคนไข้</span>
+                <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-primary btn-lg d-inline-flex align-items-center gap-2 px-4 shadow rounded-pill">
+                    <i class="fas fa-play-circle"></i>
+                    <span class="fw-bold">เริ่มต้นใช้งาน (Onboarding)</span>
                 </a>
-                <a href="{% url 'accounts:doctor_login' %}" class="btn btn-light d-inline-flex align-items-center gap-2 text-dark">
+                <a href="{% url 'accounts:doctor_login' %}" class="btn btn-light d-inline-flex align-items-center gap-2 text-dark rounded-pill border px-3">
                     <i class="fas fa-stethoscope text-primary-clinic"></i>
-                    <span>เข้าสู่ระบบแพทย์ (Doctor EMR)</span>
+                    <span>ระบบแพทย์ (Doctor EMR)</span>
                 </a>
             </div>
         </div>
     </section>
+
 
 </div>
 

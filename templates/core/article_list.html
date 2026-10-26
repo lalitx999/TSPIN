@@ -1,0 +1,98 @@
+{% extends 'layouts/public_base.html' %}
+{% load static %}
+
+{% block title %}สาระสุขภาพและบทความทางการแพทย์ | TSPI CLINIC — 39 แกนชีววิทยา{% endblock %}
+
+{% block content %}
+<div class="py-5">
+    <div class="container-xl">
+        <!-- Header -->
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <div class="d-inline-flex align-items-center gap-2 badge-subtle-primary mb-3">
+                <i class="fas fa-microscope text-primary-clinic"></i>
+                <span>Clinical Insights &amp; Systems Biology Knowledge</span>
+            </div>
+            <h1 class="display-6 fw-bold text-dark mb-3">
+                สาระสุขภาพและ <span class="text-primary-clinic">การแพทย์แม่นยำ</span>
+            </h1>
+            <p class="text-muted fs-6 mb-0">
+                รวมบทความ งานวิจัยทางคลินิก และความรู้เชิงลึกเกี่ยวกับ 39 แกนชีววิทยา การฟื้นฟูระดับเซลล์ และโปรโตคอลการดูแลสุขภาพแบบองค์รวม
+            </p>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
+            <a href="{% url 'core:article_list' %}" class="btn btn-sm rounded-pill px-3 {% if not selected_category %}btn-primary{% else %}btn-light border text-muted{% endif %}">
+                ทั้งหมด
+            </a>
+            {% for code, label in categories %}
+            <a href="{% url 'core:article_list' %}?category={{ code }}" class="btn btn-sm rounded-pill px-3 {% if selected_category == code %}btn-primary{% else %}btn-light border text-muted{% endif %}">
+                {{ label }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Article Grid -->
+        <div class="row g-4">
+            {% for art in articles %}
+            <div class="col-md-6 col-lg-6">
+                <div class="card h-100 card-hover border-0 shadow-sm overflow-hidden d-flex flex-column" style="border-radius: 1.25rem;">
+                    {% if art.cover_image_url %}
+                    <div class="position-relative" style="height: 220px; overflow: hidden;">
+                        <img src="{{ art.cover_image_url }}" alt="{{ art.title }}" class="w-100 h-100" style="object-fit: cover; transition: transform 0.3s ease;">
+                        <div class="position-absolute top-0 start-0 m-3">
+                            <span class="badge bg-white text-primary-clinic shadow-sm fw-semibold px-2 py-1">
+                                {{ art.get_category_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body p-4 d-flex flex-column flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 text-muted small mb-2">
+                            <span><i class="far fa-clock text-primary-clinic me-1"></i> อ่าน {{ art.read_time_minutes }} นาที</span>
+                            <span>&bull;</span>
+                            <span><i class="far fa-eye text-primary-clinic me-1"></i> {{ art.view_count }} วิว</span>
+                            <span>&bull;</span>
+                            <span>{{ art.published_at|date:"d M Y" }}</span>
+                        </div>
+
+                        <h4 class="card-title fw-bold text-dark fs-5 mb-2 lh-base">
+                            <a href="{% url 'core:article_detail' slug=art.slug %}" class="text-dark text-decoration-none hover-primary">
+                                {{ art.title }}
+                            </a>
+                        </h4>
+
+                        <p class="card-text text-muted small line-clamp-3 mb-4 flex-grow-1">
+                            {{ art.excerpt }}
+                        </p>
+
+                        <div class="pt-3 border-top d-flex align-items-center justify-content-between mt-auto">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; font-size: 13px;">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-semibold text-dark small lh-1">{{ art.author_name }}</div>
+                                    <small class="text-muted" style="font-size: 11px;">{{ art.author_title }}</small>
+                                </div>
+                            </div>
+                            <a href="{% url 'core:article_detail' slug=art.slug %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                อ่านต่อ &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-newspaper fs-1 text-muted opacity-50 mb-3 d-block"></i>
+                <h5 class="text-dark fw-bold">ไม่พบบทความในหมวดหมู่นี้</h5>
+                <p class="text-muted small">กรุณาเลือกหมวดหมู่อื่น หรือกลับไปยังรายการทั้งหมด</p>
+                <a href="{% url 'core:article_list' %}" class="btn btn-primary btn-sm rounded-pill px-3">ดูบทความทั้งหมด</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

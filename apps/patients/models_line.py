@@ -7,7 +7,7 @@ and Clinical Review Queue Gate before EMR Entry (Human-in-the-loop).
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-from apps.core.models import SoftDeleteModel
+from core.models import SoftDeleteModel
 
 
 class LineUser(models.Model):

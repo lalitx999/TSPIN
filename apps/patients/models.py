@@ -144,6 +144,26 @@ class Patient(SoftDeleteModel):
         return f"{raw[0]}-xxxx-xxxxx-{raw[10:12]}-{raw[12]}"
 
     @property
+    def masked_name(self) -> str:
+        """ชื่อ-นามสกุลแบบปิดบังเพื่อความปลอดภัยตาม PDPA เช่น คุณ ส*** สุข***"""
+        f = (self.first_name or '').strip()
+        l = (self.last_name or '').strip()
+        masked_f = f"{f[0]}***" if f else "***"
+        masked_l = f"{l[0]}***" if l else "***"
+        return f"คุณ {masked_f} {masked_l}"
+
+    @property
+    def masked_phone(self) -> str:
+        """เบอร์โทรศัพท์แบบปิดบังเพื่อความปลอดภัยตาม PDPA เช่น 081-xxx-xx77"""
+        p = (self.phone or '').replace('-', '').replace(' ', '')
+        if len(p) >= 10:
+            return f"{p[:3]}-xxx-xx{p[-2:]}"
+        elif len(p) >= 4:
+            return f"{p[:2]}***{p[-2:]}"
+        return "***-***-****"
+
+
+    @property
     def status_badge_class(self) -> str:
         """CSS Badge Class สำหรับสถานะคนไข้ ไม่ต้องเขียน if ซ้อนใน HTML"""
         mapping = {

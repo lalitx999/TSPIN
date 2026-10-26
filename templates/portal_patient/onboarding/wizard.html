@@ -1,0 +1,558 @@
+{% extends 'layouts/public_base.html' %}
+{% load static %}
+
+{% block title %}เริ่มต้นใช้งาน — ระบบประเมินสุขภาพ 39 แกนชีววิทยา | TSPI CLINIC{% endblock %}
+
+{% block extra_head %}
+<style>
+    .wizard-card {
+        max-width: 680px;
+        margin: 0 auto;
+        border-radius: 1.5rem;
+        border: 1px solid #E2E8F0;
+        background: #FFFFFF;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+    .step-pill {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        background-color: #E2E8F0;
+        color: #64748B;
+        transition: all 0.3s ease;
+    }
+    .step-pill.active {
+        background-color: #2E7D32;
+        color: #FFFFFF;
+        box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.15);
+    }
+    .step-pill.completed {
+        background-color: #E8F5E9;
+        color: #2E7D32;
+    }
+    .selection-box {
+        border: 2px solid #E2E8F0;
+        border-radius: 1rem;
+        padding: 1.25rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #FFFFFF;
+    }
+    .selection-box:hover {
+        border-color: #2E7D32;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(46, 125, 50, 0.08);
+    }
+    .selection-box.selected {
+        border-color: #2E7D32;
+        background-color: #F0F6EC;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="py-5 bg-light-subtle min-vh-75 d-flex align-items-center">
+    <div class="container-xl">
+        <div class="wizard-card p-4 p-md-5">
+
+            <!-- Stepper Progress Header -->
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center gap-2 badge-subtle-primary mb-2">
+                    <i class="fas fa-user-check text-primary-clinic"></i>
+                    <span>Smart Patient Onboarding &bull; PDPA Compliant</span>
+                </div>
+                <h2 class="h4 fw-bold text-dark mb-1" id="wizard-title">ยินดีต้อนรับสู่ TSPI CLINIC</h2>
+                <p class="text-muted small mb-0" id="wizard-subtitle">เริ่มต้นใช้งานระบบเวชระเบียนและความฉลาดทางการแพทย์ 39 แกนชีววิทยา</p>
+            </div>
+
+            <!-- Steps Progress Bar -->
+            <div class="d-flex align-items-center justify-content-center gap-2 gap-sm-3 mb-4 pb-3 border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="step-pill active" id="step-num-1">1</span>
+                    <span class="small fw-semibold text-dark d-none d-sm-inline">สัญชาติ</span>
+                </div>
+                <div class="text-muted opacity-50">&bull;&bull;&bull;</div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="step-pill" id="step-num-2">2</span>
+                    <span class="small fw-semibold text-muted d-none d-sm-inline">ประวัติบริการ</span>
+                </div>
+                <div class="text-muted opacity-50">&bull;&bull;&bull;</div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="step-pill" id="step-num-3">3</span>
+                    <span class="small fw-semibold text-muted d-none d-sm-inline">ยืนยันตัวตน</span>
+                </div>
+            </div>
+
+            <!-- Alert Messages Container -->
+            <div id="onboarding-alert" class="alert d-none small mb-4" role="alert"></div>
+
+            <!-- ============================================== -->
+            <!-- STEP 1: Nationality Selection                  -->
+            <!-- ============================================== -->
+            <div id="step-1" class="wizard-step">
+                <h5 class="fw-bold text-dark mb-3">กรุณาเลือกสัญชาติของคุณ (Nationality)</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <div class="selection-box text-center h-100" onclick="selectNationality('TH')">
+                            <div class="fs-1 mb-2">🇹🇭</div>
+                            <h6 class="fw-bold text-dark mb-1">สัญชาติไทย</h6>
+                            <p class="text-muted small mb-0">มีเลขประจำตัวประชาชน 13 หลัก</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="selection-box text-center h-100" onclick="selectNationality('INTL')">
+                            <div class="fs-1 mb-2">🌐</div>
+                            <h6 class="fw-bold text-dark mb-1">Foreigner / Expat</h6>
+                            <p class="text-muted small mb-0">International Patient with Passport</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- STEP 2: Service History (Existing vs New)      -->
+            <!-- ============================================== -->
+            <div id="step-2" class="wizard-step d-none">
+                <h5 class="fw-bold text-dark mb-2">ท่านเคยรับบริการหรือมีประวัติกับ TSPI Clinic หรือไม่?</h5>
+                <p class="text-muted small mb-4">ระบบจะทำการค้นหาข้อมูลเวชระเบียนเดิมเพื่อนำมาเชื่อมต่ออย่างปลอดภัย</p>
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <div class="selection-box d-flex align-items-center gap-3" onclick="selectHistory('EXISTING')">
+                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center p-3 fs-4" style="width: 52px; height: 52px;">
+                                <i class="fas fa-file-medical-alt"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">เคยรับการตรวจหรือมีประวัติกับคลินิกแล้ว</h6>
+                                <p class="text-muted small mb-0">ค้นหาประวัติเดิมด้วยเลขบัตรประชาชน / Passport เพื่อดูผลตรวจและเริ่มใช้ AI</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted ms-auto"></i>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="selection-box d-flex align-items-center gap-3" onclick="selectHistory('NEW')">
+                            <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center p-3 fs-4" style="width: 52px; height: 52px;">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">เป็นคนไข้ใหม่ (ยังไม่เคยมีประวัติ)</h6>
+                                <p class="text-muted small mb-0">กรอกข้อมูลเบื้องต้นสั้นๆ เพื่อลงทะเบียนและเริ่มทำแบบประเมินสุขภาพ AI ทันที</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted ms-auto"></i>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-link text-muted p-0 small" onclick="goToStep(1)">
+                    &larr; ย้อนกลับไปเลือกสัญชาติ
+                </button>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- STEP 3-A: Existing Patient Lookup Form         -->
+            <!-- ============================================== -->
+            <div id="step-3-existing-search" class="wizard-step d-none">
+                <h5 class="fw-bold text-dark mb-2">ค้นหาประวัติเวชระเบียนเดิม</h5>
+                <p class="text-muted small mb-4">กรุณาระบุเลขประจำตัวเพื่อตรวจสอบประวัติสุขภาพที่บันทึกไว้ในคลินิก</p>
+                
+                <form id="form-lookup" onsubmit="handleLookup(event)">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-dark small" id="label-identifier">
+                            เลขประจำตัวประชาชน 13 หลัก
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-id-card text-muted"></i></span>
+                            <input type="text" class="form-control form-control-lg fs-6" id="input-identifier" placeholder="1-xxxx-xxxxx-xx-x" required>
+                        </div>
+                        <div class="form-text text-muted small mt-1">
+                            <i class="fas fa-lock text-success me-1"></i> ข้อมูลได้รับการเข้ารหัส AES-256 ตามมาตรฐานการคุ้มครองข้อมูลส่วนบุคคล PDPA
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between">
+                        <button type="button" class="btn btn-link text-muted p-0 small" onclick="goToStep(2)">
+                            &larr; ย้อนกลับ
+                        </button>
+                        <button type="submit" class="btn btn-primary px-4 fw-bold rounded-pill" id="btn-lookup">
+                            <span class="spinner-border spinner-border-sm d-none me-1" id="spinner-lookup"></span>
+                            <span>ตรวจสอบประวัติ &rarr;</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- STEP 3-A Confirmation: Masked Identity Claim   -->
+            <!-- ============================================== -->
+            <div id="step-3-existing-confirm" class="wizard-step d-none">
+                <div class="p-4 bg-success-subtle rounded-4 border border-success-subtle mb-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                            <i class="fas fa-check fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0">พบข้อมูลเวชระเบียนในระบบ TSPI</h6>
+                            <small class="text-muted">กรุณายืนยันตัวตนเพื่อเข้าถึงข้อมูลสุขภาพส่วนบุคคล</small>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-3 rounded-3 border small">
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">ชื่อ-นามสกุล:</span>
+                                <strong class="text-dark fs-6" id="confirm-masked-name">คุณ ส*** สุข***</strong>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">รหัสเวชระเบียน (HN):</span>
+                                <strong class="text-primary-clinic fs-6 font-monospace" id="confirm-hn">HN-XXXX</strong>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">เลขประจำตัว:</span>
+                                <strong class="text-dark font-monospace" id="confirm-masked-id">1-xxxx-xxxxx-04-6</strong>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">เบอร์โทรศัพท์ที่บันทึกไว้:</span>
+                                <strong class="text-dark font-monospace" id="confirm-masked-phone">081-xxx-xx77</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="form-claim" onsubmit="handleClaim(event)">
+                    {% csrf_token %}
+                    <input type="hidden" id="claim-patient-uuid" value="">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark small">
+                            กรอกเบอร์โทรศัพท์ 4 ตัวท้ายเพื่อยืนยันตัวตน (Identity Verification)
+                        </label>
+                        <input type="text" class="form-control" id="claim-phone-last4" placeholder="เช่น 4321" maxlength="4" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-dark small">
+                            ตั้งรหัสผ่านสำหรับเข้าใช้งาน Patient Portal
+                        </label>
+                        <input type="password" class="form-control" id="claim-password" placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" required>
+                        <div class="form-text text-muted small">ใช้สำหรับเข้าดูผลการตรวจ 39 แกนชีววิทยาในครั้งถัดไป</div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between">
+                        <button type="button" class="btn btn-link text-muted p-0 small" onclick="goToStep(2)">
+                            &larr; ไม่ใช่ข้อมูลของฉัน
+                        </button>
+                        <button type="submit" class="btn btn-primary px-4 fw-bold rounded-pill" id="btn-claim">
+                            <span class="spinner-border spinner-border-sm d-none me-1" id="spinner-claim"></span>
+                            <span>ยืนยันและเข้าสู่ระบบ &rarr;</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- STEP 3-B: New Patient Short Form               -->
+            <!-- ============================================== -->
+            <div id="step-3-new" class="wizard-step d-none">
+                <h5 class="fw-bold text-dark mb-1">ลงทะเบียนคนไข้ใหม่</h5>
+                <p class="text-muted small mb-4">กรอกข้อมูลเบื้องต้นเพื่อสร้างเวชระเบียนและเข้าสู่ระบบประเมินสุขภาพ AI</p>
+
+                <form id="form-new-patient" onsubmit="handleNewPatient(event)">
+                    {% csrf_token %}
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold text-dark small">ชื่อจริง (First Name) *</label>
+                            <input type="text" class="form-control" id="new-first-name" required placeholder="ชื่อจริง">
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold text-dark small">นามสกุล (Last Name) *</label>
+                            <input type="text" class="form-control" id="new-last-name" required placeholder="นามสกุล">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold text-dark small">เบอร์โทรศัพท์มือถือ *</label>
+                            <input type="tel" class="form-control" id="new-phone" required placeholder="08x-xxx-xxxx">
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold text-dark small">อีเมล (ถ้ามี)</label>
+                            <input type="email" class="form-control" id="new-email" placeholder="name@example.com">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold text-dark small">วันเดือนปีเกิด</label>
+                            <input type="date" class="form-control" id="new-birth-date">
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold text-dark small">เพศตามกำเนิด</label>
+                            <select class="form-select" id="new-gender">
+                                <option value="M">ชาย (Male)</option>
+                                <option value="F">หญิง (Female)</option>
+                                <option value="O" selected>อื่นๆ / ไม่ระบุ (Other)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark small" id="label-new-id">
+                            เลขบัตรประจำตัวประชาชน 13 หลัก (หรือ Passport)
+                        </label>
+                        <input type="text" class="form-control" id="new-id-card" placeholder="เลข 13 หลัก หรือ Passport No.">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-dark small">กำหนดรหัสผ่าน (Password) สำหรับเข้าดูผลตรวจ</label>
+                        <input type="password" class="form-control" id="new-password" placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" required>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="new-consent" required checked>
+                        <label class="form-check-label text-muted small" for="new-consent">
+                            ข้าพเจ้ายินยอมให้ TSPI Clinic จัดเก็บและประมวลผลข้อมูลสุขภาพตาม <a href="{% url 'core:privacy' %}" target="_blank" class="text-primary-clinic">นโยบายความเป็นส่วนตัว (PDPA)</a>
+                        </label>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between">
+                        <button type="button" class="btn btn-link text-muted p-0 small" onclick="goToStep(2)">
+                            &larr; ย้อนกลับ
+                        </button>
+                        <button type="submit" class="btn btn-primary px-4 fw-bold rounded-pill" id="btn-new-patient">
+                            <span class="spinner-border spinner-border-sm d-none me-1" id="spinner-new-patient"></span>
+                            <span>สร้างเวชระเบียนและเริ่มทำแบบประเมิน AI &rarr;</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let wizardState = {
+    nationality: 'TH',
+    historyType: null, // 'EXISTING' or 'NEW'
+    currentStep: 1,
+};
+
+function showAlert(message, type = 'danger') {
+    const alertBox = document.getElementById('onboarding-alert');
+    alertBox.className = `alert alert-${type} small mb-4`;
+    alertBox.innerHTML = `<i class="fas ${type === 'danger' ? 'fa-exclamation-circle' : 'fa-info-circle'} me-1"></i> ${message}`;
+    alertBox.classList.remove('d-none');
+    window.scrollTo({ top: alertBox.offsetTop - 80, behavior: 'smooth' });
+}
+
+function hideAlert() {
+    document.getElementById('onboarding-alert').classList.add('d-none');
+}
+
+function setStepIndicators(step) {
+    for (let i = 1; i <= 3; i++) {
+        const pill = document.getElementById(`step-num-${i}`);
+        if (pill) {
+            pill.classList.remove('active', 'completed');
+            if (i < step) pill.classList.add('completed');
+            if (i === step) pill.classList.add('active');
+        }
+    }
+}
+
+function goToStep(step) {
+    hideAlert();
+    wizardState.currentStep = step;
+    setStepIndicators(step);
+
+    document.querySelectorAll('.wizard-step').forEach(el => el.classList.add('d-none'));
+
+    if (step === 1) {
+        document.getElementById('step-1').classList.remove('d-none');
+        document.getElementById('wizard-title').innerText = 'ยินดีต้อนรับสู่ TSPI CLINIC';
+    } else if (step === 2) {
+        document.getElementById('step-2').classList.remove('d-none');
+        document.getElementById('wizard-title').innerText = 'ประวัติการรับบริการ';
+    } else if (step === 3) {
+        if (wizardState.historyType === 'EXISTING') {
+            document.getElementById('step-3-existing-search').classList.remove('d-none');
+            document.getElementById('wizard-title').innerText = 'ค้นหาประวัติเดิม';
+        } else {
+            document.getElementById('step-3-new').classList.remove('d-none');
+            document.getElementById('wizard-title').innerText = 'ลงทะเบียนคนไข้ใหม่';
+        }
+    }
+}
+
+function selectNationality(nat) {
+    wizardState.nationality = nat;
+    const labelIdentifier = document.getElementById('label-identifier');
+    const inputIdentifier = document.getElementById('input-identifier');
+    const labelNewId = document.getElementById('label-new-id');
+
+    if (nat === 'TH') {
+        if (labelIdentifier) labelIdentifier.innerText = 'เลขประจำตัวประชาชน 13 หลัก';
+        if (inputIdentifier) inputIdentifier.placeholder = '1-xxxx-xxxxx-xx-x';
+        if (labelNewId) labelNewId.innerText = 'เลขประจำตัวประชาชน 13 หลัก';
+    } else {
+        if (labelIdentifier) labelIdentifier.innerText = 'Passport Number / หมายเลขหนังสือเดินทาง';
+        if (inputIdentifier) inputIdentifier.placeholder = 'e.g. AA1234567';
+        if (labelNewId) labelNewId.innerText = 'Passport Number / หมายเลขหนังสือเดินทาง';
+    }
+    goToStep(2);
+}
+
+function selectHistory(hist) {
+    wizardState.historyType = hist;
+    goToStep(3);
+}
+
+// Handle Existing Patient Search
+async function handleLookup(e) {
+    e.preventDefault();
+    hideAlert();
+
+    const identifier = document.getElementById('input-identifier').value.trim();
+    if (!identifier) {
+        showAlert('กรุณาระบุเลขประจำตัวหรือหนังสือเดินทาง');
+        return;
+    }
+
+    const btn = document.getElementById('btn-lookup');
+    const spinner = document.getElementById('spinner-lookup');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+
+    const formData = new FormData();
+    formData.append('nationality', wizardState.nationality);
+    formData.append('identifier', identifier);
+
+    try {
+        const response = await fetch('/patient/api/onboarding/lookup/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            // Show masked confirmation step
+            document.getElementById('step-3-existing-search').classList.add('d-none');
+            document.getElementById('step-3-existing-confirm').classList.remove('d-none');
+
+            document.getElementById('confirm-masked-name').innerText = data.masked_name;
+            document.getElementById('confirm-hn').innerText = data.hn;
+            document.getElementById('confirm-masked-id').innerText = data.masked_id;
+            document.getElementById('confirm-masked-phone').innerText = data.masked_phone;
+            document.getElementById('claim-patient-uuid').value = data.patient_uuid;
+
+            document.getElementById('wizard-title').innerText = 'ยืนยันตัวตนของคุณ';
+        } else {
+            showAlert(data.message || 'ไม่พบข้อมูล กรุณาตรวจสอบอีกครั้งหรือลงทะเบียนเป็นคนไข้ใหม่');
+        }
+    } catch (err) {
+        showAlert('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง');
+    } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+}
+
+// Handle Account Claim / Confirmation
+async function handleClaim(e) {
+    e.preventDefault();
+    hideAlert();
+
+    const patientUuid = document.getElementById('claim-patient-uuid').value;
+    const phoneLast4 = document.getElementById('claim-phone-last4').value.trim();
+    const password = document.getElementById('claim-password').value;
+
+    const btn = document.getElementById('btn-claim');
+    const spinner = document.getElementById('spinner-claim');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+
+    const formData = new FormData();
+    formData.append('patient_uuid', patientUuid);
+    formData.append('phone_last4', phoneLast4);
+    formData.append('password', password);
+
+    try {
+        const response = await fetch('/patient/api/onboarding/claim/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            window.location.href = data.redirect_url || '/portal/ai-intake/';
+        } else {
+            showAlert(data.message || 'การยืนยันตัวตนไม่สำเร็จ กรุณาตรวจสอบเบอร์โทรศัพท์ 4 ตัวท้าย');
+        }
+    } catch (err) {
+        showAlert('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง');
+    } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+}
+
+// Handle New Patient Registration
+async function handleNewPatient(e) {
+    e.preventDefault();
+    hideAlert();
+
+    const btn = document.getElementById('btn-new-patient');
+    const spinner = document.getElementById('spinner-new-patient');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+
+    const formData = new FormData();
+    formData.append('first_name', document.getElementById('new-first-name').value.trim());
+    formData.append('last_name', document.getElementById('new-last-name').value.trim());
+    formData.append('phone', document.getElementById('new-phone').value.trim());
+    formData.append('email', document.getElementById('new-email').value.trim());
+    formData.append('birth_date', document.getElementById('new-birth-date').value);
+    formData.append('gender', document.getElementById('new-gender').value);
+    formData.append('nationality', wizardState.nationality);
+    formData.append('id_card', document.getElementById('new-id-card').value.trim());
+    formData.append('password', document.getElementById('new-password').value);
+
+    try {
+        const response = await fetch('/patient/api/onboarding/new-patient/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            window.location.href = data.redirect_url || '/portal/ai-intake/';
+        } else {
+            showAlert(data.message || 'ไม่สามารถลงทะเบียนได้ กรุณาตรวจสอบข้อมูล');
+        }
+    } catch (err) {
+        showAlert('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง');
+    } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+}
+</script>
+{% endblock %}

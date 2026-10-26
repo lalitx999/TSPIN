@@ -90,3 +90,38 @@ class CorePagesLayoutTests(TestCase):
                 from config.settings import prod
                 importlib.reload(prod)
 
+    def test_medical_article_list_and_detail_views(self):
+        """Phase 1: ตรวจสอบหน้ารวมบทความและหน้ารายละเอียดบทความทางการแพทย์"""
+        from core.models import MedicalArticle
+
+        article = MedicalArticle.objects.create(
+            title="ทดสอบบทความ 39 แกนชีววิทยา",
+            slug="test-39-axes-article",
+            category="systems_biology",
+            author_name="นพ. ทดสอบ",
+            author_title="ผู้เชี่ยวชาญ",
+            excerpt="บทคัดย่อทดสอบ",
+            content="### หัวข้อบทความ\nข้อความเนื้อหา <script>alert('xss')</script>",
+            meta_title="SEO Title Test",
+            meta_description="SEO Description Test",
+            is_published=True
+        )
+
+        # 1. หน้ารวมบทความ
+        resp_list = self.client.get(reverse('core:article_list'))
+        self.assertEqual(resp_list.status_code, 200)
+        self.assertContains(resp_list, "ทดสอบบทความ 39 แกนชีววิทยา")
+
+        # 2. หน้ารายละเอียดบทความ
+        resp_detail = self.client.get(reverse('core:article_detail', kwargs={'slug': article.slug}))
+        self.assertEqual(resp_detail.status_code, 200)
+        self.assertContains(resp_detail, "ทดสอบบทความ 39 แกนชีววิทยา")
+        self.assertContains(resp_detail, "SEO Title Test")
+        # Gotcha 1 Verification: nh3 must sanitize script tags
+        self.assertNotContains(resp_detail, "<script>alert('xss')</script>")
+
+        # View count should increment
+        article.refresh_from_db()
+        self.assertEqual(article.view_count, 1)
+
+

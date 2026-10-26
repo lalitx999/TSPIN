@@ -1,17 +1,92 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.db import connection
+from django.utils.safestring import mark_safe
+import markdown
+import nh3
+
+from core.models import MedicalArticle
 
 def home(request):
     """
     Public Landing Page:
-    - Hero Section with tagline
+    - Hero Section with CTA 'เริ่มต้นใช้งาน'
     - 3-Phase 9-Step Recovery Protocol Overview
-    - 38 Biological Axes Living Network
+    - 39 Biological Axes Living Network
     - Clinical Validation & Stats
+    - Latest Medical Articles & Clinical Insights (Phase 1)
     - Doctor & Clinic Credentials
     """
-    return render(request, 'core/home.html')
+    latest_articles = MedicalArticle.objects.alive().filter(
+        is_published=True
+    ).order_by('-published_at')[:4]
+
+    context = {
+        'latest_articles': latest_articles,
+    }
+    return render(request, 'core/home.html', context)
+
+def article_list_view(request):
+    """
+    รายการบทความทางการแพทย์และสาระสุขภาพ (Clinical Articles & Insights)
+    รองรับการกรองตามหมวดหมู่
+    """
+    category = request.GET.get('category', '').strip()
+    articles_qs = MedicalArticle.objects.alive().filter(is_published=True)
+    if category:
+        articles_qs = articles_qs.filter(category=category)
+
+    articles = articles_qs.order_by('-published_at')
+    categories = MedicalArticle.CATEGORY_CHOICES
+
+    context = {
+        'articles': articles,
+        'selected_category': category,
+        'categories': categories,
+    }
+    return render(request, 'core/article_list.html', context)
+
+def article_detail_view(request, slug):
+    """
+    หน้ารายละเอียดบทความทางการแพทย์ฉบับเต็ม:
+    - เพิ่มยอดวิว (view_count)
+    - เรนเดอร์ Markdown อย่างปลอดภัยด้วย nh3 Sanitization (Gotcha 1)
+    - ส่งค่า OpenGraph Meta Tags สำหรับ Facebook/LINE Share
+    - แนะนำบทความที่เกี่ยวข้อง
+    """
+    article = get_object_or_404(
+        MedicalArticle.objects.alive().filter(is_published=True),
+        slug=slug
+    )
+    article.increment_view_count()
+
+    # Markdown conversion + strict HTML sanitization via nh3 (Prevent XSS)
+    raw_html = markdown.markdown(
+        article.content,
+        extensions=['extra', 'nl2br']
+    )
+    clean_html = nh3.clean(
+        raw_html,
+        tags={'p', 'br', 'strong', 'em', 'h1', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'a'},
+        attributes={'a': {'href', 'target'}},
+        link_rel='noopener noreferrer'
+    )
+
+
+    related_articles = MedicalArticle.objects.alive().filter(
+        is_published=True
+    ).exclude(pk=article.pk).order_by('-published_at')[:3]
+
+    context = {
+        'article': article,
+        'rendered_content': mark_safe(clean_html),
+        'related_articles': related_articles,
+        'meta_title': article.meta_title or f"{article.title} | TSPI Clinic",
+        'meta_description': article.meta_description or article.excerpt,
+        'og_image': article.cover_image_url or '/static/img/og_default.jpg',
+    }
+    return render(request, 'core/article_detail.html', context)
+
 
 def platform_view(request):
     """

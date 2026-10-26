@@ -235,10 +235,10 @@ def doctor_pre_visit(request):
 
     # ถ้ายังไม่ได้เลือกคนไข้ ให้ดึงคิวตรวจแรกของวันนี้ หรือคนไข้คนล่าสุด
     if not selected_patient:
-        selected_patient = Patient.objects.order_by('-updated_at').first()
+        selected_patient = Patient.objects.prefetch_related('biological_records').order_by('-updated_at').first()
 
     waiting_patients = Patient.objects.all().order_by('-created_at')[:10]
-    recent_appointments = Appointment.objects.all().order_by('appointment_date', 'appointment_time')[:10]
+    recent_appointments = Appointment.objects.select_related('patient', 'doctor').order_by('appointment_date', 'appointment_time')[:10]
 
     # สรุปข้อมูลชีววิทยา 39 แกนจริงของคนไข้จากฐานข้อมูล (No mockup data!)
     bio_record = selected_patient.biological_records.first() if selected_patient else None
@@ -297,12 +297,15 @@ def doctor_appointments(request):
             messages.success(request, f"สร้างนัดหมายสำหรับ {patient.full_name} สำเร็จ")
             return redirect('patients:doctor_appointments')
 
-    all_appointments = Appointment.objects.select_related('patient', 'doctor').order_by('appointment_date', 'appointment_time')
-    patients = Patient.objects.all().order_by('first_name')
+    appointment_qs = Appointment.objects.select_related('patient', 'doctor').order_by('appointment_date', 'appointment_time')
+    from django.core.paginator import Paginator
+    paginator = Paginator(appointment_qs, 20)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     return render(request, 'patients/doctor_appointments.html', {
-        'appointments': all_appointments,
-        'patients': patients,
+        'appointments': page_obj.object_list,
+        'page_obj': page_obj,
     })
 
 
@@ -334,7 +337,7 @@ def doctor_voice_form(request):
     """
     บันทึกเสียงแพทย์แปลงเป็นบันทึก SOAP Note (/doctor/voice-form/)
     """
-    patients = Patient.objects.all().order_by('first_name')
+    patients = Patient.objects.all().order_by('-updated_at')[:10]
     return render(request, 'patients/doctor_voice_form.html', {
         'patients': patients,
     })
@@ -422,3 +425,34 @@ def doctor_settings(request):
     ตั้งค่าบัญชีแพทย์ ลายเซ็นดิจิทัล และข้อมูลคลินิก (/doctor/settings/)
     """
     return render(request, 'patients/doctor_settings.html')
+
+
+@clinical_staff_required
+def api_patient_search(request):
+    """
+    API ค้นหาคนไข้แบบ Real-time AJAX Autocomplete (Pillar 5 Performance)
+    รองรับค้นหาด้วยชื่อ, นามสกุล, HN หรือเบอร์โทรศัพท์ คืนผลลัพธ์ทันที
+    """
+    q = request.GET.get('q', '').strip()
+    if not q:
+        return JsonResponse({'patients': []})
+    
+    patients = Patient.objects.filter(
+        Q(first_name__icontains=q) |
+        Q(last_name__icontains=q) |
+        Q(hn__icontains=q) |
+        Q(phone__icontains=q)
+    ).order_by('-created_at')[:15]
+    
+    data = [{
+        'id': p.id,
+        'hn': p.hn,
+        'full_name': p.full_name,
+        'first_name': p.first_name,
+        'last_name': p.last_name,
+        'age': p.age,
+        'gender': p.get_gender_display(),
+        'phone': p.phone or '-',
+    } for p in patients]
+    
+    return JsonResponse({'results': data, 'patients': data})

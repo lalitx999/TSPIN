@@ -4,130 +4,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}TSPI CLINIC - ระบบเวชระเบียนและความฉลาดทางการแพทย์ 39 แกนชีววิทยา (12 โดเมน){% endblock %}</title>
-    
-    <!-- Google Fonts: Kanit (Clean & Readable) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+    <title>{% block title %}TSPI CLINIC — ระบบเวชระเบียนและความฉลาดทางการแพทย์ 39 แกนชีววิทยา (12 โดเมน){% endblock %}</title>
 
-    <!-- TailwindCSS CDN -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            DEFAULT: '#689D4B',
-                            light: '#82b366',
-                            dark: '#528238',
-                            50: '#f4f8f1',
-                            100: '#e6f0e0',
-                            200: '#cfe3c4',
-                            500: '#689D4B',
-                            600: '#528238',
-                            700: '#3e632a',
-                        },
-                        secondary: {
-                            DEFAULT: '#F2F2F2',
-                            light: '#FAFAFA',
-                            dark: '#E5E5E5',
-                        },
-                        surface: '#FFFFFF',
-                    },
-                    fontFamily: {
-                        kanit: ['Kanit', 'sans-serif'],
-                        sans: ['Kanit', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
-                        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Bootstrap 5.3.8 CSS (Local Static — No CDN / No npm) -->
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
 
-    <!-- Global Styling: Soft Medical Clean (Primary: #689D4B, Secondary: #F2F2F2, Black Font Kanit) -->
+    <!-- FontAwesome Free Icons (Local Static) -->
+    <link rel="stylesheet" href="{% static 'vendor/adminlte/plugins/fontawesome-free/css/all.min.css' %}">
+
+    <!-- HTMX 2.0.4 & Alpine.js 3.14 -->
+    <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+    <script defer src="{% static 'vendor/alpine/alpine.min.js' %}"></script>
+
+    <!-- Global Styling: Soft Medical Clean (Primary: #689D4B, Secondary: #F8F9FA, Font: THSarabunNew) -->
     <style>
-        :root {
-            --primary: #689D4B;
-            --primary-dark: #528238;
-            --primary-light: #82b366;
-            --secondary: #F2F2F2;
-            --surface: #FFFFFF;
-            --text-main: #111827;
-            --text-muted: #4b5563;
-            --border-color: #e5e7eb;
-        }
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Kanit', sans-serif;
+        @font-face {
+            font-family: 'THSarabunNew';
+            src: url("{% static 'fonts/THSarabunNew.ttf' %}") format('truetype');
             font-weight: 400;
-            background-color: #F8FAF6;
-            color: #111827;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'THSarabunNew';
+            src: url("{% static 'fonts/THSarabunNew Bold.ttf' %}") format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'THSarabunNew';
+            src: url("{% static 'fonts/THSarabunNew Italic.ttf' %}") format('truetype');
+            font-weight: 400;
+            font-style: italic;
+        }
+        @font-face {
+            font-family: 'THSarabunNew';
+            src: url("{% static 'fonts/THSarabunNew BoldItalic.ttf' %}") format('truetype');
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        :root {
+            --bs-primary: #2E7D32;
+            --bs-primary-rgb: 46, 125, 50;
+            --bs-primary-dark: #1B5E20;
+            --bs-primary-light: #4CAF50;
+            --bs-body-font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+            --bs-body-bg: #EEF2F6;
+            --bs-body-color: #0F172A;
+            --bs-border-radius: 0.85rem;
+            --bs-border-radius-lg: 1.25rem;
+            --bs-border-radius-xl: 1.5rem;
+        }
+
+        html {
+            font-size: 19px; /* Enhanced sharpness and legibility for TH Sarabun New */
+        }
+
+        body {
+            font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+            font-weight: 500; /* Medium weight gives solid, readable strokes on high-DPI screens */
+            font-size: 1.05rem;
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.45;
         }
+
         h1, h2, h3, h4, h5, h6 {
-            font-family: 'Kanit', sans-serif;
+            font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+            font-weight: 700;
+            color: #0F172A;
+            line-height: 1.25;
+        }
+
+        /* Stronger Readability for Subtext */
+        .text-muted {
+            color: #475569 !important; /* High contrast slate-600 instead of washed-out gray */
             font-weight: 500;
-            color: #111827;
-            letter-spacing: -0.01em;
         }
 
-        /* Modern Tailwind 2026 Form Controls (Overrides outdated Bootstrap form-control) */
-        .form-control, input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], select, textarea {
-            width: 100%;
-            border-radius: 0.75rem !important; /* rounded-xl */
-            border: 1px solid #E5E7EB !important; /* border-gray-200 */
-            background-color: #FFFFFF !important;
-            padding: 0.625rem 0.875rem !important;
-            font-size: 0.875rem !important;
-            line-height: 1.25rem !important;
-            color: #111827 !important;
-            font-family: 'Kanit', sans-serif !important;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
-        .form-control:focus, input:focus, select:focus, textarea:focus {
-            outline: none !important;
-            border-color: #689D4B !important;
-            box-shadow: 0 0 0 3px rgba(104, 157, 75, 0.18) !important;
-        }
-        .form-control::placeholder, input::placeholder, textarea::placeholder {
-            color: #9CA3AF !important;
-            font-weight: 300 !important;
+        /* Buttons */
+        .btn {
+            font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 0.65rem;
         }
 
-        /* Custom Sleek Scrollbar */
+        .btn-primary {
+            --bs-btn-bg: #2E7D32;
+            --bs-btn-border-color: #2E7D32;
+            --bs-btn-hover-bg: #1B5E20;
+            --bs-btn-hover-border-color: #1B5E20;
+            --bs-btn-active-bg: #144618;
+            --bs-btn-active-border-color: #144618;
+            --bs-btn-focus-shadow-rgb: 46, 125, 50;
+            padding: 0.45rem 1.25rem;
+            box-shadow: 0 2px 6px rgba(46, 125, 50, 0.2);
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-outline-primary {
+            --bs-btn-color: #2E7D32;
+            --bs-btn-border-color: #2E7D32;
+            --bs-btn-hover-bg: #2E7D32;
+            --bs-btn-hover-border-color: #2E7D32;
+            padding: 0.45rem 1.25rem;
+            transition: all 0.2s ease;
+        }
+
+        /* Cards with High Contrast */
+        .card {
+            border-radius: 0.85rem;
+            border: 1px solid #CBD5E1;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+            background-color: #FFFFFF;
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            border-radius: 0.65rem;
+            border: 1px solid #94A3B8;
+            padding: 0.5rem 0.85rem;
+            font-size: 1.05rem;
+            font-weight: 500;
+            font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+            color: #0F172A;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #2E7D32;
+            box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.2);
+        }
+
+        /* Badges */
+        .badge {
+            font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.35em 0.7em;
+        }
+
+        .badge-primary-soft {
+            background-color: rgba(46, 125, 50, 0.12);
+            color: #1B5E20;
+            border: 1px solid rgba(46, 125, 50, 0.3);
+        }
+
+        /* Sleek Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #F2F2F2;
+            background: #F1F5F9;
         }
         ::-webkit-scrollbar-thumb {
-            background: #D1D5DB;
+            background: #CBD5E1;
             border-radius: 9999px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #9CA3AF;
+            background: #94A3B8;
         }
     </style>
-
-    <!-- FontAwesome Free Icons (Local Vendor) -->
-    <link rel="stylesheet" href="{% static 'vendor/adminlte/plugins/fontawesome-free/css/all.min.css' %}">
-    
-    <!-- HTMX 2.0.4 & Alpine.js 3.14 -->
-    <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
-    <script defer src="{% static 'vendor/alpine/alpine.min.js' %}"></script>
 
     <!-- CSRF Token Integration for HTMX -->
     <script>
@@ -143,8 +191,11 @@
 
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-[#F2F2F2] text-[#111827] font-kanit {% block body_class %}{% endblock %}">
+<body class="{% block body_class %}{% endblock %}">
     {% block layout %}{% block content %}{% endblock %}{% endblock %}
+
+    <!-- Bootstrap 5.3.8 JS Bundle (Local Static) -->
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

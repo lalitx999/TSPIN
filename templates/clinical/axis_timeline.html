@@ -8,31 +8,26 @@
 {% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="d-flex flex-column gap-4">
+
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-200">
-        <div>
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                    <i class="fas fa-history text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 font-kanit flex items-center gap-2">
-                        เส้นเวลาพัฒนาการสุขภาพ (Biological Axes Timeline)
-                    </h1>
-                    <p class="text-sm text-gray-500 font-kanit">
-                        ติดตามแนวโน้มการฟื้นตัวของเซลล์และกลไกชีวภาพตามช่วงเวลาการรักษา
-                    </p>
-                </div>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 pb-3 border-bottom">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
+                <i class="fas fa-history fs-4"></i>
+            </div>
+            <div>
+                <h1 class="h4 fw-bold mb-1 text-dark">เส้นเวลาพัฒนาการสุขภาพ (Biological Axes Timeline)</h1>
+                <p class="text-muted small mb-0">ติดตามแนวโน้มการฟื้นตัวของเซลล์และกลไกชีวภาพตามช่วงเวลาการรักษา</p>
             </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="d-flex align-items-center gap-2">
             {% if patient %}
-            <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-gray-700 bg-secondary hover:bg-gray-200 transition-colors font-kanit">
-                <i class="fas fa-edit"></i> ประเมินคะแนน 39 แกน
+            <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-edit me-1"></i> ประเมินคะแนน 39 แกน
             </a>
-            <a href="{% url 'clinical:axis_graph' %}?patient_id={{ patient.pk }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors font-kanit">
-                <i class="fas fa-chart-pie"></i> เรดาร์ชาร์ต
+            <a href="{% url 'clinical:axis_graph' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-chart-pie me-1"></i> เรดาร์ชาร์ต
             </a>
             {% endif %}
         </div>
@@ -40,86 +35,88 @@
 
     {% if patient %}
     <!-- Patient Info Banner -->
-    <div class="bg-white rounded-2xl border border-primary/20 p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold">
-                {{ patient.first_name|slice:":1" }}
+    <div class="card shadow-sm border border-primary-subtle bg-primary-subtle">
+        <div class="card-body p-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-primary text-white fw-bold fs-4 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
+                    {{ patient.first_name|slice:":1" }}
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-0.5">
+                        <strong class="text-dark fs-6">{{ patient.full_name }}</strong>
+                        <span class="badge bg-white text-primary border border-primary-subtle font-monospace">
+                            HN: {{ patient.hn }}
+                        </span>
+                    </div>
+                    <small class="text-muted">
+                        จำนวนการตรวจประเมินชีวภาพ: {{ records|length }} ครั้ง
+                    </small>
+                </div>
             </div>
             <div>
-                <div class="flex items-center gap-2">
-                    <h3 class="font-bold text-gray-900 font-kanit text-base">{{ patient.full_name }}</h3>
-                    <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-primary/10 text-primary font-medium">
-                        HN: {{ patient.hn }}
-                    </span>
-                </div>
-                <div class="text-xs text-gray-500 font-kanit">
-                    จำนวนการตรวจประเมินชีวภาพ: {{ records|length }} ครั้ง
-                </div>
+                <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> กลับหน้าแฟ้ม EMR
+                </a>
             </div>
-        </div>
-        <div>
-            <a href="{% url 'patients:patient_detail' patient.pk %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-700 bg-secondary hover:bg-gray-200 transition-colors font-kanit">
-                <i class="fas fa-arrow-left"></i> กลับหน้าแฟ้ม EMR
-            </a>
         </div>
     </div>
 
     <!-- Timeline Chart -->
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div class="px-5 py-3.5 bg-secondary/50 border-b border-gray-200">
-            <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider font-kanit flex items-center gap-2">
+    <div class="card shadow-sm border">
+        <div class="card-header bg-light py-2.5 px-3 border-bottom">
+            <span class="small fw-bold text-dark d-flex align-items-center gap-2">
                 <i class="fas fa-chart-line text-primary"></i> แนวโน้มคะแนน 4 เสาหลักชีวภาพเมื่อเวลาผ่านไป
             </span>
         </div>
-        <div class="p-6">
-            <div class="relative h-[380px] w-full">
+        <div class="card-body p-4">
+            <div class="position-relative w-100" style="height: 380px;">
                 <canvas id="timelineChartCanvas"></canvas>
             </div>
         </div>
     </div>
 
     <!-- Records History Table -->
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div class="px-5 py-3.5 bg-secondary/50 border-b border-gray-200">
-            <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider font-kanit flex items-center gap-2">
+    <div class="card shadow-sm border">
+        <div class="card-header bg-light py-2.5 px-3 border-bottom">
+            <span class="small fw-bold text-dark d-flex align-items-center gap-2">
                 <i class="fas fa-list-alt text-primary"></i> บันทึกประวัติการประเมินย้อนหลังทั้งหมด
             </span>
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs font-kanit">
-                <thead class="bg-secondary/40 text-gray-600 border-b border-gray-200">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="font-size: 0.8125rem;">
+                <thead class="table-light text-muted border-bottom">
                     <tr>
-                        <th class="px-4 py-3 font-semibold">วันที่ตรวจ</th>
-                        <th class="px-4 py-3 font-semibold">แพทย์ผู้ประเมิน</th>
-                        <th class="px-4 py-3 font-semibold text-center">ประเภท</th>
-                        <th class="px-4 py-3 font-semibold text-center">Axis 1 (การอักเสบ)</th>
-                        <th class="px-4 py-3 font-semibold text-center">Axis 5 (อินซูลิน)</th>
-                        <th class="px-4 py-3 font-semibold text-center">Axis 8 (ไมโตคอนเดรีย)</th>
-                        <th class="px-4 py-3 font-semibold text-center">Axis 15 (ดีท็อกซ์)</th>
-                        <th class="px-4 py-3 font-semibold">บันทึกความเห็นแพทย์</th>
+                        <th class="px-3 py-2.5 fw-semibold">วันที่ตรวจ</th>
+                        <th class="px-3 py-2.5 fw-semibold">แพทย์ผู้ประเมิน</th>
+                        <th class="px-3 py-2.5 fw-semibold text-center">ประเภท</th>
+                        <th class="px-3 py-2.5 fw-semibold text-center">Axis 1 (การอักเสบ)</th>
+                        <th class="px-3 py-2.5 fw-semibold text-center">Axis 5 (อินซูลิน)</th>
+                        <th class="px-3 py-2.5 fw-semibold text-center">Axis 8 (ไมโตคอนเดรีย)</th>
+                        <th class="px-3 py-2.5 fw-semibold text-center">Axis 15 (ดีท็อกซ์)</th>
+                        <th class="px-3 py-2.5 fw-semibold">บันทึกความเห็นแพทย์</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody>
                     {% for rec in records %}
-                    <tr class="hover:bg-secondary/30 transition-colors">
-                        <td class="px-4 py-3 font-mono font-medium text-gray-900">{{ rec.record_date|date:"d M Y H:i" }}</td>
-                        <td class="px-4 py-3 text-gray-700">{{ rec.doctor.get_full_name|default:rec.doctor.username|default:"-" }}</td>
-                        <td class="px-4 py-3 text-center">
+                    <tr>
+                        <td class="px-3 py-2.5 font-monospace fw-bold text-dark">{{ rec.record_date|date:"d M Y H:i" }}</td>
+                        <td class="px-3 py-2.5 text-muted">{{ rec.doctor.get_full_name|default:rec.doctor.username|default:"-" }}</td>
+                        <td class="px-3 py-2.5 text-center">
                             {% if rec.is_baseline %}
-                                <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-blue-100 text-blue-800">Baseline</span>
+                                <span class="badge bg-primary text-white">Baseline</span>
                             {% else %}
-                                <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-secondary text-gray-700">Follow-up</span>
+                                <span class="badge bg-light text-dark border">Follow-up</span>
                             {% endif %}
                         </td>
-                        <td class="px-4 py-3 text-center font-mono font-bold text-red-600">{{ rec.axis_1 }}</td>
-                        <td class="px-4 py-3 text-center font-mono font-bold text-blue-600">{{ rec.axis_5 }}</td>
-                        <td class="px-4 py-3 text-center font-mono font-bold text-primary">{{ rec.axis_8 }}</td>
-                        <td class="px-4 py-3 text-center font-mono font-bold text-amber-600">{{ rec.axis_15 }}</td>
-                        <td class="px-4 py-3 text-gray-600">{{ rec.notes|default:"-"|truncatewords:8 }}</td>
+                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-danger">{{ rec.axis_1 }}</td>
+                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-info-emphasis">{{ rec.axis_5 }}</td>
+                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-primary">{{ rec.axis_8 }}</td>
+                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-warning-emphasis">{{ rec.axis_15 }}</td>
+                        <td class="px-3 py-2.5 text-muted text-truncate" style="max-width: 250px;">{{ rec.notes|default:"-"|truncatewords:8 }}</td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="8" class="px-4 py-8 text-center text-gray-400 font-kanit">
+                        <td colspan="8" class="text-center py-5 text-muted">
                             ยังไม่มีบันทึกคะแนนชีวภาพสำหรับคนไข้รายนี้
                         </td>
                     </tr>
@@ -129,17 +126,20 @@
         </div>
     </div>
     {% else %}
-    <div class="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-        <div class="w-16 h-16 rounded-full bg-secondary flex items-center justify-center text-gray-400 mx-auto mb-3">
-            <i class="fas fa-user-clock text-2xl"></i>
+    <div class="card shadow-sm border text-center p-5">
+        <div class="rounded-circle bg-light text-muted d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 58px; height: 58px; font-size: 1.5rem;">
+            <i class="fas fa-user-clock"></i>
         </div>
-        <h4 class="text-base font-bold text-gray-800 mb-1 font-kanit">กรุณาเลือกคนไข้เพื่อดูเส้นเวลาสุขภาพ</h4>
-        <p class="text-xs text-gray-500 mb-4 font-kanit">คุณสามารถเลือกคนไข้จากหน้ารายชื่อเวชระเบียนเพื่อดูการฟื้นฟูของเซลล์ย้อนหลัง</p>
-        <a href="{% url 'patients:patient_list' %}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-medium transition-colors font-kanit">
-            <i class="fas fa-users"></i> ไปที่หน้ารายชื่อคนไข้
-        </a>
+        <h5 class="fw-bold text-dark mb-1">กรุณาเลือกคนไข้เพื่อดูเส้นเวลาสุขภาพ</h5>
+        <p class="small text-muted mb-4">คุณสามารถเลือกคนไข้จากหน้ารายชื่อเวชระเบียนเพื่อดูการฟื้นฟูของเซลล์ย้อนหลัง</p>
+        <div>
+            <a href="{% url 'patients:patient_list' %}" class="btn btn-primary">
+                <i class="fas fa-users me-1"></i> ไปที่หน้ารายชื่อคนไข้
+            </a>
+        </div>
     </div>
     {% endif %}
+
 </div>
 
 {% if patient and records %}
@@ -161,16 +161,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     label: 'Axis 1: การอักเสบทั้งระบบ (Inflammation)',
                     data: axis1,
-                    borderColor: '#ef4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
                     fill: false,
                     tension: 0.3
                 },
                 {
                     label: 'Axis 5: อินซูลินและน้ำตาล (Insulin)',
                     data: axis5,
-                    borderColor: '#0284c7',
-                    backgroundColor: 'rgba(2, 132, 199, 0.1)',
+                    borderColor: '#0dcaf0',
+                    backgroundColor: 'rgba(13, 202, 240, 0.1)',
                     fill: false,
                     tension: 0.3
                 },
@@ -185,8 +185,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 {
                     label: 'Axis 15: การขับสารพิษระดับเซลล์ (Detox)',
                     data: axis15,
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
                     fill: false,
                     tension: 0.3
                 }
@@ -198,18 +198,18 @@ document.addEventListener("DOMContentLoaded", function () {
             scales: {
                 x: {
                     grid: { color: 'rgba(0, 0, 0, 0.05)' },
-                    ticks: { font: { family: 'Kanit' }, color: '#6b7280' }
+                    ticks: { font: { family: 'THSarabunNew', size: 13, weight: 'bold' }, color: '#6b7280' }
                 },
                 y: {
                     min: 0,
                     max: 100,
                     grid: { color: 'rgba(0, 0, 0, 0.05)' },
-                    ticks: { font: { family: 'Kanit' }, color: '#6b7280' }
+                    ticks: { font: { family: 'THSarabunNew', size: 13, weight: 'bold' }, color: '#6b7280' }
                 }
             },
             plugins: {
                 legend: {
-                    labels: { font: { family: 'Kanit' }, color: '#111827' }
+                    labels: { font: { family: 'THSarabunNew', size: 14, weight: 'bold' }, color: '#111827' }
                 }
             }
         }

@@ -1,145 +1,321 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TSPI CLINIC — ระบบเวชระเบียนและความฉลาดทางการแพทย์ 39 แกนชีววิทยา (12 โดเมน){% endblock %}</title>
 
-{% block extra_head %}
-{% block extra_public_head %}{% endblock %}
-{% endblock %}
+    <!-- Bootstrap 5.3.8 CSS (Local Static — No CDN / No npm) -->
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
 
-{% block layout %}
-<div x-data="{ mobileOpen: false }" class="min-h-screen flex flex-col bg-[#F8FAF6]">
-    <!-- Top Healthcare Header -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Brand / Logo -->
-                <a href="{% url 'core:home' %}" class="flex items-center gap-3 group">
-                    <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary text-xl font-bold transition-transform group-hover:scale-105">
-                        <i class="fas fa-leaf"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="font-semibold text-lg text-gray-900 tracking-tight leading-none">TSPI</span>
-                            <span class="font-semibold text-lg text-primary tracking-tight leading-none">CLINIC</span>
-                        </div>
-                        <span class="text-[10px] text-gray-500 font-normal tracking-wide block uppercase mt-0.5">Systems Biology AI Expert</span>
-                    </div>
-                </a>
+    <!-- FontAwesome Free Icons (Local Static) -->
+    <link rel="stylesheet" href="{% static 'vendor/adminlte/plugins/fontawesome-free/css/all.min.css' %}">
 
-                <!-- Desktop Navigation Menu -->
-                <nav class="hidden md:flex items-center gap-6">
-                    <a href="{% url 'core:home' %}" class="text-sm font-medium {% if request.resolver_match.url_name == 'home' %}text-primary font-semibold{% else %}text-gray-700 hover:text-primary{% endif %} transition-colors">หน้าแรก</a>
-                    <a href="{% url 'core:platform' %}" class="text-sm font-medium {% if request.resolver_match.url_name == 'platform' %}text-primary font-semibold{% else %}text-gray-700 hover:text-primary{% endif %} transition-colors">แพลตฟอร์ม</a>
-                    <a href="{% url 'core:protocol' %}" class="text-sm font-medium {% if request.resolver_match.url_name == 'protocol' %}text-primary font-semibold{% else %}text-gray-700 hover:text-primary{% endif %} transition-colors">9-Step โปรโตคอล</a>
-                    <a href="{% url 'core:research' %}" class="text-sm font-medium {% if request.resolver_match.url_name == 'research' %}text-primary font-semibold{% else %}text-gray-700 hover:text-primary{% endif %} transition-colors">งานวิจัย</a>
-                    <a href="{% url 'core:about' %}" class="text-sm font-medium {% if request.resolver_match.url_name == 'about' %}text-primary font-semibold{% else %}text-gray-700 hover:text-primary{% endif %} transition-colors">เกี่ยวกับเรา</a>
-                    <a href="{% url 'core:guide' %}" class="text-sm font-medium {% if request.resolver_match.url_name == 'guide' %}text-primary font-semibold{% else %}text-gray-700 hover:text-primary{% endif %} transition-colors">คู่มือ</a>
-                </nav>
+    <!-- Global Styling: Soft Medical Clean (Primary: #689D4B, Secondary: #F8F9FA, Font: THSarabunNew) -->
+    <style>
+        @font-face {
+            font-family: 'THSarabunNew';
+            src: url("{% static 'fonts/THSarabunNew.ttf' %}") format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'THSarabunNew';
+            src: url("{% static 'fonts/THSarabunNew Bold.ttf' %}") format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'THSarabunNew';
+            src: url("{% static 'fonts/THSarabunNew Italic.ttf' %}") format('truetype');
+            font-weight: 400;
+            font-style: italic;
+        }
+        @font-face {
+            font-family: 'THSarabunNew';
+            src: url("{% static 'fonts/THSarabunNew BoldItalic.ttf' %}") format('truetype');
+            font-weight: 700;
+            font-style: italic;
+        }
 
-                <!-- Auth Action Buttons -->
-                <div class="hidden md:flex items-center gap-3">
-                    <a href="{% url 'accounts:patient_login' %}" class="px-4 py-2 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-xl transition-all">
-                        <i class="fas fa-user-circle mr-1.5"></i> เข้าสู่ระบบคนไข้
-                    </a>
-                    <a href="{% url 'accounts:doctor_login' %}" class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark shadow-sm hover:shadow rounded-xl transition-all">
-                        <i class="fas fa-user-md mr-1.5"></i> สำหรับแพทย์
-                    </a>
+        :root {
+            /* Bootstrap Theme Colors Override */
+            --bs-primary: #2E7D32;
+            --bs-primary-rgb: 46, 125, 50;
+            --bs-primary-dark: #1B5E20;
+            --bs-primary-light: #4CAF50;
+            --bs-body-font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+            --bs-body-bg: #EEF2F6;
+            --bs-body-color: #0F172A;
+            --bs-border-radius: 0.85rem;
+            --bs-border-radius-lg: 1.25rem;
+            --bs-border-radius-xl: 1.5rem;
+        }
+
+        html {
+            font-size: 19px;
+        }
+
+        body {
+            font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+            font-weight: 500;
+            font-size: 1.05rem;
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            line-height: 1.45;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+            font-weight: 700;
+            color: #0F172A;
+            line-height: 1.25;
+        }
+
+        .text-muted {
+            color: #475569 !important;
+            font-weight: 500;
+        }
+
+        /* Primary Button Styling */
+        .btn-primary {
+            --bs-btn-bg: #2E7D32;
+            --bs-btn-border-color: #2E7D32;
+            --bs-btn-hover-bg: #1B5E20;
+            --bs-btn-hover-border-color: #1B5E20;
+            --bs-btn-active-bg: #144618;
+            --bs-btn-active-border-color: #144618;
+            --bs-btn-focus-shadow-rgb: 46, 125, 50;
+            font-weight: 700;
+            border-radius: 0.75rem;
+            padding: 0.55rem 1.25rem;
+            box-shadow: 0 2px 8px rgba(46, 125, 50, 0.25);
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.35);
+        }
+
+        .btn-outline-primary {
+            --bs-btn-color: #2E7D32;
+            --bs-btn-border-color: #2E7D32;
+            --bs-btn-hover-bg: #2E7D32;
+            --bs-btn-hover-border-color: #2E7D32;
+            border-radius: 0.75rem;
+            padding: 0.55rem 1.25rem;
+            font-weight: 700;
+        }
+
+        .btn-light {
+            border-radius: 0.75rem;
+            padding: 0.625rem 1.25rem;
+            border: 1px solid #E5E7EB;
+            background-color: #FFFFFF;
+            font-weight: 400;
+        }
+        .btn-light:hover {
+            background-color: #F3F4F6;
+        }
+
+        /* Cards & Surfaces */
+        .card {
+            border-radius: 1rem;
+            border: 1px solid #EAECEF;
+            background-color: #FFFFFF;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            border-color: rgba(104, 157, 75, 0.4);
+        }
+
+        /* Badges */
+        .badge-subtle-primary {
+            background-color: #F0F6EC;
+            color: #528238;
+            border: 1px solid rgba(104, 157, 75, 0.25);
+            font-weight: 400;
+            padding: 0.4rem 0.8rem;
+            border-radius: 2rem;
+        }
+
+        /* Navbar Customization */
+        .navbar-clinic {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #EAECEF;
+        }
+        .navbar-clinic .nav-link {
+            font-weight: 400;
+            color: #4B5563;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.15s ease;
+        }
+        .navbar-clinic .nav-link:hover, .navbar-clinic .nav-link.active {
+            color: #689D4B;
+            background-color: #F0F6EC;
+        }
+
+        /* Text Utilities */
+        .text-primary-clinic { color: #689D4B !important; }
+        .bg-primary-clinic { background-color: #689D4B !important; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #F8FAF6; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+    {% block extra_public_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Header Navbar (Bootstrap 5) -->
+    <nav class="navbar navbar-expand-lg navbar-clinic sticky-top py-2">
+        <div class="container-xl">
+            <!-- Brand Logo -->
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'core:home' %}">
+                <div class="d-flex align-items-center justify-content-center text-white bg-primary-clinic rounded-3" style="width: 38px; height: 38px;">
+                    <i class="fas fa-heartbeat fs-5"></i>
                 </div>
+                <div>
+                    <span class="fs-5 fw-bold text-dark d-block lh-1">TSPI <span class="text-primary-clinic">CLINIC</span></span>
+                    <small class="text-muted text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">39 Biological Axes (12 Domains)</small>
+                </div>
+            </a>
 
-                <!-- Mobile Hamburger Button -->
-                <div class="flex md:hidden">
-                    <button @click="mobileOpen = !mobileOpen" type="button" class="text-gray-600 hover:text-gray-900 p-2 rounded-lg border border-gray-200">
-                        <i class="fas" :class="mobileOpen ? 'fa-times' : 'fa-bars'"></i>
-                    </button>
+            <!-- Mobile Hamburger Toggle -->
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navigation Links & Auth Buttons -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-1">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">
+                            <i class="fas fa-home me-1 opacity-75"></i> หน้าแรก
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'platform' %}active{% endif %}" href="{% url 'core:platform' %}">
+                            <i class="fas fa-project-diagram me-1 opacity-75"></i> 39 แกนชีววิทยา
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'protocol' %}active{% endif %}" href="{% url 'core:protocol' %}">
+                            <i class="fas fa-clipboard-check me-1 opacity-75"></i> 9-Step โปรโตคอล
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'research' %}active{% endif %}" href="{% url 'core:research' %}">
+                            <i class="fas fa-flask me-1 opacity-75"></i> งานวิจัย &amp; ผลลัพธ์
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">
+                            <i class="fas fa-hospital-user me-1 opacity-75"></i> เกี่ยวกับคลินิก
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+                    <a href="{% url 'accounts:patient_login' %}" class="btn btn-light btn-sm text-dark px-3">
+                        <i class="fas fa-user-circle me-1 text-primary-clinic"></i> คนไข้เข้าสู่ระบบ
+                    </a>
+                    <a href="{% url 'accounts:doctor_login' %}" class="btn btn-primary btn-sm px-3">
+                        <i class="fas fa-user-md me-1"></i> สำหรับแพทย์
+                    </a>
                 </div>
             </div>
         </div>
+    </nav>
 
-        <!-- Mobile Drawer Menu -->
-        <div x-show="mobileOpen" x-transition class="md:hidden border-t border-gray-100 bg-white px-4 pt-3 pb-5 space-y-2">
-            <a href="{% url 'core:home' %}" class="block px-3 py-2 text-base font-medium text-gray-800 rounded-lg hover:bg-gray-50">หน้าแรก</a>
-            <a href="{% url 'core:platform' %}" class="block px-3 py-2 text-base font-medium text-gray-800 rounded-lg hover:bg-gray-50">แพลตฟอร์ม 39 แกน (12 โดเมน)</a>
-            <a href="{% url 'core:protocol' %}" class="block px-3 py-2 text-base font-medium text-gray-800 rounded-lg hover:bg-gray-50">9-Step โปรโตคอล</a>
-            <a href="{% url 'core:research' %}" class="block px-3 py-2 text-base font-medium text-gray-800 rounded-lg hover:bg-gray-50">งานวิจัยทางคลินิก</a>
-            <a href="{% url 'core:about' %}" class="block px-3 py-2 text-base font-medium text-gray-800 rounded-lg hover:bg-gray-50">เกี่ยวกับเรา</a>
-            <a href="{% url 'core:guide' %}" class="block px-3 py-2 text-base font-medium text-gray-800 rounded-lg hover:bg-gray-50">คู่มือการใช้งาน</a>
-            <a href="{% url 'core:install' %}" class="block px-3 py-2 text-base font-medium text-gray-800 rounded-lg hover:bg-gray-50">ติดตั้งแอปมือถือ</a>
-            <div class="pt-3 border-t border-gray-100 flex flex-col gap-2">
-                <a href="{% url 'accounts:patient_login' %}" class="w-full text-center py-2.5 px-4 text-sm font-medium text-primary bg-primary/10 rounded-xl">เข้าสู่ระบบคนไข้</a>
-                <a href="{% url 'accounts:doctor_login' %}" class="w-full text-center py-2.5 px-4 text-sm font-medium text-white bg-primary rounded-xl">เข้าสู่ระบบแพทย์และเจ้าหน้าที่</a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content Slot -->
-    <main class="flex-1">
+    <!-- Main Content Block -->
+    <main class="flex-grow-1">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Modern Clean Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-16 pt-12 pb-8 text-gray-600">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
-                <!-- Col 1: About TSPI -->
-                <div class="md:col-span-1">
-                    <div class="flex items-center gap-2 mb-3">
-                        <div class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-bold">
-                            <i class="fas fa-leaf text-sm"></i>
+    <!-- Footer (Bootstrap 5) -->
+    <footer class="bg-white border-top py-5 mt-5">
+        <div class="container-xl">
+            <div class="row g-4 justify-content-between">
+                <div class="col-lg-5">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="d-flex align-items-center justify-content-center text-white bg-primary-clinic rounded-3" style="width: 32px; height: 32px;">
+                            <i class="fas fa-heartbeat fs-6"></i>
                         </div>
-                        <span class="font-semibold text-lg text-gray-900">TSPI <span class="text-primary">CLINIC</span></span>
+                        <span class="fs-5 fw-bold text-dark">TSPI <span class="text-primary-clinic">CLINIC</span></span>
                     </div>
-                    <p class="text-sm text-gray-500 leading-relaxed mb-4">
-                        แพลตฟอร์มการแพทย์แม่นยำที่ขับเคลื่อนด้วย AI ผสานการวิเคราะห์ชีววิทยาระบบ 39 แกน 12 โดเมนเพื่อการดูแลสุขภาพเฉพาะบุคคลอย่างยั่งยืน
+                    <p class="text-muted small lh-base mb-3">
+                        ระบบเวชระเบียนและความฉลาดทางการแพทย์ 39 แกนชีววิทยา (12 โดเมน)
+                        บูรณาการข้อมูลทางคลินิก วิเคราะห์หาสาเหตุเชิงลึกระดับเซลล์ และวางแผนการฟื้นฟูสุขภาพเฉพาะบุคคลอย่างแม่นยำ
                     </p>
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                        <i class="fas fa-shield-alt mr-1"></i> Certified Clinical AI
-                    </span>
+                    <div class="text-muted small">
+                        <i class="fas fa-shield-alt text-primary-clinic me-1"></i> ได้รับการคุ้มครองข้อมูลสุขภาพตามมาตรฐาน PDPA &bull; Pillar 8 AuditLog
+                    </div>
                 </div>
 
-                <!-- Col 2: Platform Links -->
-                <div>
-                    <h4 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">แพลตฟอร์ม</h4>
-                    <ul class="space-y-2.5 text-sm">
-                        <li><a href="{% url 'core:platform' %}" class="hover:text-primary transition-colors">ระบบ AI 39 แกนชีววิทยา (12 โดเมน)</a></li>
-                        <li><a href="{% url 'core:protocol' %}" class="hover:text-primary transition-colors">9-Step Recovery Protocol</a></li>
-                        <li><a href="{% url 'core:research' %}" class="hover:text-primary transition-colors">งานวิจัยไฟโตเคมีคอล 200 โมดูล</a></li>
-                        <li><a href="{% url 'clinical:axes_explorer' %}" class="hover:text-primary transition-colors">Mechanistic Biological Explorer</a></li>
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h6 class="fw-semibold text-dark mb-3">บริการคลินิก</h6>
+                    <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                        <li><a href="{% url 'core:platform' %}" class="text-decoration-none text-muted">39 แกนชีวภาพ</a></li>
+                        <li><a href="{% url 'core:protocol' %}" class="text-decoration-none text-muted">9-Step โปรโตคอล</a></li>
+                        <li><a href="{% url 'core:research' %}" class="text-decoration-none text-muted">เคสสะเก็ดเงินคุณนิคม</a></li>
+                        <li><a href="{% url 'core:protocol' %}" class="text-decoration-none text-muted">200 โมดูลสารอาหาร</a></li>
                     </ul>
                 </div>
 
-                <!-- Col 3: Portal & Support -->
-                <div>
-                    <h4 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">บริการและสนับสนุน</h4>
-                    <ul class="space-y-2.5 text-sm">
-                        <li><a href="{% url 'accounts:patient_login' %}" class="hover:text-primary transition-colors">พอร์ทัลผลตรวจคนไข้</a></li>
-                        <li><a href="{% url 'accounts:doctor_login' %}" class="hover:text-primary transition-colors">ระบบแพทย์เวชระเบียน (EMR)</a></li>
-                        <li><a href="{% url 'core:guide' %}" class="hover:text-primary transition-colors">คู่มือการเตรียมตัวก่อนตรวจ</a></li>
-                        <li><a href="{% url 'core:install' %}" class="hover:text-primary transition-colors">ดาวน์โหลดและติดตั้งแอป PWA</a></li>
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h6 class="fw-semibold text-dark mb-3">เข้าสู่ระบบ</h6>
+                    <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                        <li><a href="{% url 'accounts:patient_login' %}" class="text-decoration-none text-muted">เข้าสู่ระบบคนไข้</a></li>
+                        <li><a href="{% url 'accounts:patient_register' %}" class="text-decoration-none text-muted">ลงทะเบียนคนไข้ใหม่</a></li>
+                        <li><a href="{% url 'accounts:doctor_login' %}" class="text-decoration-none text-muted">ระบบแพทย์ (Doctor EMR)</a></li>
+                        <li><a href="{% url 'core:privacy' %}" class="text-decoration-none text-muted">นโยบายความเป็นส่วนตัว</a></li>
                     </ul>
                 </div>
 
-                <!-- Col 4: Legal & Contact -->
-                <div>
-                    <h4 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">กฎหมายและการติดต่อ</h4>
-                    <ul class="space-y-2.5 text-sm">
-                        <li><a href="{% url 'core:privacy' %}" class="hover:text-primary transition-colors">นโยบายความเป็นส่วนตัว (PDPA)</a></li>
-                        <li><a href="{% url 'core:terms' %}" class="hover:text-primary transition-colors">เงื่อนไขและข้อตกลงการใช้งาน</a></li>
-                        <li><a href="{% url 'core:about' %}" class="hover:text-primary transition-colors">ติดต่อคลินิกและข้อมูลใบอนุญาต</a></li>
-                        <li class="pt-2 text-xs text-gray-400">
-                            <i class="fas fa-map-marker-alt mr-1"></i> กรุงเทพมหานคร ประเทศไทย
-                        </li>
-                    </ul>
+                <div class="col-md-6 col-lg-3">
+                    <h6 class="fw-semibold text-dark mb-3">การติดต่อ</h6>
+                    <p class="text-muted small mb-2">
+                        <i class="fas fa-map-marker-alt text-primary-clinic me-2"></i> ศูนย์การแพทย์และการฟื้นฟูสุขภาพ TSPI
+                    </p>
+                    <p class="text-muted small mb-2">
+                        <i class="fas fa-phone text-primary-clinic me-2"></i> 02-XXX-XXXX / LINE OA: @tspiclinic
+                    </p>
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-clock text-primary-clinic me-2"></i> จันทร์ - เสาร์: 09:00 - 18:00 น.
+                    </p>
                 </div>
             </div>
 
-            <div class="border-t border-gray-100 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-400 gap-4">
-                <p>&copy; 2026 TSPI Clinic (Dr. Patt Systems Biology Precision Medicine). สงวนลิขสิทธิ์ทุกประการ</p>
-                <div class="flex items-center gap-4">
-                    <span class="inline-flex items-center gap-1.5 text-gray-500">
-                        <span class="w-2 h-2 rounded-full bg-primary inline-block"></span>
-                        PostgreSQL High-Security Cloud
-                    </span>
-                </div>
+            <hr class="my-4 text-muted opacity-25">
+
+            <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2 small text-muted">
+                <div>&copy; 2026 TSPI CLINIC EMR. สงวนลิขสิทธิ์ทุกประการ</div>
+                <div>ระบบปฏิบัติการ: Bootstrap 5.3.8 &bull; Django 5 &bull; PostgreSQL Live</div>
             </div>
         </div>
     </footer>
-</div>
-{% endblock %}
+
+    <!-- Bootstrap 5.3.8 Bundle JS (Includes Popper.js — Local Static) -->
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

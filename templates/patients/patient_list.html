@@ -4,140 +4,113 @@
 {% block title %}แฟ้มเวชระเบียนผู้ป่วย | Dr. Patt EMR{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="d-flex flex-column gap-4">
+
     <!-- Header & Action Row -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-200">
-        <div>
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                    <i class="fas fa-user-injured text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 font-kanit flex items-center gap-2">
-                        แฟ้มเวชระเบียนผู้ป่วย (Patient Roster)
-                    </h1>
-                    <p class="text-sm text-gray-500 font-kanit">
-                        ศูนย์กลางจัดการเวชระเบียน การตรวจรักษา และประวัติชีวภาพระดับโมเลกุล
-                    </p>
-                </div>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 pb-3 border-bottom">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
+                <i class="fas fa-user-injured fs-4"></i>
+            </div>
+            <div>
+                <h1 class="h4 fw-bold mb-1 text-dark">แฟ้มเวชระเบียนผู้ป่วย (Patient Roster)</h1>
+                <p class="text-muted small mb-0">ศูนย์กลางจัดการเวชระเบียน การตรวจรักษา และประวัติชีวภาพระดับโมเลกุล</p>
             </div>
         </div>
-        <div class="flex items-center gap-2">
-            <a href="{% url 'patients:patient_create' %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-medium transition-colors shadow-sm font-kanit">
+        <div>
+            <a href="{% url 'patients:patient_create' %}" class="btn btn-primary d-inline-flex align-items-center gap-2">
                 <i class="fas fa-user-plus"></i> ลงทะเบียนคนไข้ใหม่
             </a>
         </div>
     </div>
 
     <!-- Search & Filter Card -->
-    <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-            <!-- Search Box with HTMX Live Search -->
-            <div class="md:col-span-6 relative">
-                <i class="fas fa-search absolute left-3.5 top-3 text-gray-400 text-xs"></i>
-                <input type="text"
-                       name="q"
-                       class="w-full pl-9 pr-8 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-xs text-gray-900 font-kanit"
-                       placeholder="ค้นหาด้วย HN, ชื่อ, นามสกุล หรือ เบอร์โทร..."
-                       value="{{ search_query }}"
-                       hx-get="{% url 'patients:patient_list' %}"
-                       hx-trigger="keyup changed delay:300ms, search"
-                       hx-target="#patient-table-body"
-                       hx-include="#status-filter"
-                       hx-indicator="#search-spinner">
-                <div id="search-spinner" class="absolute right-3 top-3 text-primary text-xs" style="display: none;">
-                    <i class="fas fa-spinner fa-spin"></i>
+    <div class="card shadow-sm border">
+        <div class="card-body p-3">
+            <div class="row g-2 align-items-center">
+                <!-- Search Box with HTMX Live Search -->
+                <div class="col-12 col-md-6 position-relative">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="fas fa-search small"></i>
+                        </span>
+                        <input type="text"
+                               name="q"
+                               class="form-control border-start-0 ps-0"
+                               placeholder="ค้นหาด้วย HN, ชื่อ, นามสกุล หรือ เบอร์โทร..."
+                               value="{{ search_query }}"
+                               hx-get="{% url 'patients:patient_list' %}"
+                               hx-trigger="keyup changed delay:300ms, search"
+                               hx-target="#patient-table-body"
+                               hx-include="#status-filter"
+                               hx-indicator="#search-spinner">
+                    </div>
+                    <div id="search-spinner" class="position-absolute end-0 top-50 translate-middle-y me-3 text-primary small" style="display: none; z-index: 5;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Status Filter -->
-            <div class="md:col-span-4">
-                <select id="status-filter" 
-                        name="status" 
-                        class="w-full px-3 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-xs text-gray-900 font-kanit bg-white"
-                        hx-get="{% url 'patients:patient_list' %}"
-                        hx-trigger="change"
-                        hx-target="#patient-table-body"
-                        hx-include="[name='q']"
-                        hx-indicator="#search-spinner">
-                    <option value="all" {% if status_filter == 'all' or not status_filter %}selected{% endif %}>ทุกสถานะ (All Status)</option>
-                    <option value="urgent" {% if status_filter == 'urgent' %}selected{% endif %}>🚨 เคสด่วนเฝ้าระวัง (Urgent)</option>
-                    <option value="medicine" {% if status_filter == 'medicine' %}selected{% endif %}>💊 รับการบำบัด/ยา (Active Therapy)</option>
-                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>⏳ รอดำเนินการ (Pending)</option>
-                    <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>✅ สิ้นสุดการรักษา (Completed)</option>
-                </select>
-            </div>
+                <!-- Status Filter -->
+                <div class="col-12 col-sm-8 col-md-4">
+                    <select id="status-filter" 
+                            name="status" 
+                            class="form-select"
+                            hx-get="{% url 'patients:patient_list' %}"
+                            hx-trigger="change"
+                            hx-target="#patient-table-body"
+                            hx-include="[name='q']"
+                            hx-indicator="#search-spinner">
+                        <option value="all" {% if status_filter == 'all' or not status_filter %}selected{% endif %}>ทุกสถานะ (All Status)</option>
+                        <option value="urgent" {% if status_filter == 'urgent' %}selected{% endif %}>🚨 เคสด่วนเฝ้าระวัง (Urgent)</option>
+                        <option value="medicine" {% if status_filter == 'medicine' %}selected{% endif %}>💊 รับการบำบัด/ยา (Active Therapy)</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>⏳ รอดำเนินการ (Pending)</option>
+                        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>✅ สิ้นสุดการรักษา (Completed)</option>
+                    </select>
+                </div>
 
-            <!-- Stats summary badge -->
-            <div class="md:col-span-2 text-right">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary text-gray-700 text-xs font-mono font-medium border border-gray-200">
-                    <i class="fas fa-users text-primary"></i> <strong id="total-badge">{{ total_count }}</strong> รายการ
-                </span>
+                <!-- Stats summary badge -->
+                <div class="col-12 col-sm-4 col-md-2 text-sm-end">
+                    <span class="badge bg-light text-dark border px-3 py-2 font-monospace w-100 text-center" style="font-size: 0.8rem;">
+                        <i class="fas fa-users text-primary me-1"></i> <strong id="total-badge">{{ total_count }}</strong> รายการ
+                    </span>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Patients Table Card -->
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div class="px-5 py-3.5 bg-secondary/50 border-b border-gray-200 flex items-center justify-between">
-            <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider font-kanit flex items-center gap-2">
+    <div class="card shadow-sm border">
+        <div class="card-header bg-light py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <span class="small fw-bold text-dark d-flex align-items-center gap-2">
                 <i class="fas fa-list-alt text-primary"></i> รายชื่อผู้ป่วยในระบบ
             </span>
-            <span class="text-xs text-gray-500 font-kanit flex items-center gap-1.5">
-                <i class="fas fa-shield-alt text-primary"></i> PDPA & Pillar 8 AuditLog
+            <span class="small text-muted d-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
+                <i class="fas fa-shield-alt text-primary"></i> PDPA &amp; Pillar 8 AuditLog
             </span>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs font-kanit">
-                <thead class="bg-secondary/40 text-gray-600 border-b border-gray-200">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="font-size: 0.8125rem;">
+                <thead class="table-light text-muted border-bottom">
                     <tr>
-                        <th class="px-4 py-3 font-semibold">หมายเลข HN</th>
-                        <th class="px-4 py-3 font-semibold">ชื่อ - นามสกุล</th>
-                        <th class="px-4 py-3 font-semibold">เพศ / อายุ</th>
-                        <th class="px-4 py-3 font-semibold">เบอร์โทรศัพท์</th>
-                        <th class="px-4 py-3 font-semibold">กรุ๊ปเลือด/แพ้</th>
-                        <th class="px-4 py-3 font-semibold text-center">สถานะ</th>
-                        <th class="px-4 py-3 font-semibold text-right">การจัดการ</th>
+                        <th class="px-3 py-2.5 fw-semibold">หมายเลข HN</th>
+                        <th class="px-3 py-2.5 fw-semibold">ชื่อ - นามสกุล</th>
+                        <th class="px-3 py-2.5 fw-semibold">เพศ / อายุ</th>
+                        <th class="px-3 py-2.5 fw-semibold">เบอร์โทรศัพท์</th>
+                        <th class="px-3 py-2.5 fw-semibold">กรุ๊ปเลือด/แพ้</th>
+                        <th class="px-3 py-2.5 fw-semibold text-center">สถานะ</th>
+                        <th class="px-3 py-2.5 fw-semibold text-end">การจัดการ</th>
                     </tr>
                 </thead>
-                <tbody id="patient-table-body" class="divide-y divide-gray-100">
+                <tbody id="patient-table-body">
                     {% include 'patients/partials/patient_table_rows.html' %}
                 </tbody>
             </table>
         </div>
 
-        <!-- Pagination Controls -->
-        {% if page_obj and page_obj.paginator.num_pages > 1 %}
-        <div class="px-5 py-3.5 bg-secondary/30 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3 font-kanit text-xs text-gray-600">
-            <div>
-                แสดง <span class="font-mono font-bold text-gray-900">{{ page_obj.start_index }} - {{ page_obj.end_index }}</span> จากทั้งหมด <span class="font-mono font-bold text-primary">{{ page_obj.paginator.count }}</span> คนไข้จริง
-            </div>
-            <div class="flex items-center gap-1.5">
-                {% if page_obj.has_previous %}
-                    <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-secondary text-gray-700 transition-colors">
-                        <i class="fas fa-angle-double-left"></i>
-                    </a>
-                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-secondary text-gray-700 transition-colors">
-                        &larr; ก่อนหน้า
-                    </a>
-                {% endif %}
-
-                <span class="px-3 py-1.5 rounded-lg bg-primary text-white font-mono font-bold">
-                    หน้า {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-                </span>
-
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-secondary text-gray-700 transition-colors">
-                        ถัดไป &rarr;
-                    </a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-secondary text-gray-700 transition-colors">
-                        <i class="fas fa-angle-double-right"></i>
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-        {% endif %}
+        <!-- Pagination Controls (Universal Partial) -->
+        {% include 'partials/pagination.html' %}
     </div>
+
 </div>
 {% endblock %}

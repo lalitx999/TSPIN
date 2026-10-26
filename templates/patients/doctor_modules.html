@@ -1,9 +1,9 @@
 {% extends 'layouts/doctor_base.html' %}
 
-{% block title %}ทะเบียนสูตรตำรับ 200 โมดูล (Phytochemical Modules) - TSPI CLINIC{% endblock %}
+{% block title %}ทะเบียนสูตรตำรับ 200 โมดูล (Phytochemical Modules) | TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto space-y-6" x-data="{
+<div class="d-flex flex-column gap-4" x-data="{
     search: '',
     selectedCategory: 'all',
     modules: [
@@ -33,51 +33,61 @@
     }
 }">
 
-    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                    <i class="fas fa-seedling mr-1"></i> Pharmacopeia & Formulations
-                </span>
-                <span class="text-xs text-gray-400">ทะเบียนสารสกัดและโมดูลตำรับสมุนไพร TSPI</span>
-            </div>
-            <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
-                ทะเบียนสูตรตำรับ 200 โมดูล (Phytochemical Modules)
-            </h1>
-            <p class="text-sm text-gray-500 mt-0.5">
-                สารสกัดมาตรฐานที่มีหลักฐานเชิงประจักษ์ (Evidence-Based) ออกฤทธิ์ตรงตามกลไกชีววิทยา 39 แกน ใน 12 โดเมน
-            </p>
-        </div>
+    <!-- Header Card -->
+    <div class="card shadow-sm border">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
+                            <i class="fas fa-seedling me-1"></i> Pharmacopeia &amp; Formulations
+                        </span>
+                        <span class="text-muted small">ทะเบียนสารสกัดและโมดูลตำรับสมุนไพร TSPI</span>
+                    </div>
+                    <h1 class="h4 fw-bold mb-1 text-dark">ทะเบียนสูตรตำรับ 200 โมดูล (Phytochemical Modules)</h1>
+                    <p class="text-muted small mb-0">
+                        สารสกัดมาตรฐานที่มีหลักฐานเชิงประจักษ์ (Evidence-Based) ออกฤทธิ์ตรงตามกลไกชีววิทยา 39 แกน ใน 12 โดเมน
+                    </p>
+                </div>
 
-        <div class="w-full md:w-72">
-            <input type="text" x-model="search" placeholder="ค้นหาชื่อโมดูล แกน หรือสรรพคุณ..." class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:ring-primary focus:border-primary">
+                <div style="min-width: 260px;">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="fas fa-search small"></i>
+                        </span>
+                        <input type="text" x-model="search" placeholder="ค้นหาชื่อโมดูล แกน หรือสรรพคุณ..." class="form-control border-start-0 ps-0">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Modules Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <!-- Modules Grid (Row 3 Cols) -->
+    <div class="row g-3">
         <template x-for="mod in filteredModules()" :key="mod.code">
-            <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs hover:border-primary/50 transition-all space-y-3">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <span class="px-2 py-0.5 rounded text-xs font-mono font-bold bg-primary/10 text-primary border border-primary/20" x-text="mod.code"></span>
-                        <h3 class="text-base font-semibold text-gray-900 mt-1" x-text="mod.name"></h3>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border p-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace py-1 px-2" x-text="mod.code"></span>
+                            <h2 class="h6 fw-bold text-dark mt-1 mb-0" x-text="mod.name"></h2>
+                        </div>
+                        <small class="text-muted font-monospace" style="font-size: 0.65rem;">Standardized</small>
                     </div>
-                    <span class="text-[10px] text-gray-400 font-mono">Standardized Extract</span>
-                </div>
 
-                <div class="text-xs space-y-1.5 pt-2 border-t border-gray-100">
-                    <div>
-                        <span class="font-medium text-gray-500">สารออกฤทธิ์สำคัญ:</span>
-                        <span class="text-gray-800" x-text="mod.active"></span>
-                    </div>
-                    <div>
-                        <span class="font-medium text-gray-500">แกนเป้าหมาย:</span>
-                        <span class="font-mono text-primary font-semibold" x-text="mod.axes"></span>
-                    </div>
-                    <div>
-                        <span class="font-medium text-gray-500">ข้อบ่งใช้ทางคลินิก:</span>
-                        <p class="text-gray-700 bg-gray-50 p-2 rounded-lg mt-0.5" x-text="mod.indications"></p>
+                    <div class="pt-2 border-top d-flex flex-column gap-1.5" style="font-size: 0.8rem;">
+                        <div>
+                            <span class="text-muted small">สารสำคัญ:</span>
+                            <span class="text-dark small d-block" x-text="mod.active"></span>
+                        </div>
+                        <div>
+                            <span class="text-muted small">แกนเป้าหมาย:</span>
+                            <span class="font-monospace text-primary fw-bold ms-1" x-text="mod.axes"></span>
+                        </div>
+                        <div class="mt-1">
+                            <span class="text-muted small d-block mb-1">ข้อบ่งใช้ทางคลินิก:</span>
+                            <div class="p-2 rounded bg-light border text-muted small" style="font-size: 0.775rem;" x-text="mod.indications"></div>
+                        </div>
                     </div>
                 </div>
             </div>

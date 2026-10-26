@@ -130,7 +130,7 @@ class AuthenticationSecurityTests(TestCase):
             'confirm_password': 'short',
             'pdpa_accepted': 'on',
         })
-        self.assertContains(short_res, "รหัสผ่านต้องมีความยาวอย่างน้อย 12 ตัวอักษร")
+        self.assertContains(short_res, "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร")
 
     def test_user_logout_flushes_session(self):
         """

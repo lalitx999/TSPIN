@@ -1,117 +1,115 @@
 {% extends 'layouts/doctor_base.html' %}
 
-{% block title %}แบบจำลอง Digital Twin 3 มิติ - TSPI CLINIC{% endblock %}
+{% block title %}แบบจำลอง Digital Twin 3 มิติ | TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto space-y-6">
+<div class="d-flex flex-column gap-4">
 
-    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                    <i class="fas fa-child mr-1"></i> Virtual Physiological Twin
+    <!-- Header Card -->
+    <div class="card shadow-sm border">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
+                    <i class="fas fa-child me-1"></i> Virtual Physiological Twin
                 </span>
-                <span class="text-xs text-gray-400">ระบบจำลองสรีรวิทยาเชิงคำนวณ</span>
+                <span class="text-muted small">ระบบจำลองสรีรวิทยาเชิงคำนวณ</span>
             </div>
-            <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
-                แบบจำลอง Digital Twin สรีรวิทยาบุคคล
-            </h1>
-            <p class="text-sm text-gray-500 mt-0.5">
+            <h1 class="h4 fw-bold mb-1 text-dark">แบบจำลอง Digital Twin สรีรวิทยาบุคคล</h1>
+            <p class="text-muted small mb-0">
                 ประมวลผลข้อมูล 39 แกน (12 โดเมน) และค่าแล็บจำลองสถานะอวัยวะและพลวัตของระบบชีววิทยาในร่างกาย
             </p>
         </div>
     </div>
 
-    <!-- Twin Visualization Canvas & Status Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
+    <!-- Twin Visualization Canvas & Status Grid (Row 7/5) -->
+    <div class="row g-4">
         <!-- 3D Twin Simulation Card (7 cols) -->
-        <div class="lg:col-span-7 bg-white border border-gray-200 rounded-2xl p-6 shadow-xs flex flex-col items-center justify-center min-h-[460px] relative overflow-hidden">
-            <div class="absolute top-4 left-4 z-10">
-                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
-                    <i class="fas fa-cube text-primary mr-1"></i> 3D Bio-Avatar Active
-                </span>
+        <div class="col-12 col-lg-7">
+            <div class="card shadow-sm border p-4 d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden" style="min-height: 460px;">
+                <div class="position-absolute top-0 start-0 m-3 z-1">
+                    <span class="badge bg-light text-dark border">
+                        <i class="fas fa-cube text-primary me-1"></i> 3D Bio-Avatar Active
+                    </span>
+                </div>
+
+                <!-- SVG Stylized Precision Human Body Outline -->
+                <div class="position-relative d-flex align-items-center justify-content-center" style="width: 240px; height: 360px;">
+                    <svg viewBox="0 0 200 400" class="w-100 h-100" style="stroke: #CBD5E1; stroke-width: 2; fill: #F8FAF6;">
+                        <!-- Head & Brain -->
+                        <circle cx="100" cy="45" r="28" />
+                        <!-- Neck -->
+                        <rect x="92" y="73" width="16" height="18" rx="4" />
+                        <!-- Torso -->
+                        <path d="M 60,95 Q 100,85 140,95 L 132,230 Q 100,235 68,230 Z" />
+                        <!-- Arms -->
+                        <path d="M 58,95 L 35,210 Q 30,225 35,235" stroke-linecap="round" />
+                        <path d="M 142,95 L 165,210 Q 170,225 165,235" stroke-linecap="round" />
+                        <!-- Legs -->
+                        <path d="M 80,230 L 75,370" stroke-linecap="round" />
+                        <path d="M 120,230 L 125,370" stroke-linecap="round" />
+                    </svg>
+
+                    <!-- Glowing Nodes -->
+                    <!-- Brain -->
+                    <div class="position-absolute rounded-circle bg-warning text-dark fw-bold d-flex align-items-center justify-content-center border border-2 border-white shadow-sm" style="top: 36px; left: 88px; width: 22px; height: 22px; font-size: 0.7rem;" title="HPA / Neuro Axis">!</div>
+
+                    <!-- Heart -->
+                    <div class="position-absolute rounded-circle bg-success border border-2 border-white shadow-sm" style="top: 105px; left: 102px; width: 16px; height: 16px;" title="Cardiovascular Tone"></div>
+
+                    <!-- Liver -->
+                    <div class="position-absolute rounded-circle bg-danger text-white fw-bold d-flex align-items-center justify-content-center border border-2 border-white shadow-sm" style="top: 135px; left: 78px; width: 22px; height: 22px; font-size: 0.7rem;" title="Hepatic Detox Overload">!</div>
+
+                    <!-- Gut -->
+                    <div class="position-absolute rounded-circle bg-warning border border-2 border-white shadow-sm" style="top: 168px; left: 94px; width: 16px; height: 16px;" title="Gut Barrier"></div>
+                </div>
+
+                <small class="text-muted mt-3 text-center" style="font-size: 0.75rem;">
+                    คลิกที่ตำแหน่งอวัยวะเพื่อดูตัวชี้วัดกลไกชีววิทยาและคะแนนความเสี่ยง
+                </small>
             </div>
-
-            <!-- SVG Stylized Precision Human Body Outline with Interactive Hotspots -->
-            <div class="relative w-64 h-96 flex items-center justify-center">
-                <svg viewBox="0 0 200 400" class="w-full h-full text-gray-200 stroke-current stroke-2 fill-gray-50">
-                    <!-- Head & Brain -->
-                    <circle cx="100" cy="45" r="28" class="hover:fill-primary/20 transition-colors cursor-pointer" />
-                    <!-- Neck -->
-                    <rect x="92" y="73" width="16" height="18" rx="4" />
-                    <!-- Torso -->
-                    <path d="M 60,95 Q 100,85 140,95 L 132,230 Q 100,235 68,230 Z" class="hover:fill-primary/20 transition-colors cursor-pointer" />
-                    <!-- Arms -->
-                    <path d="M 58,95 L 35,210 Q 30,225 35,235" stroke-linecap="round" />
-                    <path d="M 142,95 L 165,210 Q 170,225 165,235" stroke-linecap="round" />
-                    <!-- Legs -->
-                    <path d="M 80,230 L 75,370" stroke-linecap="round" />
-                    <path d="M 120,230 L 125,370" stroke-linecap="round" />
-                </svg>
-
-                <!-- Glowing Biological Nodes -->
-                <!-- Brain (A03, A04) -->
-                <div class="absolute top-10 left-[92px] w-4 h-4 rounded-full bg-amber-400 animate-ping opacity-75"></div>
-                <div class="absolute top-10 left-[92px] w-4 h-4 rounded-full bg-amber-500 border-2 border-white shadow-sm flex items-center justify-center text-[8px] text-white font-bold" title="HPA / Neuro Axis">!</div>
-
-                <!-- Heart / Vascular (A21) -->
-                <div class="absolute top-28 left-[105px] w-4 h-4 rounded-full bg-green-500 border-2 border-white shadow-sm" title="Cardiovascular Tone"></div>
-
-                <!-- Liver / Detox (A16) -->
-                <div class="absolute top-36 left-[80px] w-4 h-4 rounded-full bg-red-500 animate-ping opacity-75"></div>
-                <div class="absolute top-36 left-[80px] w-4 h-4 rounded-full bg-red-500 border-2 border-white shadow-sm flex items-center justify-center text-[8px] text-white font-bold" title="Hepatic Detox Overload">!</div>
-
-                <!-- Gut / Microbiome (A18, A19) -->
-                <div class="absolute top-44 left-[96px] w-4 h-4 rounded-full bg-amber-500 border-2 border-white shadow-sm" title="Gut Barrier / Leaky Gut"></div>
-            </div>
-
-            <p class="text-xs text-gray-400 mt-4 text-center">
-                คลิกที่ตำแหน่งอวัยวะเพื่อดูตัวชี้วัดกลไกชีววิทยาและคะแนนความเสี่ยง
-            </p>
         </div>
 
         <!-- Organ Systems Heatmap (5 cols) -->
-        <div class="lg:col-span-5 space-y-4">
-            <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs">
-                <h3 class="text-base font-semibold text-gray-900 mb-3">สถานะระบบอวัยวะ (Systemic Vitality)</h3>
-
-                <div class="space-y-3">
-                    <div class="p-3 bg-red-50/50 border border-red-200 rounded-xl flex items-center justify-between">
+        <div class="col-12 col-lg-5">
+            <div class="card shadow-sm border">
+                <div class="card-header bg-light py-2.5 px-3 border-bottom">
+                    <h6 class="fw-bold text-dark mb-0 small">สถานะระบบอวัยวะ (Systemic Vitality)</h6>
+                </div>
+                <div class="card-body p-3 d-flex flex-column gap-2.5">
+                    <div class="p-3 rounded-3 bg-danger-subtle border border-danger-subtle d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-xs font-bold text-red-700">HEPATIC / DETOX SYSTEM</span>
-                            <span class="block text-[11px] text-gray-600">ภาระสารพิษตกค้างสูง, ALT/AST ปานกลาง</span>
+                            <span class="small fw-bold text-danger d-block">HEPATIC / DETOX SYSTEM</span>
+                            <small class="text-muted">ภาระสารพิษตกค้างสูง, ALT/AST ปานกลาง</small>
                         </div>
-                        <span class="text-sm font-bold text-red-700">82% Burden</span>
+                        <span class="fs-6 fw-bold text-danger font-monospace">82% Burden</span>
                     </div>
 
-                    <div class="p-3 bg-amber-50/50 border border-amber-200 rounded-xl flex items-center justify-between">
+                    <div class="p-3 rounded-3 bg-warning-subtle border border-warning-subtle d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-xs font-bold text-amber-700">GASTROINTESTINAL & GUT</span>
-                            <span class="block text-[11px] text-gray-600">Leaky Gut Flag, Zonulin สูงกว่าปกติ</span>
+                            <span class="small fw-bold text-warning-emphasis d-block">GASTROINTESTINAL &amp; GUT</span>
+                            <small class="text-muted">Leaky Gut Flag, Zonulin สูงกว่าปกติ</small>
                         </div>
-                        <span class="text-sm font-bold text-amber-700">68% Risk</span>
+                        <span class="fs-6 fw-bold text-warning-emphasis font-monospace">68% Risk</span>
                     </div>
 
-                    <div class="p-3 bg-green-50/50 border border-green-200 rounded-xl flex items-center justify-between">
+                    <div class="p-3 rounded-3 bg-success-subtle border border-success-subtle d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-xs font-bold text-green-700">CARDIOVASCULAR & RENAL</span>
-                            <span class="block text-[11px] text-gray-600">eGFR 98, ความดันโลหิตและชีพจรปกติ</span>
+                            <span class="small fw-bold text-success d-block">CARDIOVASCULAR &amp; RENAL</span>
+                            <small class="text-muted">eGFR 98, ความดันโลหิตและชีพจรปกติ</small>
                         </div>
-                        <span class="text-sm font-bold text-green-700">Normal</span>
+                        <span class="fs-6 fw-bold text-success font-monospace">Normal</span>
                     </div>
 
-                    <div class="p-3 bg-green-50/50 border border-green-200 rounded-xl flex items-center justify-between">
+                    <div class="p-3 rounded-3 bg-success-subtle border border-success-subtle d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-xs font-bold text-green-700">MITOCHONDRIAL ENERGY</span>
-                            <span class="block text-[11px] text-gray-600">การเผาผลาญพลังงานเซลล์และ ATP เสถียร</span>
+                            <span class="small fw-bold text-success d-block">MITOCHONDRIAL ENERGY</span>
+                            <small class="text-muted">การเผาผลาญพลังงานเซลล์และ ATP เสถียร</small>
                         </div>
-                        <span class="text-sm font-bold text-green-700">Stable</span>
+                        <span class="fs-6 fw-bold text-success font-monospace">Stable</span>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
 </div>

@@ -3,86 +3,139 @@
 
 {% block extra_head %}
 <style>
-    /* Clean Medical Patient Portal (Tailwind 2026) */
-    body {
-        background-color: #F8FAF6 !important;
-        color: #111827 !important;
-        font-family: 'Kanit', sans-serif !important;
+    /* Patient Portal Clean Styling (Bootstrap 5.3.8) */
+    .patient-navbar {
+        height: 65px;
+        background-color: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid #CBD5E1;
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+    }
+
+    .patient-nav-link {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #334155;
+        text-decoration: none;
+        padding: 0.5rem 0.85rem;
+        border-radius: 0.5rem;
+        transition: all 0.15s ease;
+    }
+
+    .patient-nav-link:hover {
+        color: #2E7D32;
+        background-color: rgba(46, 125, 50, 0.08);
+    }
+
+    .patient-nav-link.active {
+        color: #2E7D32;
+        font-weight: 700;
+        background-color: rgba(46, 125, 50, 0.14);
+    }
+
+    /* Mobile bottom bar */
+    .mobile-bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #FFFFFF;
+        border-top: 1px solid #CBD5E1;
+        z-index: 1030;
+        display: flex;
+        justify-content: space-around;
+        padding: 0.5rem 0.25rem;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .mobile-bottom-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.2rem;
+        color: #64748B;
+        text-decoration: none;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .mobile-bottom-nav a.active, .mobile-bottom-nav a:hover {
+        color: #2E7D32;
     }
 </style>
 {% block extra_patient_head %}{% endblock %}
 {% endblock %}
 
 {% block layout %}
-<div class="min-h-screen flex flex-col bg-[#F8FAF6]">
+<div class="d-flex flex-column min-vh-100 bg-body">
     <!-- Top Patient Header -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Brand -->
-                <a href="{% url 'portal_patient:dashboard' %}" class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary text-lg font-bold">
-                        <i class="fas fa-heartbeat"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-1">
-                            <span class="font-semibold text-base text-gray-900 leading-none">TSPI</span>
-                            <span class="font-semibold text-base text-primary leading-none">HEALTH</span>
-                        </div>
-                        <span class="text-[10px] text-gray-400 font-normal block mt-0.5">พอร์ทัลสุขภาพคนไข้ส่วนบุคคล</span>
-                    </div>
-                </a>
-
-                <!-- Desktop Nav -->
-                <nav class="hidden md:flex items-center gap-6">
-                    <a href="{% url 'portal_patient:dashboard' %}" class="text-sm font-medium text-gray-700 hover:text-primary transition-colors">แดชบอร์ด</a>
-                    <a href="{% url 'portal_patient:patient_ai_intake' %}" class="text-sm font-medium text-gray-700 hover:text-primary transition-colors">ซักประวัติ AI</a>
-                    <a href="{% url 'portal_patient:patient_axes_result' %}" class="text-sm font-medium text-gray-700 hover:text-primary transition-colors">ผล 39 แกน</a>
-                    <a href="{% url 'portal_patient:patient_digital_twin' %}" class="text-sm font-medium text-gray-700 hover:text-primary transition-colors">Digital Twin</a>
-                    <a href="{% url 'portal_patient:portal_appointments' %}" class="text-sm font-medium text-gray-700 hover:text-primary transition-colors">นัดหมาย</a>
-                    <a href="{% url 'portal_patient:patient_history' %}" class="text-sm font-medium text-gray-700 hover:text-primary transition-colors">ประวัติการรักษา</a>
-                    <a href="{% url 'portal_patient:patient_download' %}" class="text-sm font-medium text-gray-700 hover:text-primary transition-colors">ดาวน์โหลดรายงาน</a>
-                </nav>
-
-                <!-- Patient Profile & Logout -->
-                <div class="flex items-center gap-3">
-                    <span class="hidden sm:inline-block text-xs text-gray-600 font-medium">
-                        คุณ {{ request.user.first_name|default:request.user.username }}
-                    </span>
-                    <a href="{% url 'accounts:logout' %}" class="px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-red-600 hover:bg-red-50 transition-all">
-                        <i class="fas fa-sign-out-alt mr-1"></i> ออกจากระบบ
-                    </a>
+    <header class="patient-navbar shadow-xs">
+        <div class="container-xl h-100 d-flex align-items-center justify-content-between px-3">
+            <!-- Brand -->
+            <a href="{% url 'portal_patient:dashboard' %}" class="d-flex align-items-center gap-2.5 text-decoration-none">
+                <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                    <i class="fas fa-heartbeat fs-5"></i>
                 </div>
+                <div>
+                    <div class="d-flex align-items-center gap-1 lh-1">
+                        <span class="fw-bold text-dark" style="font-size: 0.95rem;">TSPI</span>
+                        <span class="fw-bold text-primary" style="font-size: 0.95rem;">HEALTH</span>
+                    </div>
+                    <small class="text-muted d-block" style="font-size: 0.65rem;">พอร์ทัลสุขภาพคนไข้ส่วนบุคคล</small>
+                </div>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="d-none d-lg-flex align-items-center gap-2">
+                <a href="{% url 'portal_patient:dashboard' %}" class="patient-nav-link">แดชบอร์ด</a>
+                <a href="{% url 'portal_patient:patient_ai_intake' %}" class="patient-nav-link">ซักประวัติ AI</a>
+                <a href="{% url 'portal_patient:patient_axes_result' %}" class="patient-nav-link">ผล 39 แกน</a>
+                <a href="{% url 'portal_patient:patient_digital_twin' %}" class="patient-nav-link">Digital Twin</a>
+                <a href="{% url 'portal_patient:portal_appointments' %}" class="patient-nav-link">นัดหมาย</a>
+                <a href="{% url 'portal_patient:patient_history' %}" class="patient-nav-link">ประวัติการรักษา</a>
+                <a href="{% url 'portal_patient:patient_download' %}" class="patient-nav-link">ดาวน์โหลดรายงาน</a>
+            </nav>
+
+            <!-- Patient Profile & Logout -->
+            <div class="d-flex align-items-center gap-2">
+                <span class="d-none d-sm-inline-block small text-muted">
+                    คุณ {{ request.user.first_name|default:request.user.username }}
+                </span>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-sign-out-alt me-1"></i> ออกจากระบบ
+                </a>
             </div>
         </div>
     </header>
-                
+
     <!-- Main Content -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
+    <main class="flex-grow-1 container-xl py-4 px-3 mb-5 mb-lg-0">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Mobile Bottom Navigation Bar -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 flex items-center justify-around py-2.5 shadow-lg text-xs">
-        <a href="{% url 'portal_patient:dashboard' %}" class="flex flex-col items-center gap-1 text-gray-600 hover:text-primary">
-            <i class="fas fa-home text-base"></i>
-            <span class="text-[10px]">หน้าหลัก</span>
+    <nav class="mobile-bottom-nav d-lg-none">
+        <a href="{% url 'portal_patient:dashboard' %}">
+            <i class="fas fa-home fs-6"></i>
+            <span>หน้าหลัก</span>
         </a>
-        <a href="{% url 'portal_patient:patient_ai_intake' %}" class="flex flex-col items-center gap-1 text-gray-600 hover:text-primary">
-            <i class="fas fa-comment-medical text-base"></i>
-            <span class="text-[10px]">ปรึกษา AI</span>
+        <a href="{% url 'portal_patient:patient_ai_intake' %}">
+            <i class="fas fa-comment-medical fs-6"></i>
+            <span>ปรึกษา AI</span>
         </a>
-        <a href="{% url 'portal_patient:patient_axes_result' %}" class="flex flex-col items-center gap-1 text-gray-600 hover:text-primary">
-            <i class="fas fa-chart-pie text-base"></i>
-            <span class="text-[10px]">39 แกน</span>
+        <a href="{% url 'portal_patient:patient_axes_result' %}">
+            <i class="fas fa-chart-pie fs-6"></i>
+            <span>39 แกน</span>
         </a>
-        <a href="{% url 'portal_patient:portal_appointments' %}" class="flex flex-col items-center gap-1 text-gray-600 hover:text-primary">
-            <i class="fas fa-calendar-alt text-base"></i>
-            <span class="text-[10px]">นัดหมาย</span>
+        <a href="{% url 'portal_patient:portal_appointments' %}">
+            <i class="fas fa-calendar-alt fs-6"></i>
+            <span>นัดหมาย</span>
         </a>
-        <a href="{% url 'portal_patient:patient_history' %}" class="flex flex-col items-center gap-1 text-gray-600 hover:text-primary">
-            <i class="fas fa-history text-base"></i>
-            <span class="text-[10px]">ประวัติ</span>
+        <a href="{% url 'portal_patient:patient_history' %}">
+            <i class="fas fa-history fs-6"></i>
+            <span>ประวัติ</span>
         </a>
     </nav>
 </div>

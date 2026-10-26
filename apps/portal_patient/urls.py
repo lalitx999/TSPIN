@@ -16,6 +16,12 @@ from patients.views_line import (
     line_webhook_view,
     line_account_binding_callback_view
 )
+from patients.views_liff import (
+    liff_binding_page_view,
+    liff_request_otp_api,
+    liff_verify_otp_api,
+    liff_request_staff_assisted_api,
+)
 
 app_name = 'portal_patient'
 
@@ -50,4 +56,10 @@ urlpatterns = [
     path('line/webhook/', line_webhook_view, name='line_webhook_alias'),
     path('line/bind/', portal_create_line_token_view, name='portal_line_binding'),
     path('line/confirm/', line_account_binding_callback_view, name='line_binding_confirm'),
+
+    # Level 2 LIFF 2-Step Identity & Caregiver Hub (Pillars 1, 14)
+    path('line/liff/', liff_binding_page_view, name='liff_binding_page'),
+    path('line/liff/request-otp/', liff_request_otp_api, name='liff_request_otp_api'),
+    path('line/liff/verify-otp/', liff_verify_otp_api, name='liff_verify_otp_api'),
+    path('line/liff/request-staff-assisted/', liff_request_staff_assisted_api, name='liff_request_staff_assisted_api'),
 ]

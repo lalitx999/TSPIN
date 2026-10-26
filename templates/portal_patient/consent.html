@@ -3,38 +3,40 @@
 {% block title %}หนังสือยินยอมรับการรักษาและ PDPA | TSPI Health{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6">
+<div class="container py-2" style="max-width: 900px;">
 
-    <div class="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-xs flex items-center justify-between">
-        <div>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200 mb-1">
-                <i class="fas fa-file-contract mr-1"></i> Patient Informed Consent
+    <div class="card border-0 shadow-xs mb-4">
+        <div class="card-body p-4 p-md-5">
+            <span class="badge bg-success-subtle text-success mb-2">
+                <i class="fas fa-file-contract me-1"></i> Patient Informed Consent
             </span>
-            <h1 class="text-2xl font-bold text-gray-900">หนังสือยินยอมรับการรักษาและนโยบายความเป็นส่วนตัว</h1>
-            <p class="text-xs text-gray-500 mt-1">ยินยอมให้ประมวลผลข้อมูลสุขภาพและข้อมูลทางพันธุศาสตร์/ผลแล็บตามมาตรฐาน PDPA</p>
+            <h1 class="h4 fw-bold text-dark mb-1">หนังสือยินยอมรับการรักษาและนโยบายความเป็นส่วนตัว</h1>
+            <p class="small text-muted mb-0">ยินยอมให้ประมวลผลข้อมูลสุขภาพและข้อมูลทางพันธุศาสตร์/ผลแล็บตามมาตรฐาน PDPA</p>
         </div>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-xs space-y-4 text-xs sm:text-sm text-gray-700 leading-relaxed">
-        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-2">
-            <h4 class="font-bold text-gray-900">1. การยินยอมรับการประเมินและการรักษา</h4>
-            <p>
-                ข้าพเจ้ายินยอมให้ทีมแพทย์ TSPI Clinic และระบบ AI Clinical Engine วิเคราะห์ข้อมูลสุขภาพ ผลการตรวจเลือด สัญญาณชีพ และประวัติครอบครัว 
-                เพื่อการวางแผนบำบัดฟื้นฟูด้วยไฟโตเคมีคอลมาตรฐาน 200 โมดูล
-            </p>
-        </div>
+    <div class="card border-0 shadow-xs">
+        <div class="card-body p-4 p-md-5 d-flex flex-column gap-3 small lh-base text-secondary">
+            <div class="p-3 bg-light rounded-3 border">
+                <h6 class="fw-bold text-dark mb-2">1. การยินยอมรับการประเมินและการรักษา</h6>
+                <p class="mb-0">
+                    ข้าพเจ้ายินยอมให้ทีมแพทย์ TSPI Clinic และระบบ AI Clinical Engine วิเคราะห์ข้อมูลสุขภาพ ผลการตรวจเลือด สัญญาณชีพ และประวัติครอบครัว 
+                    เพื่อการวางแผนบำบัดฟื้นฟูด้วยไฟโตเคมีคอลมาตรฐาน 200 โมดูล
+                </p>
+            </div>
 
-        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-2">
-            <h4 class="font-bold text-gray-900">2. การคุ้มครองข้อมูลส่วนบุคคล (PDPA)</h4>
-            <p>
-                ข้อมูลของท่านจะได้รับการเข้ารหัสตามมาตรฐานความปลอดภัยสูง และใช้เพื่อวัตถุประสงค์ในการดูแลรักษาเฉพาะบุคคลเท่านั้น 
-                ท่านสามารถเพิกถอนความยินยอมหรือขอตรวจสอบประวัติการเข้าถึงข้อมูลได้ตลอดเวลา
-            </p>
-        </div>
+            <div class="p-3 bg-light rounded-3 border">
+                <h6 class="fw-bold text-dark mb-2">2. การคุ้มครองข้อมูลส่วนบุคคล (PDPA)</h6>
+                <p class="mb-0">
+                    ข้อมูลของท่านจะได้รับการเข้ารหัสตามมาตรฐานความปลอดภัยสูง และใช้เพื่อวัตถุประสงค์ในการดูแลรักษาเฉพาะบุคคลเท่านั้น 
+                    ท่านสามารถเพิกถอนความยินยอมหรือขอตรวจสอบประวัติการเข้าถึงข้อมูลได้ตลอดเวลา
+                </p>
+            </div>
 
-        <div class="pt-4 flex items-center justify-between">
-            <span class="text-xs text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i> ท่านได้ลงนามยินยอมทางอิเล็กทรอนิกส์แล้ว</span>
-            <span class="text-xs text-gray-400">Consent Verified</span>
+            <div class="pt-3 border-top d-flex align-items-center justify-content-between">
+                <span class="small text-success fw-semibold"><i class="fas fa-check-circle me-1"></i> ท่านได้ลงนามยินยอมทางอิเล็กทรอนิกส์แล้ว</span>
+                <span class="small text-muted font-monospace">Consent Verified</span>
+            </div>
         </div>
     </div>
 

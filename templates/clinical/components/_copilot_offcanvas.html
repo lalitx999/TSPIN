@@ -1,0 +1,447 @@
+<!-- TSPI Clinical AI Copilot Streaming Drawer (Option 4) -->
+<style>
+    .copilot-fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1040;
+        box-shadow: 0 6px 20px rgba(46, 125, 50, 0.35);
+        border: none;
+        border-radius: 50px;
+        padding: 10px 18px;
+        background: linear-gradient(135deg, #1B5E20, #2E7D32);
+        color: #ffffff;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.25s ease-in-out;
+    }
+    .copilot-fab:hover {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 8px 24px rgba(46, 125, 50, 0.45);
+        color: #ffffff;
+    }
+    .copilot-pulse {
+        width: 10px;
+        height: 10px;
+        background-color: #4ADE80;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 0 rgba(74, 222, 128, 0.7);
+        animation: copilotPulse 2s infinite;
+    }
+    @keyframes copilotPulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+    }
+    .copilot-offcanvas {
+        width: 480px !important;
+        max-width: 95vw;
+        border-left: 1px solid #E2E8F0;
+        box-shadow: -8px 0 30px rgba(0, 0, 0, 0.12);
+        display: flex;
+        flex-direction: column;
+    }
+    .copilot-chat-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        background-color: #F8FAFC;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+    .copilot-bubble-user {
+        background-color: #2E7D32;
+        color: #FFFFFF;
+        padding: 10px 14px;
+        border-radius: 14px 14px 2px 14px;
+        max-width: 85%;
+        align-self: flex-end;
+        font-size: 0.925rem;
+        box-shadow: 0 2px 6px rgba(46, 125, 50, 0.15);
+        word-break: break-word;
+    }
+    .copilot-bubble-ai {
+        background-color: #FFFFFF;
+        color: #1E293B;
+        border: 1px solid #E2E8F0;
+        padding: 14px 16px;
+        border-radius: 14px 14px 14px 2px;
+        max-width: 92%;
+        align-self: flex-start;
+        font-size: 0.925rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        line-height: 1.55;
+        word-break: break-word;
+    }
+    .copilot-bubble-ai h3, .copilot-bubble-ai h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #166534;
+        margin-top: 6px;
+        margin-bottom: 4px;
+    }
+    .copilot-bubble-ai blockquote {
+        border-left: 3px solid #2E7D32;
+        padding-left: 10px;
+        margin: 6px 0;
+        color: #475569;
+        font-size: 0.875rem;
+        background: #F0FDF4;
+        padding: 6px 10px;
+        border-radius: 4px;
+    }
+    .copilot-cursor {
+        display: inline-block;
+        width: 7px;
+        height: 15px;
+        background-color: #2E7D32;
+        margin-left: 3px;
+        vertical-align: middle;
+        animation: copilotBlink 0.8s infinite;
+    }
+    @keyframes copilotBlink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+    .quick-prompt-pill {
+        font-size: 0.775rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #FFFFFF;
+        border: 1px solid #CBD5E1;
+        color: #334155;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+    }
+    .quick-prompt-pill:hover {
+        background: #F0FDF4;
+        border-color: #86EFAC;
+        color: #166534;
+    }
+</style>
+
+<!-- Floating AI Copilot Trigger Button -->
+<button class="copilot-fab" type="button" data-bs-toggle="offcanvas" data-bs-target="#copilotOffcanvas" aria-controls="copilotOffcanvas" id="openCopilotBtn">
+    <span class="copilot-pulse"></span>
+    <i class="fas fa-brain"></i>
+    <span>AI Copilot</span>
+</button>
+
+<!-- Offcanvas Drawer -->
+<div class="offcanvas offcanvas-end copilot-offcanvas" tabindex="-1" id="copilotOffcanvas" aria-labelledby="copilotOffcanvasLabel" data-bs-scroll="true">
+    <!-- Header -->
+    <div class="offcanvas-header border-bottom bg-white py-3">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <div class="bg-success-subtle text-success p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div>
+                    <h6 class="offcanvas-title fw-bold text-dark mb-0" id="copilotOffcanvasLabel">
+                        TSPI Medical Copilot
+                    </h6>
+                    <small class="text-muted" style="font-size: 0.75rem;">39 Biological Axes Mechanistic Intelligence</small>
+                </div>
+            </div>
+            <!-- Patient Context Badge if available -->
+            <div class="mt-2" id="copilotPatientContextBadge">
+                {% if patient %}
+                <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold font-mono">
+                    <i class="fas fa-user-check me-1"></i> เชื่อมโยงบริบท: {{ patient.full_name }} (HN: {{ patient.hn }})
+                </span>
+                <input type="hidden" id="copilotActivePatientId" value="{{ patient.pk }}">
+                {% elif analysis and analysis.patient %}
+                <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold font-mono">
+                    <i class="fas fa-user-check me-1"></i> เชื่อมโยงบริบท: {{ analysis.patient.full_name }} (HN: {{ analysis.patient.hn }})
+                </span>
+                <input type="hidden" id="copilotActivePatientId" value="{{ analysis.patient.pk }}">
+                {% else %}
+                <span class="badge bg-secondary-subtle text-secondary font-mono" style="font-size: 0.72rem;">
+                    <i class="fas fa-info-circle me-1"></i> โหมดทั่วไป (ระบุผู้ป่วยเพื่อดึง 39 แกนอัตโนมัติ)
+                </span>
+                <input type="hidden" id="copilotActivePatientId" value="">
+                {% endif %}
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary border-0" id="copilotClearChatBtn" title="ล้างประวัติการสนทนา">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <!-- Chat Messages Container -->
+    <div class="copilot-chat-container" id="copilotMessages">
+        <!-- AI Welcome Greeting -->
+        <div class="copilot-bubble-ai">
+            <div class="fw-bold text-success mb-1">
+                <i class="fas fa-sparkles me-1"></i> สวัสดีครับ คุณหมอ
+            </div>
+            <div>
+                ผมคือ <strong>TSPI Clinical AI Copilot</strong> พร้อมช่วยวิเคราะห์กลไก 39 แกนชีววิทยา, คัดกรองความปลอดภัย (Iron Safety / MASH), และค้นหาตำรับสารอาหาร 9-Step Protocol ตามมาตรฐานคลินิกครับ
+            </div>
+            <div class="mt-2 pt-2 border-top text-muted" style="font-size: 0.8rem;">
+                💡 <em>ลองคลิกเลือกหัวข้อด่วนด้านล่าง หรือพิมพ์คำถามทางคลินิกได้ทันทีครับ</em>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Prompts Pills -->
+    <div class="px-3 py-2 bg-light border-top d-flex gap-2 overflow-x-auto" style="scrollbar-width: none;">
+        <span class="quick-prompt-pill" onclick="sendQuickPrompt('สรุปแกนชีวภาพที่มีปัญหาของคนไข้รายนี้')">
+            🔍 สรุปแกนที่มีปัญหา
+        </span>
+        <span class="quick-prompt-pill" onclick="sendQuickPrompt('ตรวจสอบเกณฑ์ความปลอดภัย Iron Safety Gate และ MASH')">
+            🛡️ ตรวจเกณฑ์ความปลอดภัย
+        </span>
+        <span class="quick-prompt-pill" onclick="sendQuickPrompt('แนะนำแผนฟื้นฟู 9-Step Protocol และโมดูลที่เกี่ยวข้อง')">
+            🌿 แนะนำโมดูลบำบัด
+        </span>
+    </div>
+
+    <!-- Footer Input Bar -->
+    <div class="p-3 bg-white border-top">
+        <form id="copilotChatForm" class="d-flex flex-column gap-2">
+            {% csrf_token %}
+            <div class="position-relative">
+                <textarea 
+                    id="copilotInput" 
+                    class="form-control form-control-sm pr-5" 
+                    rows="2" 
+                    placeholder="พิมพ์คำถามทางคลินิก (กด Enter เพื่อส่ง, Shift+Enter ขึ้นบรรทัดใหม่)..."
+                    style="resize: none; font-size: 0.9rem;"
+                    required
+                ></textarea>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="text-muted" style="font-size: 0.72rem;">
+                        <i class="fas fa-shield-alt text-success me-1"></i> AI ทำหน้าที่ผู้ช่วยสรุปเวชสารสนเทศเท่านั้น
+                    </span>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-danger d-none" id="copilotStopBtn">
+                            <i class="fas fa-stop me-1"></i> หยุด
+                        </button>
+                        <button type="submit" class="btn btn-sm btn-success px-3 fw-bold" id="copilotSendBtn">
+                            <i class="fas fa-paper-plane me-1"></i> ส่งคำถาม
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- AI Copilot Streaming JavaScript Client -->
+<script>
+(function() {
+    let abortController = null;
+
+    window.sendQuickPrompt = function(promptText) {
+        const input = document.getElementById('copilotInput');
+        if (input) {
+            input.value = promptText;
+            document.getElementById('copilotChatForm').dispatchEvent(new Event('submit'));
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('copilotChatForm');
+        const input = document.getElementById('copilotInput');
+        const messagesContainer = document.getElementById('copilotMessages');
+        const sendBtn = document.getElementById('copilotSendBtn');
+        const stopBtn = document.getElementById('copilotStopBtn');
+        const clearBtn = document.getElementById('copilotClearChatBtn');
+        const patientIdInp = document.getElementById('copilotActivePatientId');
+
+        if (!form || !input) return;
+
+        // Auto-scroll to bottom of chat
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Clear Chat
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                if (confirm('คุณต้องการล้างประวัติการสนทนานี้ใช่หรือไม่?')) {
+                    messagesContainer.innerHTML = `
+                        <div class="copilot-bubble-ai">
+                            <div class="fw-bold text-success mb-1">
+                                <i class="fas fa-sparkles me-1"></i> ล้างการสนทนาเรียบร้อยแล้ว
+                            </div>
+                            <div>พร้อมสำหรับการปรึกษาคำถามทางคลินิกหัวข้อใหม่ครับ</div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Enter key to send (Shift+Enter for newline)
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                form.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Stop generation handler
+        if (stopBtn) {
+            stopBtn.addEventListener('click', function() {
+                if (abortController) {
+                    abortController.abort();
+                    stopBtn.classList.add('d-none');
+                    sendBtn.classList.remove('d-none');
+                }
+            });
+        }
+
+        // Form Submit -> Streaming SSE
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const message = input.value.trim();
+            if (!message) return;
+
+            // 1. Optimistic UI: Append User Bubble
+            const userBubble = document.createElement('div');
+            userBubble.className = 'copilot-bubble-user';
+            userBubble.textContent = message;
+            messagesContainer.appendChild(userBubble);
+            input.value = '';
+            scrollToBottom();
+
+            // 2. Prepare AI Bubble with Typing Cursor
+            const aiBubble = document.createElement('div');
+            aiBubble.className = 'copilot-bubble-ai';
+            aiBubble.innerHTML = '<span class="text-muted"><i class="fas fa-circle-notch fa-spin me-1"></i> กำลังวิเคราะห์ข้อมูล 39 แกน...</span><span class="copilot-cursor"></span>';
+            messagesContainer.appendChild(aiBubble);
+            scrollToBottom();
+
+            // UI State
+            sendBtn.classList.add('d-none');
+            stopBtn.classList.remove('d-none');
+            abortController = new AbortController();
+
+            let fullResponseText = '';
+            let isFirstChunk = true;
+
+            try {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+                const patientId = patientIdInp ? patientIdInp.value : null;
+
+                const response = await fetch('/clinical/api/copilot/stream/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        patient_id: patientId
+                    }),
+                    signal: abortController.signal
+                });
+
+                if (response.status === 429) {
+                    aiBubble.innerHTML = '<span class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-1"></i> คุณส่งคำถามเกินกำหนด (จำกัด 10 ครั้ง/นาที) กรุณารอสักครู่ครับ</span>';
+                    return;
+                }
+                if (response.status === 403) {
+                    aiBubble.innerHTML = '<span class="text-danger fw-bold"><i class="fas fa-lock me-1"></i> สิทธิ์การเข้าถึงถูกจำกัดสำหรับแพทย์ผู้มีอำนาจลงนามเท่านั้น (403 Forbidden)</span>';
+                    return;
+                }
+                if (!response.ok) {
+                    throw new Error(`Server returned HTTP ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let buffer = '';
+
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // keep partial line in buffer
+
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (trimmed.startsWith('data:')) {
+                            const jsonStr = trimmed.replace(/^data:\s*/, '').trim();
+                            if (!jsonStr) continue;
+                            try {
+                                const parsed = JSON.parse(jsonStr);
+                                if (parsed.chunk) {
+                                    if (isFirstChunk) {
+                                        aiBubble.innerHTML = '';
+                                        isFirstChunk = false;
+                                    }
+                                    fullResponseText += parsed.chunk;
+                                    
+                                    // Simple markdown-to-HTML parser for real-time streaming
+                                    let formatted = fullResponseText
+                                        .replace(/\n\n/g, '<br><br>')
+                                        .replace(/\n/g, '<br>')
+                                        .replace(/### (.*?)(<br>|$)/g, '<h3>$1</h3>')
+                                        .replace(/#### (.*?)(<br>|$)/g, '<h4>$1</h4>')
+                                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                        .replace(/`([^`]+)`/g, '<code class="bg-light text-success px-1 rounded">$1</code>')
+                                        .replace(/> (.*?)(<br>|$)/g, '<blockquote>$1</blockquote>');
+
+                                    aiBubble.innerHTML = formatted + '<span class="copilot-cursor"></span>';
+                                    scrollToBottom();
+                                }
+                                if (parsed.done) {
+                                    // Finished streaming
+                                    const cursor = aiBubble.querySelector('.copilot-cursor');
+                                    if (cursor) cursor.remove();
+                                }
+                            } catch (e) {
+                                // Ignore non-JSON line
+                            }
+                        }
+                    }
+                }
+
+                // Remove cursor on complete
+                const cursor = aiBubble.querySelector('.copilot-cursor');
+                if (cursor) cursor.remove();
+
+                // Add copy button
+                const copyBtn = document.createElement('div');
+                copyBtn.className = 'text-end mt-2 pt-1 border-top';
+                copyBtn.innerHTML = `
+                    <button type="button" class="btn btn-sm btn-link text-muted p-0 text-decoration-none" style="font-size: 0.75rem;">
+                        <i class="far fa-copy me-1"></i> คัดลอกข้อความ
+                    </button>
+                `;
+                copyBtn.querySelector('button').addEventListener('click', function() {
+                    navigator.clipboard.writeText(fullResponseText);
+                    this.innerHTML = '<i class="fas fa-check text-success me-1"></i> คัดลอกแล้ว';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="far fa-copy me-1"></i> คัดลอกข้อความ';
+                    }, 2000);
+                });
+                aiBubble.appendChild(copyBtn);
+
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    aiBubble.innerHTML += '<div class="text-warning mt-1" style="font-size: 0.8rem;"><i class="fas fa-pause-circle me-1"></i> หยุดการสร้างข้อความแล้ว</div>';
+                } else {
+                    aiBubble.innerHTML = `<span class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-1"></i> เกิดข้อผิดพลาดในการเชื่อมต่อ: ${err.message}</span>`;
+                }
+            } finally {
+                sendBtn.classList.remove('d-none');
+                stopBtn.classList.add('d-none');
+                input.focus();
+            }
+        });
+    });
+})();
+</script>

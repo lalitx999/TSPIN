@@ -1,162 +1,199 @@
 {% extends 'layouts/public_base.html' %}
+{% load static %}
 
-{% block title %}9-Step Clinical Recovery Protocol - TSPI CLINIC{% endblock %}
+{% block title %}9-Step Clinical Recovery Protocol — TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+<div class="container-xl py-5">
 
     <!-- Header -->
-    <div class="text-center max-w-3xl mx-auto space-y-4">
-        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+    <div class="text-center mx-auto mb-5" style="max-width: 800px;">
+        <span class="badge-subtle-primary mb-2 d-inline-block">
             Mechanistic Treatment Ladder
         </span>
-        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
+        <h1 class="display-6 fw-bold text-dark mt-2 mb-3">
             TSPI 9-Step Recovery Protocol
         </h1>
-        <p class="text-base text-gray-600 leading-relaxed">
+        <p class="lead text-muted fs-6 mb-0 lh-base">
             ลำดับขั้นการฟื้นฟูสุขภาพที่ออกแบบตามหลักสรีรวิทยาเชิงกลไก โดยเน้นการขจัดสารพิษและรักษาลำไส้ก่อน 
             เพื่อเปิดทางให้การฟื้นฟูระบบเผาผลาญและระดับเซลล์ทำงานได้อย่างมีประสิทธิภาพสูงสุด
         </p>
     </div>
 
     <!-- Phase 1: Assess & Cleanse -->
-    <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-xs space-y-6">
-        <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+    <div class="card p-4 p-lg-5 mb-5 border shadow-sm">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-2">
             <div>
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">PHASE 1</span>
-                <h2 class="text-xl font-bold text-gray-900 mt-2">Assess & Cleanse (สัปดาห์ที่ 1 - 8)</h2>
-                <p class="text-xs text-gray-500 mt-0.5">ประเมินเชิงลึก กำจัดภาระสารพิษตับ และฟื้นฟูเกราะป้องกันลำไส้</p>
+                <span class="badge bg-primary-subtle text-primary-emphasis px-3 py-1 rounded-pill fw-semibold mb-2">PHASE 1</span>
+                <h2 class="h4 fw-bold text-dark mb-1">Assess &amp; Cleanse (สัปดาห์ที่ 1 - 8)</h2>
+                <p class="small text-muted mb-0">ประเมินเชิงลึก กำจัดภาระสารพิษตับ และฟื้นฟูเกราะป้องกันลำไส้</p>
             </div>
-            <span class="text-xs font-mono text-gray-400">Duration: 6-8 Weeks</span>
+            <span class="badge bg-light text-muted border font-monospace px-3 py-2">ระยะเวลา: 6-8 สัปดาห์</span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
-                <span class="text-xs font-bold font-mono text-primary">STEP 01</span>
-                <h3 class="text-base font-semibold text-gray-900">Deep Assessment</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    วิเคราะห์ข้อมูลสุขภาพ 39 แกนชีววิทยา (12 โดเมน) ด้วย AI ประเมินชีวเคมีเลือด สัญญาณการอักเสบ และตรวจคัดกรอง Leaky Gut
-                </p>
-                <div class="text-[11px] text-gray-500 pt-2 border-t border-gray-200">
-                    <strong>โมดูลที่ใช้:</strong> AI Intake, Comprehensive Blood Panel, Digital Twin
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <span class="badge bg-white text-primary-clinic border fw-bold mb-2">STEP 01</span>
+                    <h3 class="h6 fw-bold text-dark mb-2">Deep Assessment</h3>
+                    <p class="small text-muted mb-3 lh-base">
+                        วิเคราะห์ข้อมูลสุขภาพ 39 แกนชีววิทยา (12 โดเมน) ด้วย AI ประเมินชีวเคมีเลือด สัญญาณการอักเสบ และตรวจคัดกรอง Leaky Gut
+                    </p>
+                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
+                        <strong>โมดูลที่ใช้:</strong> AI Intake, Blood Panel, Digital Twin
+                    </div>
                 </div>
             </div>
 
-            <div class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
-                <span class="text-xs font-bold font-mono text-primary">STEP 02</span>
-                <h3 class="text-base font-semibold text-gray-900">Detoxification</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    กระตุ้นเอนไซม์ Cytochrome P450 และ Conjugation ในตับ ขับสารพิษสะสม โลหะหนัก และลดภาระตับคั่งไขมัน
-                </p>
-                <div class="text-[11px] text-gray-500 pt-2 border-t border-gray-200">
-                    <strong>โมดูลที่ใช้:</strong> HEPA-1, HEPA-3, Glutathione Support
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <span class="badge bg-white text-primary-clinic border fw-bold mb-2">STEP 02</span>
+                    <h3 class="h6 fw-bold text-dark mb-2">Detoxification</h3>
+                    <p class="small text-muted mb-3 lh-base">
+                        กระตุ้นเอนไซม์ Cytochrome P450 และ Conjugation ในตับ ขับสารพิษสะสม โลหะหนัก และลดภาระตับคั่งไขมัน
+                    </p>
+                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
+                        <strong>โมดูลที่ใช้:</strong> HEPA-1, HEPA-3, Glutathione Support
+                    </div>
                 </div>
             </div>
 
-            <div class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
-                <span class="text-xs font-bold font-mono text-primary">STEP 03</span>
-                <h3 class="text-base font-semibold text-gray-900">Gut Restoration</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    ซ่อมแซม Tight Junctions ที่ผนังลำไส้ ลดการรั่วไหลของ Endotoxin สู่กระแสเลือด และปรับสมดุล Microbiome
-                </p>
-                <div class="text-[11px] text-gray-500 pt-2 border-t border-gray-200">
-                    <strong>โมดูลที่ใช้:</strong> CINNARA, KURMA, STOMMA, Targeted Probiotics
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <span class="badge bg-white text-primary-clinic border fw-bold mb-2">STEP 03</span>
+                    <h3 class="h6 fw-bold text-dark mb-2">Gut Restoration</h3>
+                    <p class="small text-muted mb-3 lh-base">
+                        ซ่อมแซม Tight Junctions ที่ผนังลำไส้ ลดการรั่วไหลของ Endotoxin สู่กระแสเลือด และปรับสมดุล Microbiome
+                    </p>
+                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
+                        <strong>โมดูลที่ใช้:</strong> CINNARA, GUT-1, Glutamine Complex
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Phase 2: Rebalance Core -->
-    <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-xs space-y-6">
-        <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+    <div class="card p-4 p-lg-5 mb-5 border shadow-sm">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-2">
             <div>
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800">PHASE 2</span>
-                <h2 class="text-xl font-bold text-gray-900 mt-2">Rebalance Core (สัปดาห์ที่ 8 - 16)</h2>
-                <p class="text-xs text-gray-500 mt-0.5">ปรับสมดุลระบบเผาผลาญ ฮอร์โมน และระบบภูมิคุ้มกัน</p>
+                <span class="badge bg-info-subtle text-info-emphasis px-3 py-1 rounded-pill fw-semibold mb-2">PHASE 2</span>
+                <h2 class="h4 fw-bold text-dark mb-1">Rebalance Core (สัปดาห์ที่ 9 - 16)</h2>
+                <p class="small text-muted mb-0">ปรับสมดุลการเผาผลาญ ฟื้นฟูต่อมไร้ท่อ และควบคุมการอักเสบระดับเซลล์</p>
             </div>
-            <span class="text-xs font-mono text-gray-400">Duration: 8-12 Weeks</span>
+            <span class="badge bg-light text-muted border font-monospace px-3 py-2">ระยะเวลา: 8 สัปดาห์</span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
-                <span class="text-xs font-bold font-mono text-purple-600">STEP 04</span>
-                <h3 class="text-base font-semibold text-gray-900">Metabolic Reset</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    ปรับปรุงความไวต่ออินซูลิน ลดภาวะ Glucose Variability และส่งเสริมการเผาผลาญไขมันผ่าน AMPK Pathway
-                </p>
-                <div class="text-[11px] text-gray-500 pt-2 border-t border-gray-200">
-                    <strong>โมดูลที่ใช้:</strong> DB1, BOVA, BENJAKUL
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <span class="badge bg-white text-info border fw-bold mb-2">STEP 04</span>
+                    <h3 class="h6 fw-bold text-dark mb-2">Metabolic Reset</h3>
+                    <p class="small text-muted mb-3 lh-base">
+                        ปรับปรุงความไวของตัวรับอินซูลิน ลดภาวะไขมันพอกตับ และเพิ่มความยืดหยุ่นในการสลับแหล่งพลังงาน (Metabolic Flexibility)
+                    </p>
+                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
+                        <strong>โมดูลที่ใช้:</strong> MET-1, Berberine Synergy, Alpha-Lipoic Acid
+                    </div>
                 </div>
             </div>
 
-            <div class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
-                <span class="text-xs font-bold font-mono text-purple-600">STEP 05</span>
-                <h3 class="text-base font-semibold text-gray-900">Hormonal Balance</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    ปรับความสมดุลของแกน HPA ลดฮอร์โมนความเครียดเรื้อรัง และปรับสมดุลไทรอยด์และฮอร์โมนเพศ
-                </p>
-                <div class="text-[11px] text-gray-500 pt-2 border-t border-gray-200">
-                    <strong>โมดูลที่ใช้:</strong> ANGERA, Adrenal Adaptogens
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <span class="badge bg-white text-info border fw-bold mb-2">STEP 05</span>
+                    <h3 class="h6 fw-bold text-dark mb-2">Hormonal Balance</h3>
+                    <p class="small text-muted mb-3 lh-base">
+                        ปรับจังหวะการหลั่งคอร์ติซอล ฟื้นฟูต่อมหมวกไตล้า สมดุลฮอร์โมนไทรอยด์ และสร้างเสถียรภาพแก่ฮอร์โมนเพศ
+                    </p>
+                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
+                        <strong>โมดูลที่ใช้:</strong> ADREN-1, Ashwagandha KSM-66, Thyroid Support
+                    </div>
                 </div>
             </div>
 
-            <div class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
-                <span class="text-xs font-bold font-mono text-purple-600">STEP 06</span>
-                <h3 class="text-base font-semibold text-gray-900">Immune Modulation</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    ควบคุมสมดุลเม็ดเลือดขาว Th1/Th2/Th17 เสริมการทำงานของ Treg Cells เพื่อหยุดวงจรการทำลายตัวเอง
-                </p>
-                <div class="text-[11px] text-gray-500 pt-2 border-t border-gray-200">
-                    <strong>โมดูลที่ใช้:</strong> KERRA, MINOZA, KS, Beta G
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <span class="badge bg-white text-info border fw-bold mb-2">STEP 06</span>
+                    <h3 class="h6 fw-bold text-dark mb-2">Immune Modulation</h3>
+                    <p class="small text-muted mb-3 lh-base">
+                        กดการส่งสัญญาณ NF-κB, ปรับสัดส่วน Th1/Th2 และ M1/M2 Macrophages เพื่อหยุดวงจรการโจมตีเนื้อเยื่อตนเอง
+                    </p>
+                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
+                        <strong>โมดูลที่ใช้:</strong> KERRA, MINOZA, Curcumin Phospholipid
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Phase 3: Repair & Longevity -->
-    <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-xs space-y-6">
-        <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+    <div class="card p-4 p-lg-5 mb-5 border shadow-sm">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-2">
             <div>
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-primary/20 text-primary-dark">PHASE 3</span>
-                <h2 class="text-xl font-bold text-gray-900 mt-2">Repair & Longevity (สัปดาห์ที่ 16 เป็นต้นไป)</h2>
-                <p class="text-xs text-gray-500 mt-0.5">ซ่อมแซมระดับเซลล์ ฟื้นฟูระบบประสาท และดูแลสุขภาพระยะยาว</p>
+                <span class="badge bg-success-subtle text-success-emphasis px-3 py-1 rounded-pill fw-semibold mb-2">PHASE 3</span>
+                <h2 class="h4 fw-bold text-dark mb-1">Repair &amp; Longevity (สัปดาห์ที่ 17+)</h2>
+                <p class="small text-muted mb-0">กระตุ้นการซ่อมแซมดีเอ็นเอ ยืดความยาวเทโลเมียร์ และคงสภาพเซลล์อ่อนเยาว์</p>
             </div>
-            <span class="text-xs font-mono text-gray-400">Duration: Maintenance</span>
+            <span class="badge bg-light text-muted border font-monospace px-3 py-2">ระยะเวลา: ต่อเนื่องระยะยาว</span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
-                <span class="text-xs font-bold font-mono text-primary">STEP 07</span>
-                <h3 class="text-base font-semibold text-gray-900">Cellular Repair</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    ส่งเสริมการกำจัดเซลล์แก่ (Senescent Cells) กระตุ้นการซ่อมแซม DNA และรักษาความยาวเทโลเมียร์
-                </p>
-                <div class="text-[11px] text-gray-500 pt-2 border-t border-gray-200">
-                    <strong>โมดูลที่ใช้:</strong> LIVOXY, CoQ10, Resveratrol, NAD+ Precursors
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <span class="badge bg-white text-success border fw-bold mb-2">STEP 07</span>
+                    <h3 class="h6 fw-bold text-dark mb-2">Cellular Repair</h3>
+                    <p class="small text-muted mb-3 lh-base">
+                        เร่งการกำจัดเซลล์ชราภาพ (Senescent Cells) ผ่านกระบวนการ Autophagy และกระตุ้นเอนไซม์ซ่อมแซมรหัสพันธุกรรม PARP
+                    </p>
+                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
+                        <strong>โมดูลที่ใช้:</strong> CELL-1, Spermidine, Resveratrol Active
+                    </div>
                 </div>
             </div>
 
-            <div class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
-                <span class="text-xs font-bold font-mono text-primary">STEP 08</span>
-                <h3 class="text-base font-semibold text-gray-900">Neuroplasticity</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    เพิ่มสารสื่อประสาท บำรุงปลอกไมอีลิน ลดการอักเสบในเนื้อเยื่อสมอง และกระตุ้น BDNF
-                </p>
-                <div class="text-[11px] text-gray-500 pt-2 border-t border-gray-200">
-                    <strong>โมดูลที่ใช้:</strong> Neuro-Nutrients, Lion's Mane Extract
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <span class="badge bg-white text-success border fw-bold mb-2">STEP 08</span>
+                    <h3 class="h6 fw-bold text-dark mb-2">Neuroplasticity</h3>
+                    <p class="small text-muted mb-3 lh-base">
+                        ส่งเสริมการสร้างเซลล์ประสาทใหม่ (BDNF) ฟื้นฟูไมอีลิน และเพิ่มประสิทธิภาพการชะล้างของเสียสมองช่วงหลับลึก
+                    </p>
+                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
+                        <strong>โมดูลที่ใช้:</strong> NEURO-1, Lion's Mane Dual-Extract, Phosphatidylserine
+                    </div>
                 </div>
             </div>
 
-            <div class="p-5 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
-                <span class="text-xs font-bold font-mono text-primary">STEP 09</span>
-                <h3 class="text-base font-semibold text-gray-900">Longevity Protocol</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    โปรแกรมรักษาระดับสุขภาพที่เหมาะสมเฉพาะบุคคล ตรวจติดตามผลอย่างสม่ำเสมอเพื่อสุขภาพยืนยาว
-                </p>
-                <div class="text-[11px] text-gray-500 pt-2 border-t border-gray-200">
-                    <strong>โมดูลที่ใช้:</strong> Seasonal Maintenance, Annual 38-Axes Checkup
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <span class="badge bg-white text-success border fw-bold mb-2">STEP 09</span>
+                    <h3 class="h6 fw-bold text-dark mb-2">Longevity Protocol</h3>
+                    <p class="small text-muted mb-3 lh-base">
+                        ออกแบบโปรแกรมบำรุงรักษาสุขภาพเฉพาะบุคคล เพื่อป้องกันการเกิดโรคซ้ำ และคงสภาวะความอ่อนเยาว์ในระดับโมเลกุล
+                    </p>
+                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
+                        <strong>โมดูลที่ใช้:</strong> LONGEV-MAX, NMN Synergy, CoQ10 Ubiquinol
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="card p-5 text-center shadow-sm border bg-white">
+        <h3 class="h4 fw-bold text-dark mb-2">เริ่มต้นโปรโตคอลการรักษากับแพทย์ผู้เชี่ยวชาญ</h3>
+        <p class="text-muted small mx-auto mb-4" style="max-width: 600px;">
+            รับการประเมิน 39 แกนชีววิทยา เพื่อเลือกบันไดการฟื้นฟูสุขภาพที่ตรงกับสภาพร่างกายของคุณที่สุด
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'accounts:patient_login' %}" class="btn btn-primary d-inline-flex align-items-center gap-2">
+                <i class="fas fa-user-circle"></i>
+                <span>เข้าสู่ระบบคนไข้</span>
+            </a>
+            <a href="{% url 'accounts:patient_register' %}" class="btn btn-light d-inline-flex align-items-center gap-2 text-dark">
+                <i class="fas fa-user-plus text-primary-clinic"></i>
+                <span>ลงทะเบียนรับคำปรึกษา</span>
+            </a>
         </div>
     </div>
 

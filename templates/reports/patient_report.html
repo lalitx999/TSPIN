@@ -1,0 +1,118 @@
+{% extends 'reports/_base_report.html' %}
+
+{% block report_title %}สมุดบันทึกสุขภาพการแพทย์แม่นยำ (ฉบับผู้รับบริการ) — {{ identity.full_name }} (HN: {{ identity.hn }}){% endblock %}
+
+{% block edition_badge_block %}
+<span class="edition-badge badge-patient">PATIENT HEALTH BLUEPRINT (ฉบับผู้รับบริการ)</span>
+{% endblock %}
+
+{% block report_body %}
+    <!-- Section 1: Overview & Natural Prose -->
+    <div class="section-bar">1. สรุปภาพรวมสุขภาพและคำแนะนำจากแพทย์ผู้เชี่ยวชาญ</div>
+    <div style="background: #F0FDF4; border: 1px solid #BBF7D0; padding: 10px 14px; border-radius: 6px; margin-bottom: 14px;">
+        <div style="font-weight: 700; color: #166534; font-size: 11pt; margin-bottom: 4px;">
+            เรียน คุณ {{ identity.full_name }}
+        </div>
+        <div style="font-size: 10pt; line-height: 1.6; color: #1E293B;">
+            {{ patient_sanitized_prose|default:"ผลการตรวจคัดกรองสุขภาพเชิงลึกของท่านได้รับการประเมินตามมาตรฐานชีววิทยาของ TSPI Clinic เรียบร้อยแล้ว ขอให้ท่านปฏิบัติตามคำแนะนำของแพทย์เพื่อการฟื้นฟูสุขภาพอย่างยั่งยืน" }}
+        </div>
+    </div>
+
+    <!-- Section 2: 12 Biological Domains Summary -->
+    <div class="section-bar">2. สรุปผลการประเมิน 12 ระบบการทำงานของร่างกาย (12 Biological Domains)</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 10%;">รหัส</th>
+                <th style="width: 45%;">ระบบการทำงานของร่างกาย (Domain Title)</th>
+                <th style="width: 25%;" class="text-center">สถานะการทำงาน</th>
+                <th style="width: 20%;" class="text-center">ผลการประเมิน</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dom in domain_summaries %}
+            <tr>
+                <td class="font-mono text-center fw-bold">{{ dom.code }}</td>
+                <td>
+                    <strong style="color: #0F172A;">{{ dom.title }}</strong>
+                    <div style="font-size: 8pt; color: #64748B;">{{ dom.desc }}</div>
+                </td>
+                <td class="text-center">
+                    {% if dom.status_label == 'สมดุลดี' %}
+                    <span class="score-pill score-optimal">สมดุลดี</span>
+                    {% elif dom.status_label == 'ควรดูแลเพิ่มเติม' %}
+                    <span class="score-pill score-subclinical">ควรดูแลเพิ่มเติม</span>
+                    {% elif dom.status_label == 'เสื่อมหน้าที่' %}
+                    <span class="score-pill score-functional">มีจุดบกพร่อง</span>
+                    {% else %}
+                    <span class="score-pill score-unscored">รอตรวจยืนยัน</span>
+                    {% endif %}
+                </td>
+                <td class="text-center fw-bold font-mono">
+                    {% if dom.avg_score is not None %}
+                    {{ dom.avg_score }} / 100
+                    {% else %}
+                    <span style="color: #94A3B8; font-size: 8.5pt;">รอตรวจยืนยัน</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Section 3: 39 Biological Axes Detailed List for Patient -->
+    <div class="section-bar">3. รายละเอียดการทำงานของ 39 แกนชีวภาพ (Biological Breakdown)</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 6%;">แกนที่</th>
+                <th style="width: 50%;">ชื่อแกนชีวภาพ (Biological Axis)</th>
+                <th style="width: 22%;" class="text-center">ระดับคะแนน</th>
+                <th style="width: 22%;" class="text-center">คำอธิบายสถานะ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ax in axes_list %}
+            <tr>
+                <td class="font-mono text-center">{{ ax.axis_id }}</td>
+                <td>
+                    <strong style="color: #0F172A;">{{ ax.canonical_axis_name }}</strong>
+                </td>
+                <td class="text-center font-mono fw-bold">
+                    {% if ax.severity_score is not None %}
+                    {{ ax.severity_score }}
+                    {% else %}
+                    <span style="color: #64748B; font-size: 8.5pt;">รอการตรวจยืนยันเพิ่มเติม</span>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if ax.severity_score is not None %}
+                        {% if ax.severity_score < 40 %}
+                        <span class="score-pill score-optimal">ทำงานได้อย่างสมบูรณ์</span>
+                        {% elif ax.severity_score < 60 %}
+                        <span class="score-pill score-subclinical">ควรปรับพฤติกรรม</span>
+                        {% elif ax.severity_score < 80 %}
+                        <span class="score-pill score-functional">มีภาวะทำงานบกพร่อง</span>
+                        {% else %}
+                        <span class="score-pill score-pathological">ควรพบแพทย์ดูแลด่วน</span>
+                        {% endif %}
+                    {% else %}
+                    <span class="score-pill score-unscored">รอผลแล็บเพิ่มเติม</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Section 4: Personalized Lifestyle Recommendations -->
+    <div class="section-bar">4. ข้อปฏิบัติเพื่อการฟื้นฟูสุขภาพส่วนบุคคล (Personalized Action Plan)</div>
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 10px 14px; border-radius: 6px; font-size: 9.5pt; line-height: 1.55;">
+        <ul style="margin: 0; padding-left: 20px;">
+            <li><strong>การนอนหลับ:</strong> นอนหลับพักผ่อนให้เพียงพอ 7-8 ชั่วโมงต่อคืน เพื่อกระตุ้นกระบวนการฟื้นฟูระดับเซลล์ (Autophagy)</li>
+            <li><strong>โภชนาการ:</strong> หลีกเลี่ยงน้ำตาลทรายขัดสีและอาหารแปรรูปสูงเพื่อควบคุมการอักเสบในระบบหลอดเลือดและลำไส้</li>
+            <li><strong>การเคลื่อนไหว:</strong> ออกกำลังกายแบบแอโรบิกระดับปานกลางสม่ำเสมอสัปดาห์ละ 150 นาที เพื่อเสริมความแข็งแรงของระบบไมโทคอนเดรีย</li>
+            <li><strong>การติดตามผล:</strong> นัดหมายตรวจติดตามผลการทำงานของแกนชีวภาพตามรอบที่แพทย์กำหนดเพื่อเปรียบเทียบพัฒนาการ</li>
+        </ul>
+    </div>
+{% endblock %}

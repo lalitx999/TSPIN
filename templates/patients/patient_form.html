@@ -4,34 +4,35 @@
 {% block title %}{{ title }} | Dr. Patt EMR{% endblock %}
 
 {% block content %}
-<div class="space-y-6 max-w-4xl mx-auto">
+<div class="d-flex flex-column gap-4 mx-auto" style="max-width: 860px;">
+
     <!-- Header -->
-    <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+    <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
         <div>
-            <a href="{% if patient %}{% url 'patients:patient_detail' patient.pk %}{% else %}{% url 'patients:patient_list' %}{% endif %}" class="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-primary mb-1 transition-colors font-kanit">
+            <a href="{% if patient %}{% url 'patients:patient_detail' patient.pk %}{% else %}{% url 'patients:patient_list' %}{% endif %}" class="btn btn-sm btn-link text-decoration-none text-muted p-0 mb-1 d-inline-flex align-items-center gap-1.5" style="font-size: 0.775rem;">
                 <i class="fas fa-arrow-left"></i> ยกเลิกและย้อนกลับ
             </a>
-            <h1 class="text-2xl font-bold text-gray-900 font-kanit flex items-center gap-2">
+            <h1 class="h4 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
                 <i class="fas fa-user-edit text-primary"></i> {{ title }}
             </h1>
         </div>
     </div>
 
     <!-- Form Container -->
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 bg-secondary/50 border-b border-gray-200">
-            <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider font-kanit flex items-center gap-2">
+    <div class="card shadow-sm border">
+        <div class="card-header bg-light py-2.5 px-3 border-bottom">
+            <span class="small fw-bold text-dark d-flex align-items-center gap-2">
                 <i class="fas fa-clipboard-list text-primary"></i> แบบฟอร์มข้อมูลเวชระเบียนผู้ป่วย (Patient Master Record)
             </span>
         </div>
 
-        <div class="p-6">
+        <div class="card-body p-4">
             {% if form.errors %}
-                <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-800 font-kanit mb-6">
-                    <strong class="font-bold flex items-center gap-1.5 mb-1">
-                        <i class="fas fa-exclamation-circle text-red-600"></i> กรุณาตรวจสอบข้อมูลที่ระบุ:
+                <div class="alert alert-danger shadow-xs border mb-4 py-2.5 px-3" role="alert" style="font-size: 0.8rem;">
+                    <strong class="d-flex align-items-center gap-1.5 mb-1">
+                        <i class="fas fa-exclamation-circle text-danger"></i> กรุณาตรวจสอบข้อมูลที่ระบุ:
                     </strong>
-                    <ul class="list-disc list-inside space-y-0.5">
+                    <ul class="mb-0 ps-3">
                         {% for field, errors in form.errors.items %}
                             {% for error in errors %}
                                 <li>{{ field }}: {{ error }}</li>
@@ -41,22 +42,22 @@
                 </div>
             {% endif %}
 
-            <form method="post" novalidate class="space-y-6 text-xs font-kanit">
+            <form method="post" novalidate class="d-flex flex-column gap-4">
                 {% csrf_token %}
 
                 <!-- Section 1: หมายเลขระบุตัวตนและสถานะ -->
                 <div>
-                    <h3 class="text-xs font-bold text-primary uppercase tracking-wider mb-3 pb-1 border-b border-gray-100 flex items-center gap-1.5">
-                        <i class="fas fa-id-card"></i> 1. หมายเลขเวชระเบียนและสถานะ (Identifiers & Status)
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-medium text-gray-700 mb-1">หมายเลข HN <span class="text-red-500">*</span></label>
+                    <h6 class="small fw-bold text-primary text-uppercase mb-2.5 pb-1 border-bottom d-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
+                        <i class="fas fa-id-card"></i> 1. หมายเลขเวชระเบียนและสถานะ (Identifiers &amp; Status)
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-medium text-dark mb-1">หมายเลข HN <span class="text-danger">*</span></label>
                             {{ form.hn }}
-                            <p class="text-[11px] text-gray-400 mt-1">เช่น HN-2026-0001 (ต้องไม่ซ้ำในระบบ)</p>
+                            <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">เช่น HN-2026-0001 (ต้องไม่ซ้ำในระบบ)</small>
                         </div>
-                        <div>
-                            <label class="block font-medium text-gray-700 mb-1">สถานะทางคลินิก (Clinical Status) <span class="text-red-500">*</span></label>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-medium text-dark mb-1">สถานะทางคลินิก (Clinical Status) <span class="text-danger">*</span></label>
                             {{ form.status }}
                         </div>
                     </div>
@@ -64,32 +65,32 @@
 
                 <!-- Section 2: ข้อมูลส่วนบุคคล -->
                 <div>
-                    <h3 class="text-xs font-bold text-primary uppercase tracking-wider mb-3 pb-1 border-b border-gray-100 flex items-center gap-1.5">
+                    <h6 class="small fw-bold text-primary text-uppercase mb-2.5 pb-1 border-bottom d-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
                         <i class="fas fa-user"></i> 2. ข้อมูลส่วนบุคคล (Personal Information)
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                        <div class="md:col-span-5">
-                            <label class="block font-medium text-gray-700 mb-1">ชื่อจริง (First Name) <span class="text-red-500">*</span></label>
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-5">
+                            <label class="form-label small fw-medium text-dark mb-1">ชื่อจริง (First Name) <span class="text-danger">*</span></label>
                             {{ form.first_name }}
                         </div>
-                        <div class="md:col-span-5">
-                            <label class="block font-medium text-gray-700 mb-1">นามสกุล (Last Name) <span class="text-red-500">*</span></label>
+                        <div class="col-12 col-md-5">
+                            <label class="form-label small fw-medium text-dark mb-1">นามสกุล (Last Name) <span class="text-danger">*</span></label>
                             {{ form.last_name }}
                         </div>
-                        <div class="md:col-span-2">
-                            <label class="block font-medium text-gray-700 mb-1">ชื่อเล่น</label>
+                        <div class="col-12 col-md-2">
+                            <label class="form-label small fw-medium text-dark mb-1">ชื่อเล่น</label>
                             {{ form.nickname }}
                         </div>
-                        <div class="md:col-span-4">
-                            <label class="block font-medium text-gray-700 mb-1">เพศสภาพ (Gender)</label>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-medium text-dark mb-1">เพศสภาพ (Gender)</label>
                             {{ form.gender }}
                         </div>
-                        <div class="md:col-span-4">
-                            <label class="block font-medium text-gray-700 mb-1">วันเกิด (Birth Date)</label>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-medium text-dark mb-1">วันเกิด (Birth Date)</label>
                             {{ form.birth_date }}
                         </div>
-                        <div class="md:col-span-4">
-                            <label class="block font-medium text-gray-700 mb-1">กรุ๊ปเลือด (Blood Type)</label>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-medium text-dark mb-1">กรุ๊ปเลือด (Blood Type)</label>
                             {{ form.blood_type }}
                         </div>
                     </div>
@@ -97,17 +98,17 @@
 
                 <!-- Section 3: ข้อมูลติดต่อ -->
                 <div>
-                    <h3 class="text-xs font-bold text-primary uppercase tracking-wider mb-3 pb-1 border-b border-gray-100 flex items-center gap-1.5">
+                    <h6 class="small fw-bold text-primary text-uppercase mb-2.5 pb-1 border-bottom d-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
                         <i class="fas fa-phone"></i> 3. ข้อมูลการติดต่อ (Contact Details)
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-medium text-gray-700 mb-1">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-medium text-dark mb-1">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
                             {{ form.phone }}
-                            <p class="text-[11px] text-gray-400 mt-1">เบอร์โทรศัพท์ 10 หลัก สำหรับติดต่อและยืนยันตัวตน</p>
+                            <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">เบอร์โทรศัพท์ 10 หลัก สำหรับติดต่อและยืนยันตัวตน</small>
                         </div>
-                        <div>
-                            <label class="block font-medium text-gray-700 mb-1">อีเมล (Email)</label>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-medium text-dark mb-1">อีเมล (Email)</label>
                             {{ form.email }}
                         </div>
                     </div>
@@ -115,41 +116,42 @@
 
                 <!-- Section 4: ข้อมูลทางคลินิกและข้อควรระวัง -->
                 <div>
-                    <h3 class="text-xs font-bold text-red-600 uppercase tracking-wider mb-3 pb-1 border-b border-gray-100 flex items-center gap-1.5">
-                        <i class="fas fa-notes-medical"></i> 4. ประวัติทางการแพทย์และข้อควรระวัง (Medical History & Alerts)
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="p-4 rounded-xl bg-red-50 border border-red-200">
-                            <label class="block font-bold text-red-900 mb-1">
+                    <h6 class="small fw-bold text-danger text-uppercase mb-2.5 pb-1 border-bottom d-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
+                        <i class="fas fa-notes-medical"></i> 4. ประวัติทางการแพทย์และข้อควรระวัง (Medical History &amp; Alerts)
+                    </h6>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="card bg-danger-subtle border border-danger-subtle p-3">
+                            <label class="form-label small fw-bold text-danger mb-1">
                                 ⚠️ ประวัติการแพ้ยา / สารเคมี / อาหาร (Allergies):
                             </label>
                             {{ form.allergies }}
-                            <p class="text-[11px] text-red-700 mt-1">หากมีการแพ้ยา จะถูกนำไปแสดงเป็นแบนเนอร์แจ้งเตือนสีแดงในหน้าแฟ้มตรวจ</p>
+                            <small class="text-danger d-block mt-1" style="font-size: 0.7rem;">หากมีการแพ้ยา จะถูกนำไปแสดงเป็นแบนเนอร์แจ้งเตือนสีแดงในหน้าแฟ้มตรวจ</small>
                         </div>
 
                         <div>
-                            <label class="block font-medium text-gray-700 mb-1">อาการสำคัญแรกรับ (Chief Complaint):</label>
+                            <label class="form-label small fw-medium text-dark mb-1">อาการสำคัญแรกรับ (Chief Complaint):</label>
                             {{ form.chief_complaint }}
                         </div>
 
                         <div>
-                            <label class="block font-medium text-gray-700 mb-1">โรคประจำตัว / ประวัติการรักษา / ยาเดิม (Medical History):</label>
+                            <label class="form-label small fw-medium text-dark mb-1">โรคประจำตัว / ประวัติการรักษา / ยาเดิม (Medical History):</label>
                             {{ form.medical_history }}
                         </div>
                     </div>
                 </div>
 
-                <!-- Buttons -->
-                <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <a href="{% if patient %}{% url 'patients:patient_detail' patient.pk %}{% else %}{% url 'patients:patient_list' %}{% endif %}" class="px-4 py-2 rounded-xl text-xs font-medium text-gray-700 bg-secondary hover:bg-gray-200 transition-colors font-kanit">
-                        <i class="fas fa-times mr-1"></i> ยกเลิก
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a href="{% if patient %}{% url 'patients:patient_detail' patient.pk %}{% else %}{% url 'patients:patient_list' %}{% endif %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i> ยกเลิก
                     </a>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-medium transition-colors shadow-sm font-kanit flex items-center gap-1.5">
+                    <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
                         <i class="fas fa-save"></i> บันทึกเวชระเบียน
                     </button>
                 </div>
             </form>
         </div>
     </div>
+
 </div>
 {% endblock %}

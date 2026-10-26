@@ -1,0 +1,300 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block report_title %}TSPI Precision Clinical Dossier — {{ identity.full_name }} (HN: {{ identity.hn }}){% endblock %}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 12mm 10mm 15mm 10mm;
+            @top-right {
+                content: "HN: {{ identity.hn }} | {{ identity.full_name }}";
+                font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+                font-size: 8pt;
+                color: #64748B;
+            }
+            @bottom-left {
+                content: "TSPI Precision Clinical Intelligence OS • Anti-Drift Single Source of Truth";
+                font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+                font-size: 8pt;
+                color: #64748B;
+            }
+            @bottom-right {
+                content: "หน้า " counter(page) " จาก " counter(pages);
+                font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+                font-size: 8pt;
+                color: #64748B;
+            }
+        }
+
+        @font-face {
+            font-family: 'THSarabunNew';
+            src: url("{% static 'fonts/THSarabunNew.ttf' %}") format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'THSarabunNew';
+            src: url("{% static 'fonts/THSarabunNew Bold.ttf' %}") format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+            color: #0F172A;
+            background: #FFFFFF;
+            margin: 0;
+            padding: 0;
+            font-size: 11pt;
+            line-height: 1.45;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'THSarabunNew', 'Sarabun', sans-serif;
+            font-weight: 700;
+            margin: 0;
+            padding: 0;
+            line-height: 1.25;
+        }
+
+        /* Draft Watermark */
+        .watermark {
+            position: fixed;
+            top: 35%;
+            left: 5%;
+            width: 90%;
+            text-align: center;
+            font-size: 32pt;
+            font-weight: bold;
+            color: rgba(220, 38, 38, 0.12);
+            transform: rotate(-35deg);
+            z-index: 9999;
+            pointer-events: none;
+            border: 4px dashed rgba(220, 38, 38, 0.15);
+            padding: 16px;
+            text-transform: uppercase;
+        }
+
+        /* Top Header */
+        .report-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-bottom: 2px solid #2E7D32;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+        .clinic-brand-title {
+            font-size: 16pt;
+            font-weight: 700;
+            color: #1B5E20;
+        }
+        .clinic-sub {
+            font-size: 9pt;
+            color: #64748B;
+        }
+        .edition-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 9pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-physician {
+            background-color: #EFF6FF;
+            color: #1D4ED8;
+            border: 1px solid #BFDBFE;
+        }
+        .badge-patient {
+            background-color: #F0FDF4;
+            color: #15803D;
+            border: 1px solid #BBF7D0;
+        }
+        .badge-multiomics {
+            background-color: #FAF5FF;
+            color: #7E22CE;
+            border: 1px solid #E9D5FF;
+        }
+
+        /* Patient Dossier Strip */
+        .dossier-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            margin-bottom: 14px;
+        }
+        .dossier-table td {
+            padding: 4px 8px;
+            font-size: 9.5pt;
+            border-bottom: 1px solid #F1F5F9;
+        }
+        .dossier-lbl {
+            color: #64748B;
+            font-weight: 700;
+            width: 16%;
+        }
+        .dossier-val {
+            color: #0F172A;
+            font-weight: 700;
+            width: 34%;
+        }
+
+        /* Section Headings */
+        .section-bar {
+            background-color: #F1F5F9;
+            border-left: 4px solid #2E7D32;
+            padding: 4px 8px;
+            font-size: 11pt;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 12px 0 8px 0;
+            text-transform: uppercase;
+        }
+
+        /* Table Styling */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 9pt;
+        }
+        .data-table th {
+            background-color: #F8FAFC;
+            border-top: 1px solid #CBD5E1;
+            border-bottom: 1.5px solid #94A3B8;
+            padding: 5px 6px;
+            text-align: left;
+            font-weight: 700;
+            color: #334155;
+        }
+        .data-table td {
+            border-bottom: 1px solid #E2E8F0;
+            padding: 4px 6px;
+            vertical-align: top;
+        }
+        .text-center { text-align: center; }
+        .text-end { text-align: right; }
+        .font-mono { font-family: monospace; }
+        .fw-bold { font-weight: 700; }
+
+        /* Score Pills */
+        .score-pill {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-weight: 700;
+            font-size: 8.5pt;
+        }
+        .score-optimal { background-color: #DCFCE7; color: #166534; }
+        .score-subclinical { background-color: #FEF9C3; color: #854D0E; }
+        .score-functional { background-color: #FFEDD5; color: #9A3412; }
+        .score-pathological { background-color: #FEE2E2; color: #991B1B; }
+        .score-unscored { background-color: #F1F5F9; color: #64748B; }
+
+        /* Alert Callout */
+        .callout-box {
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            font-size: 9.5pt;
+        }
+        .callout-warning {
+            background-color: #FFFBEB;
+            border-left: 4px solid #F59E0B;
+            color: #92400E;
+        }
+        .callout-danger {
+            background-color: #FEF2F2;
+            border-left: 4px solid #EF4444;
+            color: #991B1B;
+        }
+        .callout-success {
+            background-color: #F0FDF4;
+            border-left: 4px solid #10B981;
+            color: #065F46;
+        }
+    </style>
+    {% block extra_styles %}{% endblock %}
+</head>
+<body>
+    {% if watermark_text %}
+    <div class="watermark">{{ watermark_text }}</div>
+    {% endif %}
+
+    <!-- Report Header Table -->
+    <table class="report-header-table">
+        <tr>
+            <td style="vertical-align: middle;">
+                <div class="clinic-brand-title">TSPI PRECISION CLINIC & MEDICAL INTELLIGENCE</div>
+                <div class="clinic-sub">การแพทย์เชิงกลไกแห่งอนาคต • 39 Biological Axes Mechanistic Platform</div>
+            </td>
+            <td style="text-align: right; vertical-align: middle;">
+                {% block edition_badge_block %}
+                <span class="edition-badge badge-physician">{{ edition_title }}</span>
+                {% endblock %}
+                <div class="clinic-sub" style="margin-top: 4px;">
+                    รหัสวิเคราะห์: #{{ analysis_id }} | Version: {{ framework_version }}
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Common Patient Dossier Strip (Anti-Drift Verification) -->
+    <table class="dossier-table">
+        <tr>
+            <td class="dossier-lbl">รหัสคนไข้ (HN):</td>
+            <td class="dossier-val font-mono">{{ identity.hn }}</td>
+            <td class="dossier-lbl">ชื่อ-สกุล:</td>
+            <td class="dossier-val">{{ identity.full_name }}</td>
+        </tr>
+        <tr>
+            <td class="dossier-lbl">เพศ / อายุ:</td>
+            <td class="dossier-val">{% if identity.sex == 'M' or identity.sex == 'male' %}ชาย (Male){% else %}หญิง (Female){% endif %} / {{ identity.age }} ปี</td>
+            <td class="dossier-lbl">วันออกรายงาน:</td>
+            <td class="dossier-val">{{ generation_time|date:"d M Y, H:i" }} น.</td>
+        </tr>
+        <tr>
+            <td class="dossier-lbl">สถานะการอนุมัติ:</td>
+            <td class="dossier-val">
+                {% if is_approved %}
+                <span style="color: #16A34A;">● อนุมัติลงนามแล้ว (Approved)</span>
+                {% else %}
+                <span style="color: #DC2626;">▲ ฉบับร่างระหว่างตรวจทาน (AI Draft)</span>
+                {% endif %}
+            </td>
+            <td class="dossier-lbl">ระบบข้อมูล:</td>
+            <td class="dossier-val">Single Source of Truth (100% Invariant Checked)</td>
+        </tr>
+    </table>
+
+    <!-- Main Content Area -->
+    {% block report_body %}{% endblock %}
+
+    <!-- Footer Signature Block -->
+    {% block signature_block %}
+    <div style="margin-top: 20px; page-break-inside: avoid;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 9pt;">
+            <tr>
+                <td style="width: 60%; vertical-align: top; color: #64748B;">
+                    <strong>ข้อกำหนดการใช้งานเวชสารสนเทศ:</strong><br>
+                    รายงานนี้สร้างขึ้นจากสถาปัตยกรรมข้อมูล Single Source of Truth ตามมาตรฐานการแพทย์แม่นยำ TSPI Clinic 
+                    ข้อมูลทั้งหมดได้รับการตรวจสอบความสอดคล้องข้ามฉบับ (Cross-Report Invariant Validator) 100%
+                </td>
+                <td style="width: 40%; text-align: center; vertical-align: top;">
+                    <div style="border-bottom: 1px dotted #94A3B8; width: 160px; margin: 0 auto 4px auto; height: 35px;"></div>
+                    <strong>แพทย์ผู้เชี่ยวชาญ / ผู้มีอำนาจลงนาม</strong><br>
+                    <span style="font-size: 8pt; color: #64748B;">TSPI Clinical Board of Governance</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    {% endblock %}
+</body>
+</html>

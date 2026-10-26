@@ -4,13 +4,17 @@ Enforces Relational Integrity, Thai ID Protection, and Complete Audit Trail.
 """
 
 from datetime import date
+import uuid
+import hashlib
+from typing import Optional
 from django.db import models
 from django.conf import settings
+from core.models import SoftDeleteModel, ClinicalEncryption
 
-class Patient(models.Model):
+class Patient(SoftDeleteModel):
     """
     เวชระเบียนผู้ป่วย (Patient Master Record)
-    รองรับการระบุตัวตนด้วย HN และเข้ารหัสความปลอดภัยตามมาตรฐาน PDPA
+    รองรับการระบุตัวตนด้วย HN และเข้ารหัสความปลอดภัยตามมาตรฐาน PDPA (Two-Tier ID Protection)
     """
     GENDER_CHOICES = [
         ('M', 'ชาย (Male)'),
@@ -33,6 +37,9 @@ class Patient(models.Model):
         ('UNKNOWN', 'ไม่ระบุ'),
     ]
 
+    # Public Non-Predictable Identifier (Anti-IDOR)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
+
     # Primary Medical Identifiers
     hn = models.CharField(
         max_length=50,
@@ -44,7 +51,12 @@ class Patient(models.Model):
         max_length=64,
         blank=True,
         db_index=True,
-        help_text="SHA-256 Hash ของเลขบัตรประชาชน 13 หลัก"
+        help_text="SHA-256 Hash ของเลขบัตรประชาชน 13 หลัก สำหรับค้นหาแบบ Exact Match"
+    )
+    id_card_encrypted = models.TextField(
+        blank=True,
+        null=True,
+        help_text="AES-256 Fernet Encrypted ID Card สำหรับถอดรหัสมาแสดงผลเฉพาะผู้มีสิทธิ์"
     )
 
     # Personal Information
@@ -86,8 +98,10 @@ class Patient(models.Model):
         db_table = 'emr_patients'
         ordering = ['-created_at']
         indexes = [
-            models.Index(fields=['first_name', 'last_name']),
-            models.Index(fields=['status', '-created_at']),
+            models.Index(fields=['first_name', 'last_name'], condition=models.Q(is_deleted=False), name='idx_pt_name_act'),
+            models.Index(fields=['status', '-created_at'], condition=models.Q(is_deleted=False), name='idx_pt_stat_dt_act'),
+            models.Index(fields=['hn'], condition=models.Q(is_deleted=False), name='idx_pt_hn_act'),
+            models.Index(fields=['phone'], condition=models.Q(is_deleted=False), name='idx_pt_phone_act'),
         ]
 
     def __str__(self):
@@ -107,11 +121,50 @@ class Patient(models.Model):
             (today.month, today.day) < (self.birth_date.month, self.birth_date.day)
         )
 
+    def set_id_card(self, raw_id: str):
+        """ตั้งค่าเลขบัตร ปชช. ทั้งแบบ Hash สำหรับค้นหา และ AES Encrypted สำหรับแสดงผล"""
+        if not raw_id:
+            self.id_card_hash = ""
+            self.id_card_encrypted = None
+            return
+        cleaned = raw_id.strip().replace('-', '').replace(' ', '')
+        self.id_card_hash = hashlib.sha256(cleaned.encode('utf-8')).hexdigest()
+        self.id_card_encrypted = ClinicalEncryption.encrypt(cleaned)
 
-class PatientHistory(models.Model):
+    def get_id_card(self) -> Optional[str]:
+        """ถอดรหัสเลขบัตรประชาชน 13 หลักกลับมา"""
+        return ClinicalEncryption.decrypt(self.id_card_encrypted)
+
+    @property
+    def masked_id_card(self) -> str:
+        """เลขบัตรประชาชนแบบปิดบังเพื่อความปลอดภัยตาม PDPA เช่น 1-xxxx-xxxxx-04-6"""
+        raw = self.get_id_card()
+        if not raw or len(raw) != 13:
+            return "x-xxxx-xxxxx-xx-x"
+        return f"{raw[0]}-xxxx-xxxxx-{raw[10:12]}-{raw[12]}"
+
+    @property
+    def status_badge_class(self) -> str:
+        """CSS Badge Class สำหรับสถานะคนไข้ ไม่ต้องเขียน if ซ้อนใน HTML"""
+        mapping = {
+            'urgent': 'badge bg-danger-subtle text-danger border border-danger',
+            'medicine': 'badge bg-primary-subtle text-primary border border-primary',
+            'completed': 'badge bg-success-subtle text-success border border-success',
+            'pending': 'badge bg-warning-subtle text-warning-emphasis border border-warning',
+        }
+        return mapping.get(self.status, 'badge bg-light text-dark border')
+
+    @property
+    def status_label(self) -> str:
+        """ป้ายชื่อสถานะภาษาไทย"""
+        return dict(self.STATUS_CHOICES).get(self.status, self.status)
+
+
+class PatientHistory(SoftDeleteModel):
     """
     บันทึกการตรวจรักษาและการติดตามผลของแพทย์ (SOAP Clinical Notes)
     """
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     patient = models.ForeignKey(
         Patient,
         on_delete=models.CASCADE,
@@ -141,13 +194,16 @@ class PatientHistory(models.Model):
         app_label = 'patients'
         db_table = 'emr_patient_histories'
         ordering = ['-visit_date']
+        indexes = [
+            models.Index(fields=['patient', '-visit_date'], condition=models.Q(is_deleted=False), name='idx_hist_pt_dt_act'),
+        ]
 
     def __str__(self):
         doc_name = self.doctor.get_full_name() if self.doctor else "Unknown Doctor"
         return f"SOAP Note: {self.patient.hn} on {self.visit_date:%d/%m/%Y} by {doc_name}"
 
 
-class Appointment(models.Model):
+class Appointment(SoftDeleteModel):
     """
     ตารางนัดหมายแพทย์
     """
@@ -158,6 +214,7 @@ class Appointment(models.Model):
         ('cancelled', 'ยกเลิกนัด (Cancelled)'),
     ]
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')
     doctor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -176,9 +233,29 @@ class Appointment(models.Model):
         app_label = 'patients'
         db_table = 'emr_appointments'
         ordering = ['appointment_date', 'appointment_time']
+        indexes = [
+            models.Index(fields=['appointment_date', 'status'], condition=models.Q(is_deleted=False), name='idx_appt_dt_stat_act'),
+            models.Index(fields=['patient', 'appointment_date'], condition=models.Q(is_deleted=False), name='idx_appt_pt_dt_act'),
+        ]
 
     def __str__(self):
         return f"Appt: {self.patient.full_name} on {self.appointment_date} at {self.appointment_time}"
+
+    @property
+    def status_badge_class(self) -> str:
+        """CSS Badge Class สำหรับสถานะนัดหมาย"""
+        mapping = {
+            'scheduled': 'badge bg-primary-subtle text-primary border border-primary',
+            'confirmed': 'badge bg-success-subtle text-success border border-success',
+            'completed': 'badge bg-secondary-subtle text-secondary border',
+            'cancelled': 'badge bg-danger-subtle text-danger border border-danger',
+        }
+        return mapping.get(self.status, 'badge bg-light text-dark border')
+
+    @property
+    def status_label(self) -> str:
+        """ป้ายชื่อสถานะนัดหมายภาษาไทย"""
+        return dict(self.STATUS_CHOICES).get(self.status, self.status)
 
 from datetime import date, timedelta
 from django.utils import timezone
@@ -249,4 +326,36 @@ class PatientLinkingToken(models.Model):
             action_type=action_type,
             expires_at=timezone.now() + timedelta(minutes=expires_in_minutes)
         )
+
+    @classmethod
+    def create_otp_token(cls, patient: Patient, expires_in_minutes: int = 15) -> tuple['PatientLinkingToken', str]:
+        """
+        สร้างคำขอ 2-Step OTP Verification สำหรับ LIFF Binding
+        สุ่ม OTP 6 หลัก และสร้าง Token UUID
+        """
+        otp = f"{secrets.randbelow(900000) + 100000}"
+        token_str = secrets.token_urlsafe(32)
+        obj = cls.objects.create(
+            patient=patient,
+            token=token_str,
+            nonce=otp,
+            action_type='line_binding',
+            expires_at=timezone.now() + timedelta(minutes=expires_in_minutes)
+        )
+        return obj, otp
+
+    def verify_otp(self, input_otp: str) -> bool:
+        """ตรวจสอบความถูกต้องของ OTP ด้วย constant-time comparison ป้องกัน Timing Attacks"""
+        if not self.is_valid:
+            return False
+        return secrets.compare_digest(str(self.nonce).strip(), str(input_otp).strip())
+
+
+# Re-export Level 2 LINE OA & Caregiver Models
+from .models_line import (
+    LineUser,
+    LinePatientBinding,
+    CommunicationRecord,
+    ClinicalReviewItem,
+)
 

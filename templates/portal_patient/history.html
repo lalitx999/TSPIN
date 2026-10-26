@@ -3,29 +3,31 @@
 {% block title %}ประวัติการรักษาและผลแล็บ | TSPI Health{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6">
+<div class="container py-2" style="max-width: 900px;">
 
-    <div class="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-xs flex items-center justify-between">
-        <div>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 mb-1">
-                <i class="fas fa-history mr-1"></i> Medical Timeline
+    <div class="card border-0 shadow-xs mb-4">
+        <div class="card-body p-4 p-md-5">
+            <span class="badge bg-primary-subtle text-primary mb-2">
+                <i class="fas fa-history me-1"></i> Medical Timeline
             </span>
-            <h1 class="text-2xl font-bold text-gray-900">ประวัติการรักษาและไทม์ไลน์สุขภาพ</h1>
-            <p class="text-xs text-gray-500 mt-1">ประวัติการพบแพทย์ บันทึกการตรวจรักษา และผลแล็บย้อนหลัง</p>
+            <h1 class="h4 fw-bold text-dark mb-1">ประวัติการรักษาและไทม์ไลน์สุขภาพ</h1>
+            <p class="small text-muted mb-0">ประวัติการพบแพทย์ บันทึกการตรวจรักษา และผลแล็บย้อนหลัง</p>
         </div>
     </div>
 
     <!-- Timeline List -->
-    <div class="space-y-4">
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-2">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-mono font-semibold text-primary">24 ตุลาคม 2026</span>
-                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-green-100 text-green-700">ตรวจรักษาเสร็จสิ้น</span>
+    <div class="d-flex flex-column gap-3">
+        <div class="card border-0 shadow-xs">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="small font-monospace fw-bold text-primary">24 ตุลาคม 2026</span>
+                    <span class="badge bg-success-subtle text-success">ตรวจรักษาเสร็จสิ้น</span>
+                </div>
+                <h6 class="fw-bold text-dark mb-2">การตรวจติดตามผล Phase 1: Deep Assessment & Detox</h6>
+                <p class="small text-muted mb-0 lh-base">
+                    แพทย์ผู้ตรวจประเมินผลแล็บ hs-CRP และตรวจระดับ Zonulin อาการผื่นคันตอบสนองดีขึ้น ได้รับสูตรตำรับ KERRA และ MINOZA ต่อเนื่องอีก 4 สัปดาห์
+                </p>
             </div>
-            <h3 class="text-base font-semibold text-gray-900">การตรวจติดตามผล Phase 1: Deep Assessment & Detox</h3>
-            <p class="text-xs text-gray-600 leading-relaxed">
-                แพทย์ผู้ตรวจประเมินผลแล็บ hs-CRP และตรวจระดับ Zonulin อาการผื่นคันตอบสนองดีขึ้น ได้รับสูตรตำรับ KERRA และ MINOZA ต่อเนื่องอีก 4 สัปดาห์
-            </p>
         </div>
     </div>
 

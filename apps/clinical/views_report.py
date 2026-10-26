@@ -5,8 +5,9 @@ Enforces Human-in-the-loop Sign-off (Pillar 15), RBAC 403 (Pillar 2), and Comple
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseForbidden
 from django.views.decorators.http import require_http_methods
+from django.core.paginator import Paginator
 from django.utils import timezone
 from accounts.decorators import clinical_staff_required
 from accounts.models import AuditLog
@@ -14,13 +15,14 @@ from accounts.views import get_client_ip
 from patients.models import Patient
 from clinical.models import AnalysisRecord, BiologicalRecord
 from clinical.reports import PrecisionReportGenerator
+from clinical.services.report_generator import ReportGeneratorService
 
 
 @clinical_staff_required
 def report_dashboard_view(request):
     """
     ศูนย์รวมและแดชบอร์ดจัดการรายงานการแพทย์แม่นยำ (Precision Reports Dashboard)
-    แสดงรายการรายงานทั้งหมด สถานะการลงนามแพทย์ และลิงก์ดาวน์โหลด PDF
+    แสดงรายการรายงานทั้งหมด สถานะการลงนามแพทย์ และลิงก์ดาวน์โหลด PDF (พร้อมระบบแบ่งหน้า Paginator)
     """
     status_filter = request.GET.get('status', 'all')
     patient_id = request.GET.get('patient_id')
@@ -32,15 +34,20 @@ def report_dashboard_view(request):
     if patient_id:
         queryset = queryset.filter(patient_id=patient_id)
 
-    analyses = queryset.order_by('-analysis_date')[:50]
+    queryset = queryset.order_by('-analysis_date')
+    paginator = Paginator(queryset, 20)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
     patients = Patient.objects.all().order_by('first_name')[:100]
 
     return render(request, 'clinical/reports/report_dashboard.html', {
-        'analyses': analyses,
+        'page_obj': page_obj,
+        'analyses': page_obj.object_list,
         'patients': patients,
         'status_filter': status_filter,
         'selected_patient_id': patient_id,
-        'total_count': queryset.count(),
+        'total_count': paginator.count,
         'approved_count': AnalysisRecord.objects.filter(status__in=['approved', 'released']).count(),
         'draft_count': AnalysisRecord.objects.filter(status='draft').count(),
     })
@@ -142,9 +149,17 @@ def report_download_pdf_view(request, analysis_id=None, pk=None):
     if is_patient_owner and not is_staff and analysis.status not in ['approved', 'released']:
         return HttpResponseForbidden("รายงานฉบับนี้ยังไม่ได้รับการอนุมัติโดยแพทย์")
 
-    edition = request.GET.get('edition', 'patient' if is_patient_owner else 'physician')
+    edition = request.GET.get('edition', 'patient' if is_patient_owner else 'physician').lower()
 
-    pdf_bytes = PrecisionReportGenerator.generate_pdf(analysis, edition=edition)
+    # Option 2 Engine: Single Source of Truth CoreAnalysisPayload
+    payload = ReportGeneratorService.payload_from_analysis_record(analysis)
+
+    if edition == 'patient':
+        pdf_bytes = ReportGeneratorService.generate_patient_pdf(payload)
+    elif edition in ['omics', 'multiomics', 'multi_omics']:
+        pdf_bytes = ReportGeneratorService.generate_multiomics_pdf(payload)
+    else:
+        pdf_bytes = ReportGeneratorService.generate_physician_pdf(payload)
 
     AuditLog.objects.create(
         user=request.user if request.user.is_authenticated else None,

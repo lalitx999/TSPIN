@@ -1,14 +1,14 @@
 {% extends 'layouts/doctor_base.html' %}
 
-{% block title %}แชทสื่อสารคนไข้ LINE OA & Flex Message Simulator - TSPI CLINIC{% endblock %}
+{% block title %}แชทสื่อสารคนไข้ LINE OA & Flex Message Simulator | TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto space-y-6" x-data="{
+<div class="d-flex flex-column gap-4" x-data="{
     activePatient: {
         id: '{{ patients.0.pk|default:1 }}',
-        name: '{{ patients.0.full_name|default:\"แทนชล วรรณวงศ์\" }}',
-        hn: '{{ patients.0.hn|default:\"26-00001\" }}',
-        phone: '{{ patients.0.phone|default:\"0624980094\" }}'
+        name: '{{ patients.0.full_name|default:"แทนชล วรรณวงศ์" }}',
+        hn: '{{ patients.0.hn|default:"26-00001" }}',
+        phone: '{{ patients.0.phone|default:"0624980094" }}'
     },
     messageInput: '',
     messages: [
@@ -51,149 +51,154 @@
     }
 }">
 
-    <!-- Header -->
-    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    <i class="fab fa-line mr-1"></i> LINE Official Account Bridge
-                </span>
-                <span class="text-xs text-gray-400">ระบบสื่อสารสองทาง &amp; Interactive Flex Simulator</span>
+    <!-- Header Card -->
+    <div class="card shadow-sm border">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2.5">
+                            <i class="fab fa-line me-1"></i> LINE Official Account Bridge
+                        </span>
+                        <span class="text-muted small">ระบบสื่อสารสองทาง &amp; Interactive Flex Simulator</span>
+                    </div>
+                    <h1 class="h4 fw-bold mb-1 text-dark">ห้องแชทสื่อสารระหว่างแพทย์กับคนไข้ (Clinical Chats &amp; LINE Simulator)</h1>
+                    <p class="text-muted small mb-0">
+                        ตอบคำถามคนไข้ผ่าน LINE OA ส่งผลการประเมิน 39 แกนชีววิทยา และแจ้งเตือนเวลานัดหมายแบบสองทาง
+                    </p>
+                </div>
+
+                <div>
+                    <button type="button" @click="sendFlexCard()" class="btn btn-success d-inline-flex align-items-center gap-1.5 shadow-sm">
+                        <i class="fab fa-line fs-6"></i> ส่ง LINE Flex Card (39 แกน)
+                    </button>
+                </div>
             </div>
-            <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
-                ห้องแชทสื่อสารระหว่างแพทย์กับคนไข้ (Clinical Chats &amp; LINE Simulator)
-            </h1>
-            <p class="text-sm text-gray-500 mt-0.5">
-                ตอบคำถามคนไข้ผ่าน LINE OA ส่งผลการประเมิน 39 แกนชีววิทยา และแจ้งเตือนเวลานัดหมายแบบสองทาง
-            </p>
-        </div>
-        <div class="flex items-center gap-2">
-            <button type="button" @click="sendFlexCard()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-kanit font-medium transition-all shadow-xs">
-                <i class="fab fa-line text-sm"></i> ส่ง LINE Flex Card (39 แกน)
-            </button>
         </div>
     </div>
 
-    <!-- Chat Console Layout (2 cols) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[540px]">
-
+    <!-- Chat Console Layout (Row 4/8) -->
+    <div class="row g-4" style="min-height: 540px;">
         <!-- Left: Real Patient Conversations List (4 cols) -->
-        <div class="lg:col-span-4 bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden flex flex-col">
-            <div class="p-4 border-b border-gray-100 bg-secondary/30 flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-700 font-kanit">คนไข้จริงจากฐานข้อมูลคลินิก</span>
-                <span class="text-[11px] font-mono text-primary font-bold">{{ patients|length }} เคส</span>
-            </div>
-            <div class="divide-y divide-gray-100 overflow-y-auto flex-1 max-h-[500px]">
-                {% for p in patients %}
-                    <div @click="activePatient = { id: '{{ p.pk }}', name: '{{ p.full_name }}', hn: '{{ p.hn }}', phone: '{{ p.phone|default:\"-\" }}' }"
-                         class="p-3.5 hover:bg-gray-50 cursor-pointer transition-colors"
-                         :class="activePatient.id === '{{ p.pk }}' ? 'bg-primary/5 border-l-4 border-primary' : ''">
-                        <div class="flex items-start justify-between">
-                            <span class="font-semibold text-xs text-gray-900 font-kanit">{{ p.full_name }}</span>
-                            <span class="text-[10px] text-gray-400 font-mono">HN: {{ p.hn }}</span>
+        <div class="col-12 col-lg-4">
+            <div class="card shadow-sm border h-100 d-flex flex-column">
+                <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
+                    <span class="small fw-bold text-dark">คนไข้จริงจากฐานข้อมูลคลินิก</span>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">{{ patients|length }} เคส</span>
+                </div>
+                <div class="list-group list-group-flush overflow-auto flex-grow-1" style="max-height: 480px;">
+                    {% for p in patients %}
+                        <button type="button" 
+                                @click="activePatient = { id: '{{ p.pk }}', name: '{{ p.full_name }}', hn: '{{ p.hn }}', phone: '{{ p.phone|default:'-' }}' }"
+                                class="list-group-item list-group-item-action p-3 border-bottom text-start"
+                                :class="activePatient.id === '{{ p.pk }}' ? 'bg-primary-subtle border-start border-4 border-start-primary' : ''">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <strong class="small text-dark">{{ p.full_name }}</strong>
+                                <small class="text-muted font-monospace" style="font-size: 0.7rem;">HN: {{ p.hn }}</small>
+                            </div>
+                            <small class="text-muted text-truncate d-block" style="font-size: 0.75rem;">
+                                {% if p.medical_history %}{{ p.medical_history|truncatechars:40 }}{% else %}ติดตามอาการและประเมินผล 39 แกนต่อเนื่อง{% endif %}
+                            </small>
+                        </button>
+                    {% empty %}
+                        <div class="p-4 text-center text-muted small">
+                            ยังไม่มีบทสนทนาใหม่
                         </div>
-                        <p class="text-[11px] text-gray-500 truncate mt-1 font-kanit">
-                            {% if p.medical_history %}{{ p.medical_history|truncatechars:40 }}{% else %}ติดตามอาการและประเมินผล 39 แกนต่อเนื่อง{% endif %}
-                        </p>
-                    </div>
-                {% empty %}
-                    <div class="p-8 text-center text-xs text-gray-400">
-                        ยังไม่มีบทสนทนาใหม่
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
 
         <!-- Right: Chat Messages Window & Flex Simulator (8 cols) -->
-        <div class="lg:col-span-8 bg-white border border-gray-200 rounded-2xl shadow-xs flex flex-col overflow-hidden">
-            <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm font-kanit" x-text="activePatient.name.charAt(0)">
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm border h-100 d-flex flex-column">
+                <div class="card-header bg-light py-2 px-3 border-bottom d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; font-size: 0.85rem;" x-text="activePatient.name.charAt(0)"></div>
+                        <div>
+                            <strong class="small text-dark d-block mb-0">
+                                <span x-text="activePatient.name"></span>
+                                <small class="text-muted font-monospace" style="font-size: 0.725rem;">(HN: <span x-text="activePatient.hn"></span>)</small>
+                            </strong>
+                            <small class="text-success d-flex align-items-center gap-1" style="font-size: 0.7rem;">
+                                <span class="rounded-circle bg-success d-inline-block" style="width: 6px; height: 6px;"></span> เชื่อมต่อผ่าน LINE OA สำเร็จ
+                            </small>
+                        </div>
                     </div>
                     <div>
-                        <h4 class="text-sm font-semibold text-gray-900 font-kanit">
-                            <span x-text="activePatient.name"></span>
-                            <span class="text-gray-400 font-mono text-xs">(HN: <span x-text="activePatient.hn"></span>)</span>
-                        </h4>
-                        <span class="text-[10px] text-emerald-600 font-medium font-kanit flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> เชื่อมต่อผ่าน LINE OA สำเร็จ
-                        </span>
+                        <a :href="'/doctor/pre-visit/?patient_id=' + activePatient.id" class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem;">
+                            ดูสรุปก่อนตรวจ (Pre-visit)
+                        </a>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <a :href="'/doctor/pre-visit/?patient_id=' + activePatient.id" class="px-3 py-1 bg-white border border-gray-200 text-xs text-gray-700 font-medium rounded-lg hover:bg-gray-50 font-kanit">
-                        ดูสรุปก่อนตรวจ (Pre-visit)
-                    </a>
+
+                <!-- Messages Stream -->
+                <div id="chat-stream" class="card-body p-3 overflow-auto flex-grow-1 bg-light-subtle d-flex flex-column gap-3" style="min-height: 360px; max-height: 440px;">
+                    <template x-for="(msg, idx) in messages" :key="idx">
+                        <div>
+                            <!-- Normal Text Message -->
+                            <template x-if="msg.type === 'text'">
+                                <div class="d-flex align-items-start gap-2" :class="msg.sender === 'doctor' ? 'justify-content-end ms-auto' : ''" style="max-width: 80%;">
+                                    <template x-if="msg.sender === 'patient'">
+                                        <div class="rounded-circle bg-success text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width: 26px; height: 26px; font-size: 0.65rem;">LINE</div>
+                                    </template>
+                                    <div class="p-2.5 rounded-3 shadow-xs" :class="msg.sender === 'doctor' ? 'bg-primary text-white' : 'bg-white border text-dark'">
+                                        <p class="mb-1 small lh-base" x-text="msg.text" style="font-size: 0.85rem;"></p>
+                                        <small class="d-block text-end font-monospace" :class="msg.sender === 'doctor' ? 'text-white-50' : 'text-muted'" style="font-size: 0.65rem;" x-text="msg.time"></small>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- LINE Flex Message Simulation Bubble -->
+                            <template x-if="msg.type === 'flex'">
+                                <div class="d-flex justify-content-end ms-auto" style="max-width: 360px;">
+                                    <div class="card border border-2 border-success shadow-sm overflow-hidden w-100">
+                                        <div class="card-header bg-success text-white py-2 px-3 d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center gap-1.5">
+                                                <i class="fab fa-line fs-5"></i>
+                                                <strong class="small" x-text="msg.flexData.title"></strong>
+                                            </div>
+                                            <span class="badge bg-white text-success font-monospace" style="font-size: 0.65rem;">FLEX CARD</span>
+                                        </div>
+                                        <div class="card-body p-3 d-flex flex-column gap-2 small" style="font-size: 0.8rem;">
+                                            <div class="d-flex justify-content-between border-bottom pb-1.5">
+                                                <span class="text-muted">คนไข้:</span>
+                                                <strong class="text-dark" x-text="msg.flexData.patientName"></strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-bottom pb-1.5">
+                                                <span class="text-muted">หมายเลข HN:</span>
+                                                <strong class="font-monospace text-dark" x-text="msg.flexData.hn"></strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-bottom pb-1.5">
+                                                <span class="text-muted">ระยะการฟื้นฟู:</span>
+                                                <strong class="text-primary" x-text="msg.flexData.phase"></strong>
+                                            </div>
+                                            <div class="p-2 rounded bg-success-subtle text-success border border-success-subtle small">
+                                                <i class="fas fa-check-circle me-1"></i> <span x-text="msg.flexData.status"></span>
+                                            </div>
+                                            <div class="pt-1">
+                                                <a :href="msg.flexData.actionUrl" class="btn btn-sm btn-success w-100">
+                                                    เปิดดูผลตรวจ 39 แกนฉบับเต็ม &rarr;
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer bg-light py-1 px-2 text-end text-muted font-monospace" style="font-size: 0.65rem;" x-text="msg.time"></div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
                 </div>
+
+                <!-- Message Input Form -->
+                <form @submit.prevent="sendMessage()" class="card-footer bg-white border-top p-2 d-flex gap-2">
+                    <input type="text" x-model="messageInput" placeholder="พิมพ์ข้อความตอบกลับคนไข้ผ่าน LINE OA..." class="form-control">
+                    <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5 text-nowrap">
+                        <i class="fas fa-paper-plane"></i> ส่ง
+                    </button>
+                </form>
             </div>
-
-            <!-- Messages Stream -->
-            <div id="chat-stream" class="flex-1 p-5 space-y-4 overflow-y-auto bg-gray-50/30 text-xs min-h-[360px]">
-                <template x-for="(msg, idx) in messages" :key="idx">
-                    <div>
-                        <!-- Normal Text Message -->
-                        <template x-if="msg.type === 'text'">
-                            <div :class="msg.sender === 'doctor' ? 'flex items-start justify-end gap-2.5 ml-auto max-w-md' : 'flex items-start gap-2.5 max-w-md'">
-                                <template x-if="msg.sender === 'patient'">
-                                    <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0">LINE</div>
-                                </template>
-                                <div :class="msg.sender === 'doctor' ? 'bg-primary text-white p-3 rounded-2xl rounded-tr-none shadow-xs space-y-1 font-kanit' : 'bg-white border border-gray-200 p-3 rounded-2xl rounded-tl-none shadow-xs text-gray-800 space-y-1 font-kanit'">
-                                    <p x-text="msg.text" class="leading-relaxed"></p>
-                                    <span :class="msg.sender === 'doctor' ? 'text-[9px] text-white/70 block text-right font-mono' : 'text-[9px] text-gray-400 block text-right font-mono'" x-text="msg.time"></span>
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- LINE Flex Message Simulation Bubble -->
-                        <template x-if="msg.type === 'flex'">
-                            <div class="flex items-start justify-end gap-2.5 ml-auto max-w-sm">
-                                <div class="bg-white border-2 border-emerald-500 rounded-2xl overflow-hidden shadow-md font-kanit w-full">
-                                    <div class="bg-emerald-600 px-4 py-3 text-white flex items-center justify-between">
-                                        <div class="flex items-center gap-1.5">
-                                            <i class="fab fa-line text-lg"></i>
-                                            <span class="font-bold text-xs" x-text="msg.flexData.title"></span>
-                                        </div>
-                                        <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-mono">FLEX CARD</span>
-                                    </div>
-                                    <div class="p-4 space-y-2.5 bg-white text-xs">
-                                        <div class="flex justify-between border-b border-gray-100 pb-2">
-                                            <span class="text-gray-500">คนไข้:</span>
-                                            <strong class="text-gray-900" x-text="msg.flexData.patientName"></strong>
-                                        </div>
-                                        <div class="flex justify-between border-b border-gray-100 pb-2">
-                                            <span class="text-gray-500">หมายเลข HN:</span>
-                                            <span class="font-mono text-gray-800 font-bold" x-text="msg.flexData.hn"></span>
-                                        </div>
-                                        <div class="flex justify-between border-b border-gray-100 pb-2">
-                                            <span class="text-gray-500">ระยะการฟื้นฟู:</span>
-                                            <span class="text-primary font-bold" x-text="msg.flexData.phase"></span>
-                                        </div>
-                                        <div class="p-2 bg-emerald-50 rounded-xl border border-emerald-100 text-[11px] text-emerald-800">
-                                            <i class="fas fa-check-circle mr-1"></i> <span x-text="msg.flexData.status"></span>
-                                        </div>
-                                        <div class="pt-2">
-                                            <a :href="msg.flexData.actionUrl" class="block w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-center font-medium rounded-xl text-xs transition-colors">
-                                                เปิดดูผลตรวจ 39 แกนฉบับเต็ม &rarr;
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="px-3 py-1.5 bg-gray-50 text-[10px] text-gray-400 text-right font-mono" x-text="msg.time"></div>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </template>
-            </div>
-
-            <!-- Message Input Form -->
-            <form @submit.prevent="sendMessage()" class="p-3 border-t border-gray-100 bg-white flex items-center gap-2">
-                <input type="text" x-model="messageInput" placeholder="พิมพ์ข้อความตอบกลับคนไข้ผ่าน LINE OA..." class="flex-1 text-sm bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-gray-800 focus:ring-primary focus:border-primary font-kanit">
-                <button type="submit" class="px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark transition-all shadow-xs font-kanit flex items-center gap-1.5">
-                    <i class="fas fa-paper-plane"></i> ส่ง
-                </button>
-            </form>
         </div>
-
     </div>
 
 </div>

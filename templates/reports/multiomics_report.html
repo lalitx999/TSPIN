@@ -1,0 +1,109 @@
+{% extends 'reports/_base_report.html' %}
+
+{% block report_title %}รายงานมัลติโอมิกส์เชิงลึก (Multi-Omics Edition) — {{ identity.full_name }} (HN: {{ identity.hn }}){% endblock %}
+
+{% block edition_badge_block %}
+<span class="edition-badge badge-multiomics">MULTI-OMICS & SYSTEMS BIOLOGY DOSSIER</span>
+{% endblock %}
+
+{% block report_body %}
+    <!-- Section 1: Multi-Omics Systems Biology Overview -->
+    <div class="section-bar">1. เครือข่ายชีววิทยาระบบและการส่งสัญญาณระดับเซลล์ (Multi-Omics Topology)</div>
+    <div style="background: #FAF5FF; border: 1px solid #E9D5FF; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; font-size: 9.5pt;">
+        <div style="font-weight: 700; color: #6B21A8; margin-bottom: 2px;">
+            🧬 กลไกชีวภาพระดับโมเลกุล (Epigenomics, Metabolomics & Mitochondrial Network)
+        </div>
+        <div style="color: #3B0764; font-size: 9pt; line-height: 1.5;">
+            วิเคราะห์ปฏิสัมพันธ์ข้ามระบบระหว่างจีโนมิกส์ (Genomic Integrity), อีพีเจเนติกส์ (Epigenetic Clocks), 
+            การผลิตพลังงานระดับเซลล์ (Mitochondrial Redox) และระบบนิเวศจุลชีพในลำไส้ (Metagenomic Crosstalk) 
+            เพื่อระบุจุดผกผันของความเสื่อมก่อนปรากฏอาการทางคลินิก
+        </div>
+    </div>
+
+    <!-- Section 2: Uncertainty & Evidence Confidence Breakdown -->
+    <div class="section-bar">2. ระดับความเชื่อมั่นของหลักฐานชีววิทยา (Evidence Confidence & Uncertainty Profile)</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">ระดับหลักฐาน (Evidence Tier)</th>
+                <th style="width: 20%;" class="text-center">จำนวนแกนชีวภาพ</th>
+                <th style="width: 25%;" class="text-center">ระดับความไม่แน่นอน (Uncertainty)</th>
+                <th style="width: 30%;">แนวทางทางคลินิก (Clinical Handling)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>MEASURED (ผลตรวจวัดโดยตรง)</strong></td>
+                <td class="text-center font-mono fw-bold text-success">{{ evidence_counts.MEASURED|default:0 }}</td>
+                <td class="text-center"><span class="score-pill score-optimal">ต่ำมาก (&lt; 5%)</span></td>
+                <td>ใช้เป็นหลักฐานขั้นปฐมภูมิในการสั่งการรักษา</td>
+            </tr>
+            <tr>
+                <td><strong>DERIVED (การคำนวณชีวภาพ)</strong></td>
+                <td class="text-center font-mono fw-bold text-primary">{{ evidence_counts.DERIVED|default:0 }}</td>
+                <td class="text-center"><span class="score-pill score-subclinical">ต่ำ (5-15%)</span></td>
+                <td>ผ่านการตรวจสอบความสอดคล้องทางสถิติการแพทย์</td>
+            </tr>
+            <tr>
+                <td><strong>HYPOTHESIS (ข้อสมมติฐาน)</strong></td>
+                <td class="text-center font-mono fw-bold text-muted">{{ evidence_counts.HYPOTHESIS|default:0 }}</td>
+                <td class="text-center"><span class="score-pill score-unscored">สูง (รอตรวจยืนยัน)</span></td>
+                <td><strong>ล็อก Hard Invariant:</strong> ไม่ให้คะแนนตัวเลขจนกว่าจะมีผลตรวจ</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Section 3: Deterministic 39 Biological Axes Matrix -->
+    <div class="section-bar">3. เมทริกซ์ 39 แกนชีววิทยาระบบ (Deterministic Systems Biology Matrix)</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 5%;">#</th>
+                <th style="width: 30%;">แกนชีววิทยา (Systems Axis)</th>
+                <th style="width: 15%;">Evidence Confidence</th>
+                <th style="width: 15%;">Assessment Status</th>
+                <th style="width: 15%;" class="text-center">คะแนนความเสื่อม</th>
+                <th style="width: 20%;" class="text-center">Omics Mapping Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ax in axes_list %}
+            <tr>
+                <td class="font-mono text-center">{{ ax.axis_id }}</td>
+                <td>
+                    <strong style="color: #0F172A;">{{ ax.canonical_axis_name }}</strong>
+                </td>
+                <td>
+                    <span style="font-size: 8pt; color: #475569;">{{ ax.evidence_status }}</span>
+                </td>
+                <td>
+                    <span style="font-size: 8pt; color: #475569;">{{ ax.assessment_status }}</span>
+                </td>
+                <td class="text-center font-mono fw-bold">
+                    {% if ax.severity_score is not None %}
+                        {{ ax.severity_score }}
+                    {% else %}
+                        <span style="color: #94A3B8; font-size: 8pt;">Null (Hypothesis)</span>
+                    {% endif %}
+                </td>
+                <td class="text-center" style="font-size: 8pt;">
+                    {% if ax.severity_score is not None %}
+                        <span style="color: #7E22CE; font-weight: 700;">● Mapped (Active)</span>
+                    {% else %}
+                        <span style="color: #94A3B8;">○ Candidate (Pending)</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Section 4: Deep Biological Biomarker Targets -->
+    <div class="section-bar">4. เป้าหมายตัวบ่งชี้ชีวภาพเชิงลึก (Deep Biomarker Signatures)</div>
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 10px 14px; border-radius: 6px; font-size: 9pt; line-height: 1.5;">
+        <div><strong>Genomic / Telomeric:</strong> 8-OHdG, Leukocyte Telomere Length (T/S Ratio), LINE-1 Methylation</div>
+        <div style="margin-top: 3px;"><strong>Mitochondrial / Redox:</strong> CoQ10 Plasma, Malondialdehyde (MDA), Reduced/Oxidized Glutathione (GSH/GSSG)</div>
+        <div style="margin-top: 3px;"><strong>Metabolic / Lipid:</strong> ApoB/ApoA1, Small Dense LDL, HOMA2-IR, Adiponectin/Leptin Ratio</div>
+        <div style="margin-top: 3px;"><strong>Immune / Senescence:</strong> hs-CRP, IL-6, TNF-alpha, p16INK4a, CD4/CD8 Ratio, Senescence-Associated Secretory Phenotype</div>
+    </div>
+{% endblock %}

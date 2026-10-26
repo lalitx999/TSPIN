@@ -3,47 +3,47 @@
 {% block title %}ดาวน์โหลดรายงานผลสุขภาพ | TSPI Health{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6">
+<div class="container py-2" style="max-width: 900px;">
 
-    <div class="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-xs flex items-center justify-between">
-        <div>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 mb-1">
-                <i class="fas fa-file-download mr-1"></i> Certified Medical Reports
+    <div class="card border-0 shadow-xs mb-4">
+        <div class="card-body p-4 p-md-5">
+            <span class="badge bg-primary-subtle text-primary mb-2">
+                <i class="fas fa-file-download me-1"></i> Certified Medical Reports
             </span>
-            <h1 class="text-2xl font-bold text-gray-900">ดาวน์โหลดเล่มรายงาน Precision Report</h1>
-            <p class="text-xs text-gray-500 mt-1">รายงานผลการวิเคราะห์ระดับเซลล์ที่ผ่านการตรวจทานและลงนามโดยแพทย์ผู้เชี่ยวชาญ</p>
+            <h1 class="h4 fw-bold text-dark mb-1">ดาวน์โหลดเล่มรายงาน Precision Report</h1>
+            <p class="small text-muted mb-0">รายงานผลการวิเคราะห์ระดับเซลล์ที่ผ่านการตรวจทานและลงนามโดยแพทย์ผู้เชี่ยวชาญ</p>
         </div>
     </div>
 
     <!-- Download List -->
-    <div class="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden">
-        <div class="p-5 border-b border-gray-100 flex items-center justify-between">
-            <h3 class="text-base font-semibold text-gray-900">เล่มรายงานที่พร้อมดาวน์โหลด</h3>
+    <div class="card border-0 shadow-xs overflow-hidden">
+        <div class="card-header bg-light border-bottom p-3">
+            <h6 class="fw-bold text-dark mb-0">เล่มรายงานที่พร้อมดาวน์โหลด</h6>
         </div>
 
-        <div class="divide-y divide-gray-100">
+        <ul class="list-group list-group-flush">
             {% for rep in reports %}
-                <div class="p-5 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg">
-                            <i class="fas fa-file-pdf"></i>
+                <li class="list-group-item p-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-3 bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                            <i class="fas fa-file-pdf fs-5"></i>
                         </div>
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-900">TSPI Precision Report #{{ rep.id }}</h4>
-                            <span class="text-xs text-gray-500 font-mono">{{ rep.created_at|date:"d M Y H:i" }} &bull; Physician Sign-off Verified</span>
+                            <h6 class="fw-bold text-dark mb-0">TSPI Precision Report #{{ rep.id }}</h6>
+                            <small class="text-muted font-monospace">{{ rep.created_at|date:"d M Y H:i" }} &bull; Physician Sign-off Verified</small>
                         </div>
                     </div>
-                    <a href="{% url 'clinical:report_pdf' rep.id %}" target="_blank" class="px-4 py-2 bg-primary text-white text-xs font-medium rounded-xl hover:bg-primary-dark transition-all flex items-center gap-1.5 shadow-xs">
+                    <a href="{% url 'clinical:report_pdf' rep.id %}" target="_blank" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5">
                         <i class="fas fa-download"></i> ดาวน์โหลด PDF
                     </a>
-                </div>
+                </li>
             {% empty %}
-                <div class="p-10 text-center text-xs text-gray-400">
-                    <i class="far fa-file-pdf text-3xl mb-2 block"></i>
-                    ยังไม่มีเล่มรายงานที่ออกให้ในขณะนี้ เมื่อแพทย์ออกรายงานเสร็จสิ้นจะปรากฏที่นี่ทันที
-                </div>
+                <li class="list-group-item p-5 text-center text-muted">
+                    <i class="far fa-file-pdf fs-2 mb-2 d-block text-secondary"></i>
+                    <p class="small mb-0">ยังไม่มีเล่มรายงานที่ออกให้ในขณะนี้ เมื่อแพทย์ออกรายงานเสร็จสิ้นจะปรากฏที่นี่ทันที</p>
+                </li>
             {% endfor %}
-        </div>
+        </ul>
     </div>
 
 </div>

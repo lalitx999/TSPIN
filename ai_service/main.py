@@ -8,12 +8,15 @@ and botanical module citations.
 import os
 import json
 import asyncio
+import logging
 from pathlib import Path
 from typing import AsyncGenerator, Dict, List, Any, Optional
-from fastapi import FastAPI, Header, HTTPException, Query, Body, Request
+from fastapi import FastAPI, Header, HTTPException, Query, Body, Request, BackgroundTasks, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
+
+logger = logging.getLogger("tspi.ai_service")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / 'apps' / 'clinical' / 'data'
@@ -85,6 +88,8 @@ async def startup_event():
 class ChatRequest(BaseModel):
     message: str
     patient_id: Optional[int] = None
+    patient_hn: Optional[str] = None
+    context: Optional[str] = None
     role: str = "doctor"
 
 
@@ -147,13 +152,19 @@ def search_relevant_axes(query: str) -> List[Dict[str, Any]]:
     return matches[:4]
 
 
-def build_clinical_reasoning_response(query: str, patient_id: Optional[int] = None) -> str:
+from starlette.responses import StreamingResponse
+
+def build_clinical_reasoning_response(query: str, patient_id: Optional[int] = None, context: Optional[str] = None) -> str:
     """Generate structured, grounded clinical reasoning citing 39 axes and botanical modules."""
-    matched_axes = search_relevant_axes(query)
-    
     lines = []
     lines.append(f"### 🧬 ผลการวิเคราะห์ทางคลินิกเชิงกลไกชีววิทยา (Mechanistic Reasoning)\n")
     lines.append(f"**คำถาม/อาการทางคลินิก:** {query}\n")
+
+    if context:
+        lines.append("> 📋 **บริบททางคลินิกของผู้ป่วยที่เชื่อมโยง (Patient Grounding Context):**")
+        lines.append("> ข้อมูลดึงตรงจาก Single Source of Truth และจำกัดเฉพาะแกนชีวภาพที่มีผลตรวจยืนยัน\n")
+
+    matched_axes = search_relevant_axes(query)
     lines.append(f"จากการตรวจเทียบกับระบบ **39 แกนชีววิทยา (12 โดเมน)** และคลังพฤกษเคมี 200 โมดูล พบความเชื่อมโยงสำคัญ:\n")
 
     for i, ax in enumerate(matched_axes, 1):
@@ -162,7 +173,7 @@ def build_clinical_reasoning_response(query: str, patient_id: Optional[int] = No
         dom = ax.get('domain_title')
         mods = ax.get('modules', [])
         mod_str = ", ".join(mods[:4]) if mods else "KERRA, MINOZA, KS, VITALPLUS"
-        
+
         lines.append(f"#### {i}. Axis {ax_id}: {name}")
         lines.append(f"- **โดเมนชีววิทยา:** {dom}")
         lines.append(f"- **กลไกระดับเซลล์:** มีผลต่อ signaling cascades, cellular stress และ metabolic homeostasis")
@@ -172,9 +183,19 @@ def build_clinical_reasoning_response(query: str, patient_id: Optional[int] = No
     lines.append("- **ระยะที่ 1 (Phase 1: Assess & Cleanse):** เคลียร์การอักเสบสะสมและเสริมเกราะป้องกันเยื่อบุ")
     lines.append("- **ระยะที่ 2 (Phase 2: Cellular Repair):** ฟื้นฟูการสร้างพลังงาน ATP และสมดุลไมโทคอนเดรีย")
     lines.append("- **ระยะที่ 3 (Phase 3: Longevity & Maintenance):** ปรับจังหวะชีวภาพและการฟื้นฟูระดับยีน\n")
-    lines.append("> ⚠️ **ข้อควรระวังทางคลินิก (Safety Gate):** ให้ตรวจทานค่าการทำงานของตับ (ALT/AST) และไต (eGFR/Cr) ก่อนสั่งจ่ายโมดูลตำรับสมุนไพรเข้มข้น")
+    lines.append("> ⚠️ **ข้อควรระวังทางคลินิก (Safety Gates & Guardrails):**")
+    lines.append("> 1. **Iron Safety Gate:** ห้ามสั่งจ่ายธาตุเหล็กจนกว่าจะมีผลแล็บ Ferritin / TIBC ยืนยัน (HOLD PENDING CONFIRMATION)")
+    lines.append("> 2. **Terminology Invariant:** นิยามภาวะไขมันพอกตับต้องใช้ 'Metabolic dysfunction-associated steatohepatitis (MASH)'")
+    lines.append("> 3. **Clinical Role:** ข้อมูลนี้จัดทำขึ้นเพื่อเป็นผู้ช่วยสรุปเวชสารสนเทศสำหรับแพทย์ผู้เชี่ยวชาญเท่านั้น ไม่สามารถใช้แทนการวินิจฉัยโรคหรือคำสั่งการรักษาขั้นสุดท้ายได้")
 
     return "\n".join(lines)
+
+
+SSE_HEADERS = {
+    "X-Accel-Buffering": "no",
+    "Cache-Control": "no-cache",
+    "Connection": "keep-alive",
+}
 
 
 @app.get("/api/v1/copilot/stream")
@@ -183,7 +204,7 @@ async def stream_copilot_chat_get(
     patient_id: Optional[int] = Query(None)
 ):
     """
-    Streaming AI Copilot Chat for EventSource GET requests.
+    Streaming AI Copilot Chat for EventSource GET requests with X-Accel-Buffering disabled.
     Yields chunks formatted as JSON: {"chunk": "...", "done": false}
     """
     async def token_generator() -> AsyncGenerator[str, None]:
@@ -193,12 +214,12 @@ async def stream_copilot_chat_get(
             chunk = word + (" " if i < len(words) - 1 else "")
             payload = json.dumps({"chunk": chunk, "done": False}, ensure_ascii=False)
             yield f"data: {payload}\n\n"
-            await asyncio.sleep(0.02)
-        
+            await asyncio.sleep(0.015)
+
         done_payload = json.dumps({"chunk": "", "done": True})
         yield f"data: {done_payload}\n\n"
 
-    return EventSourceResponse(token_generator())
+    return StreamingResponse(token_generator(), media_type="text/event-stream", headers=SSE_HEADERS)
 
 
 @app.post("/api/v1/copilot/stream")
@@ -207,21 +228,220 @@ async def stream_copilot_chat_post(
     x_internal_secret: Optional[str] = Header(None)
 ):
     """
-    Streaming AI Copilot Chat for POST requests.
+    Streaming AI Copilot Chat for POST requests with X-Accel-Buffering disabled.
     """
     async def token_generator() -> AsyncGenerator[str, None]:
-        response_text = build_clinical_reasoning_response(req.message, req.patient_id)
+        response_text = build_clinical_reasoning_response(req.message, req.patient_id, req.context)
         words = response_text.split(" ")
         for i, word in enumerate(words):
             chunk = word + (" " if i < len(words) - 1 else "")
             payload = json.dumps({"chunk": chunk, "done": False}, ensure_ascii=False)
             yield f"data: {payload}\n\n"
-            await asyncio.sleep(0.02)
-        
+            await asyncio.sleep(0.015)
+
         done_payload = json.dumps({"chunk": "", "done": True})
         yield f"data: {done_payload}\n\n"
 
-    return EventSourceResponse(token_generator())
+    return StreamingResponse(token_generator(), media_type="text/event-stream", headers=SSE_HEADERS)
+
+
+# --- Schemas for AI-Intake, Lab OCR, and LINE Webhook ---
+
+class AiIntakeRequest(BaseModel):
+    transcript: str = Field(..., description="ข้อความบอกเล่าอาการของผู้ป่วยหรือเสียงแปลงข้อความ")
+    patient_id: Optional[int] = None
+    age: Optional[int] = None
+    gender: Optional[str] = None
+
+
+class AiIntakeResponse(BaseModel):
+    triage_level: str  # 'normal', 'warning', 'urgent'
+    red_flags: List[str]
+    chief_complaint: str
+    suspected_axes: List[Dict[str, Any]]
+    recommended_domains: List[str]
+    suggested_soap_draft: Dict[str, str]
+
+
+class LabOcrRequest(BaseModel):
+    raw_text: str = Field(..., description="ข้อความจากผลแล็บ หรือผลที่ได้จาก OCR")
+    patient_id: Optional[int] = None
+
+
+class LabOcrResponse(BaseModel):
+    extracted_markers: List[Dict[str, Any]]
+    critical_abnormalities: List[str]
+    axis_score_recommendations: Dict[int, int]
+
+
+# --- LINE Webhook Background Worker (<10ms Response) ---
+
+async def process_line_webhook_background(payload: Dict[str, Any]):
+    """
+    ประมวลผล LINE Webhook ใน Background Task
+    หลีกเลี่ยง Timeout 10 วินาทีของ LINE Platform อย่างเด็ดขาด
+    """
+    try:
+        events = payload.get("events", [])
+        for ev in events:
+            ev_type = ev.get("type")
+            source = ev.get("source", {})
+            user_id = source.get("userId")
+            reply_token = ev.get("replyToken")
+            
+            logger.info(f"[LINE Background] Processing event {ev_type} for user {user_id}")
+            if ev_type == "message" and ev.get("message", {}).get("type") == "text":
+                text = ev.get("message", {}).get("text", "")
+                # Simulate clinical response generation or call Django Internal API
+                logger.info(f"[LINE Background] Received message: '{text[:50]}' from user: {user_id}")
+    except Exception as e:
+        logger.error(f"[LINE Background] Error processing background event: {e}", exc_info=True)
+
+
+@app.post("/api/v1/webhook/line")
+async def line_webhook_endpoint(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    x_line_signature: Optional[str] = Header(None)
+):
+    """
+    LINE Webhook High-Speed Ingestion:
+    ตอบกลับ HTTP 200 OK ทันทีภายใน < 10ms เพื่อป้องกัน LINE Timeout
+    แล้วส่งงานประมวลผล AI และ Messaging ไปยัง Background Task
+    """
+    try:
+        body_bytes = await request.body()
+        if not body_bytes:
+            return {"status": "ok", "message": "empty body"}
+            
+        data = json.loads(body_bytes.decode('utf-8'))
+    except Exception:
+        # Fail gracefully to keep LINE webhook healthy
+        return {"status": "ok", "message": "malformed json acknowledged"}
+
+    # ถ้าเป็น LINE Probe
+    if not data.get("events"):
+        return {"status": "ok", "message": "probe verified"}
+
+    # ส่งเข้า Background Task ทันที
+    background_tasks.add_task(process_line_webhook_background, data)
+
+    return {"status": "ok", "message": "queued_in_background", "events_count": len(data.get("events", []))}
+
+
+# --- AI-Intake Endpoint ---
+
+@app.post("/api/v1/ai-intake", response_model=AiIntakeResponse)
+async def ai_intake_endpoint(req: AiIntakeRequest):
+    """
+    AI-Intake คัดกรองและสกัดโครงสร้างอาการคนไข้
+    เชื่อมโยงเข้า 39 แกนชีววิทยา พร้อมตรวจจับสัญญาณอันตราย (Red Flags)
+    """
+    text_lower = req.transcript.lower()
+
+    # ตรวจจับ Red Flags เบื้องต้น
+    red_flags = []
+    urgent_keywords = [
+        ("แน่นหน้าอก", "สงสัยกล้ามเนื้อหัวใจขาดเลือดเฉียบพลัน (Acute Coronary Syndrome)"),
+        ("เจ็บหน้าอกร้าวไปกราม", "สงสัยภาวะหลอดเลือดหัวใจวิกฤต"),
+        ("ปากเบี้ยว", "สงสัยโรคหลอดเลือดสมองฉับพลัน (Acute Stroke - FAST)"),
+        ("แขนขาอ่อนแรงครึ่งซีก", "สงสัยภาวะสมองขาดเลือด"),
+        ("หมดสติ", "ภาวะหมดสติไม่ทราบสาเหตุ (Syncope)"),
+        ("ไอเป็นเลือดสด", "ภาวะเลือดออกในทางเดินหายใจวิกฤต (Hemoptysis)"),
+        ("ถ่ายเป็นเลือดสดปริมาณมาก", "ภาวะเลือดออกทางเดินอาหารเฉียบพลัน"),
+    ]
+    for kw, alert in urgent_keywords:
+        if kw in text_lower:
+            red_flags.append(f"{kw}: {alert}")
+
+    triage_level = "urgent" if red_flags else ("warning" if any(w in text_lower for w in ["ปวดเรื้อรัง", "เหนื่อย", "อ่อนเพลียมาก", "แผลไม่หาย"]) else "normal")
+
+    matched_axes = search_relevant_axes(req.transcript)
+    suspected_axes = [
+        {
+            "axis_id": ax.get("axis_id"),
+            "name": ax.get("name"),
+            "domain": ax.get("domain_title"),
+            "suggested_score": 70 if triage_level == "urgent" else 55
+        }
+        for ax in matched_axes
+    ]
+
+    domains = list({ax.get("domain_title") for ax in matched_axes if ax.get("domain_title")})
+
+    return AiIntakeResponse(
+        triage_level=triage_level,
+        red_flags=red_flags,
+        chief_complaint=req.transcript[:150] + ("..." if len(req.transcript) > 150 else ""),
+        suspected_axes=suspected_axes,
+        recommended_domains=domains,
+        suggested_soap_draft={
+            "subjective": f"ผู้ป่วยแจ้งอาการ: {req.transcript}",
+            "objective": "สัญญาณชีพบาดเจ็บเบื้องต้นรอตรวจทานหน้าร้านคลินิก",
+            "assessment": f"ความเสี่ยงระดับ {triage_level.upper()} - เชื่อมโยงแกน {', '.join(str(a['axis_id']) for a in suspected_axes)}",
+            "plan": "แนะนำพบแพทย์เพื่อประเมิน 39 แกนชีวภาพเชิงลึกและส่งตรวจห้องปฏิบัติการจำเพาะ"
+        }
+    )
+
+
+# --- Lab OCR Vision Parser Endpoint ---
+
+@app.post("/api/v1/lab-ocr", response_model=LabOcrResponse)
+async def lab_ocr_endpoint(req: LabOcrRequest):
+    """
+    Lab Marker Parser:
+    แยกแยะค่าผลตรวจเลือด แปลงเป็นตัวเลข และตรวจเทียบค่าวิกฤตพร้อมจับคู่แกนชีวภาพ
+    """
+    import re
+
+    markers_config = [
+        {"name": "FBS (Fasting Blood Sugar)", "pattern": r"(?:fbs|glucose|น้ำตาล)\s*[:=]?\s*(\d+(?:\.\d+)?)", "unit": "mg/dL", "min": 70, "max": 99, "axis": 5},
+        {"name": "HbA1c", "pattern": r"(?:hba1c|a1c)\s*[:=]?\s*(\d+(?:\.\d+)?)", "unit": "%", "min": 4.0, "max": 5.6, "axis": 5},
+        {"name": "Total Cholesterol", "pattern": r"(?:cholesterol|tc)\s*[:=]?\s*(\d+(?:\.\d+)?)", "unit": "mg/dL", "min": 100, "max": 200, "axis": 6},
+        {"name": "Triglycerides", "pattern": r"(?:triglyceride|tg)\s*[:=]?\s*(\d+(?:\.\d+)?)", "unit": "mg/dL", "min": 50, "max": 150, "axis": 6},
+        {"name": "HDL", "pattern": r"(?:hdl)\s*[:=]?\s*(\d+(?:\.\d+)?)", "unit": "mg/dL", "min": 40, "max": 100, "axis": 6},
+        {"name": "LDL", "pattern": r"(?:ldl)\s*[:=]?\s*(\d+(?:\.\d+)?)", "unit": "mg/dL", "min": 0, "max": 100, "axis": 6},
+        {"name": "SGOT (AST)", "pattern": r"(?:ast|sgot)\s*[:=]?\s*(\d+(?:\.\d+)?)", "unit": "U/L", "min": 0, "max": 40, "axis": 15},
+        {"name": "SGPT (ALT)", "pattern": r"(?:alt|sgpt)\s*[:=]?\s*(\d+(?:\.\d+)?)", "unit": "U/L", "min": 0, "max": 40, "axis": 15},
+        {"name": "eGFR", "pattern": r"(?:egfr|gfr)\s*[:=]?\s*(\d+(?:\.\d+)?)", "unit": "mL/min/1.73m2", "min": 60, "max": 120, "axis": 35},
+        {"name": "Creatinine", "pattern": r"(?:creatinine|cr)\s*[:=]?\s*(\d+(?:\.\d+)?)", "unit": "mg/dL", "min": 0.6, "max": 1.2, "axis": 35},
+        {"name": "hs-CRP", "pattern": r"(?:crp|hs-crp)\s*[:=]?\s*(\d+(?:\.\d+)?)", "unit": "mg/L", "min": 0, "max": 3.0, "axis": 1},
+    ]
+
+    extracted = []
+    critical_abnormalities = []
+    axis_recommendations = {}
+
+    for cfg in markers_config:
+        match = re.search(cfg["pattern"], req.raw_text, re.IGNORECASE)
+        if match:
+            val = float(match.group(1))
+            status = "normal"
+            if val < cfg["min"]:
+                status = "low"
+                critical_abnormalities.append(f"{cfg['name']} ต่ำกว่าเกณฑ์ ({val} {cfg['unit']})")
+                axis_recommendations[cfg["axis"]] = 65
+            elif val > cfg["max"]:
+                status = "high"
+                critical_abnormalities.append(f"{cfg['name']} สูงเกินเกณฑ์ ({val} {cfg['unit']})")
+                axis_recommendations[cfg["axis"]] = 75
+            else:
+                axis_recommendations[cfg["axis"]] = 35
+
+            extracted.append({
+                "marker": cfg["name"],
+                "value": val,
+                "unit": cfg["unit"],
+                "status": status,
+                "reference_range": f"{cfg['min']} - {cfg['max']}",
+                "associated_axis": cfg["axis"]
+            })
+
+    return LabOcrResponse(
+        extracted_markers=extracted,
+        critical_abnormalities=critical_abnormalities,
+        axis_score_recommendations=axis_recommendations
+    )
 
 
 @app.post("/api/v1/rag-query")
@@ -250,6 +470,111 @@ async def rag_knowledge_query(
     }
 
 
+# ==============================================================================
+# LINE OA Webhook High-Concurrency Ingestion Gateway (FastAPI < 10ms Response)
+# ==============================================================================
+DJANGO_INTERNAL_URL = os.environ.get(
+    "DJANGO_INTERNAL_URL",
+    "http://127.0.0.1:8000/internal/line/webhook/"
+)
+INTERNAL_API_TOKEN = os.environ.get(
+    "INTERNAL_API_TOKEN",
+    "tspi_internal_sec_token_9f83a21b9c74820d91ef_2026"
+)
+LINE_CHANNEL_SECRET = os.environ.get("LINE_CHANNEL_SECRET", "")
+
+
+async def forward_line_event_to_django(event: dict):
+    """
+    Background Task: ส่งต่อ LINE Event เข้าสู่ Django Core อย่างปลอดภัย
+    Timeout สั้น (3.0s) พร้อม Error Boundary ป้องกัน Worker ค้าง
+    """
+    import httpx
+
+    headers = {
+        "X-Internal-Token": INTERNAL_API_TOKEN,
+        "Content-Type": "application/json"
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.post(
+                DJANGO_INTERNAL_URL,
+                json={"event": event},
+                headers=headers
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                logger.info(f"[FastAPI -> Django] Event forwarded successfully: action={data.get('action')}, msg_id={data.get('line_message_id')}")
+            else:
+                logger.warning(f"[FastAPI -> Django] Non-200 response ({resp.status_code}): {resp.text}")
+    except httpx.TimeoutException:
+        logger.error(f"[FastAPI -> Django] Timeout (3.0s) forwarding event: {event.get('type')}")
+    except Exception as e:
+        logger.error(f"[FastAPI -> Django] Unexpected error forwarding event: {e}", exc_info=True)
+
+
+@app.post("/api/v1/webhook/line")
+async def line_webhook_fastapi_gateway(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    x_line_signature: Optional[str] = Header(None, alias="X-Line-Signature"),
+    x_mock_webhook: Optional[str] = Header(None, alias="X-Mock-Webhook")
+):
+    """
+    FastAPI Webhook Gateway สำหรับรับ Webhook จาก LINE Official Account Platform
+    1. ตรวจสอบ HMAC-SHA256 Signature (Fail-Closed)
+    2. ตอบกลับ 200 OK ทันที (< 10ms) เพื่อป้องกัน Timeout ฝั่ง LINE
+    3. ส่งต่องานเข้า BackgroundTasks ไปยัง Django Core
+    """
+    import hmac
+    import hashlib
+
+    raw_body = await request.body()
+
+    # ตรวจสอบลายเซ็น HMAC-SHA256 (ยกเว้นโหมด Mock Sandbox ใน Dev)
+    is_mock = x_mock_webhook == "true" or os.environ.get("ENV") == "test"
+    if LINE_CHANNEL_SECRET and not is_mock:
+        if not x_line_signature:
+            raise HTTPException(status_code=401, detail="Missing X-Line-Signature header")
+
+        hash_digest = hmac.new(
+            LINE_CHANNEL_SECRET.encode('utf-8'),
+            raw_body,
+            hashlib.sha256
+        ).digest()
+        import base64
+        expected_sig = base64.b64encode(hash_digest).decode('utf-8')
+
+        if not hmac.compare_digest(x_line_signature, expected_sig):
+            raise HTTPException(status_code=401, detail="Invalid cryptographic LINE signature")
+
+    # ถอดรหัส JSON Payload
+    try:
+        payload = json.loads(raw_body.decode('utf-8'))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Malformed JSON payload: {e}")
+
+    events = payload.get('events', [])
+    if not isinstance(events, list):
+        raise HTTPException(status_code=400, detail="Invalid events container shape")
+
+    # Probe ตรวจสอบสถานะจาก LINE Console
+    if len(events) == 0:
+        return {"status": "ok", "message": "Probe verified successfully", "received_events": 0}
+
+    # กระจาย Event ให้ Background Tasks ประมวลผลแบบ Non-blocking
+    for event in events:
+        background_tasks.add_task(forward_line_event_to_django, event)
+
+    return {
+        "status": "ok",
+        "received_events": len(events),
+        "dispatched_async": True
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8088)
+

@@ -12,7 +12,9 @@ urlpatterns = [
     path('guide/', views.guide_view, name='guide'),
     path('install/', views.install_view, name='install'),
     path('legal/privacy/', views.privacy_policy, name='privacy'),
+    path('privacy/', views.privacy_policy, name='privacy_alias'),
     path('legal/terms/', views.terms_of_service, name='terms'),
+    path('terms/', views.terms_of_service, name='terms_alias'),
     path('health/', views.health_check_view, name='health'),
     path('healthz/', views.health_check_view, name='healthz'),
 ]

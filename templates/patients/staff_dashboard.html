@@ -1,0 +1,241 @@
+{% extends 'layouts/doctor_base.html' %}
+{% load static %}
+
+{% block title %}ศูนย์ควบคุมและบริการคลินิก (Staff Control Hub) — TSPI Clinic{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3 px-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h4 class="fw-bold text-dark mb-1">
+                <i class="fas fa-hospital-user text-primary me-2"></i>ศูนย์ควบคุมและบริหารคลินิก (Staff Control Hub)
+            </h4>
+            <div class="text-muted small">
+                ภาพรวมคิวคัดกรองอาการทางคลินิก (Human-in-the-Loop) และข้อความผู้ป่วยจาก LINE Official Account
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-2 mt-md-0">
+            <a href="{% url 'patients:staff_inbox' %}" class="btn btn-outline-primary shadow-xs">
+                <i class="fas fa-inbox me-1"></i> รวมแชท Inbox
+            </a>
+            <a href="{% url 'patients:staff_review_queue' %}" class="btn btn-primary shadow-xs fw-bold">
+                <i class="fas fa-stethoscope me-1"></i> คิวตรวจทานแพทย์/พยาบาล
+                {% if total_pending > 0 %}
+                <span class="badge bg-danger ms-1">{{ total_pending }}</span>
+                {% endif %}
+            </a>
+        </div>
+    </div>
+
+    <!-- Stat Summary Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Level 1 Pending (Nurse + Doctor) -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden" style="background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); border-left: 4px solid #16A34A !important;">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-success fw-bold small">
+                            <i class="fas fa-user-nurse me-1"></i> Level 1: คัดกรองทั่วไป
+                        </span>
+                        <span class="badge bg-success bg-opacity-25 text-success">Nurse / Doctor</span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <h2 class="fw-bold text-dark mb-0">{{ pending_level1 }}</h2>
+                        <span class="text-muted small">เคสรอตรวจ</span>
+                    </div>
+                    <div class="text-muted small mt-2" style="font-size: 0.8rem;">
+                        อาการทั่วไป, ซักประวัติ, ข้อมูลสัญญาณชีพ
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level 2 Pending (Doctor Only) -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden" style="background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); border-left: 4px solid #DC2626 !important;">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-danger fw-bold small">
+                            <i class="fas fa-user-md me-1"></i> Level 2: วินิจฉัย/ด่วน
+                        </span>
+                        <span class="badge bg-danger bg-opacity-25 text-danger">Doctor Only</span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <h2 class="fw-bold text-danger mb-0">{{ pending_level2 }}</h2>
+                        <span class="text-muted small">เคสรอแพทย์ลงนาม</span>
+                    </div>
+                    <div class="text-muted small mt-2" style="font-size: 0.8rem;">
+                        เคสวิกฤต, ผลแล็บผิดปกติ, คำสั่งการรักษา
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approved Today -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden" style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border-left: 4px solid #2563EB !important;">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-primary fw-bold small">
+                            <i class="fas fa-check-circle me-1"></i> อนุมัติลง EMR วันนี้
+                        </span>
+                        <span class="badge bg-primary bg-opacity-25 text-primary">วันนี้</span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <h2 class="fw-bold text-primary mb-0">{{ approved_today }}</h2>
+                        <span class="text-muted small">บันทึกเวชระเบียน</span>
+                    </div>
+                    <div class="text-muted small mt-2" style="font-size: 0.8rem;">
+                        ผ่านการตรวจสอบและลงนามทางการแพทย์แล้ว
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rejected Today -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden" style="background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); border-left: 4px solid #64748B !important;">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary fw-bold small">
+                            <i class="fas fa-times-circle me-1"></i> ปฏิเสธ/ไม่เกี่ยวข้อง
+                        </span>
+                        <span class="badge bg-secondary bg-opacity-25 text-secondary">วันนี้</span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <h2 class="fw-bold text-secondary mb-0">{{ rejected_today }}</h2>
+                        <span class="text-muted small">รายการ</span>
+                    </div>
+                    <div class="text-muted small mt-2" style="font-size: 0.8rem;">
+                        ข้อความทั่วไปหรือคำถามนอกเหนือการรักษา
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Urgent Case Alert Section -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white py-3 px-3.5 d-flex justify-content-between align-items-center border-bottom">
+                    <div class="fw-bold text-danger">
+                        <i class="fas fa-exclamation-triangle me-1"></i> เฝ้าระวังเคสด่วนวิกฤต (Urgent Items)
+                    </div>
+                    <a href="{% url 'patients:staff_review_queue' %}?tab=level2" class="btn btn-sm btn-outline-danger">
+                        ดูทั้งหมด <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="card-body p-3">
+                    {% if urgent_items %}
+                        <div class="d-flex flex-column gap-2.5">
+                            {% for u in urgent_items %}
+                            <div class="p-3 rounded-3 border {% if u.is_long_wait %}border-danger bg-danger bg-opacity-10{% else %}border-warning bg-warning bg-opacity-10{% endif %}">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <div>
+                                        <strong class="text-dark small">{{ u.item.patient.full_name }}</strong>
+                                        <span class="font-monospace text-primary small ms-1">(HN: {{ u.item.patient.hn }})</span>
+                                    </div>
+                                    <span class="badge {% if u.is_long_wait %}bg-danger text-white{% else %}bg-warning text-dark{% endif %} font-monospace">
+                                        <i class="far fa-clock me-1"></i> รอ {{ u.wait_minutes }} นาที
+                                    </span>
+                                </div>
+                                <div class="text-dark small mb-2 fst-italic">
+                                    "{{ u.item.source_message.content|truncatechars:120 }}"
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size: 0.75rem;">
+                                        Level 2: เฉพาะแพทย์
+                                    </span>
+                                    <a href="{% url 'patients:staff_review_queue' %}?tab=level2" class="btn btn-sm btn-danger px-2.5 py-1" style="font-size: 0.8rem;">
+                                        <i class="fas fa-edit me-1"></i> ตรวจสอบเคส
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-shield-alt text-success fs-1 mb-2"></i>
+                            <div class="fw-bold">ไม่มีเคสด่วนคั่งค้างในขณะนี้</div>
+                            <div class="small">ระบบเฝ้าระวัง 39 แกนชีวภาพทำงานเป็นปกติ</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Inbound LINE Messages -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white py-3 px-3.5 d-flex justify-content-between align-items-center border-bottom">
+                    <div class="fw-bold text-dark">
+                        <i class="fab fa-line text-success me-1"></i> ข้อความล่าสุดจาก LINE OA (Unified Inbox)
+                    </div>
+                    <a href="{% url 'patients:staff_inbox' %}" class="btn btn-sm btn-outline-primary">
+                        เปิดแชททั้งหมด <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3 py-2">ผู้ส่ง / คนไข้</th>
+                                    <th class="py-2">ข้อความ</th>
+                                    <th class="py-2 text-center">สถานะคัดกรอง</th>
+                                    <th class="pe-3 py-2 text-end">เวลา</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for msg in recent_messages %}
+                                <tr>
+                                    <td class="ps-3 py-2.5">
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 140px;">
+                                            {{ msg.line_user.display_name }}
+                                        </div>
+                                        {% if msg.patient %}
+                                        <div class="text-muted font-monospace" style="font-size: 0.75rem;">
+                                            {{ msg.patient.hn }}
+                                        </div>
+                                        {% else %}
+                                        <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">ยังไม่ผูก HN</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-2.5">
+                                        <div class="text-dark text-truncate" style="max-width: 200px;">
+                                            {{ msg.content }}
+                                        </div>
+                                    </td>
+                                    <td class="py-2.5 text-center">
+                                        {% if msg.is_clinical_candidate %}
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning" style="font-size: 0.75rem;">
+                                            <i class="fas fa-notes-medical me-1"></i> อาการ
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.75rem;">
+                                            ทั่วไป
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-3 py-2.5 text-end text-muted font-monospace" style="font-size: 0.8rem;">
+                                        {{ msg.created_at|date:"H:i" }} น.
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        ยังไม่มีประวัติข้อความในระบบ
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

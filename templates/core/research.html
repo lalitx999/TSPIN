@@ -1,87 +1,149 @@
 {% extends 'layouts/public_base.html' %}
+{% load static %}
 
-{% block title %}งานวิจัยทางคลินิกและข้อมูลเชิงประจักษ์ - TSPI CLINIC{% endblock %}
+{% block title %}งานวิจัยทางคลินิกและข้อมูลเชิงประจักษ์ — TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+<div class="container-xl py-5">
 
     <!-- Header -->
-    <div class="text-center max-w-3xl mx-auto space-y-4">
-        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+    <div class="text-center mx-auto mb-5" style="max-width: 800px;">
+        <span class="badge-subtle-primary mb-2 d-inline-block">
             Evidence-Based Precision Medicine
         </span>
-        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
+        <h1 class="display-6 fw-bold text-dark mt-2 mb-3">
             งานวิจัยทางคลินิกและข้อมูลเชิงประจักษ์
         </h1>
-        <p class="text-base text-gray-600 leading-relaxed">
-            รวบรวมหลักฐานทางวิทยาศาสตร์ การศึกษาไฟโตเคมีคอลมาตรฐาน 200 โมดูล และผลการทดสอบทางคลินิกในผู้ป่วยจริง
+        <p class="lead text-muted fs-6 mb-0 lh-base">
+            รวบรวมหลักฐานทางวิทยาศาสตร์ การศึกษาไฟโตเคมีคอลมาตรฐาน 200 โมดูล และผลการทดสอบทางคลินิกในผู้ป่วยจริง 
+            เพื่อยืนยันประสิทธิผลของการรักษาด้วย 39 แกนชีววิทยา
         </p>
     </div>
 
     <!-- Case Nikom Benchmark Card -->
-    <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-xs space-y-6">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+    <div class="card p-4 p-lg-5 mb-5 border shadow-sm">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-4 mb-4 border-bottom gap-3">
             <div>
-                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-primary text-white">Clinical Landmark Case</span>
-                <h2 class="text-xl font-bold text-gray-900 mt-2">กรณีศึกษาผู้ป่วยสะเก็ดเงินรุนแรง (คุณนิคม)</h2>
-                <p class="text-xs text-gray-500">ผลการฟื้นฟูด้วย TSPI 9-Step Mechanistic Protocol ระยะเวลา 16 สัปดาห์</p>
+                <span class="badge bg-primary text-white px-3 py-1 rounded-pill fw-semibold mb-2">Clinical Landmark Case</span>
+                <h2 class="h4 fw-bold text-dark mb-1">กรณีศึกษาผู้ป่วยสะเก็ดเงินรุนแรง (เคสคุณนิคม)</h2>
+                <p class="small text-muted mb-0">ผลการฟื้นฟูด้วย TSPI 9-Step Mechanistic Protocol ระยะเวลา 16 สัปดาห์</p>
             </div>
-            <div class="flex items-center gap-6">
-                <div>
-                    <span class="text-xs text-gray-400 block">PASI Reduction</span>
-                    <span class="text-2xl font-bold text-primary">-82%</span>
+            <div class="d-flex align-items-center gap-4">
+                <div class="text-center">
+                    <small class="text-muted d-block" style="font-size: 11px;">PASI Score ลดลง</small>
+                    <span class="h3 fw-bold text-primary-clinic font-monospace mb-0">-82%</span>
                 </div>
-                <div>
-                    <span class="text-xs text-gray-400 block">Steroid Usage</span>
-                    <span class="text-2xl font-bold text-green-700">0% (หยุดใช้)</span>
+                <div class="vr opacity-25"></div>
+                <div class="text-center">
+                    <small class="text-muted d-block" style="font-size: 11px;">การใช้ยาสเตียรอยด์</small>
+                    <span class="h3 fw-bold text-success font-monospace mb-0">0% (หยุดใช้)</span>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-gray-600 leading-relaxed">
-            <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-2">
-                <h4 class="font-bold text-gray-900 text-sm">ก่อนการรักษา (Baseline)</h4>
-                <p>มีผื่นสะเก็ดเงินหนากระจายทั่วลำตัว ข้อศอก และศีรษะ ค่าการอักเสบ hsCRP 8.4 mg/L มีอาการคันและแสบผิวหนังรุนแรง</p>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-danger-subtle text-danger px-2.5 py-1 rounded">ระยะเริ่มต้น</span>
+                        <h3 class="h6 fw-bold text-dark mb-0">ก่อนการรักษา (Baseline)</h3>
+                    </div>
+                    <p class="small text-muted mb-0 lh-base">
+                        มีผื่นสะเก็ดเงินหนากระจายทั่วลำตัว ข้อศอก และศีรษะ ค่าการอักเสบ hsCRP 8.4 mg/L มีอาการคันและแสบผิวหนังรุนแรง ส่งผลกระทบต่อการนอนหลับและการใช้ชีวิตประจำวัน
+                    </p>
+                </div>
             </div>
-            <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-2">
-                <h4 class="font-bold text-gray-900 text-sm">โปรโตคอลการรักษา</h4>
-                <p>ได้รับโมดูล KERRA, MINOZA เพื่อลด NF-κB และไซโตไคน์อักเสบ ร่วมกับ CINNARA เพื่อฟื้นฟูเยื่อบุลำไส้รั่ว (Leaky Gut)</p>
+
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-primary-subtle text-primary px-2.5 py-1 rounded">โปรโตคอล</span>
+                        <h3 class="h6 fw-bold text-dark mb-0">การฟื้นฟูด้วย 39 แกน</h3>
+                    </div>
+                    <p class="small text-muted mb-0 lh-base">
+                        ได้รับโมดูล KERRA, MINOZA เพื่อลด NF-κB และไซโตไคน์อักเสบ ร่วมกับ CINNARA เพื่อฟื้นฟูเยื่อบุลำไส้รั่ว (Leaky Gut) พร้อมปรับสมดุลอาหารบำบัดเฉพาะบุคคล
+                    </p>
+                </div>
             </div>
-            <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-2">
-                <h4 class="font-bold text-gray-900 text-sm">ผลลัพธ์หลัง 16 สัปดาห์</h4>
-                <p>ผื่นยุบลงและผิวหนังกลับสู่สภาพปกติ ค่า hsCRP ลดลงสู่ 1.1 mg/L คุณภาพชีวิตและพลังงานดีขึ้นอย่างมีนัยสำคัญ</p>
+
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-success-subtle text-success px-2.5 py-1 rounded">ผลลัพธ์</span>
+                        <h3 class="h6 fw-bold text-dark mb-0">หลังผ่าน 16 สัปดาห์</h3>
+                    </div>
+                    <p class="small text-muted mb-0 lh-base">
+                        ผื่นสะเก็ดเงินยุบตัวลงอย่างชัดเจน ผิวหนังฟื้นฟูกลับสู่สภาพปกติ ค่า hsCRP ลดลงเหลือ 1.1 mg/L สุขภาพจิต ระดับพลังงาน และคุณภาพชีวิตดีขึ้นอย่างสมบูรณ์
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Biomarker Correlation Matrix -->
-    <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-xs space-y-4">
-        <h3 class="text-lg font-bold text-gray-900">ตัวชี้วัดชีวภาพหลัก (Key Clinical Biomarkers)</h3>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-xs">
-            <div class="p-3 bg-gray-50 rounded-xl text-center border border-gray-100">
-                <span class="font-bold text-primary block">hs-CRP</span>
-                <span class="text-gray-500 text-[11px]">Systemic Inflammation</span>
+    <div class="card p-4 p-lg-5 mb-5 border shadow-sm">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-2">
+            <div>
+                <h3 class="h5 fw-bold text-dark mb-1">ตัวชี้วัดชีวภาพหลัก (Key Clinical Biomarkers)</h3>
+                <p class="small text-muted mb-0">สารบ่งชี้ระดับโมเลกุลที่ระบบ AI นำมาตรวจติดตามผลลัพธ์</p>
             </div>
-            <div class="p-3 bg-gray-50 rounded-xl text-center border border-gray-100">
-                <span class="font-bold text-primary block">Zonulin</span>
-                <span class="text-gray-500 text-[11px]">Gut Barrier Integrity</span>
+            <span class="badge bg-light text-muted border font-monospace px-3 py-2">6 ตัวชี้วัดสำคัญ</span>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
+                    <strong class="text-primary-clinic font-monospace d-block mb-1">hs-CRP</strong>
+                    <small class="text-muted d-block" style="font-size: 11px;">Systemic Inflammation</small>
+                </div>
             </div>
-            <div class="p-3 bg-gray-50 rounded-xl text-center border border-gray-100">
-                <span class="font-bold text-primary block">Fasting Insulin</span>
-                <span class="text-gray-500 text-[11px]">Insulin Resistance</span>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
+                    <strong class="text-primary-clinic font-monospace d-block mb-1">Zonulin</strong>
+                    <small class="text-muted d-block" style="font-size: 11px;">Gut Barrier Integrity</small>
+                </div>
             </div>
-            <div class="p-3 bg-gray-50 rounded-xl text-center border border-gray-100">
-                <span class="font-bold text-primary block">8-OHdG</span>
-                <span class="text-gray-500 text-[11px]">DNA Oxidative Damage</span>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
+                    <strong class="text-primary-clinic font-monospace d-block mb-1">Fasting Insulin</strong>
+                    <small class="text-muted d-block" style="font-size: 11px;">Insulin Resistance</small>
+                </div>
             </div>
-            <div class="p-3 bg-gray-50 rounded-xl text-center border border-gray-100">
-                <span class="font-bold text-primary block">IL-6 / TNF-α</span>
-                <span class="text-gray-500 text-[11px]">Cytokine Cascade</span>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
+                    <strong class="text-primary-clinic font-monospace d-block mb-1">8-OHdG</strong>
+                    <small class="text-muted d-block" style="font-size: 11px;">DNA Oxidative Damage</small>
+                </div>
             </div>
-            <div class="p-3 bg-gray-50 rounded-xl text-center border border-gray-100">
-                <span class="font-bold text-primary block">Cortisol Rhythm</span>
-                <span class="text-gray-500 text-[11px]">HPA Axis Function</span>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
+                    <strong class="text-primary-clinic font-monospace d-block mb-1">IL-6 / TNF-α</strong>
+                    <small class="text-muted d-block" style="font-size: 11px;">Cytokine Cascade</small>
+                </div>
             </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
+                    <strong class="text-primary-clinic font-monospace d-block mb-1">Cortisol Rhythm</strong>
+                    <small class="text-muted d-block" style="font-size: 11px;">HPA Axis Function</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="card p-5 text-center shadow-sm border bg-white">
+        <h3 class="h4 fw-bold text-dark mb-2">เข้าถึงรายงานการแพทย์แม่นยำฉบับเต็ม</h3>
+        <p class="text-muted small mx-auto mb-4" style="max-width: 600px;">
+            แพทย์ผู้เชี่ยวชาญสามารถดูรายละเอียดผลแล็บ กราฟชีวภาพ และคำนวณสูตรการรักษาเฉพาะบุคคลผ่านระบบ EMR
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'accounts:doctor_login' %}" class="btn btn-primary d-inline-flex align-items-center gap-2">
+                <i class="fas fa-stethoscope"></i>
+                <span>เข้าสู่ระบบแพทย์ (Doctor EMR)</span>
+            </a>
+            <a href="{% url 'core:home' %}" class="btn btn-light d-inline-flex align-items-center gap-2 text-dark">
+                <span>กลับสู่หน้าแรก</span>
+            </a>
         </div>
     </div>
 

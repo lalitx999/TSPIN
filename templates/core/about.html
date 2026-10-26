@@ -1,52 +1,59 @@
 {% extends 'layouts/public_base.html' %}
+{% load static %}
 
-{% block title %}เกี่ยวกับ TSPI Clinic | การแพทย์เชิงกลไกแห่งอนาคต{% endblock %}
+{% block title %}เกี่ยวกับ TSPI Clinic — การแพทย์เชิงกลไกแห่งอนาคต{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="bg-white border border-gray-200 rounded-3xl p-8 sm:p-12 shadow-sm space-y-6">
-        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-            TSPI Clinical Philosophy
-        </span>
-        <h1 class="text-3xl font-bold text-gray-900 leading-tight">
-            เกี่ยวกับ TSPI Clinic และระบบการแพทย์ 39 แกนชีววิทยา (12 โดเมน)
-        </h1>
+<div class="container-xl py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+            <div class="card p-4 p-lg-5 shadow-sm border">
+                <span class="badge-subtle-primary mb-3 d-inline-block align-self-start">
+                    TSPI Clinical Philosophy
+                </span>
 
-        <div class="text-sm text-gray-700 leading-relaxed space-y-4">
-            <p>
-                <strong>TSPI Clinic</strong> เป็นผู้นำด้านการแพทย์เชิงกลไก (Mechanistic Medicine) ที่มองร่างกายมนุษย์ในฐานะ 
-                <em>"ระบบเครือข่ายชีวภาพที่เชื่อมโยงถึงกันอย่างสมบูรณ์ (Interconnected Biological Network)"</em> มิใช่การมองแยกส่วนตามอวัยวะเดี่ยว
-            </p>
+                <h1 class="display-6 fw-bold text-dark mb-4">
+                    เกี่ยวกับ TSPI Clinic และระบบการแพทย์ 39 แกนชีววิทยา (12 โดเมน)
+                </h1>
 
-            <h3 class="text-lg font-bold text-gray-900 pt-3">
-                ปรัชญาการรักษา: 3 Keys &amp; 9-Step Restoration Ladder
-            </h3>
-            <p>
-                เราไม่ได้มุ่งเน้นเพียงแค่การใช้ยาเพื่อกดอาการที่ปลายเหตุ แต่ใช้ปัญญาประดิษฐ์และความฉลาดทางการแพทย์ในการตรวจวิเคราะห์หาจุดติดขัด (Bottleneck) 
-                หรือความผิดปกติในระดับไมโทคอนเดรีย ดีท็อกซิฟิเคชัน การอักเสบระดับเซลล์ และแกนประสาทต่อมไร้ท่อ 
-                เพื่อฟื้นฟูกลไกธรรมชาติของร่างกายให้กลับมาทำงานได้อย่างเต็มประสิทธิภาพ
-            </p>
+                <div class="text-muted lh-lg mb-4 space-y-4">
+                    <p class="fs-6">
+                        <strong class="text-dark">TSPI Clinic</strong> เป็นผู้นำด้านการแพทย์เชิงกลไก (Mechanistic Medicine) ที่มองร่างกายมนุษย์ในฐานะ 
+                        <em class="text-dark">"ระบบเครือข่ายชีวภาพที่เชื่อมโยงถึงกันอย่างสมบูรณ์ (Interconnected Biological Network)"</em> มิใช่การมองแยกส่วนตามอวัยวะเดี่ยว
+                    </p>
 
-            <div class="bg-primary/5 border-l-4 border-primary p-4 rounded-r-2xl my-4">
-                <p class="text-gray-800 italic text-xs sm:text-sm">
-                    "AI เป็นเครื่องมือเสริมพลังแพทย์ ไม่ใช่ผู้ตัดสินใจแทนแพทย์ผู้เชี่ยวชาญ ทุกคำแนะนำต้องผ่านการตรวจสอบจากแพทย์ผู้รักษาตัวจริงเสมอ (Pillar 15 Physician Invariant)"
-                </p>
+                    <h2 class="h5 fw-bold text-dark pt-3 mb-2">
+                        ปรัชญาการรักษา: 3 Keys &amp; 9-Step Restoration Ladder
+                    </h2>
+                    <p class="small">
+                        เราไม่ได้มุ่งเน้นเพียงแค่การใช้ยาเพื่อกดอาการที่ปลายเหตุ แต่ใช้ปัญญาประดิษฐ์และความฉลาดทางการแพทย์ในการตรวจวิเคราะห์หาจุดติดขัด (Bottleneck) 
+                        หรือความผิดปกติในระดับไมโทคอนเดรีย ดีท็อกซิฟิเคชัน การอักเสบระดับเซลล์ และแกนประสาทต่อมไร้ท่อ 
+                        เพื่อฟื้นฟูกลไกธรรมชาติของร่างกายให้กลับมาทำงานได้อย่างเต็มประสิทธิภาพ
+                    </p>
+
+                    <div class="p-3 my-3 rounded-3 bg-light border-start border-4 border-success">
+                        <p class="text-dark mb-0 small fst-italic">
+                            "AI เป็นเครื่องมือเสริมพลังแพทย์ ไม่ใช่ผู้ตัดสินใจแทนแพทย์ผู้เชี่ยวชาญ ทุกคำแนะนำต้องผ่านการตรวจสอบจากแพทย์ผู้รักษาตัวจริงเสมอ (Pillar 15 Physician Invariant)"
+                        </p>
+                    </div>
+
+                    <h2 class="h5 fw-bold text-dark pt-3 mb-2">
+                        มาตรฐานและการกำกับดูแลตามกฎหมาย
+                    </h2>
+                    <p class="small">
+                        ระบบของเราจัดเก็บข้อมูลตามมาตรฐาน PDPA ของประเทศไทย พร้อมโครงข่ายความปลอดภัยระดับสากล 
+                        ให้ความสำคัญกับความเป็นส่วนตัวของผู้ป่วยและความถูกต้องของประวัติการรักษาเป็นลำดับสูงสุด
+                    </p>
+                </div>
+
+                <div class="pt-4 border-top d-flex flex-column flex-sm-row align-items-center justify-content-between gap-3">
+                    <a href="{% url 'core:home' %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>กลับสู่หน้าแรก</span>
+                    </a>
+                    <span class="small text-muted font-monospace">Dr. Patt Clinical Intelligence OS &bull; 2026</span>
+                </div>
             </div>
-
-            <h3 class="text-lg font-bold text-gray-900 pt-3">
-                มาตรฐานและการกำกับดูแล
-            </h3>
-            <p>
-                ระบบของเราจัดเก็บข้อมูลตามมาตรฐาน PDPA ของประเทศไทย พร้อมโครงข่ายความปลอดภัยระดับสากล 
-                ให้ความสำคัญกับความเป็นส่วนตัวของผู้ป่วยและความถูกต้องของประวัติการรักษาเป็นลำดับสูงสุด
-            </p>
-        </div>
-
-        <div class="pt-6 border-t border-gray-100 flex items-center justify-between">
-            <a href="{% url 'core:home' %}" class="text-xs font-medium text-primary hover:underline flex items-center gap-1">
-                &larr; กลับสู่หน้าแรก
-            </a>
-            <span class="text-xs text-gray-400">Dr. Patt Clinical Intelligence OS</span>
         </div>
     </div>
 </div>

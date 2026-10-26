@@ -1,238 +1,294 @@
 {% extends 'layouts/public_base.html' %}
+{% load static %}
 
-{% block title %}แพลตฟอร์มการแพทย์แม่นยำ 39 แกนชีววิทยา (12 โดเมน) - TSPI CLINIC{% endblock %}
+{% block title %}แพลตฟอร์มการแพทย์แม่นยำ 39 แกนชีววิทยา (12 โดเมน) — TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+<div class="container-xl py-5">
 
     <!-- Platform Hero -->
-    <div class="text-center max-w-3xl mx-auto space-y-4">
-        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+    <div class="text-center mx-auto mb-5" style="max-width: 800px;">
+        <span class="badge-subtle-primary mb-2 d-inline-block">
             TSPI Systems Biology Architecture
         </span>
-        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
+        <h1 class="display-6 fw-bold text-dark mt-2 mb-3">
             ระบบปัญญาประดิษฐ์วิเคราะห์สรีรวิทยา 39 แกน (12 โดเมน)
         </h1>
-        <p class="text-base text-gray-600 leading-relaxed">
+        <p class="lead text-muted fs-6 mb-0 lh-base">
             เปลี่ยนผ่านจากการรักษาตามอาการ สู่การวิเคราะห์ความเชื่อมโยงระดับเครือข่ายชีวโมเลกุล (Mechanistic Biological Networks) 
-            ครอบคลุมครบทั้ง 12 โดเมน และ 39 แกนกลไกชีวภาพของมนุษย์
+            ครอบคลุมครบทั้ง 12 โดเมน และ 39 แกนกลไกชีวภาพของมนุษย์ เพื่อการฟื้นฟูสุขภาพตรงจุดระดับเซลล์
         </p>
     </div>
 
-    <!-- 12 Domains Full Overview Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- 12 Domains Full Overview Grid (Bootstrap 5) -->
+    <div class="row g-4 mb-5">
 
         <!-- Domain 1: Immune-Infection Governance -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">01</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Immune–Infection Governance</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 1 - 4</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-danger-subtle text-danger fw-bold fs-6" style="width: 42px; height: 42px;">
+                        01
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Immune–Infection Governance</h3>
+                        <small class="text-muted">แกนที่ 1 - 4</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 1:</strong> Systemic Inflammatory Load (NF-κB, IL-6, TNF-α)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 2:</strong> Immune Homeostasis (Th1/Th2, M1/M2, Treg)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 3:</strong> Pathogen Defense (Host Defense &amp; Mucosal Barrier)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 4:</strong> Post-Infectious Persistence (Latent Viral Reactivation)</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 1: Systemic Inflammatory Load (NF-κB, IL-6, TNF-α)</li>
-                <li>&bull; Axis 2: Immune Homeostasis (Th1/Th2, M1/M2, Treg)</li>
-                <li>&bull; Axis 3: Pathogen Defense (Host Defense & Mucosal Barrier)</li>
-                <li>&bull; Axis 4: Post-Infectious Persistence (Latent Viral Reactivation)</li>
-            </ul>
         </div>
 
         <!-- Domain 2: Metabolic-Energy Core -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-sm">02</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Metabolic–Energy Core</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 5 - 10</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-warning-subtle text-warning-emphasis fw-bold fs-6" style="width: 42px; height: 42px;">
+                        02
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Metabolic–Energy Core</h3>
+                        <small class="text-muted">แกนที่ 5 - 10</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 5:</strong> Glucose–Insulin Regulation (HOMA-IR, AKT)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 6:</strong> Lipid–Lipotoxicity (Atherogenic Lipid, NAFLD)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 7:</strong> Nutrient Sensing (AMPK vs mTORC1 switch)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 8:</strong> Mitochondrial Network &amp; Bioenergetics</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 9:</strong> Oxidative Stress &amp; Redox Signaling</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 10:</strong> Autophagy &amp; Proteostasis Dynamics</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 5: Glucose–Insulin Regulation (HOMA-IR, AKT)</li>
-                <li>&bull; Axis 6: Lipid–Lipotoxicity (Atherogenic Lipid, NAFLD)</li>
-                <li>&bull; Axis 7: Nutrient Sensing (AMPK vs mTORC1 switch)</li>
-                <li>&bull; Axis 8: Mitochondrial Network & Bioenergetics</li>
-                <li>&bull; Axis 9: Oxidative Stress & Redox Signaling</li>
-                <li>&bull; Axis 10: Autophagy & Proteostasis Dynamics</li>
-            </ul>
         </div>
 
         <!-- Domain 3: Genomic Programming -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">03</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Genomic Programming</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 11 - 14</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-primary-subtle text-primary fw-bold fs-6" style="width: 42px; height: 42px;">
+                        03
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Genomic Programming</h3>
+                        <small class="text-muted">แกนที่ 11 - 14</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 11:</strong> DNA Repair &amp; Genomic Stability (8-OHdG)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 12:</strong> Telomere Dynamics &amp; Cellular Lifespan</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 13:</strong> Epigenetic Maintenance &amp; Methylation</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 14:</strong> Cellular Senescence &amp; SASP Secretion</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 11: DNA Repair & Genomic Stability (8-OHdG)</li>
-                <li>&bull; Axis 12: Telomere Dynamics & Cellular Lifespan</li>
-                <li>&bull; Axis 13: Epigenetic Maintenance & Methylation</li>
-                <li>&bull; Axis 14: Cellular Senescence & SASP Secretion</li>
-            </ul>
         </div>
 
         <!-- Domain 4: Detoxification & Cellular Clearance -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">04</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Detoxification & Clearance</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 15</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-success-subtle text-success fw-bold fs-6" style="width: 42px; height: 42px;">
+                        04
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Detoxification &amp; Clearance</h3>
+                        <small class="text-muted">แกนที่ 15</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 15:</strong> Detoxification &amp; Defense (Hepatic Phase 1/2)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i>Glutathione Conjugation &amp; Toxin Elimination</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i>Heavy Metal Chelation &amp; Uric Acid Clearance</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 15: Detoxification & Cellular Defense (Hepatic Phase 1/2)</li>
-                <li>&bull; Glutathione Conjugation & Toxin Elimination</li>
-                <li>&bull; Heavy Metal Chelation & Uric Acid Clearance</li>
-            </ul>
         </div>
 
         <!-- Domain 5: Digestive–Gut Ecosystem -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-green-100 text-green-700 flex items-center justify-center font-bold text-sm">05</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Digestive–Gut Ecosystem</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 16 - 19</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-success-subtle text-success fw-bold fs-6" style="width: 42px; height: 42px;">
+                        05
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Digestive–Gut Ecosystem</h3>
+                        <small class="text-muted">แกนที่ 16 - 19</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 16:</strong> Digestive–Absorptive Function (Enzyme Output)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 17:</strong> Microbiome Ecosystem (SCFAs, Dysbiosis)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 18:</strong> Bile &amp; Liver–Gut Axis (Bile Acid Dynamics)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 19:</strong> Gut Barrier Integrity (Zonulin, Leaky Gut)</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 16: Digestive–Absorptive Function (Enzyme Output)</li>
-                <li>&bull; Axis 17: Microbiome Ecosystem (SCFAs, Dysbiosis)</li>
-                <li>&bull; Axis 18: Bile & Liver–Gut Axis (Bile Acid Dynamics)</li>
-                <li>&bull; Axis 19: Gut Barrier Integrity (Zonulin, Leaky Gut)</li>
-            </ul>
         </div>
 
         <!-- Domain 6: Vascular–Circulation -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">06</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Vascular–Circulation</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 20 - 23</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-info-subtle text-info fw-bold fs-6" style="width: 42px; height: 42px;">
+                        06
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Vascular–Circulation</h3>
+                        <small class="text-muted">แกนที่ 20 - 23</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 20:</strong> Endothelial Function (NO Signaling)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 21:</strong> Microcirculation &amp; Tissue Perfusion</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 22:</strong> Coagulation–Fibrinolysis Balance</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 23:</strong> Lymphatic Flow &amp; Tissue Drainage</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 20: Endothelial Function (NO Signaling)</li>
-                <li>&bull; Axis 21: Microcirculation & Tissue Perfusion</li>
-                <li>&bull; Axis 22: Coagulation–Fibrinolysis Balance</li>
-                <li>&bull; Axis 23: Lymphatic Flow & Tissue Drainage</li>
-            </ul>
         </div>
 
         <!-- Domain 7: Repair–Regeneration -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold text-sm">07</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Repair–Regeneration</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 24 - 27</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-info-subtle text-info fw-bold fs-6" style="width: 42px; height: 42px;">
+                        07
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Repair–Regeneration</h3>
+                        <small class="text-muted">แกนที่ 24 - 27</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 24:</strong> Wound Healing (Internal + External Epithelium)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 25:</strong> Extracellular Matrix (ECM Remodeling)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 26:</strong> Bone Remodeling &amp; Mineral Turnover</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 27:</strong> Cartilage &amp; Joint Homeostasis</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 24: Wound Healing (Internal + External Epithelium)</li>
-                <li>&bull; Axis 25: Extracellular Matrix (ECM Remodeling)</li>
-                <li>&bull; Axis 26: Bone Remodeling & Mineral Turnover</li>
-                <li>&bull; Axis 27: Cartilage & Joint Homeostasis</li>
-            </ul>
         </div>
 
         <!-- Domain 8: Musculoskeletal & Structural Integrity -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-sm">08</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Musculoskeletal & Structural</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 28 - 30</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-warning-subtle text-warning-emphasis fw-bold fs-6" style="width: 42px; height: 42px;">
+                        08
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Musculoskeletal &amp; Structural</h3>
+                        <small class="text-muted">แกนที่ 28 - 30</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 28:</strong> Muscle Protein Turnover (Anabolic Signaling)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 29:</strong> Fascial &amp; Structural Integrity</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 30:</strong> Tendon &amp; Ligament Resilience</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 28: Muscle Protein Turnover (Anabolic Signaling)</li>
-                <li>&bull; Axis 29: Fascial & Structural Integrity</li>
-                <li>&bull; Axis 30: Tendon & Ligament Resilience</li>
-            </ul>
         </div>
 
         <!-- Domain 9: Endocrine Network -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-sm">09</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Endocrine Network</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 31 - 33</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-danger-subtle text-danger fw-bold fs-6" style="width: 42px; height: 42px;">
+                        09
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Endocrine Network</h3>
+                        <small class="text-muted">แกนที่ 31 - 33</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 31:</strong> Female Hormone Network (Estrogen / Progesterone)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 32:</strong> Male Androgen Network (Testosterone / DHT)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 33:</strong> Thyroid–Adrenal–Growth Axis (HPA Rhythm, TSH)</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 31: Female Hormone Network (Estrogen / Progesterone)</li>
-                <li>&bull; Axis 32: Male Androgen Network (Testosterone / DHT)</li>
-                <li>&bull; Axis 33: Thyroid–Adrenal–Growth Axis (HPA Rhythm, TSH)</li>
-            </ul>
         </div>
 
         <!-- Domain 10: Neurological Regulation -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm">10</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Neurological Regulation</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 34</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-secondary-subtle text-secondary-emphasis fw-bold fs-6" style="width: 42px; height: 42px;">
+                        10
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Neurological Regulation</h3>
+                        <small class="text-muted">แกนที่ 34</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 34:</strong> Neuro–Sleep–Stress–Brain Clearance</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i>Glymphatic Clearance &amp; Circadian Rhythm</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i>Neuroinflammation &amp; Autonomic Tone</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 34: Neuro–Sleep–Stress–Brain Clearance</li>
-                <li>&bull; Glymphatic Clearance & Circadian Rhythm</li>
-                <li>&bull; Neuroinflammation & Autonomic Tone</li>
-            </ul>
         </div>
 
         <!-- Domain 11: Organ Axis -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">11</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Organ Axis</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 35 - 36</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-warning-subtle text-warning fw-bold fs-6" style="width: 42px; height: 42px;">
+                        11
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Organ Axis</h3>
+                        <small class="text-muted">แกนที่ 35 - 36</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 35:</strong> Organ Resilience &amp; Functional Reserve (ตับ, ไต, หัวใจ)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 36:</strong> Local Organ &amp; Tissue Interface (ตา, ไซนัส, มดลูก)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i>Visceral Functional Redundancy &amp; Organ Resilience</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 35: Organ Resilience & Functional Reserve (ตับ, ไต, หัวใจ)</li>
-                <li>&bull; Axis 36: Local Organ & Tissue Interface (ตา, ไซนัส, มดลูก)</li>
-                <li>&bull; Visceral Functional Redundancy & Organ Resilience</li>
-            </ul>
         </div>
 
         <!-- Domain 12: Oncology & System-Level Regulation -->
-        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-sm">12</div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900">Oncology & System-Level</h3>
-                    <span class="text-xs text-gray-500">แกนที่ 37 - 39</span>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 p-4 border shadow-sm card-hover">
+                <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-danger-subtle text-danger fw-bold fs-6" style="width: 42px; height: 42px;">
+                        12
+                    </div>
+                    <div>
+                        <h3 class="h6 fw-bold text-dark mb-0">Oncology &amp; System-Level</h3>
+                        <small class="text-muted">แกนที่ 37 - 39</small>
+                    </div>
                 </div>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 37:</strong> Oncologic Cell Fate (Apoptosis, Cell Cycle)</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 38:</strong> Tumor Microenvironment &amp; Metastatic Dynamics</li>
+                    <li><i class="fas fa-check-circle text-primary-clinic me-1.5 opacity-75"></i><strong>Axis 39:</strong> Genomic Regulation Homeostasis</li>
+                </ul>
             </div>
-            <ul class="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
-                <li>&bull; Axis 37: Oncologic Cell Fate (Apoptosis, Cell Cycle)</li>
-                <li>&bull; Axis 38: Tumor Microenvironment & Metastatic Dynamics</li>
-                <li>&bull; Axis 39: Genomic Regulation Homeostasis</li>
-            </ul>
         </div>
 
     </div>
 
     <!-- CTA Section -->
-    <div class="bg-white border border-gray-200 rounded-3xl p-8 text-center space-y-4 shadow-xs">
-        <h3 class="text-xl font-bold text-gray-900">ต้องการดูการทำงานของเครื่องมือแพทย์เชิงลึก?</h3>
-        <p class="text-sm text-gray-500 max-w-lg mx-auto">
-            เข้าสู่ระบบแพทย์เพื่อทดลองใช้งาน 39 Biological Axes Explorer (12 โดเมน), Network Topology และเมทริกซ์การรักษา
+    <div class="card p-5 text-center shadow-sm border bg-white">
+        <h3 class="h4 fw-bold text-dark mb-2">ต้องการดูการทำงานของเครื่องมือแพทย์เชิงลึก?</h3>
+        <p class="text-muted small mx-auto mb-4" style="max-width: 600px;">
+            เข้าสู่ระบบแพทย์เพื่อทดลองใช้งาน 39 Biological Axes Explorer, Network Topology และเมทริกซ์การรักษาเฉพาะบุคคล
         </p>
-        <a href="{% url 'accounts:doctor_login' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark transition-all shadow-xs">
-            <i class="fas fa-stethoscope"></i> เข้าสู่ระบบแพทย์ (Doctor EMR)
-        </a>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'accounts:doctor_login' %}" class="btn btn-primary d-inline-flex align-items-center gap-2">
+                <i class="fas fa-stethoscope"></i>
+                <span>เข้าสู่ระบบแพทย์ (Doctor EMR)</span>
+            </a>
+            <a href="{% url 'core:protocol' %}" class="btn btn-light d-inline-flex align-items-center gap-2 text-dark">
+                <span>ดูโปรโตคอล 9 ขั้นตอน</span>
+                <i class="fas fa-arrow-right fs-6"></i>
+            </a>
+        </div>
     </div>
 
 </div>

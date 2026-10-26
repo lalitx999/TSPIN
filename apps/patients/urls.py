@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import views_staff
 import clinical.views as clinical_views
 import clinical.views_report as report_views
 import intelligence.views as intel_views
@@ -12,9 +13,12 @@ urlpatterns = [
     path('dashboard/', views.doctor_dashboard, name='dashboard'),
     path('patients/', views.patient_list_view, name='patient_list'),
     path('patients/new/', views.patient_create_view, name='patient_create'),
+    path('patients/create/', views.patient_create_view, name='patient_create_alias'),
     path('patients/<int:patient_id>/', views.patient_detail_view, name='patient_detail'),
     path('patients/<int:patient_id>/edit/', views.patient_edit_view, name='patient_edit'),
     path('patients/<int:patient_id>/add-soap/', views.patient_add_soap_view, name='patient_add_soap'),
+    path('api/search/', views.api_patient_search, name='api_patient_search'),
+    path('patients/api/search/', views.api_patient_search, name='api_patient_search_alias'),
 
     # Clinical Visits & Operations (Fix 404s)
     path('pre-visit/', views.doctor_pre_visit, name='doctor_pre_visit'),
@@ -45,4 +49,13 @@ urlpatterns = [
     path('precision-report/', report_views.report_dashboard_view, name='doctor_precision_report'),
     path('audit/', views.doctor_audit, name='doctor_audit'),
     path('settings/', views.doctor_settings, name='doctor_settings'),
+
+    # Option C: Staff UI (Unified Inbox & Clinical Review Queue)
+    path('staff/', views_staff.staff_dashboard_view, name='staff_dashboard'),
+    path('inbox/', views_staff.staff_inbox_view, name='staff_inbox'),
+    path('review-queue/', views_staff.staff_review_queue_view, name='staff_review_queue'),
+    path('api/inbox/create-review-item/', views_staff.staff_create_review_from_message_api, name='api_create_review_from_message'),
+    path('api/review-queue/poll/', views_staff.staff_review_queue_poll_api, name='api_review_queue_poll'),
+    path('api/review-item/<int:item_id>/approve/', views_staff.staff_approve_review_item_api, name='api_approve_review_item'),
+    path('api/review-item/<int:item_id>/reject/', views_staff.staff_reject_review_item_api, name='api_reject_review_item'),
 ]

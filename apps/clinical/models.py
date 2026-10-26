@@ -3,11 +3,13 @@ Clinical Models for TSPI 39 Biological Axes Framework & Analysis Records (EP 4).
 Enforces Mechanistic Ontologies, Immutable Audit Snapshots, and Strict Doctor Approval Gates.
 """
 
+import uuid
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
+from core.models import SoftDeleteModel
 
-class BiologicalRecord(models.Model):
+class BiologicalRecord(SoftDeleteModel):
     """
     บันทึกการประเมินคะแนน 39 แกนชีววิทยา (Mechanistic Biological Axes Record)
     ระดับคะแนน 0 - 100:
@@ -15,6 +17,7 @@ class BiologicalRecord(models.Model):
       - 40 - 69: ภาวะเครียดระดับเบาถึงปานกลาง (Mild to Moderate Stress)
       - 70 - 100: ความผิดปกติรุนแรง / เสื่อมสภาพ (Severe Dysfunction / Clinical Priority)
     """
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     patient = models.ForeignKey(
         'patients.Patient',
         on_delete=models.CASCADE,
@@ -84,6 +87,9 @@ class BiologicalRecord(models.Model):
         app_label = 'clinical'
         db_table = 'clinical_biological_records'
         ordering = ['-record_date']
+        indexes = [
+            models.Index(fields=['patient', '-record_date'], condition=models.Q(is_deleted=False), name='idx_bio_pt_dt_act'),
+        ]
 
     def __str__(self):
         return f"39-Axes Record: {self.patient.hn} on {self.record_date:%d/%m/%Y}"
@@ -106,7 +112,7 @@ class BiologicalRecord(models.Model):
         return sorted(high_axes, key=lambda x: x['score'], reverse=True)
 
 
-class AnalysisRecord(models.Model):
+class AnalysisRecord(SoftDeleteModel):
     """
     เอกสารวิเคราะห์และรายงานทางคลินิกแบบไม่สามารถแก้ไขย้อนหลังได้ (Immutable Clinical Snapshot)
     คุ้มครองความปลอดภัยตาม Pillar 8 & 15 เพื่อใช้ในการออกรายงาน Precision Medicine
@@ -118,6 +124,7 @@ class AnalysisRecord(models.Model):
         ('released', 'ส่งมอบรายงานให้คนไข้ (Released to Patient)'),
     ]
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     patient = models.ForeignKey(
         'patients.Patient',
         on_delete=models.CASCADE,
@@ -153,6 +160,24 @@ class AnalysisRecord(models.Model):
         app_label = 'clinical'
         db_table = 'clinical_analysis_records'
         ordering = ['-analysis_date']
+        indexes = [
+            models.Index(fields=['patient', 'status'], condition=models.Q(is_deleted=False), name='idx_ana_pt_stat_act'),
+            models.Index(fields=['status', '-analysis_date'], condition=models.Q(is_deleted=False), name='idx_ana_stat_dt_act'),
+        ]
 
     def __str__(self):
         return f"Analysis Snapshot: {self.patient.hn} [{self.get_status_display()}] ({self.analysis_date:%d/%m/%Y})"
+
+    @property
+    def status_badge_class(self):
+        mapping = {
+            'draft': 'bg-secondary-subtle text-secondary border border-secondary-subtle',
+            'reviewed': 'bg-info-subtle text-info border border-info-subtle',
+            'approved': 'bg-success-subtle text-success border border-success-subtle',
+            'released': 'bg-primary-subtle text-primary border border-primary-subtle',
+        }
+        return mapping.get(self.status, 'bg-light text-dark')
+
+    @property
+    def status_label(self):
+        return dict(self.STATUS_CHOICES).get(self.status, self.status)

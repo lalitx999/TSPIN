@@ -1,9 +1,9 @@
 {% extends 'layouts/doctor_base.html' %}
 
-{% block title %}สืบค้นงานวิจัยทางคลินิก (Knowledge RAG) - TSPI CLINIC{% endblock %}
+{% block title %}สืบค้นงานวิจัยทางคลินิก (Knowledge RAG) | TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto space-y-6" x-data="{
+<div class="d-flex flex-column gap-4" x-data="{
     query: '',
     isSearching: false,
     results: [
@@ -28,57 +28,58 @@
     ]
 }">
 
-    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                    <i class="fas fa-book-medical mr-1"></i> Retrieval-Augmented Generation (RAG)
+    <!-- Header Card -->
+    <div class="card shadow-sm border">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
+                    <i class="fas fa-book-medical me-1"></i> Retrieval-Augmented Generation (RAG)
                 </span>
-                <span class="text-xs text-gray-400">ระบบสืบค้นเอกสารและงานวิจัยทางการแพทย์</span>
+                <span class="text-muted small">ระบบสืบค้นเอกสารและงานวิจัยทางการแพทย์</span>
             </div>
-            <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
-                สืบค้นองค์ความรู้และหลักฐานทางคลินิก (Knowledge RAG)
-            </h1>
-            <p class="text-sm text-gray-500 mt-0.5">
+            <h1 class="h4 fw-bold mb-1 text-dark">สืบค้นองค์ความรู้และหลักฐานทางคลินิก (Knowledge RAG)</h1>
+            <p class="text-muted small mb-0">
                 ค้นหาข้อมูลกลไกชีวเคมี เอกสารกำกับสูตรยา 200 โมดูล และผลการทดสอบทางคลินิก
             </p>
         </div>
     </div>
 
     <!-- Search Input Box -->
-    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
-        <div class="relative">
-            <input type="text" x-model="query" placeholder="พิมพ์คำค้นหา เช่น 'กลไกสะเก็ดเงิน', 'Kerra ข้อห้ามใช้', 'Zonulin', 'Insulin Resistance'..." class="w-full text-base bg-gray-50 border border-gray-200 rounded-xl pl-12 pr-28 py-3.5 text-gray-900 focus:ring-primary focus:border-primary">
-            <div class="absolute left-4 top-4 text-gray-400 text-lg">
-                <i class="fas fa-search"></i>
+    <div class="card shadow-sm border">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 text-muted">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" x-model="query" placeholder="พิมพ์คำค้นหา เช่น 'กลไกสะเก็ดเงิน', 'Kerra ข้อห้ามใช้', 'Zonulin', 'Insulin Resistance'..." class="form-control border-start-0 ps-0">
+                <button type="button" class="btn btn-primary px-4">
+                    ค้นหา RAG
+                </button>
             </div>
-            <button type="button" class="absolute right-2.5 top-2.5 px-5 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-all">
-                ค้นหา RAG
-            </button>
-        </div>
 
-        <div class="flex items-center gap-2 text-xs text-gray-500">
-            <span class="font-medium">คำค้นยอดนิยม:</span>
-            <button @click="query = 'KERRA'" class="px-2.5 py-1 bg-gray-100 rounded-lg hover:bg-gray-200">KERRA</button>
-            <button @click="query = 'Zonulin Leaky Gut'" class="px-2.5 py-1 bg-gray-100 rounded-lg hover:bg-gray-200">Zonulin Leaky Gut</button>
-            <button @click="query = 'Phase 1 Detox'" class="px-2.5 py-1 bg-gray-100 rounded-lg hover:bg-gray-200">Phase 1 Detox</button>
-            <button @click="query = 'Mitochondrial Renewal'" class="px-2.5 py-1 bg-gray-100 rounded-lg hover:bg-gray-200">Mitochondrial Renewal</button>
+            <div class="d-flex flex-wrap align-items-center gap-2 text-muted small" style="font-size: 0.8rem;">
+                <span class="fw-bold text-dark">คำค้นยอดนิยม:</span>
+                <button type="button" @click="query = 'KERRA'" class="btn btn-sm btn-light border py-0.5 px-2">KERRA</button>
+                <button type="button" @click="query = 'Zonulin Leaky Gut'" class="btn btn-sm btn-light border py-0.5 px-2">Zonulin Leaky Gut</button>
+                <button type="button" @click="query = 'Phase 1 Detox'" class="btn btn-sm btn-light border py-0.5 px-2">Phase 1 Detox</button>
+                <button type="button" @click="query = 'Mitochondrial Renewal'" class="btn btn-sm btn-light border py-0.5 px-2">Mitochondrial Renewal</button>
+            </div>
         </div>
     </div>
 
     <!-- Search Results List -->
-    <div class="space-y-4">
+    <div class="d-flex flex-column gap-3">
         <template x-for="item in results" :key="item.title">
-            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-3 hover:border-primary/50 transition-all">
-                <div class="flex items-start justify-between gap-4">
-                    <h3 class="text-base font-semibold text-gray-900 leading-snug" x-text="item.title"></h3>
-                    <span class="text-xs px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 whitespace-nowrap font-medium">Verified Evidence</span>
+            <div class="card shadow-sm border p-4">
+                <div class="d-flex justify-content-between align-items-start gap-3 mb-1">
+                    <h2 class="h6 fw-bold text-dark mb-0" x-text="item.title"></h2>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle text-nowrap">Verified Evidence</span>
                 </div>
-                <p class="text-xs text-gray-400 font-mono" x-text="item.source"></p>
-                <p class="text-sm text-gray-700 leading-relaxed bg-gray-50 p-3 rounded-xl border border-gray-100" x-text="item.excerpt"></p>
-                <div class="flex flex-wrap gap-1.5 pt-1">
+                <small class="text-muted font-monospace d-block mb-2" x-text="item.source"></small>
+                <div class="p-3 rounded-3 bg-light border text-muted small lh-base mb-2.5" style="font-size: 0.85rem;" x-text="item.excerpt"></div>
+                <div class="d-flex flex-wrap gap-1.5">
                     <template x-for="tag in item.tags" :key="tag">
-                        <span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-primary/10 text-primary border border-primary/20" x-text="tag"></span>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" x-text="tag"></span>
                     </template>
                 </div>
             </div>

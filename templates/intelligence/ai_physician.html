@@ -4,97 +4,93 @@
 {% block title %}ผู้ช่วยแพทย์ AI Physician Assistant | Dr. Patt EMR{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="container-fluid px-0">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-200">
-        <div>
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                    <i class="fas fa-brain text-xl"></i>
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 pb-3 mb-4 border-bottom">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center shadow-xs" style="width: 44px; height: 44px;">
+                <i class="fas fa-brain fs-5"></i>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <h1 class="h4 fw-bold text-dark mb-0">ผู้ช่วยแพทย์ AI Physician Copilot</h1>
+                    <span class="badge bg-success-subtle text-success">
+                        FastAPI SSE Port 8088
+                    </span>
                 </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 font-kanit flex items-center gap-2">
-                        ผู้ช่วยแพทย์ AI Physician Copilot
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                            FastAPI SSE Port 8088
-                        </span>
-                    </h1>
-                    <p class="text-sm text-gray-500 font-kanit">
-                        ระบบให้คำปรึกษาทางคลินิกเชิงกลไก เชื่อมโยงบริบทเวชระเบียน และ 39 แกนชีววิทยาแบบ Real-time
-                    </p>
-                </div>
+                <p class="small text-muted mb-0">ระบบให้คำปรึกษาทางคลินิกเชิงกลไก เชื่อมโยงบริบทเวชระเบียน และ 39 แกนชีววิทยาแบบ Real-time</p>
             </div>
         </div>
-        <div class="flex items-center gap-2">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-secondary text-gray-700 border border-gray-200">
-                <i class="fas fa-shield-alt text-primary"></i> Pillar 15: Grounded Safety Boundaries
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-secondary-subtle text-secondary border p-2">
+                <i class="fas fa-shield-alt text-primary me-1"></i> Pillar 15: Grounded Safety Boundaries
             </span>
         </div>
     </div>
 
     <!-- Main Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="row g-4">
         <!-- Left Column: Patient Context & Quick Tools (4 cols) -->
-        <div class="lg:col-span-4 space-y-4">
+        <div class="col-12 col-lg-4">
             <!-- Patient Context Card -->
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="px-5 py-3.5 bg-secondary/50 border-b border-gray-200 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider font-kanit flex items-center gap-2">
-                        <i class="fas fa-user-injured text-primary"></i> บริบทคนไข้ปัจจุบัน
+            <div class="card border-0 shadow-xs mb-3 overflow-hidden">
+                <div class="card-header bg-light border-bottom d-flex align-items-center justify-content-between py-2.5 px-3">
+                    <span class="small fw-bold text-uppercase text-dark">
+                        <i class="fas fa-user-injured text-primary me-1"></i> บริบทคนไข้ปัจจุบัน
                     </span>
                     {% if patient %}
-                    <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-primary/10 text-primary font-medium">
+                    <span class="badge bg-primary-subtle text-primary font-monospace">
                         HN: {{ patient.hn }}
                     </span>
                     {% endif %}
                 </div>
-                <div class="p-5">
+                <div class="card-body p-3">
                     {% if patient %}
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-5" style="width: 46px; height: 46px;">
                                 {{ patient.first_name|slice:":1" }}
                             </div>
                             <div>
-                                <h3 class="font-bold text-gray-900 font-kanit text-base">{{ patient.full_name }}</h3>
-                                <div class="text-xs text-gray-500">
+                                <h6 class="fw-bold text-dark mb-0">{{ patient.full_name }}</h6>
+                                <small class="text-muted d-block mt-0.5">
                                     เพศ: {{ patient.get_gender_display|default:"-" }} | อายุ: {{ patient.age|default:"-" }} ปี
-                                </div>
+                                </small>
                             </div>
                         </div>
 
                         {% if patient.allergies %}
-                        <div class="p-3 rounded-xl bg-red-50 border border-red-200 mb-3">
-                            <div class="text-xs font-semibold text-red-700 flex items-center gap-1.5 mb-1">
+                        <div class="alert alert-danger border-0 p-2.5 mb-3">
+                            <div class="small fw-bold text-danger d-flex align-items-center gap-1 mb-1">
                                 <i class="fas fa-exclamation-triangle"></i> ประวัติแพ้ยา / สารอาหาร:
                             </div>
-                            <p class="text-xs text-red-900 font-kanit">{{ patient.allergies }}</p>
+                            <p class="small text-danger mb-0">{{ patient.allergies }}</p>
                         </div>
                         {% endif %}
 
-                        <div class="space-y-2 text-xs text-gray-600 border-t border-gray-100 pt-3">
-                            <div>
-                                <span class="font-medium text-gray-900">อาการสำคัญ (CC):</span>
-                                <p class="text-gray-600 mt-0.5">{{ patient.chief_complaint|default:"-"|truncatewords:15 }}</p>
+                        <div class="small border-top pt-2">
+                            <div class="mb-2">
+                                <span class="fw-semibold text-dark">อาการสำคัญ (CC):</span>
+                                <p class="text-muted mb-0">{{ patient.chief_complaint|default:"-"|truncatewords:15 }}</p>
                             </div>
                             <div>
-                                <span class="font-medium text-gray-900">โรคประจำตัว (PMH):</span>
-                                <p class="text-gray-600 mt-0.5">{{ patient.medical_history|default:"-"|truncatewords:15 }}</p>
+                                <span class="fw-semibold text-dark">โรคประจำตัว (PMH):</span>
+                                <p class="text-muted mb-0">{{ patient.medical_history|default:"-"|truncatewords:15 }}</p>
                             </div>
                         </div>
 
-                        <div class="mt-4 pt-3 border-t border-gray-100 flex gap-2">
-                            <a href="{% url 'patients:patient_detail' patient.pk %}" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors">
-                                <i class="fas fa-folder-open"></i> เปิดแฟ้มเวชระเบียน EMR
+                        <div class="mt-3 pt-3 border-top">
+                            <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                                <i class="fas fa-folder-open me-1"></i> เปิดแฟ้มเวชระเบียน EMR
                             </a>
                         </div>
                     {% else %}
-                        <div class="text-center py-6">
-                            <div class="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-gray-400 mx-auto mb-2">
-                                <i class="fas fa-user-slash text-lg"></i>
+                        <div class="text-center py-4">
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center text-muted mb-2" style="width: 48px; height: 48px;">
+                                <i class="fas fa-user-slash fs-5"></i>
                             </div>
-                            <p class="text-xs text-gray-500 mb-3 font-kanit">โหมดปรึกษาเคสทั่วไป (ไม่ได้เลือกคนไข้)</p>
-                            <a href="{% url 'patients:patient_list' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-700 bg-secondary hover:bg-gray-200 transition-colors">
-                                <i class="fas fa-users"></i> เลือกคนไข้จากเวชระเบียน
+                            <p class="small text-muted mb-2">โหมดปรึกษาเคสทั่วไป (ไม่ได้เลือกคนไข้)</p>
+                            <a href="{% url 'patients:patient_list' %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-users me-1"></i> เลือกคนไข้จากเวชระเบียน
                             </a>
                         </div>
                     {% endif %}
@@ -102,81 +98,81 @@
             </div>
 
             <!-- Quick Prompts Card -->
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="px-5 py-3.5 bg-secondary/50 border-b border-gray-200">
-                    <span class="text-xs font-semibold text-gray-700 uppercase tracking-wider font-kanit flex items-center gap-2">
-                        <i class="fas fa-lightbulb text-amber-500"></i> คำถามคลินิกด่วน (Quick Prompts)
+            <div class="card border-0 shadow-xs overflow-hidden">
+                <div class="card-header bg-light border-bottom py-2.5 px-3">
+                    <span class="small fw-bold text-uppercase text-dark">
+                        <i class="fas fa-lightbulb text-warning me-1"></i> คำถามคลินิกด่วน (Quick Prompts)
                     </span>
                 </div>
-                <div class="p-3 space-y-2">
-                    <button type="button" onclick="setPrompt('ช่วยวิเคราะห์แกนชีวภาพที่มีความผิดปกติหลักของผู้ป่วยรายนี้ และกลไกที่เชื่อมโยงกัน')" class="w-full text-left p-2.5 rounded-xl text-xs text-gray-700 bg-secondary/40 hover:bg-secondary border border-gray-200 transition-colors flex items-center gap-2 font-kanit">
-                        <i class="fas fa-chevron-right text-primary text-[10px]"></i> วิเคราะห์แกนชีวภาพที่มีปัญหา
+                <div class="card-body p-2 d-flex flex-column gap-1.5">
+                    <button type="button" onclick="setPrompt('ช่วยวิเคราะห์แกนชีวภาพที่มีความผิดปกติหลักของผู้ป่วยรายนี้ และกลไกที่เชื่อมโยงกัน')" class="btn btn-sm btn-light text-start border d-flex align-items-center gap-2 py-2">
+                        <i class="fas fa-chevron-right text-primary small"></i> <span>วิเคราะห์แกนชีวภาพที่มีปัญหา</span>
                     </button>
-                    <button type="button" onclick="setPrompt('แนะนำโมดูลสารพฤกษเคมีบำบัด 200 โมดูลที่เหมาะสมกับผลตรวจของผู้ป่วย')" class="w-full text-left p-2.5 rounded-xl text-xs text-gray-700 bg-secondary/40 hover:bg-secondary border border-gray-200 transition-colors flex items-center gap-2 font-kanit">
-                        <i class="fas fa-chevron-right text-primary text-[10px]"></i> แนะนำโมดูลสารอาหารบำบัด
+                    <button type="button" onclick="setPrompt('แนะนำโมดูลสารพฤกษเคมีบำบัด 200 โมดูลที่เหมาะสมกับผลตรวจของผู้ป่วย')" class="btn btn-sm btn-light text-start border d-flex align-items-center gap-2 py-2">
+                        <i class="fas fa-chevron-right text-primary small"></i> <span>แนะนำโมดูลสารอาหารบำบัด</span>
                     </button>
-                    <button type="button" onclick="setPrompt('ตรวจสอบข้อควรระวังทางการแพทย์ ประวัติการแพ้ยา และภาวะแทรกซ้อนที่ต้องเฝ้าระวัง')" class="w-full text-left p-2.5 rounded-xl text-xs text-gray-700 bg-secondary/40 hover:bg-secondary border border-gray-200 transition-colors flex items-center gap-2 font-kanit">
-                        <i class="fas fa-chevron-right text-primary text-[10px]"></i> ตรวจข้อควรระวังและประวัติแพ้ยา
+                    <button type="button" onclick="setPrompt('ตรวจสอบข้อควรระวังทางการแพทย์ ประวัติการแพ้ยา และภาวะแทรกซ้อนที่ต้องเฝ้าระวัง')" class="btn btn-sm btn-light text-start border d-flex align-items-center gap-2 py-2">
+                        <i class="fas fa-chevron-right text-primary small"></i> <span>ตรวจข้อควรระวังและประวัติแพ้ยา</span>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Right Column: Chat Window (8 cols) -->
-        <div class="lg:col-span-8">
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-[700px]">
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-xs overflow-hidden d-flex flex-column" style="height: 680px;">
                 <!-- Chat Header -->
-                <div class="px-5 py-3.5 bg-secondary/50 border-b border-gray-200 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold">
+                <div class="card-header bg-light border-bottom d-flex align-items-center justify-content-between py-2.5 px-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-2 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                             <i class="fas fa-stethoscope"></i>
                         </div>
                         <div>
-                            <h3 class="text-sm font-bold text-gray-900 font-kanit">{{ session.title|default:"Clinical Reasoning Session" }}</h3>
-                            <div class="flex items-center gap-1.5 text-[11px] text-emerald-600 font-kanit">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <h6 class="fw-bold text-dark mb-0">{{ session.title|default:"Clinical Reasoning Session" }}</h6>
+                            <small class="text-success d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                                <span class="spinner-grow spinner-grow-sm text-success" style="width: 8px; height: 8px;" role="status"></span>
                                 FastAPI Copilot Streaming Ready (Port 8088)
-                            </div>
+                            </small>
                         </div>
                     </div>
-                    <span class="text-xs font-mono px-2 py-1 rounded bg-white border border-gray-200 text-gray-500">
+                    <span class="badge bg-white text-secondary border font-monospace">
                         Session #{{ session.pk }}
                     </span>
                 </div>
 
                 <!-- Chat Messages Body -->
-                <div id="chat-messages-container" class="flex-1 p-5 overflow-y-auto space-y-4 bg-secondary/10">
+                <div id="chat-messages-container" class="card-body p-3 overflow-y-auto bg-light flex-grow-1 d-flex flex-column gap-3">
                     <!-- Welcome AI Greeting -->
-                    <div class="flex gap-3 max-w-3xl">
-                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0">
+                    <div class="d-flex gap-2.5" style="max-width: 85%;">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold small flex-shrink-0" style="width: 34px; height: 34px;">
                             AI
                         </div>
-                        <div class="bg-white border border-gray-200 rounded-2xl rounded-tl-sm p-4 text-sm text-gray-800 shadow-sm font-kanit leading-relaxed">
+                        <div class="bg-white border rounded-3 p-3 shadow-xs small text-dark lh-base">
                             สวัสดีครับ นพ./พญ. {{ request.user.first_name|default:request.user.username }} ผมคือผู้ช่วยแพทย์ AI Clinical Copilot ขับเคลื่อนด้วย FastAPI microservice และองค์ความรู้ TSPI 39 Biological Axes พร้อมให้คำปรึกษาเชิงลึกครับ
                         </div>
                     </div>
 
                     <!-- Past Messages -->
                     {% for msg in past_messages %}
-                    <div class="flex gap-3 {% if msg.role == 'user' %}justify-end{% else %}max-w-3xl{% endif %}">
+                    <div class="d-flex gap-2.5 {% if msg.role == 'user' %}justify-content-end{% endif %}" {% if msg.role != 'user' %}style="max-width: 85%;"{% endif %}>
                         {% if msg.role != 'user' %}
-                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold small flex-shrink-0" style="width: 34px; height: 34px;">
                             AI
                         </div>
                         {% endif %}
-                        <div class="{% if msg.role == 'user' %}bg-primary text-white rounded-tr-sm ml-auto max-w-xl{% else %}bg-white border border-gray-200 text-gray-800 rounded-tl-sm{% endif %} rounded-2xl p-4 text-sm shadow-sm font-kanit leading-relaxed whitespace-pre-line">
+                        <div class="{% if msg.role == 'user' %}bg-primary text-white ms-auto{% else %}bg-white border text-dark{% endif %} rounded-3 p-3 shadow-xs small lh-base" style="max-width: 80%; white-space: pre-line;">
                             {{ msg.content }}
                         </div>
                     </div>
                     {% endfor %}
 
                     <!-- Live Streaming Message Box -->
-                    <div id="streaming-box" class="flex gap-3 max-w-3xl" style="display: none;">
-                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0">
+                    <div id="streaming-box" class="d-flex gap-2.5" style="display: none !important; max-width: 85%;">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold small flex-shrink-0" style="width: 34px; height: 34px;">
                             AI
                         </div>
-                        <div id="streaming-content" class="bg-white border border-primary/30 rounded-2xl rounded-tl-sm p-4 text-sm text-gray-800 shadow-sm font-kanit leading-relaxed">
-                            <span class="text-primary flex items-center gap-2">
+                        <div id="streaming-content" class="bg-white border border-primary-subtle rounded-3 p-3 shadow-xs small text-dark lh-base w-100">
+                            <span class="text-primary d-flex align-items-center gap-2">
                                 <i class="fas fa-spinner fa-spin"></i> กำลังวิเคราะห์ข้อมูลกลไกชีววิทยา...
                             </span>
                         </div>
@@ -184,16 +180,16 @@
                 </div>
 
                 <!-- Chat Input Footer -->
-                <div class="p-4 bg-white border-t border-gray-200">
-                    <form id="ai-chat-form" onsubmit="handleSendQuery(event)" class="flex gap-2">
+                <div class="card-footer bg-white border-top p-3">
+                    <form id="ai-chat-form" onsubmit="handleSendQuery(event)" class="d-flex gap-2">
                         <input type="text" 
                                id="query-input" 
-                               class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-gray-900 font-kanit"
+                               class="form-control"
                                placeholder="พิมพ์คำถามทางการแพทย์ หรือประเด็นที่ต้องการให้ AI วิเคราะห์..."
                                autocomplete="off"
                                required>
-                        <button type="submit" id="send-btn" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-medium transition-colors flex items-center gap-2 shadow-sm font-kanit">
-                            <i class="fas fa-paper-plane"></i> ส่งคำถาม
+                        <button type="submit" id="send-btn" class="btn btn-primary d-flex align-items-center gap-1.5 px-3 flex-shrink-0">
+                            <i class="fas fa-paper-plane"></i> <span>ส่งคำถาม</span>
                         </button>
                     </form>
                 </div>
@@ -221,8 +217,8 @@ function handleSendQuery(e) {
 
     // 1. Render User Message
     const userMsgHtml = `
-        <div class="flex justify-end">
-            <div class="bg-primary text-white rounded-2xl rounded-tr-sm p-4 text-sm shadow-sm font-kanit leading-relaxed max-w-xl whitespace-pre-line">
+        <div class="d-flex justify-content-end">
+            <div class="bg-primary text-white rounded-3 p-3 shadow-xs small lh-base ms-auto" style="max-width: 80%; white-space: pre-line;">
                 ${escapeHtml(query)}
             </div>
         </div>
@@ -235,8 +231,8 @@ function handleSendQuery(e) {
     // 2. Show Streaming Box
     const streamingBox = document.getElementById('streaming-box');
     const streamingContent = document.getElementById('streaming-content');
-    streamingBox.style.display = 'flex';
-    streamingContent.innerHTML = '<span class="text-primary flex items-center gap-2"><i class="fas fa-spinner fa-spin"></i> AI กำลังเชื่อมโยง RAG และคำนวณ 39 แกนชีววิทยา...</span>';
+    streamingBox.style.setProperty('display', 'flex', 'important');
+    streamingContent.innerHTML = '<span class="text-primary d-flex align-items-center gap-2"><i class="fas fa-spinner fa-spin"></i> AI กำลังเชื่อมโยง RAG และคำนวณ 39 แกนชีววิทยา...</span>';
     container.scrollTop = container.scrollHeight;
 
     // 3. Connect to FastAPI SSE Microservice (Port 8088) with Django fallback
@@ -299,7 +295,7 @@ function handleSendQuery(e) {
         fallbackSource.onerror = function() {
             fallbackSource.close();
             if (fullResponse === '') {
-                streamingContent.innerHTML = '<span class="text-red-500 font-kanit">ขออภัย ไม่สามารถเชื่อมต่อระบบ AI ได้ในขณะนี้</span>';
+                streamingContent.innerHTML = '<span class="text-danger">ขออภัย ไม่สามารถเชื่อมต่อระบบ AI ได้ในขณะนี้</span>';
             } else {
                 finalizeStreaming(fullResponse);
             }
@@ -310,13 +306,13 @@ function handleSendQuery(e) {
     };
 
     function finalizeStreaming(text) {
-        streamingBox.style.display = 'none';
+        streamingBox.style.setProperty('display', 'none', 'important');
         const aiMsgHtml = `
-            <div class="flex gap-3 max-w-3xl">
-                <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0">
+            <div class="d-flex gap-2.5" style="max-width: 85%;">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold small flex-shrink-0" style="width: 34px; height: 34px;">
                     AI
                 </div>
-                <div class="bg-white border border-gray-200 text-gray-800 rounded-2xl rounded-tl-sm p-4 text-sm shadow-sm font-kanit leading-relaxed">
+                <div class="bg-white border text-dark rounded-3 p-3 shadow-xs small lh-base">
                     ${formatMarkdown(text)}
                 </div>
             </div>
@@ -337,11 +333,11 @@ function escapeHtml(text) {
 
 function formatMarkdown(text) {
     return text
-        .replace(/### (.*?)\n/g, '<h4 class="text-base font-bold text-gray-900 mt-3 mb-1 font-kanit">$1</h4>')
-        .replace(/#### (.*?)\n/g, '<h5 class="text-sm font-bold text-gray-800 mt-2 mb-1 font-kanit">$1</h5>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em class="text-gray-700">$1</em>')
-        .replace(/> ⚠️ (.*?)\n/g, '<div class="p-2.5 rounded-xl my-2 bg-amber-50 border border-amber-200 text-xs text-amber-900 font-kanit">⚠️ $1</div>')
+        .replace(/### (.*?)\n/g, '<h5 class="fw-bold text-dark mt-3 mb-1">$1</h5>')
+        .replace(/#### (.*?)\n/g, '<h6 class="fw-bold text-dark mt-2 mb-1">$1</h6>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong class="fw-bold text-dark">$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em class="text-secondary">$1</em>')
+        .replace(/> ⚠️ (.*?)\n/g, '<div class="alert alert-warning border-0 p-2 my-2 small">⚠️ $1</div>')
         .replace(/\n/g, '<br>');
 }
 </script>

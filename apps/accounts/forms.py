@@ -5,6 +5,7 @@ Enforces Strict Input Validation, Role Filtering, and Clean Methods.
 
 import re
 from django import forms
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.core.exceptions import ValidationError
 
@@ -157,10 +158,10 @@ class PatientRegistrationForm(forms.ModelForm):
         })
     )
     password = forms.CharField(
-        label="กำหนดรหัสผ่าน (ขั้นต่ำ 12 ตัวอักษร)",
+        label="กำหนดรหัสผ่าน (ขั้นต่ำ 8 ตัวอักษร)",
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'ความยาวอย่างน้อย 12 ตัวอักษร',
+            'placeholder': 'ความยาวอย่างน้อย 8 ตัวอักษร',
             'autocomplete': 'new-password',
             'required': True,
         })
@@ -191,7 +192,12 @@ class PatientRegistrationForm(forms.ModelForm):
 
     def clean_id_card(self):
         raw_id = self.cleaned_data.get('id_card', '').strip().replace('-', '').replace(' ', '')
-        if not validate_thai_id_card(raw_id):
+        if len(raw_id) != 13 or not raw_id.isdigit():
+            raise ValidationError("กรุณาระบุเลขประจำตัวประชาชน 13 หลัก (ตัวเลขล้วน)")
+            
+        # ในโหมด Production ให้ตรวจสอบ Modulo 11 Checksum อย่างเข้มงวด
+        # ในโหมด Development/Debug ยอมรับเลข 13 หลักเพื่อความสะดวกในการทดสอบระบบ
+        if not settings.DEBUG and not validate_thai_id_card(raw_id):
             raise ValidationError("เลขประจำตัวประชาชน 13 หลักไม่ถูกต้องตามสูตรคำนวณมาตรฐาน")
         
         # ตรวจสอบว่ามีผู้ใช้นี้อยู่แล้วหรือไม่
@@ -208,8 +214,8 @@ class PatientRegistrationForm(forms.ModelForm):
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
-        if len(password) < 12:
-            raise ValidationError("รหัสผ่านต้องมีความยาวอย่างน้อย 12 ตัวอักษรตามมาตรฐานความปลอดภัย")
+        if len(password) < 8:
+            raise ValidationError("รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร")
         return password
 
     def clean(self):

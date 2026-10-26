@@ -1,63 +1,78 @@
 {% extends 'layouts/doctor_base.html' %}
 
-{% block title %}TSPI Brain Reasoning Engine - TSPI CLINIC{% endblock %}
+{% block title %}TSPI Brain Reasoning Engine | TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto space-y-6">
+<div class="d-flex flex-column gap-4">
 
-    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                    <i class="fas fa-brain mr-1"></i> Deterministic Inference Engine
+    <!-- Header Card -->
+    <div class="card shadow-sm border">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
+                    <i class="fas fa-brain me-1"></i> Deterministic Inference Engine
                 </span>
-                <span class="text-xs text-gray-400">ระบบประมวลผลการวินิจฉัยเชิงเหตุและผล</span>
+                <span class="text-muted small">ระบบประมวลผลการวินิจฉัยเชิงเหตุและผล</span>
             </div>
-            <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
-                กลไกการคิดและให้เหตุผล TSPI Brain Engine
-            </h1>
-            <p class="text-sm text-gray-500 mt-0.5">
-                ติดตามขั้นตอนการประมวลผลข้อมูลตั้งแต่ Input อาการ & แล็บ สู่การคำนวณคะแนน 39 แกน (12 โดเมน) และจัดโปรโตคอลรักษา
+            <h1 class="h4 fw-bold mb-1 text-dark">กลไกการคิดและให้เหตุผล TSPI Brain Engine</h1>
+            <p class="text-muted small mb-0">
+                ติดตามขั้นตอนการประมวลผลข้อมูลตั้งแต่ Input อาการ &amp; แล็บ สู่การคำนวณคะแนน 39 แกน (12 โดเมน) และจัดโปรโตคอลรักษา
             </p>
         </div>
     </div>
 
-    <!-- Multi-stage Execution Flow Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs relative">
-            <span class="text-xs font-bold font-mono text-primary">STAGE 01</span>
-            <h4 class="text-sm font-semibold text-gray-900 mt-1">Symptom & Lab Tokenizer</h4>
-            <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">
-                แปลงข้อความอาการซักประวัติและผลแล็บเป็น Normalized Clinical Tokens และตัวชี้วัดตัวเลข
-            </p>
-            <div class="mt-3 text-[11px] font-mono text-green-700 bg-green-50 p-2 rounded-lg">Status: 100% Parsed</div>
+    <!-- Multi-stage Execution Flow Cards (Row 4 Cols) -->
+    <div class="row g-3">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card h-100 shadow-sm border p-3">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace align-self-start mb-2">STAGE 01</span>
+                <h2 class="h6 fw-bold text-dark mb-1">Symptom &amp; Lab Tokenizer</h2>
+                <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.775rem;">
+                    แปลงข้อความอาการซักประวัติและผลแล็บเป็น Normalized Clinical Tokens และตัวชี้วัดตัวเลข
+                </p>
+                <div class="p-2 rounded bg-success-subtle text-success border border-success-subtle font-monospace small" style="font-size: 0.725rem;">
+                    Status: 100% Parsed
+                </div>
+            </div>
         </div>
 
-        <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs relative">
-            <span class="text-xs font-bold font-mono text-primary">STAGE 02</span>
-            <h4 class="text-sm font-semibold text-gray-900 mt-1">39-Axes Deterministic Scoring (12 Domains)</h4>
-            <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">
-                คำนวณคะแนนความรุนแรง 0-100 ของแต่ละแกนใน 12 โดเมนผ่านค่าน้ำหนักที่กำหนดไว้ (Zero-Hallucination)
-            </p>
-            <div class="mt-3 text-[11px] font-mono text-green-700 bg-green-50 p-2 rounded-lg">Status: 39/39 Scored (12 Domains)</div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card h-100 shadow-sm border p-3">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace align-self-start mb-2">STAGE 02</span>
+                <h2 class="h6 fw-bold text-dark mb-1">39-Axes Deterministic Scoring</h2>
+                <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.775rem;">
+                    คำนวณคะแนนความรุนแรง 0-100 ของแต่ละแกนใน 12 โดเมนผ่านค่าน้ำหนักที่กำหนดไว้ (Zero-Hallucination)
+                </p>
+                <div class="p-2 rounded bg-success-subtle text-success border border-success-subtle font-monospace small" style="font-size: 0.725rem;">
+                    Status: 39/39 Scored
+                </div>
+            </div>
         </div>
 
-        <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs relative">
-            <span class="text-xs font-bold font-mono text-primary">STAGE 03</span>
-            <h4 class="text-sm font-semibold text-gray-900 mt-1">9-Step Protocol Alignment</h4>
-            <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">
-                จัดลำดับการรักษาตามบันได 9 ขั้น (กำจัดสารพิษและรักษาลำไส้ก่อนฟื้นฟูเซลล์ระดับลึก)
-            </p>
-            <div class="mt-3 text-[11px] font-mono text-primary bg-primary/10 p-2 rounded-lg">Target: Phase 1 Active</div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card h-100 shadow-sm border p-3">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace align-self-start mb-2">STAGE 03</span>
+                <h2 class="h6 fw-bold text-dark mb-1">9-Step Protocol Alignment</h2>
+                <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.775rem;">
+                    จัดลำดับการรักษาตามบันได 9 ขั้น (กำจัดสารพิษและรักษาลำไส้ก่อนฟื้นฟูเซลล์ระดับลึก)
+                </p>
+                <div class="p-2 rounded bg-primary-subtle text-primary border border-primary-subtle font-monospace small" style="font-size: 0.725rem;">
+                    Target: Phase 1 Active
+                </div>
+            </div>
         </div>
 
-        <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs relative">
-            <span class="text-xs font-bold font-mono text-primary">STAGE 04</span>
-            <h4 class="text-sm font-semibold text-gray-900 mt-1">Phytochemical Module Dispatch</h4>
-            <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">
-                จับคู่โมดูลสมุนไพร 200 สูตรตำรับ และส่งเข้าสู่ระบบตรวจทานของแพทย์เพื่ออนุมัติ
-            </p>
-            <div class="mt-3 text-[11px] font-mono text-amber-700 bg-amber-50 p-2 rounded-lg">Awaiting Sign-off</div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card h-100 shadow-sm border p-3">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace align-self-start mb-2">STAGE 04</span>
+                <h2 class="h6 fw-bold text-dark mb-1">Module Dispatch</h2>
+                <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.775rem;">
+                    จับคู่โมดูลสมุนไพร 200 สูตรตำรับ และส่งเข้าสู่ระบบตรวจทานของแพทย์เพื่ออนุมัติ
+                </p>
+                <div class="p-2 rounded bg-warning-subtle text-warning-emphasis border border-warning-subtle font-monospace small" style="font-size: 0.725rem;">
+                    Awaiting Sign-off
+                </div>
+            </div>
         </div>
     </div>
 

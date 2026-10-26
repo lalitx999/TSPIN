@@ -1,0 +1,120 @@
+{% extends 'reports/_base_report.html' %}
+
+{% block report_title %}รายงานการแพทย์แม่นยำ (Physician Edition) — {{ identity.full_name }} (HN: {{ identity.hn }}){% endblock %}
+
+{% block edition_badge_block %}
+<span class="edition-badge badge-physician">PHYSICIAN CLINICAL DOSSIER (ฉบับแพทย์)</span>
+{% endblock %}
+
+{% block report_body %}
+    <!-- Section 1: Clinical Safety Gates -->
+    <div class="section-bar">1. เกณฑ์ความปลอดภัยทางคลินิก (Clinical Safety Gates & Terminology)</div>
+    <div class="callout-box callout-warning">
+        <div style="font-weight: 700; margin-bottom: 2px;">
+            ⚠️ คำสั่งควบคุมความปลอดภัยการเสริมธาตุเหล็ก (Iron Safety Invariant):
+        </div>
+        <div>
+            สถานะปัจจุบัน: <strong>{{ safety_gates.iron_supplementation_status.value|default:safety_gates.iron_supplementation_status }}</strong>
+        </div>
+        <div style="margin-top: 2px; color: #78350F; font-size: 8.5pt;">
+            คำแนะนำทางคลินิก: {{ safety_gates.iron_clinical_guidance }}
+            <br>
+            รายการตรวจที่จำเป็นก่อนพิจารณาธาตุเหล็ก: 
+            <strong>{{ safety_gates.iron_required_tests|join:", " }}</strong>
+        </div>
+        <div style="margin-top: 4px; font-size: 8.5pt; color: #1E3A8A; border-top: 1px dashed #FCD34D; padding-top: 2px;">
+            คำศัพท์มาตรฐานชีววิทยา: <strong>{{ safety_gates.mash_terminology }}</strong>
+        </div>
+    </div>
+
+    <!-- Section 2: Clinical Summary & Physician Notes -->
+    {% if clinical_summary or physician_notes %}
+    <div class="section-bar">2. สรุปประวัติและข้อสังเกตทางการแพทย์ (Clinical Assessment & SOAP)</div>
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 6px 10px; border-radius: 4px; margin-bottom: 12px; font-size: 9.5pt;">
+        {% if clinical_summary %}
+        <div><strong>สรุปอาการและผลประเมิน:</strong> {{ clinical_summary }}</div>
+        {% endif %}
+        {% if physician_notes %}
+        <div style="margin-top: 4px; color: #1E40AF;"><strong>บันทึกแพทย์ผู้ตรวจ:</strong> {{ physician_notes }}</div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Section 3: 39 Biological Axes Mechanistic Matrix -->
+    <div class="section-bar">3. ตารางประเมิน 39 แกนชีววิทยาเชิงลึก (39 Biological Axes Detailed Assessment)</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 5%;">#</th>
+                <th style="width: 25%;">แกนชีววิทยา (Canonical Name)</th>
+                <th style="width: 10%;">โดเมน</th>
+                <th style="width: 13%;">Evidence Status</th>
+                <th style="width: 13%;">Assessment Status</th>
+                <th style="width: 16%;" class="text-center">Scoring Rule ID</th>
+                <th style="width: 9%;" class="text-center">คะแนน</th>
+                <th style="width: 9%;" class="text-center">ระดับความเสื่อม</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ax in axes_list %}
+            <tr>
+                <td class="font-mono text-center">{{ ax.axis_id }}</td>
+                <td>
+                    <strong style="color: #0F172A;">{{ ax.canonical_axis_name }}</strong>
+                </td>
+                <td class="font-mono">{{ ax.domain_code }}</td>
+                <td>
+                    <span style="font-size: 8pt; color: #475569;">{{ ax.evidence_status }}</span>
+                </td>
+                <td>
+                    <span style="font-size: 8pt; color: #475569;">{{ ax.assessment_status }}</span>
+                </td>
+                <td class="text-center font-mono" style="font-size: 8pt; color: #1D4ED8;">
+                    {{ ax.scoring_rule_id|default:"-" }}
+                </td>
+                <td class="text-center font-mono fw-bold">
+                    {% if ax.severity_score is not None %}
+                        {{ ax.severity_score }}
+                    {% else %}
+                        <span style="color: #94A3B8; font-size: 8pt;">รอตรวจยืนยัน</span>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if ax.severity_score is not None %}
+                        {% if ax.severity_score < 40 %}
+                        <span class="score-pill score-optimal">ปกติ</span>
+                        {% elif ax.severity_score < 60 %}
+                        <span class="score-pill score-subclinical">เฝ้าระวัง</span>
+                        {% elif ax.severity_score < 80 %}
+                        <span class="score-pill score-functional">เสื่อมหน้าที่</span>
+                        {% else %}
+                        <span class="score-pill score-pathological">รุนแรง</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="score-pill score-unscored">สมมติฐาน</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Section 4: Phytochemical Formulations (Fail-Closed Whitelist) -->
+    <div class="section-bar">4. ตำรับสารอาหารและพฤกษเคมีบำบัด (Therapeutic Module Registry)</div>
+    {% if module_registry.is_hidden_in_clinical_report %}
+    <div class="callout-box" style="background-color: #F8FAFC; border-left: 4px solid #94A3B8; color: #475569;">
+        <strong>Fail-Closed Policy:</strong> รายการตำรับโมดูลสมุนไพรถูกซ่อนไว้ตามมาตรฐานความปลอดภัย (ยังไม่ได้รับการอนุมัติสูตรตำรับจากคณะกรรมการแพทย์)
+    </div>
+    {% else %}
+    <div class="callout-box callout-success">
+        <strong>Approved Modules Whitelist:</strong> มีการอนุมัติสูตรตำรับ {{ module_registry.approved_module_count }} โมดูลสำหรับผู้ป่วยรายนี้
+        <div style="margin-top: 4px;">
+            {% for mod in module_registry.approved_modules_whitelist %}
+            <span style="display: inline-block; background: #DCFCE7; color: #15803D; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin: 2px;">
+                {{ mod }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}

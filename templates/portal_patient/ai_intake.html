@@ -3,7 +3,7 @@
 {% block title %}ซักประวัติอาการกับ AI (AI Intake) | TSPI Health{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6" x-data="{
+<div class="container py-2" style="max-width: 900px;" x-data="{
     messages: [
         { sender: 'ai', text: 'สวัสดีครับ ผมคือผู้ช่วยพยาบาล AI ของ TSPI Clinic ยินดีที่ได้ดูแลคุณครับ วันนี้รู้สึกไม่สบายตรงไหน หรือมีอาการอะไรที่ต้องการปรึกษาเป็นพิเศษไหมครับ?' }
     ],
@@ -26,51 +26,56 @@
     }
 }">
 
-    <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-xs flex items-center justify-between">
-        <div>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 mb-1">
-                <i class="fas fa-robot mr-1"></i> AI Clinical Anamnesis
-            </span>
-            <h1 class="text-xl font-bold text-gray-900">ซักประวัติสุขภาพและอาการเบื้องต้นกับ AI</h1>
-            <p class="text-xs text-gray-500">พิมพ์หรือบอกเล่าอาการตามความเป็นจริง ข้อมูลจะถูกจัดระเบียบให้แพทย์ทราบล่วงหน้า</p>
-        </div>
-        <div class="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-lg">
-            <i class="fas fa-stethoscope"></i>
+    <div class="card border-0 shadow-xs mb-4">
+        <div class="card-body p-4 d-flex align-items-center justify-content-between">
+            <div>
+                <span class="badge bg-primary-subtle text-primary mb-2">
+                    <i class="fas fa-robot me-1"></i> AI Clinical Anamnesis
+                </span>
+                <h1 class="h5 fw-bold text-dark mb-1">ซักประวัติสุขภาพและอาการเบื้องต้นกับ AI</h1>
+                <p class="small text-muted mb-0">พิมพ์หรือบอกเล่าอาการตามความเป็นจริง ข้อมูลจะถูกจัดระเบียบให้แพทย์ทราบล่วงหน้า</p>
+            </div>
+            <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                <i class="fas fa-stethoscope fs-5"></i>
+            </div>
         </div>
     </div>
 
     <!-- Chat Stream Card -->
-    <div class="bg-white border border-gray-200 rounded-3xl shadow-xs overflow-hidden flex flex-col h-[480px]">
-        <div class="flex-1 p-6 space-y-4 overflow-y-auto bg-gray-50/30 text-sm">
+    <div class="card border-0 shadow-xs overflow-hidden d-flex flex-column" style="height: 500px;">
+        <div class="card-body p-4 overflow-y-auto bg-light flex-grow-1 d-flex flex-column gap-3 small">
             <template x-for="(msg, index) in messages" :key="index">
-                <div class="flex items-start gap-3" :class="msg.sender === 'user' ? 'justify-end' : ''">
+                <div class="d-flex align-items-start gap-2.5" :class="msg.sender === 'user' ? 'justify-content-end' : ''">
                     <template x-if="msg.sender === 'ai'">
-                        <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold small flex-shrink-0" style="width: 32px; height: 32px;">
                             AI
                         </div>
                     </template>
-                    <div class="p-4 rounded-2xl max-w-lg leading-relaxed shadow-xs"
-                         :class="msg.sender === 'user' ? 'bg-primary text-white rounded-tr-none' : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none'">
-                        <p x-text="msg.text"></p>
+                    <div class="p-3 rounded-3 shadow-xs lh-base"
+                         style="max-width: 75%;"
+                         :class="msg.sender === 'user' ? 'bg-primary text-white ms-auto' : 'bg-white border text-dark'">
+                        <p class="mb-0" x-text="msg.text"></p>
                     </div>
                 </div>
             </template>
 
             <!-- Thinking Indicator -->
-            <div x-show="isThinking" class="flex items-center gap-2 text-xs text-gray-400 pl-11">
-                <div class="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
-                <div class="w-2 h-2 rounded-full bg-primary animate-bounce delay-100"></div>
-                <div class="w-2 h-2 rounded-full bg-primary animate-bounce delay-200"></div>
+            <div x-show="isThinking" class="d-flex align-items-center gap-2 small text-muted ps-4">
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
                 <span>AI กำลังประมวลผลข้อมูลชีววิทยา...</span>
             </div>
         </div>
 
         <!-- Chat Input Bar -->
-        <div class="p-4 border-t border-gray-100 bg-white flex items-center gap-3">
-            <input type="text" x-model="userInput" @keydown.enter="sendMessage()" placeholder="พิมพ์บอกเล่าอาการของคุณที่นี่... (เช่น มีผื่นคัน, แน่นท้อง, อ่อนเพลีย)" class="flex-1 text-sm bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:ring-primary focus:border-primary">
-            <button @click="sendMessage()" type="button" class="px-6 py-3 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark transition-all shadow-xs flex items-center gap-2">
+        <div class="card-footer bg-white border-top p-3 d-flex align-items-center gap-2">
+            <input type="text" 
+                   x-model="userInput" 
+                   @keydown.enter="sendMessage()" 
+                   placeholder="พิมพ์บอกเล่าอาการของคุณที่นี่... (เช่น มีผื่นคัน, แน่นท้อง, อ่อนเพลีย)" 
+                   class="form-control">
+            <button @click="sendMessage()" type="button" class="btn btn-primary d-flex align-items-center gap-1.5 px-4 flex-shrink-0">
                 <span>ส่งข้อความ</span>
-                <i class="fas fa-paper-plane text-xs"></i>
+                <i class="fas fa-paper-plane small"></i>
             </button>
         </div>
     </div>

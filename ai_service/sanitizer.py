@@ -129,7 +129,10 @@ class TextDeidentifier:
     # 4. Standard Email Addresses
     EMAIL_REGEX = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
 
-    # 5. Thai Names with honorific prefixes
+    # 5. Passport Number patterns
+    PASSPORT_REGEX = re.compile(r'\b(?:Passport|หนังสือเดินทาง)?\s*(?:No\.?|เลขที่)?\s*[:#]?\s*([A-Z]{1,2}\d{7,8})\b', re.IGNORECASE)
+
+    # 6. Thai Names with honorific prefixes
     NAME_PREFIX_REGEX = re.compile(
         r'(?:นาย|นาง|นางสาว|น\.ส\.|ด\.ช\.|ด\.ญ\.|นพ\.|พญ\.|อาจารย์|อ\.|คุณลุง|คุณป้า|คุณตา|คุณยาย|คุณ)\s*([ก-๙]+(?:\s+[ก-๙]+)?)'
     )
@@ -152,6 +155,7 @@ class TextDeidentifier:
             "phone": 0,
             "hn": 0,
             "email": 0,
+            "passport": 0,
             "names": 0,
         }
 
@@ -169,7 +173,10 @@ class TextDeidentifier:
         # 4. Redact Emails
         sanitized, redacted_counts["email"] = cls.EMAIL_REGEX.subn("[EMAIL_TOKEN]", sanitized)
 
-        # 5. Redact Thai Names with prefixes
+        # 5. Redact Passports
+        sanitized, redacted_counts["passport"] = cls.PASSPORT_REGEX.subn("[PASSPORT_TOKEN]", sanitized)
+
+        # 6. Redact Thai Names with prefixes
         def replace_name(match):
             return "[PERSON_TOKEN]"
 

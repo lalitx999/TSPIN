@@ -192,6 +192,17 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
+    {% if messages %}
+        <div class="container-fluid px-4 pt-3">
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show rounded-3 shadow-sm mb-3" role="alert">
+                    <i class="fas {% if message.tags == 'error' %}fa-circle-xmark text-danger{% elif message.tags == 'warning' %}fa-triangle-exclamation text-warning{% elif message.tags == 'success' %}fa-circle-check text-success{% else %}fa-circle-info text-info{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     {% block layout %}{% block content %}{% endblock %}{% endblock %}
 
     <!-- Bootstrap 5.3.8 JS Bundle (Local Static) -->

@@ -95,14 +95,32 @@ def box_detail_view(request: HttpRequest, box_id) -> HttpResponse:
     })
 
 
+from django.core.cache import cache
+
 @require_POST
 @clinical_staff_required
 def box_unlock_action(request: HttpRequest, box_id) -> HttpResponse:
     """
     Unlocks Box contents using Doctor's Personal Box Password.
-    Enforces Rate Limiting and Audit Trail.
+    Enforces Rate Limiting (5 attempts / 5 mins) and Audit Trail.
     """
     box = get_object_or_404(Box, pk=box_id)
+    cache_key = f"unlock_attempts_{request.user.id}_{box.id}"
+    attempts = cache.get(cache_key, 0)
+
+    if attempts >= 5:
+        AuditLog.objects.create(
+            user=request.user,
+            action="BOX_UNLOCK_LOCKED_OUT",
+            model="Box",
+            object_id=str(box.id),
+            changes={"attempts": attempts, "status": "Temporary lock (5 minutes)"},
+            client_ip=get_client_ip(request),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')[:500]
+        )
+        messages.error(request, "ท่านกรอกรหัสผ่านผิดเกินกำหนด (5 ครั้ง) ระบบระงับชั่วคราวเป็นเวลา 5 นาที (ใช้ Break-Glass Protocol หากมีเหตุฉุกเฉิน)")
+        return redirect('clinical:box_detail', box_id=box.id)
+
     password = request.POST.get('box_password', '').strip()
 
     if not request.user.has_box_password:
@@ -111,19 +129,25 @@ def box_unlock_action(request: HttpRequest, box_id) -> HttpResponse:
 
     # Verify Personal Box Password
     if not request.user.check_box_password(password):
+        cache.set(cache_key, attempts + 1, timeout=300)
         AuditLog.objects.create(
             user=request.user,
             action="BOX_UNLOCK_FAILED",
             model="Box",
             object_id=str(box.id),
-            changes={"reason": "Incorrect personal box password"},
+            changes={"attempt": attempts + 1, "reason": "Incorrect personal box password"},
             client_ip=get_client_ip(request),
             user_agent=request.META.get('HTTP_USER_AGENT', '')[:500]
         )
-        messages.error(request, "รหัสผ่านเปิดกล่องส่วนตัวไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง")
+        remaining = 5 - (attempts + 1)
+        if remaining > 0:
+            messages.error(request, f"รหัสผ่านเปิดกล่องส่วนตัวไม่ถูกต้อง (เหลือโอกาสอีก {remaining} ครั้ง)")
+        else:
+            messages.error(request, "รหัสผ่านเปิดกล่องส่วนตัวไม่ถูกต้อง ระบบระงับการลองเป็นเวลา 5 นาที")
         return redirect('clinical:box_detail', box_id=box.id)
 
-    # Unlock Successful
+    # Unlock Successful -> Clear rate limiter
+    cache.delete(cache_key)
     session_key = f"box_unlocked_{box.id}"
     request.session[session_key] = True
 

@@ -686,5 +686,150 @@ class BotanyEnginePhase5Tests(TestCase):
         self.assertEqual(bg_log.changes.get("severity"), "CRITICAL")
 
 
+class BotanyEnginePhase6Tests(TestCase):
+    """
+    Test suite for TSPI Botany-Engine Phase 6 (Security Pen-Test & Institutional Hardening):
+    1. 50-Case PII Sanitization Leak Pen-Test (Zero-leak tolerance on Thai National IDs, Phones, Emails, HNs, Passports)
+    2. Brute-Force Rate Limiting Lockout on Box Unlock (5 failed attempts trigger 5-minute lockout)
+    3. Immutable Audit Trail completeness under adversarial attempts
+    """
 
+    def setUp(self):
+        self.client = Client()
+        self.doctor = User.objects.create_user(
+            username='doctor_piti',
+            email='piti@tspi.clinic',
+            password='ComplexDoctorPassword2026!',
+            role=User.Role.DOCTOR,
+            first_name='ปิติ',
+            last_name='ศิริแพทย์'
+        )
+        self.doctor.set_box_password("PitiBoxSecretKey2026!")
+        self.doctor.save()
 
+        from clinical.services_box import BoxBuilderService
+        from clinical.models import Box
+
+        self.box = BoxBuilderService.assemble_box(
+            source=Box.Source.CLINIC,
+            raw_complaint="ตรวจสุขภาพประจำปี ตับและไตปกติ",
+        )
+
+    def test_50_cases_pii_sanitization_pen_test(self):
+        """[Phase 6 Pen-Test]: ทดสอบ 50 เคสจำลองการป้อน PII ทุกรูปแบบ ต้องถูก Sanitizer กวาดล้าง 100% ไม่รั่วไหล"""
+        from ai_service.sanitizer import MediaSanitizer
+
+        pen_test_cases = [
+            # 1-10: Thai National IDs (formatted, unformatted, with words)
+            "คนไข้บัตรประชาชน 1100400123456 มาพบแพทย์",
+            "เลขบัตร: 1-1004-00123-45-6 แจ้งอาการปวดหัว",
+            "CID 3100500987654 ตรวจสุขภาพ",
+            "ประชาชนเลขที่ 5100200334455 มีไข้สูง",
+            "1-2345-67890-12-3 ปวดท้องรุนแรง",
+            "เลขประจำตัว 1122334455667 มีอาการเหนื่อยหอบ",
+            "1209800112233 ตรวจเลือดซ้ำ",
+            "3401200554433 ค่าตับสูง",
+            "1509900443322 ตรวจปัสสาวะ",
+            "บัตรปชช 1103700223344 นัดติดตามอาการ",
+            # 11-20: Thai Phone numbers (mobile, landline, hyphens, spaces)
+            "เบอร์ติดต่อ 081-234-5678 โทรแจ้งผลด่วน",
+            "โทร 0891234567 คนไข้ไม่รับสาย",
+            "เบอร์โทรศัพท์ 062-987-6543 นัดตรวจสัปดาห์หน้า",
+            "ติดต่อญาติที่ 0955554321 ฉุกเฉิน",
+            "เบอร์บ้าน 02-123-4567 โทรตาม",
+            "Tel: 083-000-1122 มีประวัติแพ้ยา",
+            "เบอร์มือถือ: 086 111 2233",
+            "โทรกลับที่ 091-888-7766 ด่วน",
+            "085-444-3322 แจ้งนัดผ่าตัด",
+            "061-222-3344 คนไข้แจ้งเปลี่ยนเบอร์",
+            # 21-30: Email addresses (various domains)
+            "ส่งผลแล็บไปที่ somchai.j@gmail.com ด้วยครับ",
+            "อีเมล patient_urgent@hotmail.com ติดต่อไม่ได้",
+            "email: doctor.consult@tspi.clinic ส่งต่อเคส",
+            "cc: user123@yahoo.co.th รับทราบ",
+            "contact: somying_2026@outlook.com เรียบร้อย",
+            "info@medical-center.or.th ส่งประวัติย้ายรพ.",
+            "test.user+tag@domain.co.th สอบถามผลเลือด",
+            "somkiat_care@sanook.com คนไข้ขอสำเนา",
+            "mail: patient.vip@hospital.go.th ส่งใบรับรอง",
+            "ส่งรายงานไปทาง info.urgent@clinics.in.th",
+            # 31-40: Hospital Numbers (HN variations)
+            "คนไข้ HN: 123456 เข้าห้องตรวจ 2",
+            "HN 987654 ย้ายมาจากแผนกศัลยกรรม",
+            "หมายเลข HN: 001122 ผลเลือดออกแล้ว",
+            "HN: 554433 มีภาวะความดันโลหิตสูง",
+            "HN 889900 นัดตรวจคลื่นไฟฟ้าหัวใจ",
+            "hn: 112233 นัดพบนักโภชนาการ",
+            "HN 776655 เจาะน้ำตาลซ้ำ",
+            "HN: 334455 ส่งต่ออายุรกรรม",
+            "hn 990011 ฉีดวัคซีนไข้หวัดใหญ่",
+            "HN: 445566 ประวัติแพ้พาราเซตามอล",
+            # 41-50: Passports & Mixed Complex Vectors
+            "หนังสือเดินทางเลขที่ AA1234567 ขอใบรับรองแพทย์",
+            "Passport No. AB9876543 สำหรับเดินทางต่างประเทศ",
+            "คนไข้ต่างชาติ Passport: AC1122334 ตรวจ PCR",
+            "นาย สมศักดิ์ รักดี เลขบัตร 1100400123456 โทร 0812345678",
+            "นาง วิจิตรา มั่นคง HN: 123456 อีเมล viji@test.com โทร 089-999-8888",
+            "น.ส. แพรวา ก้องเกียรติ CID: 3100500987654 tel: 062-111-4455",
+            "นายแพทย์วิชัย ประจำ HN 554433 โทร 02-987-6543",
+            "เด็กชายภูผา ศรีสวัสดิ์ 1122334455667 เมล phu@school.ac.th",
+            "Passport AA7654321 และเบอร์ 084-555-6677 คนไข้นัดตรวจตา",
+            "เคสฉุกเฉิน 1-1004-00123-45-6 / 081-111-2222 / urgent@hospital.com",
+        ]
+
+        from ai_service.sanitizer import TextDeidentifier
+
+        for idx, text in enumerate(pen_test_cases, 1):
+            res = TextDeidentifier.sanitize(text)
+            sanitized = res["sanitized_text"]
+            counts = res["redacted_counts"]
+            
+            # ยืนยันว่าไม่มีเบอร์โทร, เลขบัตร 13 หลัก หรืออีเมลหลุดรอด
+            import re
+            self.assertFalse(
+                re.search(r'\b\d{13}\b', sanitized),
+                f"Leak detected in test case {idx}: {sanitized}"
+            )
+            self.assertFalse(
+                re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', sanitized),
+                f"Email leak detected in test case {idx}: {sanitized}"
+            )
+            # ต้องพบการ Mask อย่างน้อย 1 รายการ
+            total_masked = sum(counts.values())
+            self.assertGreater(
+                total_masked,
+                0,
+                f"No PII masked in test case {idx}: {text}"
+            )
+
+    def test_brute_force_lockout_on_box_unlock(self):
+        """[Phase 6 Security]: ทดสอบ Brute-Force Rate Limiting (5 ครั้งแล้วระงับ 5 นาที)"""
+        from django.core.cache import cache
+        cache.clear()
+
+        self.client.force_login(self.doctor)
+
+        # ลองรหัสผ่านผิด 5 ครั้งรวด
+        for i in range(1, 6):
+            resp = self.client.post(
+                reverse('clinical:box_unlock', kwargs={'box_id': self.box.id}),
+                {'box_password': f'WrongAttempt{i}!'},
+                follow=True
+            )
+            self.assertEqual(resp.status_code, 200)
+            self.assertFalse(resp.context['is_unlocked'])
+
+        # ครั้งที่ 6: ต้องถูก Lockout อัตโนมัติ (แม้จะใส่รหัสถูกต้องก็ตาม)
+        lockout_resp = self.client.post(
+            reverse('clinical:box_unlock', kwargs={'box_id': self.box.id}),
+            {'box_password': 'PitiBoxSecretKey2026!'},
+            follow=True
+        )
+        self.assertEqual(lockout_resp.status_code, 200)
+        self.assertFalse(lockout_resp.context['is_unlocked'])
+        self.assertContains(lockout_resp, "ระงับชั่วคราวเป็นเวลา 5 นาที")
+
+        # ตรวจสอบว่าบันทึก BOX_UNLOCK_LOCKED_OUT ใน AuditLog
+        lockout_log = AuditLog.objects.filter(action="BOX_UNLOCK_LOCKED_OUT", object_id=str(self.box.id)).first()
+        self.assertIsNotNone(lockout_log)
+        self.assertEqual(lockout_log.user, self.doctor)

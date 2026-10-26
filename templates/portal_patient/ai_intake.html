@@ -1,39 +1,20 @@
 {% extends 'layouts/patient_base.html' %}
+{% load static %}
 
-{% block title %}ซักประวัติอาการกับ AI (AI Intake) | TSPI Health{% endblock %}
+{% block title %}ซักประวัติอาการกับ AI (AI Clinical Intake) | TSPI Health{% endblock %}
 
 {% block content %}
-<div class="container py-2" style="max-width: 900px;" x-data="{
-    messages: [
-        { sender: 'ai', text: 'สวัสดีครับ ผมคือผู้ช่วยพยาบาล AI ของ TSPI Clinic ยินดีที่ได้ดูแลคุณครับ วันนี้รู้สึกไม่สบายตรงไหน หรือมีอาการอะไรที่ต้องการปรึกษาเป็นพิเศษไหมครับ?' }
-    ],
-    userInput: '',
-    isThinking: false,
-    sendMessage() {
-        if (!this.userInput.trim()) return;
-        const text = this.userInput;
-        this.messages.push({ sender: 'user', text: text });
-        this.userInput = '';
-        this.isThinking = true;
+<div class="container py-2" style="max-width: 900px;" x-data="aiIntakeApp()">
 
-        setTimeout(() => {
-            this.isThinking = false;
-            this.messages.push({
-                sender: 'ai',
-                text: 'ขอบคุณสำหรับข้อมูลครับ ผมได้บันทึกอาการและส่งเข้าสู่การประเมินเบื้องต้นในกลุ่ม แกนการอักเสบ (A01) และแกนทางเดินอาหาร (A19) เรียบร้อยแล้ว มีอาการอื่นๆ เช่น แน่นท้อง อ่อนเพลีย หรือนอนไม่หลับร่วมด้วยไหมครับ?'
-            });
-        }, 1200);
-    }
-}">
-
+    <!-- Header Card -->
     <div class="card border-0 shadow-xs mb-4">
         <div class="card-body p-4 d-flex align-items-center justify-content-between">
             <div>
                 <span class="badge bg-primary-subtle text-primary mb-2">
-                    <i class="fas fa-robot me-1"></i> AI Clinical Anamnesis
+                    <i class="fas fa-robot me-1"></i> AI Clinical Anamnesis &bull; 15s Guardrail
                 </span>
                 <h1 class="h5 fw-bold text-dark mb-1">ซักประวัติสุขภาพและอาการเบื้องต้นกับ AI</h1>
-                <p class="small text-muted mb-0">พิมพ์หรือบอกเล่าอาการตามความเป็นจริง ข้อมูลจะถูกจัดระเบียบให้แพทย์ทราบล่วงหน้า</p>
+                <p class="small text-muted mb-0">ข้อมูลอาการจะถูกบันทึกลงในเวชระเบียนจริงของท่าน และจัดระเบียบให้แพทย์วิเคราะห์ล่วงหน้า</p>
             </div>
             <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
                 <i class="fas fa-stethoscope fs-5"></i>
@@ -41,9 +22,54 @@
         </div>
     </div>
 
+    <!-- Completion Success Banner -->
+    <template x-if="isCompleted">
+        <div class="alert alert-success border-success-subtle shadow-xs p-4 mb-4 rounded-3">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="fas fa-check-circle fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-0">บันทึกข้อมูลอาการเข้าสู่เวชระเบียนเรียบร้อยแล้ว</h6>
+                        <small class="text-muted">ระบบได้แมปอาการเบื้องต้นกับแกนชีววิทยาที่เกี่ยวข้องเรียบร้อยแล้ว</small>
+                    </div>
+                </div>
+                <a href="{% url 'portal_patient:patient_axes_result' %}" class="btn btn-success fw-bold px-3 rounded-pill">
+                    ดูผลวิเคราะห์คะแนน 39 แกน &rarr;
+                </a>
+            </div>
+        </div>
+    </template>
+
+    <!-- Error & Fallback Banner (Gotcha 4) -->
+    <template x-if="showFallback">
+        <div class="alert alert-warning border-warning-subtle shadow-xs p-4 mb-4 rounded-3">
+            <div class="d-flex align-items-start gap-3 mb-3">
+                <i class="fas fa-exclamation-triangle fs-4 text-warning mt-1"></i>
+                <div>
+                    <h6 class="fw-bold text-dark mb-1">การเชื่อมต่อ AI มีความล่าช้า หรือใช้เวลาเกิน 15 วินาที</h6>
+                    <p class="small text-muted mb-0">ท่านสามารถใช้แบบฟอร์มด้านล่างเพื่อพิมพ์อาการและส่งตรงถึงคณะแพทย์ได้ทันที</p>
+                </div>
+            </div>
+            <form @submit.prevent="submitFallback()">
+                <div class="mb-3">
+                    <textarea x-model="fallbackText" class="form-control form-control-sm" rows="3" placeholder="ระบุอาการสำคัญของคุณ เช่น มีผื่นคัน, ท้องอืด, เหนื่อยล้า..." required></textarea>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" @click="showFallback = false" class="btn btn-sm btn-light border">ปิด</button>
+                    <button type="submit" class="btn btn-sm btn-primary fw-bold px-3" :disabled="isSubmittingFallback">
+                        <span x-show="isSubmittingFallback" class="spinner-border spinner-border-sm me-1"></span>
+                        <span>ส่งข้อมูลให้แพทย์โดยตรง</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </template>
+
     <!-- Chat Stream Card -->
-    <div class="card border-0 shadow-xs overflow-hidden d-flex flex-column" style="height: 500px;">
-        <div class="card-body p-4 overflow-y-auto bg-light flex-grow-1 d-flex flex-column gap-3 small">
+    <div class="card border-0 shadow-xs overflow-hidden d-flex flex-column" style="height: 520px;">
+        <div class="card-body p-4 overflow-y-auto bg-light flex-grow-1 d-flex flex-column gap-3 small" id="chat-messages-container">
             <template x-for="(msg, index) in messages" :key="index">
                 <div class="d-flex align-items-start gap-2.5" :class="msg.sender === 'user' ? 'justify-content-end' : ''">
                     <template x-if="msg.sender === 'ai'">
@@ -52,9 +78,9 @@
                         </div>
                     </template>
                     <div class="p-3 rounded-3 shadow-xs lh-base"
-                         style="max-width: 75%;"
+                         style="max-width: 78%;"
                          :class="msg.sender === 'user' ? 'bg-primary text-white ms-auto' : 'bg-white border text-dark'">
-                        <p class="mb-0" x-text="msg.text"></p>
+                        <p class="mb-0" x-text="msg.text" style="white-space: pre-wrap;"></p>
                     </div>
                 </div>
             </template>
@@ -62,7 +88,7 @@
             <!-- Thinking Indicator -->
             <div x-show="isThinking" class="d-flex align-items-center gap-2 small text-muted ps-4">
                 <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
-                <span>AI กำลังประมวลผลข้อมูลชีววิทยา...</span>
+                <span>AI กำลังประมวลผลข้อมูลชีววิทยา (Timeout Guard 15s)...</span>
             </div>
         </div>
 
@@ -71,14 +97,152 @@
             <input type="text" 
                    x-model="userInput" 
                    @keydown.enter="sendMessage()" 
+                   :disabled="isThinking"
                    placeholder="พิมพ์บอกเล่าอาการของคุณที่นี่... (เช่น มีผื่นคัน, แน่นท้อง, อ่อนเพลีย)" 
                    class="form-control">
-            <button @click="sendMessage()" type="button" class="btn btn-primary d-flex align-items-center gap-1.5 px-4 flex-shrink-0">
+            <button @click="sendMessage()" type="button" class="btn btn-primary d-flex align-items-center gap-1.5 px-4 flex-shrink-0" :disabled="isThinking">
                 <span>ส่งข้อความ</span>
                 <i class="fas fa-paper-plane small"></i>
+            </button>
+            <button @click="showFallback = !showFallback" type="button" class="btn btn-outline-secondary btn-sm px-2 flex-shrink-0" title="สลับเป็นฟอร์มกรอกอาการเอง">
+                <i class="fas fa-edit"></i>
             </button>
         </div>
     </div>
 
+    <!-- CSRF Token Hidden Helper -->
+    <form id="csrf-helper" class="d-none">
+        {% csrf_token %}
+    </form>
+
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function aiIntakeApp() {
+    let initialMessages = [];
+    try {
+        const rawSaved = {{ saved_messages|safe }};
+        if (Array.isArray(rawSaved) && rawSaved.length > 0) {
+            initialMessages = rawSaved;
+        }
+    } catch (e) {
+        // Fallback default greeting
+    }
+
+    if (initialMessages.length === 0) {
+        initialMessages = [
+            {
+                sender: 'ai',
+                text: 'สวัสดีครับ ผมคือผู้ช่วยพยาบาล AI ของ TSPI Clinic ยินดีที่ได้ดูแลคุณครับ วันนี้รู้สึกไม่สบายตรงไหน หรือมีอาการอะไรที่ต้องการปรึกษาเป็นพิเศษไหมครับ?'
+            }
+        ];
+    }
+
+    return {
+        messages: initialMessages,
+        userInput: '',
+        isThinking: false,
+        isCompleted: false,
+        showFallback: false,
+        fallbackText: '',
+        isSubmittingFallback: false,
+
+        async sendMessage() {
+            if (!this.userInput.trim() || this.isThinking) return;
+
+            const text = this.userInput.trim();
+            this.messages.push({ sender: 'user', text: text });
+            this.userInput = '';
+            this.isThinking = true;
+            this.scrollToBottom();
+
+            // Setup AbortController for 15s Timeout (Gotcha 4)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+            const formData = new FormData();
+            formData.append('message', text);
+
+            const csrfToken = document.querySelector('#csrf-helper [name=csrfmiddlewaretoken]').value;
+
+            try {
+                const response = await fetch('/patient/api/ai-intake/chat/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: formData,
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    this.messages.push({
+                        sender: 'ai',
+                        text: data.reply
+                    });
+                    if (data.is_completed) {
+                        this.isCompleted = true;
+                    }
+                } else {
+                    this.showFallback = true;
+                    this.fallbackText = text;
+                }
+            } catch (err) {
+                clearTimeout(timeoutId);
+                // Timeout or network failure -> Activate Fallback Form (Gotcha 4)
+                this.showFallback = true;
+                this.fallbackText = text;
+                this.messages.push({
+                    sender: 'ai',
+                    text: 'ขออภัยครับ ขณะนี้ระบบประมวลผลใช้เวลานานกว่าปกติ ท่านสามารถใช้ "แบบฟอร์มส่งข้อมูลให้แพทย์โดยตรง" ด้านบนเพื่อบันทึกอาการได้ทันทีครับ'
+                });
+            } finally {
+                this.isThinking = false;
+                this.scrollToBottom();
+            }
+        },
+
+        async submitFallback() {
+            if (!this.fallbackText.trim()) return;
+            this.isSubmittingFallback = true;
+
+            const formData = new FormData();
+            formData.append('manual_notes', this.fallbackText.trim());
+            const csrfToken = document.querySelector('#csrf-helper [name=csrfmiddlewaretoken]').value;
+
+            try {
+                const resp = await fetch('/patient/api/ai-intake/fallback/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: formData
+                });
+                const resData = await resp.json();
+                if (resp.ok && resData.success) {
+                    alert('บันทึกอาการส่งให้แพทย์เรียบร้อยแล้ว');
+                    this.showFallback = false;
+                    this.isCompleted = true;
+                }
+            } catch (err) {
+                alert('เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่อีกครั้ง');
+            } finally {
+                this.isSubmittingFallback = false;
+            }
+        },
+
+        scrollToBottom() {
+            this.$nextTick(() => {
+                const container = document.getElementById('chat-messages-container');
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            });
+        }
+    };
+}
+</script>
 {% endblock %}

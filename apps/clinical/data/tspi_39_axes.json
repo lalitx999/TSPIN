@@ -26,7 +26,19 @@
                             "description": "การอักเสบจากความอ้วน, lipotoxicity, insulin resistance, inflammaging ซึ่งเป็นการอักเสบระดับต่ำที่เกิดจากความผิดปกติของเมตาบอลิซึมและเป็นพื้นฐานของโรค metabolic syndrome, เบาหวาน และโรคหัวใจและหลอดเลือด"
                         }
                     },
-                    "modules": [],
+                    "modules": [
+                        "KS",
+                        "KERRA",
+                        "minoza",
+                        "im6",
+                        "Im5",
+                        "beta",
+                        "im1",
+                        "im5",
+                        "db1",
+                        "im9",
+                        "beta5"
+                    ],
                     "modules_by_context": {}
                 },
                 {
@@ -57,7 +69,18 @@
                         "beta x",
                         "Merdana",
                         "RESHIMUNO",
-                        "Plumax"
+                        "Plumax",
+                        "KS",
+                        "kerra",
+                        "minoza",
+                        "ricezozyme",
+                        "im6",
+                        "variz",
+                        "sinaza",
+                        "vetchakorn",
+                        "no.6",
+                        "beta",
+                        "merdana"
                     ],
                     "modules_by_context": {}
                 },
@@ -78,7 +101,20 @@
                             "description": "ภูมิคุ้มกันด่าน mucosa (ลำไส้, ทางเดินหายใจ ฯลฯ) ผ่านกลไกของ mucosal IgA, antimicrobial peptides, epithelial barrier function และการสื่อสารระหว่าง microbiome และ mucosal immune system เพื่อป้องกันการบุกรุกของเชื้อโรค"
                         }
                     },
-                    "modules": [],
+                    "modules": [
+                        "KERRA",
+                        "minoza",
+                        "cinnara",
+                        "feva",
+                        "หญ้าตีนนก",
+                        "im6",
+                        "beta",
+                        "kerrix",
+                        "plus",
+                        "Kerrina",
+                        "virana",
+                        "propolis"
+                    ],
                     "modules_by_context": {
                         "A": [
                             "KS",
@@ -145,7 +181,16 @@
                         "VITALIS",
                         "beta x",
                         "Merdana",
-                        "RESHIMUNO"
+                        "RESHIMUNO",
+                        "KS",
+                        "KERRA",
+                        "minoza",
+                        "ricezozyme",
+                        "im6",
+                        "buminmax",
+                        "im5",
+                        "im1",
+                        "db1"
                     ],
                     "modules_by_context": {}
                 }
@@ -186,7 +231,18 @@
                         "MORMORDICA",
                         "YA TEEN NOK",
                         "TUNG CHAO PLUS 1",
-                        "TUNG CHAO PLUS 2"
+                        "TUNG CHAO PLUS 2",
+                        "KS",
+                        "KERRA",
+                        "minoza",
+                        "ricezozyme",
+                        "im6",
+                        "เบญจกูล",
+                        "มะระขี้นก",
+                        "vitalplus",
+                        "db1",
+                        "beta",
+                        "im5"
                     ],
                     "modules_by_context": {}
                 },
@@ -225,7 +281,14 @@
                         "XS",
                         "VITALPLUS",
                         "TARANA",
-                        "Benjakul"
+                        "Benjakul",
+                        "xs",
+                        "belax",
+                        "เบญจกูล",
+                        "garcinia",
+                        "garlica",
+                        "KS",
+                        "vitalplus"
                     ],
                     "modules_by_context": {}
                 },
@@ -265,7 +328,16 @@
                         "TUNG CHAO PLUS 2",
                         "TARANA",
                         "CINNARA",
-                        "Benjakul"
+                        "Benjakul",
+                        "cinnara",
+                        "STOMMA",
+                        "ampur",
+                        "anax",
+                        "vitalplus",
+                        "kerra",
+                        "KS",
+                        "vetchakorn",
+                        "no6"
                     ],
                     "modules_by_context": {}
                 },
@@ -301,7 +373,23 @@
                         "TUNG CHAO PLUS 1",
                         "TUNG CHAO PLUS 2",
                         "LIVOXY",
-                        "Benjakul"
+                        "Benjakul",
+                        "KS",
+                        "kerra",
+                        "เบญจกูล",
+                        "vitalplus",
+                        "bova",
+                        "vetchakorn",
+                        "no.6",
+                        "vitalcell",
+                        "buminmax",
+                        "tungchao",
+                        "plus",
+                        "Il",
+                        "Ampur",
+                        "kurma",
+                        "curcuma",
+                        "longa"
                     ],
                     "modules_by_context": {}
                 },
@@ -331,7 +419,13 @@
                         "IM7",
                         "Beta M",
                         "Beta V",
-                        "LIVOXY"
+                        "LIVOXY",
+                        "KS",
+                        "kerra",
+                        "garlica",
+                        "vitalplus",
+                        "curcuma",
+                        "longa"
                     ],
                     "modules_by_context": {}
                 },
@@ -364,7 +458,11 @@
                         "YA TEEN NOK",
                         "TUNG CHAO PLUS 1",
                         "TUNG CHAO PLUS 2",
-                        "Benjakul"
+                        "Benjakul",
+                        "vitalplus",
+                        "KS",
+                        "kerra",
+                        "minoza"
                     ],
                     "modules_by_context": {}
                 }
@@ -406,7 +504,18 @@
                         "TUNG CHAO PLUS 1",
                         "TUNG CHAO PLUS 2",
                         "TUNG CHAO PLUS SANCHI",
-                        "Benjakul"
+                        "Benjakul",
+                        "kerra",
+                        "KS",
+                        "vitalplus",
+                        "vitacell",
+                        "im6",
+                        "minoza",
+                        "vetchakorn",
+                        "no6",
+                        "variz",
+                        "sinaza",
+                        "im5"
                     ],
                     "modules_by_context": {}
                 },
@@ -445,7 +554,14 @@
                         "SANGVICHAI",
                         "VATTHANOTHAI",
                         "TUNG CHAO PLUS 1",
-                        "TUNG CHAO PLUS 2"
+                        "TUNG CHAO PLUS 2",
+                        "kerra",
+                        "KS",
+                        "ricezozyme",
+                        "zaminzyme",
+                        "periz",
+                        "MINOZA",
+                        "im6"
                     ],
                     "modules_by_context": {
                         "D": [
@@ -487,7 +603,24 @@
                         "VATTHANOTHAI",
                         "TUNG CHAO PLUS 1",
                         "TUNG CHAO PLUS 2",
-                        "RESHIMUNO"
+                        "RESHIMUNO",
+                        "vitalplus",
+                        "superba",
+                        "max",
+                        "vitalcell",
+                        "kerra",
+                        "KS",
+                        "เบญจกูล",
+                        "im6",
+                        "vetchakorn",
+                        "no6",
+                        "sangvichai",
+                        "Lana",
+                        "absorn",
+                        "psylaza",
+                        "branaris",
+                        "branara",
+                        "plumax"
                     ],
                     "modules_by_context": {}
                 },
@@ -525,7 +658,24 @@
                         "TUNG CHAO PLUS 2",
                         "TUNG CHAO PLUS SANCHI",
                         "RESHIMUNO",
-                        "Benjakul"
+                        "Benjakul",
+                        "RADICA",
+                        "KS",
+                        "kerra",
+                        "vitalplus",
+                        "Lana",
+                        "ถั่งเช่า",
+                        "plus",
+                        "one",
+                        "ถั่งเช่าพลัสทู",
+                        "ampur",
+                        "ฮ่อเหรินหยิน",
+                        "revita",
+                        "vetchakorn",
+                        "no6",
+                        "psylaza",
+                        "branaris",
+                        "plumax"
                     ],
                     "modules_by_context": {}
                 }
@@ -563,7 +713,16 @@
                         "HEPA2",
                         "HEPA3",
                         "HEPA PLUS",
-                        "TARANA"
+                        "TARANA",
+                        "KS",
+                        "belax",
+                        "cathartic",
+                        "lypholax",
+                        "im9",
+                        "venta",
+                        "tarana",
+                        "livita",
+                        "radica"
                     ],
                     "modules_by_context": {
                         "uric": [
@@ -613,7 +772,20 @@
                         "VITALPLUS",
                         "TARANA",
                         "Benjakul",
-                        "Stream Plus"
+                        "Stream Plus",
+                        "cinnara",
+                        "เบญจกูล",
+                        "vitalplus",
+                        "ขมิ้นชัน",
+                        "plumax",
+                        "kerma",
+                        "KS",
+                        "belax",
+                        "venta",
+                        "น้ำสลัด",
+                        "น้ำมะขาม",
+                        "ulid",
+                        "อาหารอื่นๆ"
                     ],
                     "modules_by_context": {}
                 },
@@ -645,7 +817,19 @@
                         "ZAMINZYME",
                         "FLAXPRO",
                         "TARANA",
-                        "Benjakul"
+                        "Benjakul",
+                        "KS",
+                        "belax",
+                        "cathartic",
+                        "kerra",
+                        "minoza",
+                        "ricezozyme",
+                        "zaminzyme",
+                        "plumax",
+                        "STOMMA",
+                        "rizz",
+                        "flaxpro",
+                        "periz"
                     ],
                     "modules_by_context": {
                         "IBS": [
@@ -691,7 +875,19 @@
                         "IM6",
                         "VATTHANOTHAI",
                         "SITTHIJORN",
-                        "TARANA"
+                        "TARANA",
+                        "KS",
+                        "kerra",
+                        "minoza",
+                        "ricezozyme",
+                        "cinnara",
+                        "kerma",
+                        "belax",
+                        "garlica",
+                        "rizz",
+                        "ridse",
+                        "rizzo",
+                        "im6"
                     ],
                     "modules_by_context": {}
                 },
@@ -724,7 +920,41 @@
                         "FLAXPRO",
                         "VATTHANOTHAI",
                         "TARANA",
-                        "Benjakul"
+                        "Benjakul",
+                        "รายชื่อที่เอกสารแกนระบุโดยตรง",
+                        "VENTA,",
+                        "CHATHARIC,",
+                        "LYPHOLAX,",
+                        "LAXORIM,",
+                        "BELAX,",
+                        "RICEZOZYME,",
+                        "ZAMINZYME,",
+                        "FLAXPRO,",
+                        "VATTHANOTHAI,",
+                        ",Benjakul",
+                        "belax",
+                        "cathartic",
+                        "lypholax",
+                        "im9",
+                        "venta",
+                        "tarana",
+                        "livita",
+                        "radica",
+                        "kerra",
+                        "minoza",
+                        "ricezozyme",
+                        "zaminzyme",
+                        "plumax",
+                        "STOMMA",
+                        "rizz",
+                        "flaxpro",
+                        "periz",
+                        "cinnara",
+                        "kerma",
+                        "garlica",
+                        "ridse",
+                        "rizzo",
+                        "im6"
                     ],
                     "modules_by_context": {}
                 }
@@ -765,7 +995,18 @@
                         "TUNG CHAO PLUS 1",
                         "TUNG CHAO PLUS 2",
                         "TUNG CHAO PLUS SANCHI",
-                        "Benjakul"
+                        "Benjakul",
+                        "vitalplus",
+                        "KS",
+                        "tarana",
+                        "stream",
+                        "plus",
+                        "minoza",
+                        "เคอร่า",
+                        "bova",
+                        "garlica",
+                        "hp1",
+                        "revita"
                     ],
                     "modules_by_context": {}
                 },
@@ -795,7 +1036,38 @@
                         "TUNG CHAO PLUS 1",
                         "BUTEA SUPERBA",
                         "TUNG CHAO PLUS 2",
-                        "Stream Plus"
+                        "Stream Plus",
+                        "รายชื่อที่เอกสารแกนระบุโดยตรง",
+                        "HP1,",
+                        "DB1,",
+                        "kerra",
+                        "Minoza",
+                        "KS",
+                        "Im1",
+                        "IM6,",
+                        "AMPUR,",
+                        "TUNG",
+                        "CHAO",
+                        "PLUS",
+                        "1,",
+                        "BUTEA",
+                        "SUPERBA,",
+                        "2,Stream",
+                        "Plus",
+                        "vitalplus",
+                        "tarana",
+                        "stream",
+                        "plus",
+                        "minoza",
+                        "เคอร่า",
+                        "bova",
+                        "garlica",
+                        "hp1",
+                        "revita",
+                        "vetchakorn",
+                        "no.6",
+                        "คลอโรฟีน่า",
+                        "edh"
                     ],
                     "modules_by_context": {}
                 },
@@ -834,7 +1106,19 @@
                         "BUTEA SUPERBA",
                         "TUNG CHAO PLUS 2",
                         "Benjakul",
-                        "Stream Plus"
+                        "Stream Plus",
+                        "bova",
+                        "ridse",
+                        "stream",
+                        "plus",
+                        "garlica",
+                        "คลอโรฟีน่า",
+                        "revita",
+                        "hp1",
+                        "vetchakorn",
+                        "no.6",
+                        "sangvichai",
+                        "psylaza"
                     ],
                     "modules_by_context": {
                         "coag": [
@@ -877,7 +1161,24 @@
                         "BUTEA SUPERBA",
                         "TUNG CHAO PLUS 2",
                         "Benjakul",
-                        "Stream Plus"
+                        "Stream Plus",
+                        "hp1",
+                        "stream",
+                        "plus",
+                        "bova",
+                        "vetchakorn",
+                        "no.6",
+                        "คลอโรฟีน่า",
+                        "edh",
+                        "revita",
+                        "im6",
+                        "minoza",
+                        "ridse",
+                        "rizz",
+                        "rizzo",
+                        "lypholax",
+                        "cathartic",
+                        "สิทธิจร"
                     ],
                     "modules_by_context": {}
                 }
@@ -919,7 +1220,19 @@
                         "IM7",
                         "Beta M",
                         "Beta V",
-                        "Plumax"
+                        "Plumax",
+                        "minoza",
+                        "im6",
+                        "ricezozyme",
+                        "beta",
+                        "im5",
+                        "kd",
+                        "คลอโรฟีน่า",
+                        "edh",
+                        "rizz",
+                        "ridse",
+                        "rizzo",
+                        "สิทธิจร"
                     ],
                     "modules_by_context": {}
                 },
@@ -957,7 +1270,40 @@
                         "NARIS",
                         "TARANA",
                         "LIVOXY",
-                        "Plumax"
+                        "Plumax",
+                        "รายชื่อที่เอกสารแกนระบุโดยตรง",
+                        "DB1,",
+                        "kerra,",
+                        "Minoza,",
+                        "KS,",
+                        "IM6,",
+                        "BetaG,",
+                        "IMO,IM7,",
+                        "Beta",
+                        "M,",
+                        "V,",
+                        "NARIS,",
+                        "LIVOXY,",
+                        "minoza",
+                        "im6",
+                        "ricezozyme",
+                        "beta",
+                        "im5",
+                        "kd",
+                        "คลอโรฟีน่า",
+                        "edh",
+                        "rizz",
+                        "ridse",
+                        "rizzo",
+                        "สิทธิจร",
+                        "zaminzyme",
+                        "vitalplus",
+                        "ampur",
+                        "เถาวัลย์เปรียง",
+                        "tarana",
+                        "น้ำมันเหลืองกิมลุย",
+                        "naris",
+                        "bonax"
                     ],
                     "modules_by_context": {}
                 },
@@ -998,7 +1344,13 @@
                         "TUNG CHAO PLUS 1",
                         "BUTEA SUPERBA",
                         "LIVOXY",
-                        "Plumax"
+                        "Plumax",
+                        "nourishing",
+                        "blood",
+                        "ampur",
+                        "Remax",
+                        "revita",
+                        "vitalplus"
                     ],
                     "modules_by_context": {}
                 },
@@ -1044,7 +1396,11 @@
                         "TUNG CHAO PLUS 2",
                         "TUNG CHAO PLUS SANCHI",
                         "LIVOXY",
-                        "Plumax"
+                        "Plumax",
+                        "minoza",
+                        "im6",
+                        "vitalplus",
+                        "เบญจกูล"
                     ],
                     "modules_by_context": {}
                 }
@@ -1079,7 +1435,16 @@
                         "DERRIS SCANDANS",
                         "NARIS",
                         "TARANA",
-                        "ANAX"
+                        "ANAX",
+                        "buminmax",
+                        "KS",
+                        "kerra",
+                        "ampur",
+                        "anax",
+                        "tarana",
+                        "เถาวัลย์เปรียง",
+                        "น้ำมันเหลืองกิมลุ้ย",
+                        "naria"
                     ],
                     "modules_by_context": {}
                 },
@@ -1113,7 +1478,17 @@
                         "TUNG CHAO PLUS 2",
                         "TUNG CHAO PLUS SANCHI",
                         "REDCAL",
-                        "BONAX"
+                        "BONAX",
+                        "zaminzyme",
+                        "ampur",
+                        "redcal",
+                        "Lana",
+                        "ถั่งเช่า",
+                        "plus",
+                        "one",
+                        "ถั่งเช่าพลัสทู",
+                        "vitalplus",
+                        "bonax"
                     ],
                     "modules_by_context": {}
                 },
@@ -1148,7 +1523,15 @@
                         "TARANA",
                         "TUNG CHAO PLUS 1",
                         "TUNG CHAO PLUS 2",
-                        "TUNG CHAO PLUS SANCHI"
+                        "TUNG CHAO PLUS SANCHI",
+                        "zaminzyme",
+                        "vitalplus",
+                        "ampur",
+                        "เถาวัลย์เปรียง",
+                        "tarana",
+                        "น้ำมันเหลืองกิมลุย",
+                        "naris",
+                        "bonax"
                     ],
                     "modules_by_context": {
                         "external": [
@@ -1184,7 +1567,21 @@
                         "ANGERA",
                         "ZAMINZYME",
                         "TUNG CHAO PLUS 2",
-                        "TUNG CHAO PLUS SANCHI"
+                        "TUNG CHAO PLUS SANCHI",
+                        "Lana",
+                        "lucy",
+                        "อัปสร",
+                        "ivora",
+                        "ถั่งเช่าพลัสทู",
+                        "ถั่งเช่าพลัสชานชี",
+                        "ampur",
+                        "blood",
+                        "nourishing",
+                        "urana",
+                        "urana2",
+                        "femoon",
+                        "ถั่งเช่าพลัสชานซี",
+                        "ava"
                     ],
                     "modules_by_context": {}
                 },
@@ -1211,7 +1608,17 @@
                         "VITALPLUS",
                         "BUMINMAX PLUS",
                         "AMPUR",
-                        "TUNG CHAO PLUS 1"
+                        "TUNG CHAO PLUS 1",
+                        "เรชิมูโน",
+                        "ถั่งเช่า",
+                        "plus",
+                        "one",
+                        "ampur",
+                        "superba",
+                        "max",
+                        "topaz",
+                        "KERRA",
+                        "amax"
                     ],
                     "modules_by_context": {}
                 },
@@ -1239,7 +1646,23 @@
                         "SANGVICHAI",
                         "VETCHAKORN NO.6",
                         "PSYLAZA",
-                        "BRANARA"
+                        "BRANARA",
+                        "bova",
+                        "kerra",
+                        "minoza",
+                        "vitalplus",
+                        "vetchakorn",
+                        "no.6",
+                        "KS",
+                        "เบญจกูล",
+                        "ย่าตีนนก",
+                        "feva",
+                        "stream",
+                        "plus",
+                        "psylaza",
+                        "blood",
+                        "nourishing",
+                        "ampur"
                     ],
                     "modules_by_context": {
                         "hypothyroid": [
@@ -1300,7 +1723,19 @@
                         "KS",
                         "YA TEEN NOK",
                         "BRANARA",
-                        "Benjakul"
+                        "Benjakul",
+                        "สังวิชัย",
+                        "bova",
+                        "vetchakorn",
+                        "no.6",
+                        "branara",
+                        "branaris",
+                        "xm2",
+                        "kerrix",
+                        "psylaza",
+                        "venta",
+                        "ricezozyme",
+                        "zaminzyme"
                     ],
                     "modules_by_context": {}
                 }
@@ -1327,7 +1762,28 @@
                             "description": "การทำงานของอวัยวะสืบพันธุ์และอุ้งเชิงกราน: มดลูก รังไข่ อัณฑะ ต่อมลูกหมาก ช่องคลอด ทวารหนัก ริดสีดวง และอวัยวะในอุ้งเชิงกรานอื่นๆ ที่เกี่ยวข้องกับการสืบพันธุ์และการขับถ่าย"
                         }
                     },
-                    "modules": [],
+                    "modules": [
+                        "hepa1",
+                        "hepa2",
+                        "hepaplus",
+                        "hepa",
+                        "kd",
+                        "feva",
+                        "kerra",
+                        "minoza",
+                        "ricezozyme",
+                        "urana2",
+                        "topaz",
+                        "diuretic",
+                        "beta",
+                        "sinaza",
+                        "KERRA",
+                        "im6",
+                        "merdana",
+                        "kerrina",
+                        "propolis",
+                        "plumax"
+                    ],
                     "modules_by_context": {
                         "liver": [
                             "HEPA1",
@@ -1502,7 +1958,45 @@
                             "description": "ทวารหนัก ริดสีดวง และเยื่อบุทวาร รวมถึงการทำงานของกล้ามเนื้อหูรูด, การควบคุมการขับถ่าย, และสุขภาพของเยื่อบุในบริเวณทวารหนัก"
                         }
                     },
-                    "modules": [],
+                    "modules": [
+                        "KS",
+                        "kerra",
+                        "im6",
+                        "minoza",
+                        "ridse",
+                        "rizz",
+                        "rizzo",
+                        "lypholax",
+                        "cathartic",
+                        "สิทธิจร",
+                        "Lana",
+                        "lucy",
+                        "อัปสร",
+                        "ivora",
+                        "ถั่งเช่าพลัสทู",
+                        "ถั่งเช่าพลัสชานชี",
+                        "ampur",
+                        "blood",
+                        "nourishing",
+                        "urana",
+                        "urana2",
+                        "เรชิมูโน",
+                        "ถั่งเช่า",
+                        "plus",
+                        "one",
+                        "superba",
+                        "max",
+                        "topaz",
+                        "KERRA",
+                        "amax",
+                        "focus",
+                        "sinaza",
+                        "bova",
+                        "vetchakorn",
+                        "no6",
+                        "diuretic",
+                        "ยาสีฟันน้ำยาบ้วนปาก"
+                    ],
                     "modules_by_context": {}
                 }
             ]
@@ -1575,7 +2069,20 @@
                         "BUMINMAX PLUS",
                         "ZAMINZYME",
                         "RICEZOZYME",
-                        "FLAXPRO"
+                        "FLAXPRO",
+                        "KS",
+                        "kerra",
+                        "minoza",
+                        "ricezozyme",
+                        "im6",
+                        "im5",
+                        "beta",
+                        "betaL",
+                        "imo",
+                        "umx",
+                        "ridse",
+                        "merdana",
+                        "beta5"
                     ],
                     "modules_by_context": {}
                 },
@@ -1616,7 +2123,19 @@
                         "Beta L",
                         "Beta V",
                         "Beta M",
-                        "Xm2"
+                        "Xm2",
+                        "kerra",
+                        "minoza",
+                        "ricezozyme",
+                        "im6",
+                        "im5",
+                        "beta",
+                        "betaL",
+                        "imo",
+                        "umx",
+                        "ridse",
+                        "merdana",
+                        "beta5"
                     ],
                     "modules_by_context": {}
                 },
@@ -1654,7 +2173,13 @@
                         "Zaminzyme",
                         "Minoza",
                         "Plumax",
-                        "Vitalplus"
+                        "Vitalplus",
+                        "kerra",
+                        "minoza",
+                        "im6",
+                        "ricezozyme",
+                        "zaminzyme",
+                        "flaxpro"
                     ],
                     "modules_by_context": {}
                 }

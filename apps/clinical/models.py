@@ -181,3 +181,8 @@ class AnalysisRecord(SoftDeleteModel):
     @property
     def status_label(self):
         return dict(self.STATUS_CHOICES).get(self.status, self.status)
+
+
+# Harmonized Product Catalog & 39 Axes Mappings (Phase 4)
+from clinical.models_catalog import ProductCategory, AxisProductMapping, CatalogImportLog
+

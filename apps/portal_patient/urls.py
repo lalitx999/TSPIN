@@ -40,7 +40,10 @@ urlpatterns = [
 
     # Patient Experience & AI Intake Routes (Prevent 404s)
     path('ai-intake/', views.patient_ai_intake, name='patient_ai_intake'),
+    path('api/ai-intake/chat/', views.patient_ai_intake_chat_api, name='ai_intake_chat_api'),
+    path('api/ai-intake/fallback/', views.patient_ai_intake_fallback_api, name='ai_intake_fallback_api'),
     path('checkin/', views.patient_checkin, name='patient_checkin'),
+
     path('checkin/<str:session_id>/', views.patient_checkin, name='patient_checkin_session'),
     path('axes-result/', views.patient_axes_result, name='patient_axes_result'),
     path('digital-twin/', views.patient_digital_twin, name='patient_digital_twin'),

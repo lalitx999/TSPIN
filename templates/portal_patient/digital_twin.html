@@ -1,4 +1,5 @@
 {% extends 'layouts/patient_base.html' %}
+{% load static %}
 
 {% block title %}แบบจำลอง Digital Twin ของคุณ | TSPI Health{% endblock %}
 
@@ -6,45 +7,74 @@
 <div class="container py-2" style="max-width: 900px;">
 
     <div class="card border-0 shadow-xs mb-4">
-        <div class="card-body p-4 p-md-5">
-            <span class="badge bg-primary-subtle text-primary mb-2">
-                <i class="fas fa-child me-1"></i> My Health Avatar
-            </span>
-            <h1 class="h4 fw-bold text-dark mb-1">แบบจำลองสรีรวิทยา Digital Twin ส่วนบุคคล</h1>
-            <p class="small text-muted mb-0">แสดงสถานะความสมดุลของอวัยวะและจุดที่ต้องเฝ้าระวัง</p>
+        <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div>
+                <span class="badge bg-primary-subtle text-primary mb-2">
+                    <i class="fas fa-child me-1"></i> My Health Avatar &bull; Live Bio-Twin
+                </span>
+                <h1 class="h4 fw-bold text-dark mb-1">แบบจำลองสรีรวิทยา Digital Twin ส่วนบุคคล</h1>
+                <p class="small text-muted mb-0">ประมวลผลความสมดุลของอวัยวะและจุดที่ต้องเฝ้าระวังจากข้อมูล 39 แกนชีววิทยาจริง</p>
+            </div>
+            <a href="{% url 'portal_patient:patient_axes_result' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                <i class="fas fa-chart-pie me-1"></i> ดูคะแนน 39 แกนฉบับเต็ม
+            </a>
         </div>
     </div>
 
     <!-- Avatar Overview Card -->
     <div class="card border-0 shadow-xs text-center p-4 p-md-5">
         <div class="card-body">
-            <div class="mx-auto position-relative d-flex align-items-center justify-content-center mb-4" style="width: 200px; height: 300px;">
-                <svg viewBox="0 0 200 400" class="w-100 h-100" style="stroke: #689D4B; stroke-width: 2; fill: rgba(104, 157, 75, 0.05);">
+            <div class="mx-auto position-relative d-flex align-items-center justify-content-center mb-4" style="width: 200px; height: 320px;">
+                <svg viewBox="0 0 200 400" class="w-100 h-100" style="stroke: #2E7D32; stroke-width: 2.2; fill: rgba(46, 125, 50, 0.04);">
+                    <!-- Head & Brain (Neuro/Stress Axis 34) -->
                     <circle cx="100" cy="45" r="28" />
+                    <!-- Neck -->
                     <rect x="92" y="73" width="16" height="18" rx="4" />
+                    <!-- Torso (Immune, Liver, Gut Axes) -->
                     <path d="M 60,95 Q 100,85 140,95 L 132,230 Q 100,235 68,230 Z" />
+                    <!-- Arms -->
                     <path d="M 58,95 L 35,210 Q 30,225 35,235" stroke-linecap="round" />
                     <path d="M 142,95 L 165,210 Q 170,225 165,235" stroke-linecap="round" />
+                    <!-- Legs -->
                     <path d="M 80,230 L 75,370" stroke-linecap="round" />
                     <path d="M 120,230 L 125,370" stroke-linecap="round" />
                 </svg>
-                <div class="position-absolute rounded-circle bg-warning" style="top: 32px; left: 88px; width: 14px; height: 14px; border: 2px solid #fff;"></div>
-                <div class="position-absolute rounded-circle bg-danger" style="top: 110px; left: 82px; width: 14px; height: 14px; border: 2px solid #fff;"></div>
+
+                <!-- Dynamic Hotspots based on Real Axis Scores -->
+                {% if immune_score >= 60 %}
+                <div class="position-absolute rounded-circle {% if immune_score >= 70 %}bg-danger{% else %}bg-warning{% endif %} animate-pulse" 
+                     style="top: 105px; left: 93px; width: 14px; height: 14px; border: 2px solid #fff;"
+                     title="Immune & Inflammatory Load: {{ immune_score }}/100"></div>
+                {% endif %}
+
+                {% if liver_score >= 60 %}
+                <div class="position-absolute rounded-circle {% if liver_score >= 70 %}bg-danger{% else %}bg-warning{% endif %} animate-pulse" 
+                     style="top: 135px; left: 82px; width: 14px; height: 14px; border: 2px solid #fff;"
+                     title="Liver Detoxification: {{ liver_score }}/100"></div>
+                {% endif %}
+
+                {% if gut_score >= 60 %}
+                <div class="position-absolute rounded-circle {% if gut_score >= 70 %}bg-danger{% else %}bg-warning{% endif %} animate-pulse" 
+                     style="top: 165px; left: 93px; width: 14px; height: 14px; border: 2px solid #fff;"
+                     title="Gut Barrier Permeability: {{ gut_score }}/100"></div>
+                {% endif %}
             </div>
 
-            <div class="row g-3 text-start mx-auto" style="max-width: 600px;">
+            <!-- Organ Alert Cards (Dynamic from Database) -->
+            <div class="row g-3 text-start mx-auto" style="max-width: 680px;">
+                {% for alert in organ_alerts %}
                 <div class="col-12 col-sm-6">
-                    <div class="p-3 bg-danger-subtle border border-danger-subtle rounded-3 small">
-                        <span class="fw-bold text-danger d-block mb-1">&bull; ตับและระบบขจัดสารพิษ</span>
-                        <span class="text-secondary">ภาระการทำงานหนัก ควรทานสูตร HEPA ตามแพทย์สั่ง</span>
+                    <div class="p-3 bg-{{ alert.level }}-subtle border border-{{ alert.level }}-subtle rounded-3 small h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="fw-bold text-{{ alert.level }}">
+                                &bull; {{ alert.organ }}
+                            </span>
+                            <span class="badge bg-{{ alert.level }} text-white font-monospace">{{ alert.score }}/100</span>
+                        </div>
+                        <span class="text-secondary lh-sm d-block">{{ alert.desc }}</span>
                     </div>
                 </div>
-                <div class="col-12 col-sm-6">
-                    <div class="p-3 bg-warning-subtle border border-warning-subtle rounded-3 small">
-                        <span class="fw-bold text-warning d-block mb-1">&bull; ระบบทางเดินอาหารและลำไส้</span>
-                        <span class="text-secondary">มีความไวต่ออาหารแปรรูป อยู่ระหว่างฟื้นฟูเยื่อบุ</span>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>

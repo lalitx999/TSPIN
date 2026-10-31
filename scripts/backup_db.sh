@@ -13,6 +13,16 @@ RETENTION_DAYS=7
 
 mkdir -p "${BACKUP_DIR}"
 
+# อ่าน DB_NAME/DB_USER/DB_PASSWORD จาก .env (ถ้ายังไม่ได้ export ไว้)
+if [ -f .env ]; then
+    for key in DB_NAME DB_USER DB_PASSWORD DB_HOST DB_PORT PRIVATE_MEDIA_ROOT; do
+        if [ -z "${!key:-}" ]; then
+            value=$(grep -E "^${key}=" .env | head -1 | cut -d= -f2- || true)
+            [ -n "${value}" ] && export "${key}=${value}"
+        fi
+    done
+fi
+
 echo "[TSPI Backup] Starting database backup at $(date)..."
 
 if command -v docker &> /dev/null && docker ps | grep -q tspi_postgres; then
@@ -28,9 +38,12 @@ echo "[TSPI Backup] Backup successful: ${BACKUP_FILE} (${BACKUP_SIZE})"
 
 # Encrypted clinical media (LINE/web images, audio). Files are already Fernet-encrypted,
 # so the archive is safe at rest; it still needs the same FERNET_KEY/SECRET_KEY to restore.
-PRIVATE_MEDIA_ROOT="${PRIVATE_MEDIA_ROOT:-./private_media}"
-if [ -d "${PRIVATE_MEDIA_ROOT}" ]; then
-    MEDIA_FILE="${BACKUP_DIR}/tspi_media_backup_${TIMESTAMP}.tar.gz"
+MEDIA_FILE="${BACKUP_DIR}/tspi_media_backup_${TIMESTAMP}.tar.gz"
+if command -v docker &> /dev/null && docker ps | grep -q tspi_web; then
+    # บน VPS ไฟล์อยู่ใน docker volume ของ container web
+    docker exec tspi_web tar -czf - -C /app private_media > "${MEDIA_FILE}"
+    echo "[TSPI Backup] Media backup: ${MEDIA_FILE} ($(ls -lh "${MEDIA_FILE}" | awk '{print $5}'))"
+elif PRIVATE_MEDIA_ROOT="${PRIVATE_MEDIA_ROOT:-./private_media}" && [ -d "${PRIVATE_MEDIA_ROOT}" ]; then
     tar -czf "${MEDIA_FILE}" -C "$(dirname "${PRIVATE_MEDIA_ROOT}")" "$(basename "${PRIVATE_MEDIA_ROOT}")"
     echo "[TSPI Backup] Media backup: ${MEDIA_FILE} ($(ls -lh "${MEDIA_FILE}" | awk '{print $5}'))"
 fi

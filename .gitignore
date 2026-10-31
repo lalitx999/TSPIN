@@ -58,3 +58,6 @@ htmlcov/
 
 # Encrypted clinical media (LINE/web uploads) — never commit
 private_media/
+
+# Deploy bundles
+dist/

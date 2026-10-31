@@ -44,3 +44,25 @@ fastapi>=0.110.0
 uvicorn>=0.28.0
 sse-starlette>=2.0.0
 httpx>=0.27.0
+
+# Previously missing (imported by the code; production image could not start without them)
+# Image de-identification (face blur / EXIF strip) in ai_service/sanitizer.py
+numpy>=2.0
+opencv-python-headless>=4.10
+# Report rendering (markdown -> sanitized HTML)
+Markdown>=3.6
+nh3>=0.2.17
+# Excel import of the 39x42 product catalog
+openpyxl>=3.1
+# PDF inspection (report tests)
+pdfplumber>=0.11
+
+# Imported by the code but previously missing (production image could not start without them)
+numpy>=2.0
+opencv-python-headless>=4.10
+Markdown>=3.6
+nh3>=0.2.17
+openpyxl>=3.1
+pdfplumber>=0.11
+# FastAPI form/file uploads (ai_service image/voice intake)
+python-multipart>=0.0.9

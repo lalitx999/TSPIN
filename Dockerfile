@@ -38,11 +38,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg62-turbo \
     libopenjp2-7 \
     libffi8 \
-    fonts-sarabun \
+    fontconfig \
+    fonts-thai-tlwg \
     fonts-liberation \
     curl \
     netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
+
+# Sarabun (ใช้ในรายงาน PDF ของ WeasyPrint) ไม่มีใน apt ของ Debian จึงติดตั้งจากไฟล์ในโปรเจกต์
+COPY static/fonts/*.ttf /usr/share/fonts/truetype/tspi/
+RUN fc-cache -f
 
 # Copy installed dependencies from builder
 COPY --from=builder /install/deps /install/deps

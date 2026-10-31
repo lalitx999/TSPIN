@@ -208,6 +208,11 @@ EMAIL_BACKEND = (
     else 'django.core.mail.backends.console.EmailBackend'
 )
 
+# คีย์เข้ารหัสข้อมูลทางคลินิก (เลขบัตร ปชช., ไฟล์ LINE) แยกจาก SECRET_KEY เพื่อหมุน SECRET_KEY ได้โดยข้อมูลไม่เสีย
+# FERNET_OLD_KEYS: คีย์เก่าคั่นด้วย , ใช้ถอดข้อมูลที่ยังไม่ได้หมุน (manage.py rotate_encryption_key)
+FERNET_KEY = os.environ.get('FERNET_KEY', '').strip()
+FERNET_OLD_KEYS = tuple(k.strip() for k in os.environ.get('FERNET_OLD_KEYS', '').split(',') if k.strip())
+
 # Cache: Redis เมื่อมี REDIS_HOST (ต้องใช้ร่วมกันทุก gunicorn worker ไม่งั้น rate limit/OTP/กันเดารหัส
 # จะแยกกันคนละ process) ไม่มี Redis (ตอนพัฒนา/เทสต์) ใช้ locmem
 REDIS_HOST = os.environ.get('REDIS_HOST', '')

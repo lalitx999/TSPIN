@@ -1,0 +1,94 @@
+# Rendered at container start: ${DOMAIN} comes from docker-compose (.env DOMAIN=...)
+# nginx's own $variables are left untouched because no env var has those names.
+
+# --- HTTP: Let's Encrypt challenge + redirect everything else to HTTPS ---
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${DOMAIN};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# --- HTTPS ---
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name ${DOMAIN};
+
+    ssl_certificate     /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+
+    # 25MB: lab documents, PDF reports, LINE media are fetched server-side
+    client_max_body_size 25M;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # HSTS is sent by Django (SECURE_HSTS_SECONDS) so it is not duplicated here
+
+    location /static/ {
+        alias /app/staticfiles/;
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable";
+        access_log off;
+    }
+
+    # Clinical files are served only through Django (auth + AuditLog), never directly
+    location /media/ {
+        return 404;
+    }
+
+    # Internal service-to-service endpoints are never reachable from outside
+    location /internal/ {
+        return 404;
+    }
+
+    location /health/ {
+        proxy_pass http://django_backend/health/;
+        include /etc/nginx/conf.d/proxy_headers.inc;
+        access_log off;
+    }
+
+    location /accounts/login/ {
+        limit_req zone=auth_limit burst=10 nodelay;
+        proxy_pass http://django_backend;
+        include /etc/nginx/conf.d/proxy_headers.inc;
+    }
+
+    location / {
+        limit_req zone=general_limit burst=30 nodelay;
+        proxy_pass http://django_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        include /etc/nginx/conf.d/proxy_headers.inc;
+
+        # SSE streaming (AI copilot) and slow AI calls (SOAP summary ~60s)
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 120s;
+    }
+}
+
+# --- Requests for any other host name (IP scans, spoofed Host) are dropped ---
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    server_name _;
+    ssl_certificate     /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
+    return 444;
+}

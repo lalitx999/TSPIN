@@ -103,7 +103,8 @@ def _find_data_file(filename):
     return candidates[0]
 
 MASTER_DATA_PATH = _find_data_file('TSPI Modules Master Data + Training_Pairs.json')
-NETWORK_REGISTRY_PATH = _find_data_file('180_Network.json')
+# ชื่อไฟล์ตัวพิมพ์เล็กตามไฟล์จริง (Linux แยกตัวพิมพ์เล็ก/ใหญ่ ต่างจาก macOS)
+NETWORK_REGISTRY_PATH = _find_data_file('180_network.json')
 
 # ── ans.txt Section 12 "Canonical Lock" — evidence classification for the 39 axes ──────────
 # P0-3: HYPOTHESIS never scores — hard invariant across ALL reports

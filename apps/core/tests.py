@@ -125,3 +125,41 @@ class CorePagesLayoutTests(TestCase):
         self.assertEqual(article.view_count, 1)
 
 
+
+
+class EncryptionKeyRotationTests(TestCase):
+    """ย้ายข้อมูลขึ้น VPS: ข้อมูลที่เข้ารหัสด้วยคีย์เดิมต้องอ่านได้ และหมุนไปคีย์ใหม่ได้"""
+
+    def tearDown(self):
+        from core.models import ClinicalEncryption
+        ClinicalEncryption._fernet = None
+
+    def test_old_data_readable_then_rotated_to_new_key(self):
+        import os
+        import tempfile
+        from cryptography.fernet import Fernet
+        from django.core.management import call_command
+        from django.test import override_settings
+        from core.models import ClinicalEncryption
+        from patients.models import Patient
+
+        old_key = Fernet.generate_key().decode()
+        new_key = Fernet.generate_key().decode()
+
+        with override_settings(FERNET_KEY=old_key, FERNET_OLD_KEYS=()):
+            ClinicalEncryption._fernet = None
+            p = Patient(hn='HN-ROT-1', first_name='a', last_name='b')
+            p.set_id_card('1100400123450')
+            p.save()
+        old_token = Patient.objects.get(pk=p.pk).id_card_encrypted
+
+        with override_settings(FERNET_KEY=new_key, FERNET_OLD_KEYS=(old_key,), PRIVATE_MEDIA_ROOT=tempfile.mkdtemp()):
+            ClinicalEncryption._fernet = None
+            self.assertEqual(ClinicalEncryption.decrypt(old_token), '1100400123450')
+            call_command('rotate_encryption_key', apply=True, stdout=open(os.devnull, 'w'))
+
+        with override_settings(FERNET_KEY=new_key, FERNET_OLD_KEYS=()):
+            ClinicalEncryption._fernet = None
+            rotated = Patient.objects.get(pk=p.pk).id_card_encrypted
+            self.assertNotEqual(rotated, old_token)
+            self.assertEqual(ClinicalEncryption.decrypt(rotated), '1100400123450')

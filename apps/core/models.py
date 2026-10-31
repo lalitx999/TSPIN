@@ -9,7 +9,7 @@ from typing import Optional
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, MultiFernet
 
 
 class ClinicalEncryption:
@@ -19,16 +19,21 @@ class ClinicalEncryption:
     """
     _fernet = None
 
+    @staticmethod
+    def key_from_secret(secret_key: str) -> bytes:
+        """คีย์ Fernet แบบเดิมที่ได้จาก SECRET_KEY (ใช้ถอดข้อมูลเก่าตอนย้าย/หมุนคีย์)"""
+        return base64.urlsafe_b64encode(hashlib.sha256(secret_key.encode('utf-8')).digest())
+
     @classmethod
-    def get_cipher(cls) -> Fernet:
+    def get_cipher(cls) -> MultiFernet:
+        """
+        เข้ารหัสด้วย FERNET_KEY เสมอ; ถอดรหัสลองทั้ง FERNET_KEY และ FERNET_OLD_KEYS (หมุนคีย์ได้โดยข้อมูลเก่ายังอ่านได้)
+        ไม่ตั้ง FERNET_KEY (ตอนพัฒนา) จะใช้คีย์ที่ได้จาก SECRET_KEY แบบเดิม
+        """
         if cls._fernet is None:
-            # Derive deterministic 32-byte key from Django SECRET_KEY
-            secret = getattr(settings, 'FERNET_KEY', None)
-            if not secret:
-                secret_raw = settings.SECRET_KEY.encode('utf-8')
-                derived_key = hashlib.sha256(secret_raw).digest()
-                secret = base64.urlsafe_b64encode(derived_key)
-            cls._fernet = Fernet(secret)
+            primary = getattr(settings, 'FERNET_KEY', '') or cls.key_from_secret(settings.SECRET_KEY)
+            keys = [primary] + list(getattr(settings, 'FERNET_OLD_KEYS', ()))
+            cls._fernet = MultiFernet([Fernet(k) for k in keys])
         return cls._fernet
 
     @classmethod

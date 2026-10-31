@@ -12,15 +12,28 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 if not SECRET_KEY or len(SECRET_KEY) < 50:
     raise ValueError("CRITICAL: DJANGO_SECRET_KEY must be set in environment and be at least 50 chars long!")
 
+# คีย์เข้ารหัสข้อมูลทางคลินิกต้องตั้งแยกบน Production (ไม่ผูกกับ SECRET_KEY)
+if not FERNET_KEY:
+    raise ValueError("CRITICAL: FERNET_KEY must be set in environment (generate with scripts/generate_secrets.py)")
+
 # Django <-> FastAPI shared secret ต้องตั้งค่าเสมอบน Production
 if len(INTERNAL_API_TOKEN) < 32:
     raise ValueError("CRITICAL: INTERNAL_API_TOKEN must be set in environment and be at least 32 chars long!")
+
+# ฟอร์ม POST ผ่าน HTTPS หลัง nginx ต้องระบุ origin ที่เชื่อถือได้ (Django 4+)
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()
+] or [f"https://{h}" for h in os.environ.get('ALLOWED_HOSTS', '').split(',') if h.strip()]
 
 # ระบุ Domain ชัดเจน ห้ามใช้ '*'
 raw_hosts = os.environ.get('ALLOWED_HOSTS', '')
 ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(',') if h.strip()]
 if not ALLOWED_HOSTS or '*' in ALLOWED_HOSTS:
     raise ValueError("CRITICAL: ALLOWED_HOSTS must explicitly list production domain names without '*'!")
+# Docker HEALTHCHECK เรียก http://localhost:8000/health/ จากในตัว container
+# (nginx ส่งต่อเฉพาะ DOMAIN และตัด host อื่นทิ้ง จึงไม่เปิดช่องจากภายนอก)
+if 'localhost' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('localhost')
 
 # Database: PostgreSQL Only in Production
 DATABASES = {
@@ -33,7 +46,8 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', '5432'),
         'CONN_MAX_AGE': 600,  # Connection pooling 10 นาที
         'OPTIONS': {
-            'sslmode': 'require',
+            # require เมื่อ DB อยู่นอกเครื่อง; ใน docker-compose (Postgres container ใน network ภายใน) ตั้ง DB_SSLMODE=disable
+            'sslmode': os.environ.get('DB_SSLMODE', 'require'),
         }
     }
 }

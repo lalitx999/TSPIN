@@ -55,10 +55,11 @@ services:
       DB_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      DB_SSLMODE: disable
       AI_SERVICE_URL: http://ai:8088
       PRIVATE_MEDIA_ROOT: /app/private_media
       GUNICORN_WORKERS: 3
-      GUNICORN_THREADS: 2
+      GUNICORN_THREADS: 8
     depends_on:
       db:
         condition: service_healthy
@@ -95,23 +96,46 @@ services:
       - tspi_internal
 
   # ============================================================================
-  # 4. NGINX REVERSE PROXY (SSL, Rate Limiting, Static & SSE Streaming)
+  # 4. NGINX REVERSE PROXY (HTTPS via Let's Encrypt, SSE streaming)
+  #    First-time certificate: scripts/init_tls.sh (see docs/DEPLOY_VPS.md)
   # ============================================================================
   nginx:
-    image: nginx:alpine
+    image: nginx:1.27-alpine
     container_name: tspi_nginx
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env (e.g. emr.example.com)}
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/templates:/etc/nginx/templates:ro
       - static_volume:/app/staticfiles:ro
-      - media_volume:/app/media:ro
+      - certbot_conf:/etc/letsencrypt:ro
+      - certbot_www:/var/www/certbot:ro
+    # conf.d เป็น tmpfs เพื่อไม่ให้ default.conf ของ image (หน้า Welcome) ถูกโหลด
+    tmpfs:
+      - /etc/nginx/conf.d
+    # reload ทุก 6 ชม. เพื่อใช้ใบรับรองที่ certbot ต่ออายุแล้ว
+    # ต้องเรียกผ่าน /docker-entrypoint.sh ไม่งั้น image จะไม่สร้าง conf จาก templates (nginx ไม่ฟังพอร์ตใดเลย)
+    command: /bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & exec /docker-entrypoint.sh nginx -g "daemon off;"'
     depends_on:
       - web
     networks:
       - tspi_internal
+
+  # ============================================================================
+  # 5. CERTBOT (Let's Encrypt renewal loop, every 12h)
+  # ============================================================================
+  certbot:
+    image: certbot/certbot:v2.11.0
+    container_name: tspi_certbot
+    restart: unless-stopped
+    volumes:
+      - certbot_conf:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    entrypoint: /bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done'
 
 networks:
   tspi_internal:
@@ -127,4 +151,8 @@ volumes:
   media_volume:
     driver: local
   private_media:
+    driver: local
+  certbot_conf:
+    driver: local
+  certbot_www:
     driver: local

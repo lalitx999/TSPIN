@@ -1,0 +1,23 @@
+# Secrets and patient data must never be baked into an image
+.env
+.env.*
+!.env.example
+private_media/
+media/
+backups/
+logs/
+*.sqlite3
+*.xlsx
+*.docx
+
+# Local tooling / large folders not needed at runtime
+.git/
+.venv/
+.claude/
+# legacy: ใช้ตอนรันแค่ฐานความรู้ของ AI service ไฟล์เดียว (เคสผู้ป่วยในโฟลเดอร์นี้ห้ามติดไปใน image)
+legacy_drpatt/**
+!legacy_drpatt/frontend/public/38_tspi.txt
+**/__pycache__/
+*.pyc
+.DS_Store
+docs/

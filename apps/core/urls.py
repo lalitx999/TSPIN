@@ -20,5 +20,6 @@ urlpatterns = [
     path('legal/terms/', views.terms_of_service, name='terms'),
     path('terms/', views.terms_of_service, name='terms_alias'),
     path('health/', views.health_check_view, name='health'),
+    path('api/assistant/guest/', views.guest_assistant_api, name='guest_assistant_api'),
     path('healthz/', views.health_check_view, name='healthz'),
 ]

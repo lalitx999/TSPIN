@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from django.db import connection
 from django.utils.safestring import mark_safe
 import markdown
@@ -156,3 +157,68 @@ def health_check_view(request):
         return JsonResponse(health_status, status=503)
 
     return JsonResponse(health_status, status=200)
+
+
+# ==============================================================================
+# ผู้ช่วย AI บนหน้าแรก สำหรับผู้ใช้ที่ยังไม่ลงทะเบียน
+# - ไม่เก็บบทสนทนาบนเซิร์ฟเวอร์ (ประวัติอยู่ในเบราว์เซอร์ของผู้ใช้) เพราะไม่รู้ตัวตนและไม่มีความยินยอม
+# - จำกัดจำนวนต่อ IP ต่อวัน และเพดานรวมทั้งระบบต่อวัน เพื่อกันงบ AI หมด
+# ==============================================================================
+GUEST_DAILY_LIMIT_PER_IP = 15
+GUEST_DAILY_LIMIT_TOTAL = 1000
+
+
+@require_POST
+def guest_assistant_api(request):
+    import json as _json
+    import httpx
+    from django.conf import settings as dj_settings
+    from django.core.cache import cache
+    from django.utils import timezone
+    from accounts.views import get_client_ip
+    from intelligence import ai_budget
+
+    try:
+        body = _json.loads(request.body.decode('utf-8') or '{}')
+    except (ValueError, UnicodeDecodeError):
+        return JsonResponse({'error': 'รูปแบบข้อมูลไม่ถูกต้อง'}, status=400)
+
+    raw = body.get('messages') if isinstance(body.get('messages'), list) else []
+    history = [
+        {'role': m.get('role'), 'content': str(m.get('content', ''))[:1500]}
+        for m in raw[-8:]
+        if isinstance(m, dict) and m.get('role') in ('user', 'assistant') and str(m.get('content', '')).strip()
+    ]
+    if not history or history[-1]['role'] != 'user':
+        return JsonResponse({'error': 'กรุณาพิมพ์คำถาม'}, status=400)
+
+    today = timezone.localdate().strftime('%Y%m%d')
+    ip_key = f"guest_asst_{get_client_ip(request)}_{today}"
+    total_key = f"guest_asst_total_{today}"
+    if cache.get(ip_key, 0) >= GUEST_DAILY_LIMIT_PER_IP or cache.get(total_key, 0) >= GUEST_DAILY_LIMIT_TOTAL:
+        return JsonResponse({'error': 'วันนี้ถามครบจำนวนแล้ว ลงทะเบียนเพื่อคุยต่อ หรือทักเจ้าหน้าที่ทาง LINE ได้เลยค่ะ',
+                             'limited': True}, status=429)
+    cache.set(ip_key, cache.get(ip_key, 0) + 1, timeout=60 * 60 * 24)
+    cache.set(total_key, cache.get(total_key, 0) + 1, timeout=60 * 60 * 24)
+
+    provider = dj_settings.AI_SOAP_PROVIDER
+    allowed, budget_msg = ai_budget.check_budget(provider)
+    if not allowed:
+        return JsonResponse({'answer': budget_msg, 'kind': 'unavailable', 'sources': []})
+    try:
+        resp = httpx.post(
+            f"{dj_settings.AI_SERVICE_URL}/api/ai/assistant/chat",
+            json={'messages': history},
+            headers={'X-Internal-Token': dj_settings.INTERNAL_API_TOKEN},
+            timeout=45.0,
+        )
+        data = resp.json() if resp.status_code == 200 else {}
+    except (httpx.HTTPError, ValueError):
+        data = {}
+    if any((data.get('usage') or {}).values()):
+        ai_budget.record_usage(data.get('provider') or provider, data.get('model', ''), data['usage'], 'guest_assistant')
+    return JsonResponse({
+        'answer': data.get('answer') or 'ขออภัยค่ะ ระบบผู้ช่วยไม่พร้อมใช้งานชั่วคราว กรุณาลองใหม่ภายหลัง',
+        'kind': data.get('kind', 'unavailable'),
+        'sources': data.get('sources', []),
+    })

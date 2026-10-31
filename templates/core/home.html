@@ -4,96 +4,61 @@
 {% block title %}TSPI CLINIC — นวัตกรรมเวชระเบียนและความฉลาดทางการแพทย์ 39 แกนชีววิทยา (12 โดเมน){% endblock %}
 
 {% block extra_head %}
-<!-- Three.js CDN for 3D Biological Matrix Sphere -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="{% static 'js/botanical3d.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
 <div class="py-5">
 
     <!-- ========================================== -->
-    <!-- 1. HERO SECTION & 3D INTERACTIVE CANVAS   -->
+    <!-- 1. HERO: ถามผู้ช่วย AI ได้ทันที ไม่ต้องลงทะเบียน  -->
     <!-- ========================================== -->
-    <section class="container-xl mb-5 pb-lg-4">
-        <div class="row g-5 align-items-center">
-            
-            <!-- Left: Hero Text & Call to Actions (7 cols) -->
-            <div class="col-lg-7 text-center text-lg-start">
-                <div class="d-inline-flex align-items-center gap-2 badge-subtle-primary mb-3">
-                    <i class="fas fa-sparkles text-primary-clinic"></i>
-                    <span>Next-Generation Healthcare AI &bull; 12 Domains 39 Axes</span>
+    <section class="container-xl mb-5" x-data="guestChat()">
+        <div class="tspi-hero">
+            <canvas class="tspi-hero-canvas" data-botanical3d aria-hidden="true"></canvas>
+            <div class="tspi-hero-inner">
+                <h1>ดูแลสุขภาพด้วยข้อมูลจาก <span class="text-primary">TSPI Clinic</span></h1>
+                <p class="lead mb-4">ถามเรื่องอาการ ระบบร่างกาย หรือบริการของคลินิกได้เลย ผู้ช่วยตอบจากข้อมูลของคลินิกเท่านั้น</p>
+
+                <div class="tspi-guest-log tspi-chat mb-3" x-ref="log" x-show="messages.length">
+                    <template x-for="(m, i) in messages" :key="i">
+                        <div class="tspi-bubble" :class="m.role === 'user' ? 'user' : ('bot' + (m.kind === 'emergency' ? ' emergency' : ''))">
+                            <div class="tspi-text" x-text="m.content"></div>
+                            <template x-if="m.sources && m.sources.length">
+                                <div class="tspi-sources">อ้างอิง: <span x-text="m.sources.map((s, i) => '[' + (i + 1) + '] ' + s).join('  ')"></span></div>
+                            </template>
+                        </div>
+                    </template>
+                    <div class="tspi-bubble bot text-muted" x-show="sending">กำลังพิมพ์คำตอบ…</div>
                 </div>
 
-                <h1 class="display-5 fw-bold text-dark lh-sm mb-3">
-                    ดูแลสุขภาพเชิงลึกด้วย <br class="d-none d-sm-inline">
-                    <span class="text-primary-clinic">TSPI CLINIC AI</span>
-                </h1>
+                <form class="tspi-composer" @submit.prevent="send()">
+                    <label for="guest-q" class="visually-hidden">คำถามถึงผู้ช่วย</label>
+                    <textarea id="guest-q" rows="1" maxlength="1500" placeholder="พิมพ์คำถาม หรือเล่าอาการ…" x-model="draft"
+                              @keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); send(); }" :disabled="sending"></textarea>
+                    <button class="btn btn-primary" type="submit" :disabled="sending || !draft.trim()" aria-label="ส่งคำถาม">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+                <p class="tspi-note mt-2 mb-3">ไม่ต้องใส่ชื่อ เบอร์โทร หรือเลขบัตร &bull; ผู้ช่วยไม่ใช่การวินิจฉัยของแพทย์ &bull; ฉุกเฉินโทร 1669</p>
 
-                <p class="lead text-muted fs-6 mb-4 pe-lg-4 lh-base">
-                    ยินดีต้อนรับสู่นวัตกรรมการรักษายุคใหม่ วิเคราะห์สุขภาพเชิงลึกผ่าน <strong>กลไกชีววิทยา 39 แกน ใน 12 โดเมน (39 Biological Axes)</strong> 
-                    และสูตรตำรับไฟโตเคมีคอลมาตรฐาน 200 โมดูล เพื่อผลลัพธ์การฟื้นฟูระดับเซลล์ที่แม่นยำและตรงจุดที่สุด
-                </p>
-
-                <!-- Action Buttons (Single Primary CTA: เริ่มต้นใช้งาน) -->
-                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start gap-3 mb-4">
-                    <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-primary btn-lg d-inline-flex align-items-center gap-2 px-4 shadow" style="border-radius: 2.5rem; font-size: 1.15rem;">
-                        <i class="fas fa-play-circle fs-5"></i>
-                        <span class="fw-bold">เริ่มต้นใช้งาน</span>
-                    </a>
-                    <a href="{% url 'core:protocol' %}" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2">
-                        <span>ดูโปรโตคอล 9 ขั้นตอน</span>
-                        <i class="fas fa-arrow-right fs-6"></i>
-                    </a>
-                    <a href="{% url 'accounts:patient_login' %}" class="btn btn-link text-muted text-decoration-none small">
-                        <i class="fas fa-sign-in-alt me-1"></i> เข้าสู่ระบบคนไข้เดิม
-                    </a>
+                <div class="d-flex flex-wrap justify-content-center gap-2" x-show="!messages.length">
+                    <template x-for="q in examples">
+                        <button type="button" class="tspi-chip" @click="draft = q; send()" x-text="q"></button>
+                    </template>
                 </div>
 
+                <div class="d-flex flex-wrap justify-content-center gap-2 mt-3" x-show="messages.length">
+                    <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-outline-primary">อยากให้หมอดูต่อ → ลงทะเบียน</a>
+                    <button type="button" class="btn btn-link text-muted" @click="clear()">เริ่มใหม่</button>
+                </div>
+                <p class="text-danger small mt-2 mb-0" x-show="error" x-text="error"></p>
 
-                <!-- Stats Highlights -->
-                <div class="row g-3 pt-3 border-top border-light-subtle justify-content-center justify-content-lg-start text-center text-lg-start">
-                    <div class="col-4 col-sm-3">
-                        <span class="h4 fw-bold text-dark d-block mb-0 font-monospace">10,000+</span>
-                        <small class="text-muted" style="font-size: 12px;">คนไข้ที่ไว้วางใจ</small>
-                    </div>
-                    <div class="col-4 col-sm-3 border-start border-end border-light-subtle">
-                        <span class="h4 fw-bold text-primary-clinic d-block mb-0 font-monospace">39</span>
-                        <small class="text-muted" style="font-size: 12px;">แกนชีววิทยา (Axes)</small>
-                    </div>
-                    <div class="col-4 col-sm-3">
-                        <span class="h4 fw-bold text-dark d-block mb-0 font-monospace">97.8%</span>
-                        <small class="text-muted" style="font-size: 12px;">ความแม่นยำทางคลินิก</small>
-                    </div>
+                <div class="mt-4 pt-3 border-top small">
+                    <a href="{% url 'portal_patient:onboarding' %}" class="me-3">ลงทะเบียนผู้รับบริการ</a>
+                    <a href="{% url 'accounts:patient_login' %}">เข้าสู่ระบบ</a>
                 </div>
             </div>
-
-            <!-- Right: Interactive 3D Biological Sphere (Three.js) (5 cols) -->
-            <div class="col-lg-5">
-                <div class="card p-3 shadow-sm border">
-                    <div class="d-flex align-items-center justify-content-between pb-3 border-bottom mb-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="spinner-grow spinner-grow-sm text-success" role="status"></span>
-                            <span class="small fw-bold text-dark text-uppercase">39 Biological Axes Matrix</span>
-                        </div>
-                        <span class="badge bg-light text-muted border font-monospace">3D Interactive</span>
-                    </div>
-
-                    <!-- Three.js Canvas Container -->
-                    <div id="canvas-container" class="w-100 position-relative d-flex align-items-center justify-content-center" style="height: 320px; cursor: grab;">
-                        <canvas id="axes-canvas" class="w-100 h-100"></canvas>
-                        <!-- Tooltip Overlay -->
-                        <div id="sphere-tooltip" class="position-absolute bg-dark text-white small px-2 py-1 rounded shadow-sm opacity-0 font-monospace" style="pointer-events: none; transition: opacity 0.2s; z-index: 10;">
-                            Axis 01: Inflammatory Load
-                        </div>
-                    </div>
-
-                    <div class="pt-2 border-top d-flex align-items-center justify-content-between small text-muted">
-                        <span><i class="fas fa-hand-pointer text-primary-clinic me-1"></i> หมุนเมาส์เพื่อสำรวจแกน</span>
-                        <a href="{% url 'core:platform' %}" class="text-primary-clinic text-decoration-none fw-semibold">เจาะลึก 39 แกน &rarr;</a>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </section>
 
@@ -479,147 +444,39 @@
 
 </div>
 
-<!-- Three.js 3D Biological Sphere Script -->
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const container = document.getElementById('canvas-container');
-    const canvas = document.getElementById('axes-canvas');
-    const tooltip = document.getElementById('sphere-tooltip');
-    if (!container || !canvas || typeof THREE === 'undefined') return;
-
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xffffff);
-
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.z = 220;
-
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(window.devicePixelRatio);
-
-    // Create 39 Nodes (Fibonacci sphere distribution across 12 Domains)
-    const nodeCount = 39;
-    const radius = 70;
-    const nodes = [];
-    const sphereGroup = new THREE.Group();
-
-    const nodeGeometry = new THREE.SphereGeometry(2.8, 16, 16);
-    const nodeMaterial = new THREE.MeshBasicMaterial({ color: 0x689D4B });
-    const lineMaterial = new THREE.LineBasicMaterial({ color: 0xCFE3C4, transparent: true, opacity: 0.6 });
-
-    const phi = Math.PI * (3 - Math.sqrt(5)); // Golden angle
-
-    const axisNames = [
-        "A01: Systemic Inflammatory Load", "A02: Immune Homeostasis", "A03: Pathogen Defense",
-        "A04: Post-Infectious Persistence", "A05: Glucose-Insulin Regulation", "A06: Lipid-Lipotoxicity",
-        "A07: Nutrient Sensing (AMPK-mTOR)", "A08: Mitochondrial Network", "A09: Oxidative Stress & Redox",
-        "A10: Autophagy & Proteostasis", "A11: DNA Repair & Genomic Stability", "A12: Telomere Dynamics",
-        "A13: Epigenetic Maintenance", "A14: Cellular Senescence", "A15: Detoxification & Cellular Defense",
-        "A16: Digestive-Absorptive", "A17: Microbiome Ecosystem", "A18: Bile & Liver-Gut Axis",
-        "A19: Gut Barrier Integrity", "A20: Endothelial Function", "A21: Microcirculation & Tissue Perfusion",
-        "A22: Coagulation-Fibrinolysis", "A23: Lymphatic Flow & Drainage", "A24: Wound Healing",
-        "A25: Extracellular Matrix (ECM)", "A26: Bone Remodeling", "A27: Cartilage & Joint Homeostasis",
-        "A28: Muscle Protein Turnover", "A29: Fascial & Structural Integrity", "A30: Tendon & Ligament Resilience",
-        "A31: Female Hormone Network", "A32: Male Androgen Network", "A33: Thyroid-Adrenal-Growth",
-        "A34: Neuro-Sleep-Stress-Brain Clearance", "A35: Organ Resilience & Functional Reserve", "A36: Local Organ Interface",
-        "A37: Oncologic Cell Fate", "A38: Tumor Microenvironment & Metastasis", "A39: Genomic Regulation Homeostasis"
-    ];
-
-    for (let i = 0; i < nodeCount; i++) {
-        const y = 1 - (i / (nodeCount - 1)) * 2;
-        const rAtY = Math.sqrt(1 - y * y);
-        const theta = phi * i;
-
-        const x = Math.cos(theta) * rAtY;
-        const z = Math.sin(theta) * rAtY;
-
-        const pos = new THREE.Vector3(x * radius, y * radius, z * radius);
-        const nodeMesh = new THREE.Mesh(nodeGeometry, nodeMaterial);
-        nodeMesh.position.copy(pos);
-        nodeMesh.userData = { id: i + 1, name: axisNames[i] || `Axis ${i + 1}` };
-
-        nodes.push(nodeMesh);
-        sphereGroup.add(nodeMesh);
-    }
-
-    // Connect close neighbors
-    const points = [];
-    for (let i = 0; i < nodeCount; i++) {
-        for (let j = i + 1; j < nodeCount; j++) {
-            const dist = nodes[i].position.distanceTo(nodes[j].position);
-            if (dist < 38) {
-                points.push(nodes[i].position);
-                points.push(nodes[j].position);
+// แชทผู้ช่วยบนหน้าแรก: ประวัติเก็บในเบราว์เซอร์ของผู้ใช้เท่านั้น (ไม่ส่งเก็บบนเซิร์ฟเวอร์)
+function guestChat() {
+    const KEY = 'tspi_guest_chat_v1';
+    let saved = [];
+    try { saved = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { saved = []; }
+    return {
+        messages: Array.isArray(saved) ? saved.slice(-20) : [],
+        draft: '', sending: false, error: '',
+        examples: ['ลำไส้รั่วคืออะไร', 'อ่อนเพลียบ่อย เกี่ยวกับระบบไหน', 'นัดหมายคลินิกได้อย่างไร'],
+        persist() { try { localStorage.setItem(KEY, JSON.stringify(this.messages.slice(-20))); } catch (e) {} },
+        clear() { this.messages = []; this.error = ''; this.persist(); },
+        scroll() { this.$nextTick(() => { const el = this.$refs.log; if (el) el.scrollTop = el.scrollHeight; }); },
+        async send() {
+            const text = this.draft.trim();
+            if (!text || this.sending) return;
+            this.messages.push({ role: 'user', content: text });
+            this.draft = ''; this.sending = true; this.error = ''; this.scroll();
+            try {
+                const r = await fetch('{% url "core:guest_assistant_api" %}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ messages: this.messages.slice(-8).map(m => ({ role: m.role, content: m.content })) }),
+                });
+                const d = await r.json();
+                if (r.ok) this.messages.push({ role: 'assistant', content: d.answer, kind: d.kind, sources: d.sources || [] });
+                else this.error = d.error || 'ส่งคำถามไม่สำเร็จ';
+            } catch (e) {
+                this.error = 'เชื่อมต่อไม่สำเร็จ กรุณาลองใหม่';
             }
-        }
-    }
-    const linesGeometry = new THREE.BufferGeometry().setFromPoints(points);
-    const lines = new THREE.LineSegments(linesGeometry, lineMaterial);
-    sphereGroup.add(lines);
-
-    scene.add(sphereGroup);
-
-    // Mouse drag interaction
-    let isDragging = false;
-    let prevMousePos = { x: 0, y: 0 };
-
-    container.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        prevMousePos = { x: e.clientX, y: e.clientY };
-    });
-
-    window.addEventListener('mouseup', () => { isDragging = false; });
-
-    container.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-            const deltaX = e.clientX - prevMousePos.x;
-            const deltaY = e.clientY - prevMousePos.y;
-            sphereGroup.rotation.y += deltaX * 0.008;
-            sphereGroup.rotation.x += deltaY * 0.008;
-            prevMousePos = { x: e.clientX, y: e.clientY };
-        }
-    });
-
-    // Touch support for mobile
-    container.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
-            isDragging = true;
-            prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }
-    });
-    container.addEventListener('touchmove', (e) => {
-        if (isDragging && e.touches.length === 1) {
-            const deltaX = e.touches[0].clientX - prevMousePos.x;
-            const deltaY = e.touches[0].clientY - prevMousePos.y;
-            sphereGroup.rotation.y += deltaX * 0.008;
-            sphereGroup.rotation.x += deltaY * 0.008;
-            prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }
-    });
-    window.addEventListener('touchend', () => { isDragging = false; });
-
-    // Animation Loop
-    function animate() {
-        requestAnimationFrame(animate);
-        if (!isDragging) {
-            sphereGroup.rotation.y += 0.003;
-            sphereGroup.rotation.x += 0.001;
-        }
-        renderer.render(scene, camera);
-    }
-    animate();
-
-    // Window Resize
-    window.addEventListener('resize', () => {
-        const newWidth = container.clientWidth;
-        const newHeight = container.clientHeight;
-        camera.aspect = newWidth / newHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(newWidth, newHeight);
-    });
-});
+            this.sending = false; this.persist(); this.scroll();
+        },
+    };
+}
 </script>
 {% endblock %}

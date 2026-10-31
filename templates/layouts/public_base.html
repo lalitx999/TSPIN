@@ -179,6 +179,9 @@
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
     </style>
 
+    <!-- ธีมกลางของระบบ: โหลดหลังสไตล์เดิมเพื่อให้ทุกหน้าเป็นชุดเดียวกัน -->
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <script defer src="{% static 'vendor/alpine/alpine.min.js' %}"></script>
     {% block extra_head %}{% endblock %}
     {% block extra_public_head %}{% endblock %}
 </head>

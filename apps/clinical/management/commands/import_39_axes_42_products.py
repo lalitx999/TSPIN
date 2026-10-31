@@ -11,12 +11,16 @@ import os
 import re
 import json
 import openpyxl
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
 
 from clinical.models_catalog import ProductCategory, AxisProductMapping, CatalogImportLog
 from clinical.invariants import CANONICAL_39_AXES
+
+DEFAULT_AXES_JSON = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data', 'tspi_39_axes.json'
+)
 
 
 class Command(BaseCommand):
@@ -34,14 +38,19 @@ class Command(BaseCommand):
             action='store_true',
             help='Perform validation and preview changes without modifying the database (Gotcha 5)'
         )
+        parser.add_argument(
+            '--axes-json',
+            type=str,
+            default=DEFAULT_AXES_JSON,
+            help='Path to the 39-axes JSON to enrich with product modules (tests pass a temp copy)'
+        )
 
     def handle(self, *args, **options):
         file_path = options['file']
         dry_run = options['dry_run']
 
         if not os.path.exists(file_path):
-            self.stderr.write(self.style.ERROR(f"File not found: {file_path}"))
-            return
+            raise CommandError(f"File not found: {file_path}")
 
         self.stdout.write(self.style.MIGRATE_HEADING(
             f"=== Starting Harmonization Import ({'DRY-RUN' if dry_run else 'LIVE TRANSACTION'}) ==="
@@ -221,7 +230,7 @@ class Command(BaseCommand):
         # -------------------------------------------------------------
         # 5. Harmonize with apps/clinical/data/tspi_39_axes.json
         # -------------------------------------------------------------
-        json_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data', 'tspi_39_axes.json')
+        json_path = options['axes_json']
         if os.path.exists(json_path):
             try:
                 with open(json_path, 'r', encoding='utf-8') as f:

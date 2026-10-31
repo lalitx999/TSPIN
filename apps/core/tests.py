@@ -30,7 +30,7 @@ class CorePagesLayoutTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'core/home.html')
         self.assertTemplateUsed(response, 'layouts/public_base.html')
-        self.assertContains(response, "TSPI CLINIC")
+        self.assertContains(response, "TSPI Clinic")
 
     def test_about_page_renders_200(self):
         """หน้าเกี่ยวกับคลินิก ต้องแสดงผลได้ปกติ (HTTP 200)"""

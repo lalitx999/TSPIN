@@ -952,7 +952,7 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
         messages.append({"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]})
     messages.append({"role": "user", "content": f"<ความรู้>\n{knowledge}\n</ความรู้>\n\nคำถาม: {question}"})
 
-    res = await gateway.call_chat(config.SOAP_PROVIDER, messages=messages, temperature=0.2, max_tokens=900)
+    res = await gateway.call_chat(config.SOAP_PROVIDER, messages=messages, temperature=0.2, max_tokens=1500)
     meta = {"provider": res.get("provider", config.SOAP_PROVIDER), "model": res.get("model", ""), "usage": res.get("usage", {})}
     answer = (res.get("content") or "").strip() if res.get("success") else ""
     sources = [c['title'] for c in context]

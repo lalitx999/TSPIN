@@ -1,83 +1,136 @@
 {% extends 'layouts/public_base.html' %}
 {% load static %}
 
-{% block title %}คุยกับ AI | TSPI CLINIC{% endblock %}
+{% block title %}คุยกับ AI | TSPI Clinic{% endblock %}
+
+{% block footer %}{% endblock %}
 
 {% block content %}
 <!-- แชทผู้ช่วย AI สำหรับทุกคน (ไม่ต้องลงทะเบียน): ประวัติเก็บในเบราว์เซอร์ของผู้ใช้เท่านั้น -->
-<section class="container-xl py-4" x-data="guestChat()">
-    <div class="tspi-chatpage">
-        <header class="tspi-chatpage-head">
-            <div class="d-flex align-items-center gap-3">
-                <span class="tspi-avatar"><i class="fas fa-user-nurse"></i></span>
-                <div>
-                    <h1 class="h5 mb-0">ผู้ช่วย AI ของ TSPI Clinic</h1>
-                    <small class="text-muted">ตอบจากเอกสารของคลินิก และเสริมด้วยความรู้ทั่วไปจาก AI</small>
-                </div>
-            </div>
-            <button type="button" class="btn btn-outline-secondary btn-sm" @click="clear()" x-show="messages.length">
-                <i class="fas fa-plus"></i> เริ่มคุยใหม่
-            </button>
-        </header>
+<div class="chat-shell" x-data="guestChat()">
+    <div class="chat-scroll" x-ref="log">
+        <div class="chat-col">
 
-        <div class="tspi-chatpage-body" x-ref="log">
-            <div class="tspi-chat-empty" x-show="!messages.length">
-                <span class="tspi-avatar tspi-avatar-lg mb-3"><i class="fas fa-user-nurse"></i></span>
-                <p class="fs-4 fw-bold mb-1">สวัสดีค่ะ มีอะไรให้ช่วยไหมคะ</p>
-                <p class="text-muted mb-4">ถามเรื่องโรค อาการ การรักษา หรือบริการของคลินิกได้เลย ไม่ต้องลงทะเบียน</p>
-                <div class="tspi-chat-examples">
+            <!-- หน้าว่าง: ทักทาย + ตัวอย่างคำถาม -->
+            <div class="chat-welcome" x-show="!messages.length">
+                <span class="chat-avatar chat-avatar-lg"><i class="fas fa-leaf"></i></span>
+                <h1 class="h2 mt-3 mb-2">สวัสดีค่ะ มีอะไรให้ช่วยไหมคะ</h1>
+                <p class="text-muted fs-5 mb-4">ถามเรื่องโรค อาการ การรักษา หรือบริการของ TSPI Clinic ได้เลย</p>
+                <div class="row g-3 text-start">
                     <template x-for="q in examples">
-                        <button type="button" class="tspi-chip" @click="draft = q; send()" x-text="q"></button>
+                        <div class="col-sm-6">
+                            <button type="button" class="chat-suggest" @click="ask(q.text)">
+                                <i class="fas" :class="q.icon"></i>
+                                <span x-text="q.text"></span>
+                            </button>
+                        </div>
                     </template>
                 </div>
+                <ul class="chat-promise">
+                    <li><i class="fas fa-book-medical"></i> ตอบจากเอกสารของคลินิก พร้อมเลขอ้างอิง</li>
+                    <li><i class="fas fa-robot"></i> ส่วนที่เป็นความรู้ทั่วไปจาก AI จะแยกกรอบให้เห็นชัด</li>
+                    <li><i class="fas fa-user-shield"></i> ไม่ต้องใส่ชื่อ เบอร์โทร หรือเลขบัตร</li>
+                </ul>
             </div>
 
-            <div class="tspi-chat">
-                <template x-for="(m, i) in messages" :key="i">
-                    <div class="tspi-bubble" :class="m.role === 'user' ? 'user' : ('bot' + (m.kind === 'emergency' ? ' emergency' : ''))">
-                        <template x-if="m.role === 'user' || m.kind === 'emergency'">
-                            <div class="tspi-text" x-text="m.content"></div>
-                        </template>
-                        <template x-if="m.role === 'assistant' && m.kind !== 'emergency'">
+            <!-- บทสนทนา -->
+            <template x-for="(m, i) in messages" :key="i">
+                <div>
+                    <!-- ผู้ใช้ -->
+                    <div class="chat-row user" x-show="m.role === 'user'">
+                        <div class="chat-user" x-text="m.content"></div>
+                    </div>
+
+                    <!-- ฉุกเฉิน -->
+                    <div class="chat-row" x-show="m.role === 'assistant' && m.kind === 'emergency'">
+                        <div class="alert alert-danger d-flex gap-3 mb-0 w-100" role="alert">
+                            <i class="fas fa-ambulance fs-3"></i>
                             <div>
-                                <div class="tspi-text" x-show="split(m).clinic" x-text="split(m).clinic"></div>
-                                <div class="tspi-general" x-show="split(m).general">
-                                    <div class="tspi-general-label"><i class="fas fa-robot"></i> ข้อมูลทั่วไปจาก AI (ไม่ใช่เอกสารของคลินิก)</div>
-                                    <div class="tspi-text" x-text="split(m).general"></div>
+                                <strong class="d-block fs-5 mb-1">อาจเป็นภาวะฉุกเฉิน</strong>
+                                <span x-text="m.content"></span>
+                                <a href="tel:1669" class="btn btn-danger mt-3 d-flex d-sm-inline-flex"><i class="fas fa-phone-alt"></i> โทร 1669</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ผู้ช่วย -->
+                    <div class="chat-row bot" x-show="m.role === 'assistant' && m.kind !== 'emergency'">
+                        <span class="chat-avatar"><i class="fas fa-leaf"></i></span>
+                        <div class="chat-bot">
+                            <!-- ส่วนที่มาจากเอกสารคลินิก -->
+                            <template x-for="b in blocks(parts(m).clinic)">
+                                <div class="chat-block">
+                                    <p x-show="b.type === 'p'"><template x-for="seg in b.items[0]"><span><span x-text="seg.t" x-show="!seg.cite"></span><button type="button" class="chat-cite" x-show="seg.cite" x-text="seg.cite" @click="m.open = true" :title="(m.sources || [])[seg.cite - 1] || ''"></button></span></template></p>
+                                    <ul x-show="b.type === 'ul'"><template x-for="li in b.items"><li><template x-for="seg in li"><span><span x-text="seg.t" x-show="!seg.cite"></span><button type="button" class="chat-cite" x-show="seg.cite" x-text="seg.cite" @click="m.open = true"></button></span></template></li></template></ul>
                                 </div>
-                                <template x-if="m.sources && m.sources.length">
-                                    <div class="tspi-sources">
-                                        <div class="fw-semibold mb-1"><i class="fas fa-book-medical"></i> อ้างอิงเอกสาร TSPI</div>
-                                        <template x-for="(s, j) in m.sources">
-                                            <div x-text="'[' + (j + 1) + '] ' + s"></div>
-                                        </template>
+                            </template>
+
+                            <!-- ความรู้ทั่วไปจาก AI ภายนอก -->
+                            <div class="chat-general" x-show="parts(m).general">
+                                <div class="chat-general-label"><i class="fas fa-robot"></i> ความรู้ทั่วไปจาก AI <span class="fw-normal">· ไม่ใช่เอกสารของคลินิก</span></div>
+                                <template x-for="b in blocks(parts(m).general)">
+                                    <div class="chat-block">
+                                        <p x-show="b.type === 'p'" x-text="b.items[0].map(s => s.t).join('')"></p>
+                                        <ul x-show="b.type === 'ul'"><template x-for="li in b.items"><li x-text="li.map(s => s.t).join('')"></li></template></ul>
                                     </div>
                                 </template>
                             </div>
-                        </template>
+
+                            <!-- แหล่งอ้างอิง (กดเปิด/ปิด) -->
+                            <div class="chat-sources" x-show="m.sources && m.sources.length">
+                                <button type="button" class="chat-sources-toggle" @click="m.open = !m.open" :aria-expanded="!!m.open">
+                                    <i class="fas fa-book-medical"></i>
+                                    <span x-text="'อ้างอิงเอกสาร TSPI ' + (m.sources ? m.sources.length : 0) + ' รายการ'"></span>
+                                    <i class="fas" :class="m.open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                                </button>
+                                <ol class="chat-sources-list" x-show="m.open" x-transition>
+                                    <template x-for="s in (m.sources || [])"><li x-text="s"></li></template>
+                                </ol>
+                            </div>
+
+                            <!-- คำถามต่อ (เฉพาะคำตอบล่าสุด) -->
+                            <div class="d-flex flex-wrap gap-2 mt-3" x-show="i === messages.length - 1 && !sending && m.kind !== 'out_of_scope'">
+                                <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-sm btn-primary rounded-pill"><i class="fas fa-user-md"></i> ให้แพทย์ดูต่อ</a>
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" @click="ask('อธิบายให้เข้าใจง่ายกว่านี้หน่อย')">อธิบายง่าย ๆ อีกครั้ง</button>
+                            </div>
+                        </div>
                     </div>
-                </template>
-                <div class="tspi-bubble bot text-muted" x-show="sending"><i class="fas fa-ellipsis-h fa-fade"></i> กำลังหาคำตอบ…</div>
+                </div>
+            </template>
+
+            <!-- กำลังตอบ -->
+            <div class="chat-row bot" x-show="sending">
+                <span class="chat-avatar"><i class="fas fa-leaf"></i></span>
+                <div class="chat-bot w-100" aria-live="polite">
+                    <span class="visually-hidden">กำลังหาคำตอบ</span>
+                    <p class="placeholder-glow mb-2"><span class="placeholder col-10 rounded"></span></p>
+                    <p class="placeholder-glow mb-2"><span class="placeholder col-8 rounded"></span></p>
+                    <p class="placeholder-glow mb-0"><span class="placeholder col-6 rounded"></span></p>
+                </div>
             </div>
         </div>
+    </div>
 
-        <footer class="tspi-chatpage-foot">
-            <p class="text-danger small mb-2" x-show="error" x-text="error"></p>
-            <form class="tspi-composer" @submit.prevent="send()">
+    <!-- ช่องพิมพ์ ติดขอบล่าง -->
+    <div class="chat-dock">
+        <div class="chat-col">
+            <div class="alert alert-warning py-2 mb-2" x-show="error" x-text="error" role="alert"></div>
+            <form class="chat-input" @submit.prevent="send()">
                 <label for="guest-q" class="visually-hidden">คำถามถึงผู้ช่วย</label>
-                <textarea id="guest-q" rows="1" maxlength="1500" placeholder="พิมพ์คำถาม เช่น ลำไส้รั่วรักษาอย่างไร" x-model="draft"
-                          @keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); send(); }" :disabled="sending"></textarea>
+                <textarea id="guest-q" x-ref="input" rows="1" maxlength="1500" placeholder="พิมพ์คำถาม หรือเล่าอาการ…" x-model="draft"
+                          @input="grow($el)" @keydown.enter="if (!$event.shiftKey && !$event.isComposing) { $event.preventDefault(); send(); }"
+                          :disabled="sending"></textarea>
                 <button class="btn btn-primary" type="submit" :disabled="sending || !draft.trim()" aria-label="ส่งคำถาม">
-                    <i class="fas fa-paper-plane"></i>
+                    <i class="fas fa-arrow-up"></i>
                 </button>
             </form>
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2">
-                <span class="tspi-note">ไม่ต้องใส่ชื่อ เบอร์โทร หรือเลขบัตร &bull; ไม่ใช่การวินิจฉัยของแพทย์ &bull; ฉุกเฉินโทร 1669</span>
-                <a href="{% url 'portal_patient:onboarding' %}" class="small fw-semibold" x-show="messages.length">อยากให้หมอดูต่อ → ลงทะเบียน</a>
+            <div class="d-flex justify-content-between align-items-center gap-2 mt-2 chat-foot">
+                <span>ไม่ใช่การวินิจฉัยของแพทย์ &middot; ฉุกเฉินโทร <a href="tel:1669">1669</a></span>
+                <button type="button" class="btn btn-link btn-sm p-0" x-show="messages.length" @click="clear()"><i class="fas fa-redo"></i> เริ่มคุยใหม่</button>
             </div>
-        </footer>
+        </div>
     </div>
-</section>
+</div>
 
 <script>
 function guestChat() {
@@ -88,24 +141,59 @@ function guestChat() {
     return {
         messages: Array.isArray(saved) ? saved.slice(-20) : [],
         draft: '', sending: false, error: '',
-        examples: ['ลำไส้รั่วคืออะไร รักษาอย่างไร', 'อ่อนเพลียบ่อย เกี่ยวกับระบบไหน', 'สะเก็ดเงินดูแลตัวเองอย่างไร', 'นัดหมายคลินิกได้อย่างไร'],
-        init() { this.scroll(); },
-        // แยกคำตอบเป็นส่วนที่มาจากเอกสารคลินิก กับส่วนความรู้ทั่วไปจาก AI
-        split(m) {
-            const text = (m.content || '').replace(/\*\*/g, '');
+        examples: [
+            { icon: 'fa-bacteria', text: 'ลำไส้รั่วคืออะไร รักษาอย่างไร' },
+            { icon: 'fa-battery-quarter', text: 'อ่อนเพลียบ่อย เกี่ยวกับระบบไหน' },
+            { icon: 'fa-allergies', text: 'สะเก็ดเงินดูแลตัวเองอย่างไร' },
+            { icon: 'fa-calendar-check', text: 'นัดหมายคลินิกได้อย่างไร' },
+        ],
+        init() {
+            // มาจากการ์ดหน้าแรก (?q=...) ให้ถามทันที แล้วลบออกจาก URL กันถามซ้ำตอนรีเฟรช
+            const q = new URLSearchParams(location.search).get('q');
+            if (q) { history.replaceState(null, '', location.pathname); this.ask(q.slice(0, 300)); }
+            else this.scroll();
+        },
+        // แยกคำตอบ: ส่วนจากเอกสารคลินิก กับ ส่วนความรู้ทั่วไปจาก AI
+        parts(m) {
+            const text = (m.content || '').replace(/\*\*/g, '').trim();
             if (m.kind === 'general') return { clinic: '', general: text.replace(/ข้อมูลทั่วไปเพิ่มเติม[^:\n]*:\s*/, '').trim() };
             const at = text.indexOf(GENERAL);
             if (at < 0) return { clinic: text, general: '' };
             return { clinic: text.slice(0, at).trim(), general: text.slice(at).replace(/^[^:\n]*:?\s*/, '').trim() };
         },
-        persist() { try { localStorage.setItem(KEY, JSON.stringify(this.messages.slice(-20))); } catch (e) {} },
-        clear() { this.messages = []; this.error = ''; this.persist(); },
+        // แปลงข้อความเป็นย่อหน้า/รายการ และแยกเลขอ้างอิง [n] ออกมาเป็นปุ่ม (ไม่ใช้ innerHTML)
+        blocks(text) {
+            const segs = (line) => line.split(/(\[\d+\])/).filter(Boolean)
+                .map(t => /^\[\d+\]$/.test(t) ? { cite: Number(t.slice(1, -1)) } : { t });
+            const out = [];
+            for (const raw of (text || '').split('\n')) {
+                const line = raw.trim();
+                if (!line) continue;
+                const li = line.match(/^(?:[-•*]|\d+[.)])\s+(.*)$/);
+                if (li) {
+                    const last = out[out.length - 1];
+                    if (last && last.type === 'ul') last.items.push(segs(li[1])); else out.push({ type: 'ul', items: [segs(li[1])] });
+                } else {
+                    out.push({ type: 'p', items: [segs(line)] });
+                }
+            }
+            return out;
+        },
+        grow(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 180) + 'px'; },
+        persist() {
+            const keep = this.messages.slice(-20).map(({ open, ...m }) => m);
+            try { localStorage.setItem(KEY, JSON.stringify(keep)); } catch (e) {}
+        },
+        clear() { this.messages = []; this.error = ''; this.persist(); this.$refs.input.focus(); },
         scroll() { this.$nextTick(() => { const el = this.$refs.log; if (el) el.scrollTop = el.scrollHeight; }); },
+        ask(text) { this.draft = text; this.send(); },
         async send() {
             const text = this.draft.trim();
             if (!text || this.sending) return;
             this.messages.push({ role: 'user', content: text });
-            this.draft = ''; this.sending = true; this.error = ''; this.scroll();
+            this.draft = ''; this.sending = true; this.error = '';
+            this.$nextTick(() => this.grow(this.$refs.input));
+            this.scroll();
             try {
                 const r = await fetch('{% url "core:guest_assistant_api" %}', {
                     method: 'POST',
@@ -113,12 +201,13 @@ function guestChat() {
                     body: JSON.stringify({ messages: this.messages.slice(-8).map(m => ({ role: m.role, content: m.content })) }),
                 });
                 const d = await r.json();
-                if (r.ok) this.messages.push({ role: 'assistant', content: d.answer, kind: d.kind, sources: d.sources || [] });
-                else this.error = d.error || 'ส่งคำถามไม่สำเร็จ';
+                if (r.ok) this.messages.push({ role: 'assistant', content: d.answer, kind: d.kind, sources: d.sources || [], open: false });
+                else this.error = d.error || 'ส่งคำถามไม่สำเร็จ กรุณาลองใหม่';
             } catch (e) {
-                this.error = 'เชื่อมต่อไม่สำเร็จ กรุณาลองใหม่';
+                this.error = 'เชื่อมต่อไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่';
             }
             this.sending = false; this.persist(); this.scroll();
+            this.$nextTick(() => this.$refs.input.focus());
         },
     };
 }

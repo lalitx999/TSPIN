@@ -190,7 +190,7 @@
     </script>
 
     <!-- ธีมกลางของระบบ: โหลดหลังสไตล์เดิมเพื่อให้ทุกหน้าเป็นชุดเดียวกัน -->
-    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}?v={{ ASSET_VERSION }}">
     {% block extra_head %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">

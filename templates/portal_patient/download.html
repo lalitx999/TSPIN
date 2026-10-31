@@ -30,7 +30,7 @@
                         </div>
                         <div>
                             <h6 class="fw-bold text-dark mb-0">TSPI Precision Report #{{ rep.id }}</h6>
-                            <small class="text-muted font-monospace">{{ rep.created_at|date:"d M Y H:i" }} &bull; Physician Sign-off Verified</small>
+                            <small class="text-muted font-monospace">{{ rep.analysis_date|date:"d M Y H:i" }} &bull; Physician Sign-off Verified</small>
                         </div>
                     </div>
                     <a href="{% url 'clinical:report_pdf' rep.id %}" target="_blank" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5">

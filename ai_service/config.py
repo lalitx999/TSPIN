@@ -33,7 +33,8 @@ class BotanyConfig:
     LINE_CHANNEL_ACCESS_TOKEN: str = os.getenv("LINE_CHANNEL_ACCESS_TOKEN", "").strip()
 
     # Internal Service-to-Service Security
-    INTERNAL_API_TOKEN: str = os.getenv("INTERNAL_API_TOKEN", "tspi-internal-secret-token").strip()
+    # No default: an unset token makes every internal call fail closed.
+    INTERNAL_API_TOKEN: str = os.getenv("INTERNAL_API_TOKEN", "").strip()
     STORAGE_ENCRYPTION_KEY: str = os.getenv("STORAGE_ENCRYPTION_KEY", "").strip()
 
     # Model Versioning Standards (Configured as requested by user)

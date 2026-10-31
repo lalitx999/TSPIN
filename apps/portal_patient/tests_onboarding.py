@@ -112,7 +112,7 @@ class PatientOnboardingTests(TestCase):
         data = response.json()
         self.assertTrue(data['success'])
         self.assertTrue(data['hn'].startswith('HN'))
-        self.assertEqual(data['redirect_url'], '/portal/ai-intake/')
+        self.assertEqual(data['redirect_url'], reverse('portal_patient:patient_ai_intake'))
 
         # Verify database record exists
         created_patient = Patient.objects.filter(phone='0891234567').first()
@@ -121,3 +121,55 @@ class PatientOnboardingTests(TestCase):
         self.assertEqual(created_patient.last_name, 'ใจดี')
         self.assertIsNotNone(created_patient.user)
         self.assertTrue(created_patient.user.check_password('SecurePatientPass2026!'))
+
+
+class OnboardingClaimHardeningTests(TestCase):
+    """การยืนยันเวชระเบียนเดิมต้องยึดบัญชีคนอื่นไม่ได้"""
+
+    def setUp(self):
+        cache.clear()
+        self.patient = Patient(hn='HN2610002', first_name='มานี', last_name='มีนา', phone='0812223344')
+        self.patient.set_id_card('1100400111222')
+        self.patient.save()
+        self.url = reverse('portal_patient:onboarding_claim_account_api')
+        self.password = 'StrongPatientPass2026!'
+
+    def _claim(self, **extra):
+        data = {'patient_uuid': str(self.patient.uuid), 'password': self.password}
+        data.update(extra)
+        return self.client.post(self.url, data)
+
+    def test_missing_phone_confirmation_is_rejected(self):
+        resp = self._claim()
+        self.assertEqual(resp.status_code, 400)
+        self.assertNotIn('_auth_user_id', self.client.session)
+        self.patient.refresh_from_db()
+        self.assertIsNone(self.patient.user)
+
+    def test_wrong_phone_locks_after_five_attempts(self):
+        for _ in range(5):
+            self.assertEqual(self._claim(phone_last4='0000').status_code, 400)
+        self.assertEqual(self._claim(phone_last4='3344').status_code, 429)
+
+    def test_weak_password_is_rejected(self):
+        resp = self._claim(phone_last4='3344', password='123456')
+        self.assertEqual(resp.status_code, 400)
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+    def test_correct_claim_logs_in(self):
+        resp = self._claim(phone_last4='3344')
+        self.assertEqual(resp.status_code, 200)
+        self.patient.refresh_from_db()
+        self.assertEqual(int(self.client.session['_auth_user_id']), self.patient.user.pk)
+
+    def test_existing_account_cannot_be_reclaimed(self):
+        self._claim(phone_last4='3344')
+        self.client.logout()
+        resp = self._claim(phone_last4='3344', password='AttackerPassword2026!x')
+        self.assertEqual(resp.status_code, 409)
+        self.patient.refresh_from_db()
+        self.assertTrue(self.patient.user.check_password(self.password))
+
+    def test_lookup_no_longer_matches_partial_phone(self):
+        resp = self.client.post(reverse('portal_patient:onboarding_lookup_api'), {'nationality': 'FOREIGN', 'identifier': '081'})
+        self.assertEqual(resp.status_code, 404)

@@ -51,45 +51,33 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for row in lab_rows %}
                     <tr>
-                        <td class="px-3 py-2.5 font-monospace text-muted">24/10/2026</td>
-                        <td class="px-3 py-2.5 fw-bold text-dark">คุณนิคม (HN: 26-00001)</td>
-                        <td class="px-3 py-2.5 fw-bold text-dark">hs-CRP (High-Sensitivity C-Reactive Protein)</td>
-                        <td class="px-3 py-2.5 font-monospace fw-bold text-danger">4.8 mg/L</td>
-                        <td class="px-3 py-2.5 font-monospace text-muted small">&lt; 1.0 mg/L</td>
+                        <td class="px-3 py-2.5 font-monospace text-muted">{{ row.artifact.created_at|date:"d/m/Y" }}</td>
+                        <td class="px-3 py-2.5 fw-bold text-dark">{% if row.artifact.patient %}{{ row.artifact.patient.full_name }} (HN: {{ row.artifact.patient.hn }}){% else %}—{% endif %}</td>
+                        <td class="px-3 py-2.5 fw-bold text-dark">{{ row.marker }}</td>
+                        <td class="px-3 py-2.5 font-monospace fw-bold {% if row.is_abnormal %}text-danger{% else %}text-dark{% endif %}">{{ row.value }} {{ row.unit }}</td>
+                        <td class="px-3 py-2.5 font-monospace text-muted small">{{ row.reference|default:"—" }}</td>
                         <td class="px-3 py-2.5 text-center">
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">สูงกว่าเกณฑ์</span>
-                        </td>
-                        <td class="px-3 py-2.5 text-end text-success fw-medium">
-                            <i class="fas fa-check me-1"></i> บันทึกแล้ว
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="px-3 py-2.5 font-monospace text-muted">24/10/2026</td>
-                        <td class="px-3 py-2.5 fw-bold text-dark">คุณนิคม (HN: 26-00001)</td>
-                        <td class="px-3 py-2.5 fw-bold text-dark">Fasting Blood Glucose</td>
-                        <td class="px-3 py-2.5 font-monospace text-dark">96 mg/dL</td>
-                        <td class="px-3 py-2.5 font-monospace text-muted small">70 - 99 mg/dL</td>
-                        <td class="px-3 py-2.5 text-center">
+                            {% if row.is_abnormal %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">ผิดปกติ</span>
+                            {% else %}
                             <span class="badge bg-success-subtle text-success border border-success-subtle">ปกติ</span>
+                            {% endif %}
                         </td>
-                        <td class="px-3 py-2.5 text-end text-success fw-medium">
-                            <i class="fas fa-check me-1"></i> บันทึกแล้ว
+                        <td class="px-3 py-2.5 text-end fw-medium">
+                            {% if row.artifact.status == 'pending' %}
+                            <a href="{% url 'intelligence:artifact_review' %}" class="text-primary">รอแพทย์ตรวจทาน</a>
+                            {% else %}
+                            <span class="text-muted">{{ row.artifact.get_status_display }}</span>
+                            {% endif %}
                         </td>
                     </tr>
+                    {% empty %}
                     <tr>
-                        <td class="px-3 py-2.5 font-monospace text-muted">24/10/2026</td>
-                        <td class="px-3 py-2.5 fw-bold text-dark">คุณนิคม (HN: 26-00001)</td>
-                        <td class="px-3 py-2.5 fw-bold text-dark">Fasting Insulin</td>
-                        <td class="px-3 py-2.5 font-monospace fw-bold text-warning-emphasis">16.4 uIU/mL</td>
-                        <td class="px-3 py-2.5 font-monospace text-muted small">2.6 - 10.0 uIU/mL</td>
-                        <td class="px-3 py-2.5 text-center">
-                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">เริ่มดื้ออินซูลิน</span>
-                        </td>
-                        <td class="px-3 py-2.5 text-end text-success fw-medium">
-                            <i class="fas fa-check me-1"></i> บันทึกแล้ว
-                        </td>
+                        <td colspan="7" class="text-center py-5 text-muted">ยังไม่มีผลแล็บที่นำเข้าระบบ</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

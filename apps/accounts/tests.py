@@ -137,7 +137,11 @@ class AuthenticationSecurityTests(TestCase):
         [Pillar 1]: ล็อกเอาต์ล้างเซสชันและบันทึก AuditLog
         """
         self.client.force_login(self.doctor)
-        response = self.client.get(reverse('accounts:logout'))
+        # GET ต้องไม่ทำให้ออกจากระบบ (กันเว็บอื่นสั่ง logout ผ่านลิงก์/รูปภาพ)
+        self.assertEqual(self.client.get(reverse('accounts:logout')).status_code, 405)
+        self.assertTrue('_auth_user_id' in self.client.session)
+
+        response = self.client.post(reverse('accounts:logout'))
         self.assertEqual(response.status_code, 302)
         self.assertFalse('_auth_user_id' in self.client.session)
         
@@ -315,7 +319,8 @@ class BotanyEnginePhase2Tests(TestCase):
     def setUp(self):
         from starlette.testclient import TestClient
         from ai_service.main import app as fastapi_app
-        self.api_client = TestClient(fastapi_app)
+        from ai_service.config import config as ai_config
+        self.api_client = TestClient(fastapi_app, headers={'X-Internal-Token': ai_config.INTERNAL_API_TOKEN})
 
     def test_m1_voice_intake_opt_out(self):
         """[M1 Voice]: คนไข้ไม่อนุญาต (Opt-out) -> ต้องล็อกเสียงไว้ใน Local Vault (CLASS_C) ห้ามส่งออก"""
@@ -394,7 +399,8 @@ class BotanyEnginePhase3Tests(TestCase):
     def setUp(self):
         from starlette.testclient import TestClient
         from ai_service.main import app as fastapi_app
-        self.api_client = TestClient(fastapi_app)
+        from ai_service.config import config as ai_config
+        self.api_client = TestClient(fastapi_app, headers={'X-Internal-Token': ai_config.INTERNAL_API_TOKEN})
 
     def test_m4_soap_generation_and_guardrail(self):
         """[M4 SOAP]: สร้างโครงสร้าง SOAP และผ่านการตรวจสอบ Guardrail ห้ามวินิจฉัย"""
@@ -833,3 +839,106 @@ class BotanyEnginePhase6Tests(TestCase):
         lockout_log = AuditLog.objects.filter(action="BOX_UNLOCK_LOCKED_OUT", object_id=str(self.box.id)).first()
         self.assertIsNotNone(lockout_log)
         self.assertEqual(lockout_log.user, self.doctor)
+
+
+class AIServiceAuthTests(TestCase):
+    """FastAPI เป็นบริการภายใน: ทุก route ยกเว้น /health ต้องมี X-Internal-Token ที่ถูกต้อง"""
+
+    def setUp(self):
+        from starlette.testclient import TestClient
+        from ai_service.main import app as fastapi_app
+        self.api_client = TestClient(fastapi_app)
+
+    def test_routes_reject_missing_or_wrong_token(self):
+        for headers in ({}, {'X-Internal-Token': 'wrong-token'}):
+            resp = self.api_client.post('/api/sanitizer/text', json={'text': 'โทร 0812345678'}, headers=headers)
+            self.assertEqual(resp.status_code, 401)
+            resp = self.api_client.post('/api/v1/copilot/stream', json={'message': 'test'}, headers=headers)
+            self.assertEqual(resp.status_code, 401)
+
+    def test_health_is_open(self):
+        self.assertEqual(self.api_client.get('/health').status_code, 200)
+
+    def test_line_webhook_no_longer_served_by_ai_service(self):
+        from ai_service.config import config as ai_config
+        resp = self.api_client.post('/api/v1/webhook/line', json={'events': []},
+                                    headers={'X-Internal-Token': ai_config.INTERNAL_API_TOKEN})
+        self.assertEqual(resp.status_code, 404)
+
+    def test_copilot_never_falls_back_to_default_products(self):
+        from unittest.mock import patch
+        from ai_service import main as ai_main
+        axis_without_modules = [{'axis_id': 7, 'name': 'Test Axis', 'domain_title': 'Test Domain', 'modules': []}]
+        with patch.object(ai_main, 'search_relevant_axes', return_value=axis_without_modules):
+            text = ai_main.build_clinical_reasoning_response('ทดสอบ')
+        self.assertNotIn('KERRA', text)
+        self.assertNotIn('VITALPLUS', text)
+        self.assertIn('ยังไม่มีโมดูล', text)
+
+
+class PatientIdentifierLoginTests(TestCase):
+    """ผู้ป่วยต้องล็อกอินได้ด้วย HN (มี/ไม่มีขีด) และเลขบัตร ปชช. ตามที่หน้าล็อกอินบอกไว้"""
+
+    def setUp(self):
+        from patients.models import Patient
+        self.user = User.objects.create_user(
+            username='pt_hn-26-00042', password='PatientPass2026!x', role=User.Role.PATIENT,
+        )
+        self.patient = Patient.objects.create(hn='HN-26-00042', first_name='ทดสอบ', last_name='ล็อกอิน', user=self.user)
+        self.patient.set_id_card('1-1004-00123-45-6')
+        self.patient.save()
+
+    def _login(self, identifier, password='PatientPass2026!x'):
+        return self.client.post(reverse('accounts:patient_login'), {'identifier': identifier, 'password': password})
+
+    def test_login_with_hn_with_and_without_dashes(self):
+        for identifier in ('HN-26-00042', 'hn2600042', 'HN 26 00042'):
+            self.client.logout()
+            resp = self._login(identifier)
+            self.assertEqual(resp.status_code, 302, identifier)
+            self.assertEqual(int(self.client.session['_auth_user_id']), self.user.pk)
+
+    def test_login_with_national_id(self):
+        resp = self._login('1100400123456')
+        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(int(self.client.session['_auth_user_id']), self.user.pk)
+
+    def test_wrong_password_with_hn_fails(self):
+        resp = self._login('HN-26-00042', password='wrong-password')
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+
+class NursingAssistantRoleTests(TestCase):
+    """ผู้ช่วยพยาบาลมีสิทธิ์เท่าพยาบาล: เข้าพอร์ทัลบุคลากรได้ แต่อนุมัติรายการ Level 2 (แพทย์เท่านั้น) ไม่ได้"""
+
+    def setUp(self):
+        self.na = User.objects.create_user(
+            username='na_test', email='na@tspi.test', password='AssistantPass2026!x',
+            role=User.Role.NURSING_ASSISTANT,
+        )
+
+    def test_can_login_to_staff_portal_and_open_clinical_pages(self):
+        resp = self.client.post(reverse('accounts:doctor_login'), {
+            'email_or_username': 'na@tspi.test', 'password': 'AssistantPass2026!x',
+        })
+        self.assertEqual(resp.status_code, 302)
+        for url in ('/doctor/dashboard/', '/doctor/patients/', '/staff/inbox/'):
+            self.assertEqual(self.client.get(url).status_code, 200, url)
+
+    def test_cannot_approve_level_2_diagnostic(self):
+        from django.core.exceptions import PermissionDenied
+        from patients.models import Patient, ClinicalReviewItem, CommunicationRecord, LineUser
+        patient = Patient.objects.create(hn='HN-NA-1', first_name='a', last_name='b')
+        line_user = LineUser.objects.create(line_user_id='U_NA_TEST', display_name='NA')
+        message = CommunicationRecord.objects.create(
+            line_message_id='na_msg_1', line_user=line_user, patient=patient,
+            direction=CommunicationRecord.DirectionChoices.INCOMING,
+            message_type=CommunicationRecord.MessageTypeChoices.TEXT, content='แน่นหน้าอก',
+        )
+        item = ClinicalReviewItem.objects.create(
+            patient=patient, source_message=message,
+            review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC,
+        )
+        with self.assertRaises(PermissionDenied):
+            item.approve(self.na)

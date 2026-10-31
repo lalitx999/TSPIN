@@ -4,6 +4,7 @@ Enforces Rate Limiting, Session Fixation Rotation, and Full AuditLog (Pillars 1,
 """
 
 import hashlib
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib import messages
@@ -13,10 +14,14 @@ from accounts.models import AuditLog, User
 from accounts.forms import DoctorLoginForm, PatientLoginForm, PatientRegistrationForm
 
 def get_client_ip(request):
-    """ดึง Client IP Address จริงแม้จะผ่าน Reverse Proxy"""
-    forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
-    if forwarded:
-        return forwarded.split(',')[0].strip()
+    """
+    ดึง Client IP จริง: X-Forwarded-For ตัวแรกผู้เรียกปลอมได้ จึงไม่ใช้
+    เชื่อ X-Real-IP เฉพาะเมื่อ TRUST_X_REAL_IP=True (production หลัง nginx ที่เขียนทับ header นี้เสมอ)
+    """
+    if getattr(settings, 'TRUST_X_REAL_IP', False):
+        real_ip = request.META.get('HTTP_X_REAL_IP', '').strip()
+        if real_ip:
+            return real_ip
     return request.META.get('REMOTE_ADDR', '')
 
 
@@ -151,7 +156,7 @@ def patient_register_view(request):
     return render(request, 'accounts/patient_register.html', {'form': form})
 
 
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["POST"])
 def user_logout_view(request):
     """
     ออกจากระบบ: ล้างเซสชัน ขจัดคุกกี้ หมุนเวียนคีย์ และบันทึก AuditLog (Pillar 1 & 8)

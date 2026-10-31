@@ -9,11 +9,7 @@ import hashlib
 from datetime import datetime, date
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
-from django.contrib.auth import get_user_model
 from patients.models import Patient
-from clinical.models import BiologicalRecord
-
-User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -37,11 +33,6 @@ class Command(BaseCommand):
         clear_first = options['clear_first']
 
         self.stdout.write(self.style.NOTICE("🔍 Connecting to PostgreSQL legacy schema..."))
-
-        # Default Doctor for Clinical Records
-        doctor = User.objects.filter(role='doctor').first()
-        if not doctor:
-            doctor = User.objects.filter(is_superuser=True).first()
 
         with connection.cursor() as cursor:
             # Query real patient data with health joining
@@ -89,7 +80,6 @@ class Command(BaseCommand):
 
         existing_hns = set(Patient.objects.values_list('hn', flat=True))
         patients_to_create = []
-        bios_to_create = []
 
         # Deduplication tracker for imported session
         used_hns = set(existing_hns)
@@ -161,11 +151,8 @@ class Command(BaseCommand):
             if allergy_text in ['ไม่มี', 'ไม่แพ้', '-', 'None', 'null']:
                 allergy_text = ''
 
+            # สถานะทางคลินิกให้แพทย์เป็นผู้ประเมินเองหลังนำเข้า (ห้ามเดาจากคำในข้อความโรค)
             status = 'pending'
-            if any(term in dis_text for term in ['มะเร็ง', 'ไต', 'เนื้องอก', 'ตับ', 'หัวใจ', 'หลอดเลือดสมอง']):
-                status = 'urgent'
-            elif med_text or dis_text:
-                status = 'medicine'
 
             # ID Card Hash
             id_card_hash = ''
@@ -229,53 +216,6 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f"✅ Successfully synchronized {created_count} real patients!"))
 
-        # Generate realistic baseline 39 Biological Axes scores for patients
-        self.stdout.write(self.style.NOTICE("🧬 Creating clinical 39-Axes baseline records for synced patients..."))
-        all_synced_patients = Patient.objects.filter(biological_records__isnull=True)[:1000]
-
-        for pt in all_synced_patients:
-            dis = (pt.medical_history or '').lower()
-            sym = (pt.chief_complaint or '').lower()
-
-            # Default balanced score range 35-45
-            axis_scores = {i: 38 for i in range(1, 40)}
-
-            # Clinical disease mapping to 39 Axes
-            if 'มะเร็ง' in dis or 'cancer' in dis:
-                axis_scores[1] = 88   # Systemic Inflammatory Load
-                axis_scores[2] = 85   # Immune Homeostasis
-                axis_scores[11] = 90  # Autophagy & Cell Senescence
-                axis_scores[12] = 82  # Epigenetic Plasticity
-                axis_scores[9] = 78   # Oxidative Stress
-            if 'ไต' in dis or 'kidney' in dis:
-                axis_scores[16] = 86  # Renal Clearance & Detox
-                axis_scores[15] = 82  # Cellular Detoxification
-                axis_scores[20] = 75  # Vascular Tone
-            if 'ความดัน' in dis or 'hypertension' in dis:
-                axis_scores[20] = 80  # Vascular Integrity
-                axis_scores[21] = 76  # Endothelial Function
-                axis_scores[5] = 68   # Metabolic Regulation
-            if 'เบาหวาน' in dis or 'diabetes' in dis:
-                axis_scores[5] = 85   # Insulin Sensitivity
-                axis_scores[4] = 80   # Mitochondrial Energy
-                axis_scores[27] = 78  # Glycemic Balance
-            if 'สะเก็ดเงิน' in dis or 'psoriasis' in dis or 'ผิวหนัง' in sym:
-                axis_scores[1] = 82   # Systemic Inflammation
-                axis_scores[23] = 92  # Cutaneous & Mucosal Barrier
-                axis_scores[18] = 78  # Gut Microbiome Ecology
-                axis_scores[19] = 85  # Gut Barrier Integrity
-
-            bio = BiologicalRecord(
-                patient=pt,
-                doctor=doctor,
-                is_baseline=True,
-                notes="การประเมินสภาวะชีววิทยา 39 แกนแรกรับ (Initial 39-Axes Baseline Assessment)",
-                **{f"axis_{i}": axis_scores[i] for i in range(1, 40)}
-            )
-            bios_to_create.append(bio)
-
-        if bios_to_create:
-            BiologicalRecord.objects.bulk_create(bios_to_create, batch_size=500)
-            self.stdout.write(self.style.SUCCESS(f"✅ Generated baseline 39-Axes records for {len(bios_to_create)} patients."))
+        # ไม่สร้าง BiologicalRecord ให้ผู้ป่วยที่นำเข้า: คะแนน 39 แกนต้องมาจากการประเมินจริงของแพทย์เท่านั้น
 
         self.stdout.write(self.style.SUCCESS("🎉 Real Patient Database Synchronization Completed!"))

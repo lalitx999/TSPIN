@@ -148,11 +148,21 @@ def line_internal_ingest_view(request: HttpRequest) -> JsonResponse:
     if not isinstance(event, dict):
         return JsonResponse({'status': 'error', 'message': 'Event payload must be a JSON object'}, status=400)
 
+    payload, status = ingest_line_event(event)
+    return JsonResponse(payload, status=status)
+
+
+def ingest_line_event(event: dict) -> Tuple[dict, int]:
+    """
+    บันทึก LINE event ลง Unified Inbox และสร้าง ClinicalReviewItem เมื่อเป็นข้อความอาการ
+    เรียกจาก Django LINE webhook โดยตรง (หลังตรวจลายเซ็นแล้ว) และจาก internal endpoint
+    คืนค่า (payload, http_status)
+    """
     event_type = event.get('type', 'message')
     source = event.get('source', {})
     line_user_id = source.get('userId', '').strip()
     if not line_user_id:
-        return JsonResponse({'status': 'error', 'message': 'Missing source.userId in event'}, status=400)
+        return {'status': 'error', 'message': 'Missing source.userId in event'}, 400
 
     # 3. กำหนด Deduplication Key (กฎข้อ 2 & ข้อผิดพลาดที่คนมักพลาด #1)
     # - หากเป็น message ให้ใช้ message.id
@@ -170,12 +180,12 @@ def line_internal_ingest_view(request: HttpRequest) -> JsonResponse:
     # กฎข้อ 3: Dedupe ด้วย line_message_id ก่อนบันทึกเสมอ (Idempotent 200 OK)
     if CommunicationRecord.objects.filter(line_message_id=msg_id).exists():
         logger.info(f"[LINE Internal API] Deduplicated message: {msg_id}")
-        return JsonResponse({
+        return {
             'status': 'ok',
             'action': 'deduplicated',
             'line_message_id': msg_id,
             'message': 'Event already processed'
-        }, status=200)
+        }, 200
 
     # 4. Resolve LineUser & Active Patient Context
     line_user, _ = LineUser.objects.get_or_create(
@@ -247,7 +257,7 @@ def line_internal_ingest_view(request: HttpRequest) -> JsonResponse:
             # ผู้ใช้ยังไม่ได้ผูกบัญชีคนไข้ แต่พิมพ์อาการมา
             binding_required = True
 
-    return JsonResponse({
+    return {
         'status': 'ok',
         'action': 'processed',
         'record_id': record.pk,
@@ -257,4 +267,4 @@ def line_internal_ingest_view(request: HttpRequest) -> JsonResponse:
         'matched_keywords': matched_kws,
         'review_item_id': review_item_id,
         'binding_required': binding_required
-    }, status=200)
+    }, 200

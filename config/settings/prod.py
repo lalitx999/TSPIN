@@ -12,6 +12,10 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 if not SECRET_KEY or len(SECRET_KEY) < 50:
     raise ValueError("CRITICAL: DJANGO_SECRET_KEY must be set in environment and be at least 50 chars long!")
 
+# Django <-> FastAPI shared secret ต้องตั้งค่าเสมอบน Production
+if len(INTERNAL_API_TOKEN) < 32:
+    raise ValueError("CRITICAL: INTERNAL_API_TOKEN must be set in environment and be at least 32 chars long!")
+
 # ระบุ Domain ชัดเจน ห้ามใช้ '*'
 raw_hosts = os.environ.get('ALLOWED_HOSTS', '')
 ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(',') if h.strip()]
@@ -41,6 +45,12 @@ SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+# อยู่หลัง nginx ที่ตั้ง X-Real-IP = $remote_addr เสมอ จึงเชื่อ header นี้ได้
+# (ถ้าไม่ตั้ง rate limit แบบ key='ip' จะเห็นทุกคนเป็น IP ของ nginx และนับรวมกัน)
+TRUST_X_REAL_IP = True
+RATELIMIT_IP_META_KEY = 'HTTP_X_REAL_IP'
+AXES_IPWARE_META_PRECEDENCE_ORDER = ('HTTP_X_REAL_IP', 'REMOTE_ADDR')
 
 # HSTS: 1 ปี (31,536,000 วินาที) + includeSubDomains + preload
 SECURE_HSTS_SECONDS = 31536000

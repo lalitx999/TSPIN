@@ -281,6 +281,24 @@ class PrecisionReportTests(TestCase):
         ).first()
         self.assertIsNotNone(audit)
 
+    def test_patient_owner_always_gets_patient_edition(self):
+        """ผู้ป่วยเจ้าของรายงานเปลี่ยน ?edition=physician เพื่อโหลดฉบับแพทย์ไม่ได้"""
+        from unittest.mock import patch
+        self.patient.user = self.patient_user
+        self.patient.save()
+        analysis = AnalysisRecord.objects.create(
+            patient=self.patient, biological_record=self.bio_record, physician=self.doctor,
+            status='approved', snapshot_scores=self.bio_record.to_scores_dict(),
+        )
+        self.client.force_login(self.patient_user)
+        with patch('clinical.views_report.ReportGeneratorService.generate_patient_pdf', return_value=b'%PDF-patient') as patient_pdf, \
+             patch('clinical.views_report.ReportGeneratorService.generate_physician_pdf', return_value=b'%PDF-physician') as physician_pdf:
+            resp = self.client.get(reverse('clinical:report_pdf', args=[analysis.pk]) + '?edition=physician')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content, b'%PDF-patient')
+        patient_pdf.assert_called_once()
+        physician_pdf.assert_not_called()
+
     def test_report_rbac_blocking_for_patient_role(self):
         """Pillar 2: คนไข้ทั่วไปต้องถูกบล็อกด้วย 403 Forbidden ไม่ให้เข้าศูนย์รายงานแพทย์"""
         self.client.force_login(self.patient_user)

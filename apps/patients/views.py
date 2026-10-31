@@ -243,13 +243,16 @@ def doctor_pre_visit(request):
     # สรุปข้อมูลชีววิทยา 39 แกนจริงของคนไข้จากฐานข้อมูล (No mockup data!)
     bio_record = selected_patient.biological_records.first() if selected_patient else None
     
-    score_1 = bio_record.axis_1 if bio_record else 75
-    score_5 = bio_record.axis_5 if bio_record else 65
-    score_15 = bio_record.axis_15 if bio_record else 70
-    score_16 = bio_record.axis_16 if bio_record else 55
-    score_37 = bio_record.axis_37 if bio_record else 40
+    # None = ยังไม่ได้ประเมิน ห้ามเติมคะแนนสมมติ
+    score_1 = bio_record.axis_1 if bio_record else None
+    score_5 = bio_record.axis_5 if bio_record else None
+    score_15 = bio_record.axis_15 if bio_record else None
+    score_16 = bio_record.axis_16 if bio_record else None
+    score_37 = bio_record.axis_37 if bio_record else None
 
     def get_status(score):
+        if score is None:
+            return 'unassessed'
         if score >= 75:
             return 'critical'
         elif score >= 60:
@@ -314,7 +317,12 @@ def doctor_clinical_review(request):
     """
     ตรวจทานเคสทางคลินิก (/doctor/clinical-review/)
     """
-    patients = Patient.objects.all().order_by('-updated_at')[:20]
+    patients = list(Patient.objects.prefetch_related('biological_records').order_by('-updated_at')[:20])
+    for p in patients:
+        # แกนหลักมาจากผลประเมินล่าสุดจริงเท่านั้น (ไม่มีผล = ว่าง)
+        records = list(p.biological_records.all())
+        p.focus_axes = [f"A{ax['axis_id']:02d}" for ax in records[0].get_dysfunctional_axes(threshold=60)[:3]] if records else []
+        p.has_assessment = bool(records)
     return render(request, 'patients/doctor_clinical_review.html', {
         'patients': patients,
     })
@@ -324,9 +332,18 @@ def doctor_clinical_review(request):
 def doctor_outcomes(request):
     """
     ติดตามผลลัพธ์การรักษาและไทม์ไลน์การฟื้นฟู (/doctor/outcomes/)
-    อ้างอิงเคสการฟื้นฟูสะเก็ดเงินและโรคเมตาบอลิกเรื้อรัง
+    แสดงเฉพาะผู้ป่วยที่มีผลประเมิน 39 แกนจริง พร้อมจำนวนครั้งที่ประเมินและวันที่ล่าสุด
     """
-    patients = Patient.objects.all().order_by('-created_at')[:15]
+    from django.db.models import Count, Max, Q
+    patients = (
+        Patient.objects
+        .annotate(
+            assessment_count=Count('biological_records', filter=Q(biological_records__is_deleted=False)),
+            last_assessed=Max('biological_records__record_date', filter=Q(biological_records__is_deleted=False)),
+        )
+        .filter(assessment_count__gt=0)
+        .order_by('-last_assessed')[:15]
+    )
     return render(request, 'patients/doctor_outcomes.html', {
         'patients': patients,
     })
@@ -375,9 +392,30 @@ def doctor_lab_review(request):
     """
     ตรวจทานผลแล็บที่วิเคราะห์แล้ว (/doctor/lab-review/)
     """
-    patients = Patient.objects.all().order_by('-updated_at')[:10]
+    from intelligence.models import AgenticArtifact
+
+    # ผลแล็บจริงจาก Lab OCR (AgenticArtifact) แตกเป็นแถวละหนึ่งค่า
+    lab_rows = []
+    artifacts = AgenticArtifact.objects.filter(artifact_type='lab_extraction').select_related('patient').order_by('-created_at')[:30]
+    for art in artifacts:
+        data = art.proposed_data or {}
+        markers = data.get('extracted_biomarkers', data) if isinstance(data, dict) else {}
+        for key, m in markers.items():
+            if not isinstance(m, dict) or 'value' not in m:
+                continue
+            is_abnormal = m.get('is_abnormal')
+            if is_abnormal is None:
+                is_abnormal = str(m.get('status', '')).upper() not in ('', 'NORMAL')
+            lab_rows.append({
+                'artifact': art,
+                'marker': m.get('name') or key,
+                'value': m.get('value'),
+                'unit': m.get('unit', ''),
+                'reference': f"≤ {m['normal_max']}" if m.get('normal_max') is not None else '',
+                'is_abnormal': is_abnormal,
+            })
     return render(request, 'patients/doctor_lab_review.html', {
-        'patients': patients,
+        'lab_rows': lab_rows,
     })
 
 

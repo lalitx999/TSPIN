@@ -15,7 +15,7 @@
                 <div class="d-flex align-items-center gap-2">
                     <h1 class="h4 fw-bold text-dark mb-0">ผู้ช่วยแพทย์ AI Physician Copilot</h1>
                     <span class="badge bg-success-subtle text-success">
-                        FastAPI SSE Port 8088
+                        Secure SSE Stream
                     </span>
                 </div>
                 <p class="small text-muted mb-0">ระบบให้คำปรึกษาทางคลินิกเชิงกลไก เชื่อมโยงบริบทเวชระเบียน และ 39 แกนชีววิทยาแบบ Real-time</p>
@@ -131,7 +131,7 @@
                             <h6 class="fw-bold text-dark mb-0">{{ session.title|default:"Clinical Reasoning Session" }}</h6>
                             <small class="text-success d-flex align-items-center gap-1" style="font-size: 0.75rem;">
                                 <span class="spinner-grow spinner-grow-sm text-success" style="width: 8px; height: 8px;" role="status"></span>
-                                FastAPI Copilot Streaming Ready (Port 8088)
+                                AI Copilot พร้อมใช้งาน
                             </small>
                         </div>
                     </div>
@@ -235,19 +235,11 @@ function handleSendQuery(e) {
     streamingContent.innerHTML = '<span class="text-primary d-flex align-items-center gap-2"><i class="fas fa-spinner fa-spin"></i> AI กำลังเชื่อมโยง RAG และคำนวณ 39 แกนชีววิทยา...</span>';
     container.scrollTop = container.scrollHeight;
 
-    // 3. Connect to FastAPI SSE Microservice (Port 8088) with Django fallback
-    const fastApiUrl = `http://localhost:8088/api/v1/copilot/stream?session_id=${sessionId}&q=${encodeURIComponent(query)}`;
+    // 3. Stream from Django (authenticated + audited). The browser never talks to the AI service directly.
     const djangoStreamUrl = `{% url 'intelligence:ai_stream' %}?session_id=${sessionId}&q=${encodeURIComponent(query)}`;
 
-    let eventSource = null;
     let fullResponse = '';
-
-    try {
-        eventSource = new EventSource(fastApiUrl);
-    } catch (e) {
-        console.warn("Falling back to Django SSE:", e);
-        eventSource = new EventSource(djangoStreamUrl);
-    }
+    const eventSource = new EventSource(djangoStreamUrl);
 
     eventSource.onmessage = function (event) {
         try {
@@ -269,40 +261,16 @@ function handleSendQuery(e) {
         }
     };
 
-    eventSource.onerror = function (err) {
-        console.warn("FastAPI SSE error, switching to Django fallback:", err);
+    eventSource.onerror = function () {
         eventSource.close();
-        
-        // Fallback to Django stream
-        const fallbackSource = new EventSource(djangoStreamUrl);
-        fallbackSource.onmessage = function (event) {
-            try {
-                const data = JSON.parse(event.data);
-                if (data.chunk) {
-                    if (fullResponse === '') streamingContent.innerHTML = '';
-                    fullResponse += data.chunk;
-                    streamingContent.innerHTML = formatMarkdown(fullResponse);
-                    container.scrollTop = container.scrollHeight;
-                }
-                if (data.done) {
-                    fallbackSource.close();
-                    finalizeStreaming(fullResponse);
-                }
-            } catch (err) {
-                console.error("Fallback SSE error:", err);
-            }
-        };
-        fallbackSource.onerror = function() {
-            fallbackSource.close();
-            if (fullResponse === '') {
-                streamingContent.innerHTML = '<span class="text-danger">ขออภัย ไม่สามารถเชื่อมต่อระบบ AI ได้ในขณะนี้</span>';
-            } else {
-                finalizeStreaming(fullResponse);
-            }
-            input.disabled = false;
-            sendBtn.disabled = false;
-            input.focus();
-        };
+        if (fullResponse === '') {
+            streamingContent.innerHTML = '<span class="text-danger">ขออภัย ไม่สามารถเชื่อมต่อระบบ AI ได้ในขณะนี้</span>';
+        } else {
+            finalizeStreaming(fullResponse);
+        }
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
     };
 
     function finalizeStreaming(text) {

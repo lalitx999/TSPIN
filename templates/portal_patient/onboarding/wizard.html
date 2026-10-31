@@ -237,7 +237,7 @@
                         <label class="form-label fw-semibold text-dark small">
                             ตั้งรหัสผ่านสำหรับเข้าใช้งาน Patient Portal
                         </label>
-                        <input type="password" class="form-control" id="claim-password" placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" required>
+                        <input type="password" class="form-control" id="claim-password" placeholder="อย่างน้อย 12 ตัวอักษร" minlength="12" required>
                         <div class="form-text text-muted small">ใช้สำหรับเข้าดูผลการตรวจ 39 แกนชีววิทยาในครั้งถัดไป</div>
                     </div>
 
@@ -308,7 +308,7 @@
 
                     <div class="mb-4">
                         <label class="form-label fw-semibold text-dark small">กำหนดรหัสผ่าน (Password) สำหรับเข้าดูผลตรวจ</label>
-                        <input type="password" class="form-control" id="new-password" placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" required>
+                        <input type="password" class="form-control" id="new-password" placeholder="อย่างน้อย 12 ตัวอักษร" minlength="12" required>
                     </div>
 
                     <div class="form-check mb-4">
@@ -498,7 +498,7 @@ async function handleClaim(e) {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            window.location.href = data.redirect_url || '/portal/ai-intake/';
+            window.location.href = data.redirect_url || '{% url 'portal_patient:patient_ai_intake' %}';
         } else {
             showAlert(data.message || 'การยืนยันตัวตนไม่สำเร็จ กรุณาตรวจสอบเบอร์โทรศัพท์ 4 ตัวท้าย');
         }
@@ -543,7 +543,7 @@ async function handleNewPatient(e) {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            window.location.href = data.redirect_url || '/portal/ai-intake/';
+            window.location.href = data.redirect_url || '{% url 'portal_patient:patient_ai_intake' %}';
         } else {
             showAlert(data.message || 'ไม่สามารถลงทะเบียนได้ กรุณาตรวจสอบข้อมูล');
         }

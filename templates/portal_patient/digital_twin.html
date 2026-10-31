@@ -41,19 +41,19 @@
                 </svg>
 
                 <!-- Dynamic Hotspots based on Real Axis Scores -->
-                {% if immune_score >= 60 %}
+                {% if immune_score is not None and immune_score >= 60 %}
                 <div class="position-absolute rounded-circle {% if immune_score >= 70 %}bg-danger{% else %}bg-warning{% endif %} animate-pulse" 
                      style="top: 105px; left: 93px; width: 14px; height: 14px; border: 2px solid #fff;"
                      title="Immune & Inflammatory Load: {{ immune_score }}/100"></div>
                 {% endif %}
 
-                {% if liver_score >= 60 %}
+                {% if liver_score is not None and liver_score >= 60 %}
                 <div class="position-absolute rounded-circle {% if liver_score >= 70 %}bg-danger{% else %}bg-warning{% endif %} animate-pulse" 
                      style="top: 135px; left: 82px; width: 14px; height: 14px; border: 2px solid #fff;"
                      title="Liver Detoxification: {{ liver_score }}/100"></div>
                 {% endif %}
 
-                {% if gut_score >= 60 %}
+                {% if gut_score is not None and gut_score >= 60 %}
                 <div class="position-absolute rounded-circle {% if gut_score >= 70 %}bg-danger{% else %}bg-warning{% endif %} animate-pulse" 
                      style="top: 165px; left: 93px; width: 14px; height: 14px; border: 2px solid #fff;"
                      title="Gut Barrier Permeability: {{ gut_score }}/100"></div>
@@ -72,6 +72,16 @@
                             <span class="badge bg-{{ alert.level }} text-white font-monospace">{{ alert.score }}/100</span>
                         </div>
                         <span class="text-secondary lh-sm d-block">{{ alert.desc }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="p-3 bg-light border rounded-3 small text-secondary text-center">
+                        {% if has_bio_record %}
+                        ยังไม่พบแกนชีวภาพที่ต้องเฝ้าระวังจากผลประเมินล่าสุด
+                        {% else %}
+                        ยังไม่มีผลประเมิน 39 แกนจากแพทย์ แบบจำลองจะแสดงผลหลังแพทย์ประเมินแล้ว
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}

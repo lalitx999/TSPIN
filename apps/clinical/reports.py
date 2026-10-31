@@ -24,10 +24,9 @@ class PrecisionReportGenerator:
         patient = analysis.patient
         bio_record = getattr(patient, 'biological_record', None)
         raw_scores = analysis.snapshot_scores or (bio_record.to_scores_dict() if bio_record else {})
-        scores_dict = {int(k): int(v) for k, v in raw_scores.items()}
-        for i in range(1, 40):
-            if i not in scores_dict:
-                scores_dict[i] = 50
+        # None = ยังไม่ได้ประเมิน (ห้ามเติม 50 แทน)
+        scores_dict = {i: None for i in range(1, 40)}
+        scores_dict.update({int(k): (int(v) if v is not None else None) for k, v in raw_scores.items()})
 
         # 12 โดเมน
         domain_scores = TspiClinicalEngine.calculate_domain_scores(scores_dict)
@@ -37,8 +36,8 @@ class PrecisionReportGenerator:
         dysfunctional_axes = []
         for ax in all_axes:
             ax_id = ax.get('axis_id')
-            score = scores_dict.get(ax_id, 50)
-            if score >= 60:
+            score = scores_dict.get(ax_id)
+            if score is not None and score >= 60:
                 dysfunctional_axes.append({
                     'axis_id': ax_id,
                     'name': ax.get('name'),

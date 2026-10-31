@@ -43,7 +43,7 @@ def clinical_staff_required(view_func):
     """
     เฉพาะบุคลากรทางการแพทย์ (Admin, Doctor, Nurse) เท่านั้น
     """
-    return role_required('admin', 'doctor', 'nurse')(view_func)
+    return role_required('admin', 'doctor', 'nurse', 'nursing_assistant')(view_func)
 
 
 def doctor_only(view_func):

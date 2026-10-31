@@ -13,7 +13,7 @@ Verifies:
 
 import json
 from datetime import timedelta
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.conf import settings
@@ -28,10 +28,14 @@ from patients.models import (
 from accounts.models import User
 
 
+TEST_INTERNAL_TOKEN = 'test-internal-token-for-unit-tests-only-0123456789'
+
+
+@override_settings(INTERNAL_API_TOKEN=TEST_INTERNAL_TOKEN)
 class LineInternalWebhookTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.internal_token = getattr(settings, 'INTERNAL_API_TOKEN', 'tspi_internal_sec_token_9f83a21b9c74820d91ef_2026')
+        self.internal_token = TEST_INTERNAL_TOKEN
 
         # ข้อมูลผู้ป่วยและบัญชี LINE สำหรับทดสอบ
         self.patient = Patient.objects.create(
@@ -342,3 +346,63 @@ class LineInternalWebhookTests(TestCase):
         self.assertEqual(item.review_type, ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC)
         self.assertIn("แน่นหน้าอก", item.review_notes)
         self.assertIn("ข้อความต่อเนื่อง", item.review_notes)
+
+
+TEST_LINE_SECRET = 'test-line-channel-secret'
+
+
+@override_settings(LINE_CHANNEL_SECRET=TEST_LINE_SECRET, LINE_CHANNEL_ACCESS_TOKEN='')
+class DjangoLineWebhookIngestionTests(TestCase):
+    """LINE OA ส่ง webhook ตรงเข้า Django (เส้นทางเดียว) แล้วต้องเข้า Unified Inbox"""
+
+    def setUp(self):
+        self.client = Client()
+        self.patient = Patient.objects.create(hn='HN-TEST-DJ01', first_name='ทดสอบ', last_name='เว็บฮุก', phone='0890000001')
+        self.line_user = LineUser.objects.create(line_user_id='U_DJANGO_DIRECT_001', display_name='Direct')
+        LinePatientBinding.objects.create(
+            line_user=self.line_user, patient=self.patient,
+            role=LinePatientBinding.RoleChoices.SELF, status=LinePatientBinding.StatusChoices.ACTIVE,
+            verified_method='LIFF_2STEP_OTP',
+        )
+        self.line_user.active_patient = self.patient
+        self.line_user.save()
+
+    def _post_signed(self, body: dict, signature=None):
+        import base64, hashlib, hmac
+        raw = json.dumps(body).encode('utf-8')
+        if signature is None:
+            signature = base64.b64encode(hmac.new(TEST_LINE_SECRET.encode(), raw, hashlib.sha256).digest()).decode()
+        return self.client.post('/line/webhook/', data=raw, content_type='application/json', HTTP_X_LINE_SIGNATURE=signature)
+
+    def test_signed_message_is_ingested_into_inbox_and_review_queue(self):
+        resp = self._post_signed({'events': [{
+            'type': 'message',
+            'source': {'userId': self.line_user.line_user_id},
+            'message': {'id': 'dj_direct_msg_1', 'type': 'text', 'text': 'มีไข้สูงตั้งแต่เมื่อวาน'},
+        }]})
+        self.assertEqual(resp.status_code, 200)
+        record = CommunicationRecord.objects.get(line_message_id='dj_direct_msg_1')
+        self.assertEqual(record.patient, self.patient)
+        self.assertTrue(record.is_clinical_candidate)
+        self.assertTrue(ClinicalReviewItem.objects.filter(patient=self.patient).exists())
+
+    def test_bad_signature_is_rejected_and_nothing_stored(self):
+        resp = self._post_signed({'events': [{
+            'type': 'message',
+            'source': {'userId': self.line_user.line_user_id},
+            'message': {'id': 'dj_forged_1', 'type': 'text', 'text': 'แน่นหน้าอก'},
+        }]}, signature='Zm9yZ2Vk')
+        self.assertEqual(resp.status_code, 401)
+        self.assertFalse(CommunicationRecord.objects.filter(line_message_id='dj_forged_1').exists())
+
+
+@override_settings(INTERNAL_API_TOKEN='')
+class InternalEndpointFailsClosedTests(TestCase):
+    def test_unset_token_rejects_even_empty_header(self):
+        resp = Client().post(
+            reverse('root_internal_line_webhook'),
+            data=json.dumps({'type': 'message', 'source': {'userId': 'U1'}, 'message': {'id': 'x', 'type': 'text', 'text': 'hi'}}),
+            content_type='application/json',
+            HTTP_X_INTERNAL_TOKEN='',
+        )
+        self.assertEqual(resp.status_code, 401)

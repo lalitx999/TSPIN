@@ -119,15 +119,15 @@ def axis_graph_view(request):
     if latest_record:
         latest_scores = latest_record.to_radar_list()
     else:
-        latest_scores = [50] * 39
+        latest_scores = [None] * 39
 
     if baseline_record:
         baseline_scores = baseline_record.to_radar_list()
     else:
-        baseline_scores = [50] * 39
+        baseline_scores = [None] * 39
 
     # ข้อมูลเรดาร์ 12 โดเมน
-    scores_dict = latest_record.to_scores_dict() if latest_record else {i: 50 for i in range(1, 40)}
+    scores_dict = latest_record.to_scores_dict() if latest_record else {i: None for i in range(1, 40)}
     domain_data = TspiClinicalEngine.calculate_domain_scores(scores_dict)
     domain_labels = [d['title'] for d in domain_data]
     domain_scores = [d['average_score'] for d in domain_data]

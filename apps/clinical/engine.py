@@ -111,13 +111,16 @@ class TspiClinicalEngine:
             dom_axes = dom.get('axes', [])
             if not dom_axes:
                 continue
-            total = sum(scores_dict.get(ax.get('axis_id'), 50) for ax in dom_axes)
-            avg = round(total / len(dom_axes), 1)
+            # เฉลี่ยเฉพาะแกนที่ประเมินแล้ว แกนที่ยังไม่มีผลไม่นับเป็น 50
+            scored = [scores_dict.get(ax.get('axis_id')) for ax in dom_axes]
+            scored = [v for v in scored if v is not None]
+            avg = round(sum(scored) / len(scored), 1) if scored else None
             domain_scores.append({
                 'domain_id': dom.get('domain_id'),
                 'title': dom.get('title'),
                 'average_score': avg,
-                'axes_count': len(dom_axes)
+                'axes_count': len(dom_axes),
+                'scored_axes_count': len(scored),
             })
         return domain_scores
 

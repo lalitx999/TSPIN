@@ -282,10 +282,12 @@
             <td style="font-weight: bold; font-family: monospace;">D{{ dom.domain_id }}</td>
             <td style="font-weight: 600;">{{ dom.title }}</td>
             <td style="text-align: center; font-family: monospace; font-weight: bold;">
-                {{ dom.average_score }}
+                {{ dom.average_score|default_if_none:"—" }}
             </td>
             <td style="text-align: center;">
-                {% if dom.average_score >= 70 %}
+                {% if dom.average_score is None %}
+                    <span>ยังไม่ประเมิน</span>
+                {% elif dom.average_score >= 70 %}
                     <span class="badge-severe">พยาธิสภาพรุนแรง</span>
                 {% elif dom.average_score >= 40 %}
                     <span class="badge-stress">ความเครียดปานกลาง</span>
@@ -336,13 +338,15 @@
             <td style="color: #64748b; font-size: 8pt;">{{ ax.domain_title }}</td>
             <td style="text-align: center; font-family: monospace; font-weight: bold;">
                 {% for k, v in scores_dict.items %}
-                    {% if k == ax.axis_id or k == ax.axis_id|stringformat:"s" %}{{ v }}{% endif %}
+                    {% if k == ax.axis_id or k == ax.axis_id|stringformat:"s" %}{{ v|default_if_none:"—" }}{% endif %}
                 {% endfor %}
             </td>
             <td style="text-align: center;">
                 {% for k, v in scores_dict.items %}
                     {% if k == ax.axis_id or k == ax.axis_id|stringformat:"s" %}
-                        {% if v >= 70 %}
+                        {% if v is None %}
+                            <span>Not assessed</span>
+                        {% elif v >= 70 %}
                             <span class="badge-severe">Severe</span>
                         {% elif v >= 40 %}
                             <span class="badge-stress">Stress</span>

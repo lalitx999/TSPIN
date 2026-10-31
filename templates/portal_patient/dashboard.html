@@ -17,7 +17,7 @@
                         สวัสดีคุณ {{ patient.get_full_name|default:patient.username }}
                     </h2>
                     <p class="small text-muted mb-0">
-                        หมายเลขประจำตัว: <span class="font-monospace fw-semibold text-dark">{{ patient.username }}</span> &bull; 
+                        HN: <span class="font-monospace fw-semibold text-dark">{% if patient_record %}{{ patient_record.hn }}{% else %}ยังไม่เชื่อมเวชระเบียน{% endif %}</span> &bull; 
                         เข้าสู่ระบบครั้งล่าสุด: {{ patient.last_login|date:"d M Y H:i"|default:"ครั้งแรก" }}
                     </p>
                 </div>

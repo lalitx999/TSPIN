@@ -136,7 +136,7 @@ def report_download_pdf_view(request, analysis_id=None, pk=None):
     report_id = analysis_id or pk
     analysis = get_object_or_404(AnalysisRecord.objects.select_related('patient', 'physician'), pk=report_id)
     
-    is_staff = request.user.is_authenticated and request.user.role in ['doctor', 'nurse', 'staff', 'admin']
+    is_staff = request.user.is_authenticated and request.user.role in ['doctor', 'nurse', 'nursing_assistant', 'staff', 'admin']
     portal_patient_id = request.session.get('portal_patient_id')
     is_patient_owner = (
         (portal_patient_id and portal_patient_id == analysis.patient_id) or
@@ -149,7 +149,11 @@ def report_download_pdf_view(request, analysis_id=None, pk=None):
     if is_patient_owner and not is_staff and analysis.status not in ['approved', 'released']:
         return HttpResponseForbidden("รายงานฉบับนี้ยังไม่ได้รับการอนุมัติโดยแพทย์")
 
-    edition = request.GET.get('edition', 'patient' if is_patient_owner else 'physician').lower()
+    # ผู้ป่วยได้เฉพาะฉบับผู้ป่วย เปลี่ยน ?edition= เพื่อโหลดฉบับแพทย์ไม่ได้
+    if is_staff:
+        edition = request.GET.get('edition', 'physician').lower()
+    else:
+        edition = 'patient'
 
     # Option 2 Engine: Single Source of Truth CoreAnalysisPayload
     payload = ReportGeneratorService.payload_from_analysis_record(analysis)

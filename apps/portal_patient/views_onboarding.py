@@ -11,18 +11,38 @@ import time
 import hashlib
 from datetime import datetime
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth import login, get_user_model
 from django.core.cache import cache
-from django.db import models, transaction
+from django.db import transaction
 
 User = get_user_model()
 
 
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+
 from core.models import ClinicalEncryption
 from patients.models import Patient
 from accounts.models import AuditLog
+from accounts.views import get_client_ip
+
+# จำกัดการเดาเลขท้ายเบอร์โทร 4 หลักต่อเวชระเบียน (10,000 แบบ เดาได้ถ้าไม่จำกัด)
+CLAIM_MAX_ATTEMPTS = 5
+CLAIM_LOCK_SECONDS = 15 * 60
+
+
+def password_errors(password: str, user=None):
+    """คืนข้อความ error ภาษาไทยถ้ารหัสผ่านไม่ผ่านนโยบาย AUTH_PASSWORD_VALIDATORS ของระบบ"""
+    if not password:
+        return 'กรุณากำหนดรหัสผ่าน'
+    try:
+        validate_password(password, user=user)
+    except ValidationError as e:
+        return ' '.join(e.messages)
+    return None
 
 
 def log_audit_event(user, action, model_name, object_id, details, ip_address=None):
@@ -60,7 +80,7 @@ def onboarding_lookup_api(request):
     - Anti-leak: ตอบผลลัพธ์เป็นกลาง ไม่ยืนยันว่ามีเลขนี้ในระบบหรือไม่ถ้าค้นไม่พบ
     - Masked data: คืนเฉพาะข้อมูลที่ปกปิดตัวตน เช่น 'คุณ ส*** ใจ***'
     """
-    client_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '127.0.0.1')).split(',')[0].strip()
+    client_ip = get_client_ip(request)
     rate_limit_key = f"onboarding_lookup_{client_ip}"
     attempts = cache.get(rate_limit_key, 0)
 
@@ -90,16 +110,12 @@ def onboarding_lookup_api(request):
             'message': 'กรุณาระบุเลขประจำตัวประชาชนหรือหมายเลขพาสปอร์ต'
         }, status=400)
 
-    # Search logic: For Thai nationality, hash with SHA-256; for foreigner, match passport
+    # ค้นได้เฉพาะเลขบัตร ปชช. 13 หลักแบบตรงทั้งหมด (เดิมค้นด้วยเบอร์โทรบางส่วนได้ ทำให้ไล่ดูผู้ป่วยได้)
+    # ผู้ป่วยต่างชาติยังไม่มีเลขพาสปอร์ตในระบบ ให้ติดต่อเจ้าหน้าที่
     patient = None
     if nationality == 'TH' and len(identifier) == 13 and identifier.isdigit():
         id_hash = hashlib.sha256(identifier.encode('utf-8')).hexdigest()
         patient = Patient.objects.alive().filter(id_card_hash=id_hash).first()
-    else:
-        # Search by passport or phone if provided
-        patient = Patient.objects.alive().filter(
-            models.Q(passport_number__iexact=identifier) | models.Q(phone__icontains=identifier)
-        ).first() if hasattr(Patient, 'passport_number') else Patient.objects.alive().filter(phone__icontains=identifier).first()
 
     # Audit Logging (Gotcha 2)
     id_preview = f"{identifier[:3]}***{identifier[-2:]}" if len(identifier) > 5 else "***"
@@ -138,7 +154,7 @@ def onboarding_claim_account_api(request):
     ยืนยันความเป็นเจ้าของประวัติคนไข้เดิม และสร้าง/ผูกบัญชีเข้าใช้งาน Portal
     """
     patient_uuid = request.POST.get('patient_uuid', '').strip()
-    password = request.POST.get('password', '').strip()
+    password = request.POST.get('password', '')
     phone_confirm = request.POST.get('phone_last4', '').strip()
 
     if not patient_uuid:
@@ -148,13 +164,38 @@ def onboarding_claim_account_api(request):
     if not patient:
         return JsonResponse({'success': False, 'message': 'ไม่พบข้อมูลในระบบ'}, status=404)
 
-    # Verify last 4 digits of phone number
-    cleaned_phone = (patient.phone or '').replace('-', '').replace(' ', '')
-    if phone_confirm and not cleaned_phone.endswith(phone_confirm):
+    # บัญชีที่ตั้งรหัสผ่านแล้วห้ามยึดซ้ำผ่าน onboarding (เดิมรีเซ็ตรหัสผ่านทับได้)
+    if patient.user and patient.user.has_usable_password():
+        return JsonResponse({
+            'success': False,
+            'message': 'เวชระเบียนนี้มีบัญชีผู้ใช้อยู่แล้ว กรุณาเข้าสู่ระบบ หรือติดต่อเจ้าหน้าที่หากลืมรหัสผ่าน'
+        }, status=409)
+
+    attempts_key = f"onboarding_claim_{patient.pk}"
+    attempts = cache.get(attempts_key, 0)
+    if attempts >= CLAIM_MAX_ATTEMPTS:
+        log_audit_event(None, 'RATE_LIMIT_EXCEEDED', 'Patient', patient.pk,
+                        'Onboarding claim locked after repeated phone mismatches', ip_address=get_client_ip(request))
+        return JsonResponse({
+            'success': False,
+            'message': 'ยืนยันตัวตนไม่สำเร็จหลายครั้ง กรุณารอ 15 นาที หรือติดต่อเจ้าหน้าที่คลินิก'
+        }, status=429)
+
+    # ต้องยืนยันเลขท้ายเบอร์โทร 4 หลักเสมอ (เดิมถ้าไม่ส่งมาจะข้ามการตรวจ)
+    cleaned_phone = ''.join(ch for ch in (patient.phone or '') if ch.isdigit())
+    if len(cleaned_phone) < 4 or not (phone_confirm.isdigit() and len(phone_confirm) == 4) or not cleaned_phone.endswith(phone_confirm):
+        cache.set(attempts_key, attempts + 1, timeout=CLAIM_LOCK_SECONDS)
+        log_audit_event(None, 'PORTAL_CLAIM_FAILED', 'Patient', patient.pk,
+                        'Phone last-4 verification failed', ip_address=get_client_ip(request))
         return JsonResponse({
             'success': False,
             'message': 'เบอร์โทรศัพท์ 4 ตัวท้ายไม่ตรงกับข้อมูลในระบบ กรุณาตรวจสอบอีกครั้ง'
         }, status=400)
+
+    error = password_errors(password)
+    if error:
+        return JsonResponse({'success': False, 'message': error}, status=400)
+    cache.delete(attempts_key)
 
     # Create or update portal User
     username = f"pt_{patient.hn.lower().replace('/', '_')}"
@@ -174,9 +215,8 @@ def onboarding_claim_account_api(request):
 
         patient.save(update_fields=['user'])
 
-    if password:
-        user.set_password(password)
-        user.save()
+    user.set_password(password)
+    user.save()
 
     # Log user in
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
@@ -193,7 +233,7 @@ def onboarding_claim_account_api(request):
 
     return JsonResponse({
         'success': True,
-        'redirect_url': '/portal/ai-intake/'
+        'redirect_url': reverse('portal_patient:patient_ai_intake')
     })
 
 
@@ -213,13 +253,17 @@ def onboarding_new_patient_api(request):
     gender = request.POST.get('gender', 'O').strip()
     nationality = request.POST.get('nationality', 'TH').strip()
     id_card_or_passport = request.POST.get('id_card', '').strip()
-    password = request.POST.get('password', '').strip()
+    password = request.POST.get('password', '')
 
     if not first_name or not last_name or not phone:
         return JsonResponse({
             'success': False,
             'message': 'กรุณากรอกชื่อ นามสกุล และเบอร์โทรศัพท์ให้ครบถ้วน'
         }, status=400)
+
+    error = password_errors(password)
+    if error:
+        return JsonResponse({'success': False, 'message': error}, status=400)
 
     # Parse birth date
     birth_date = None
@@ -288,5 +332,5 @@ def onboarding_new_patient_api(request):
     return JsonResponse({
         'success': True,
         'hn': patient.hn,
-        'redirect_url': '/portal/ai-intake/'
+        'redirect_url': reverse('portal_patient:patient_ai_intake')
     })

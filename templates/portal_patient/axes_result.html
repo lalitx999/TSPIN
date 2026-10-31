@@ -36,9 +36,13 @@
                     </div>
                     <div class="text-md-end">
                         <small class="text-muted d-block" style="font-size: 0.75rem;">Risk Score</small>
+                        {% if ax.score is None %}
+                        <span class="fw-bold text-secondary">ยังไม่ประเมิน</span>
+                        {% else %}
                         <span class="h4 fw-bold font-monospace mb-0 {% if ax.score >= 75 %}text-danger{% elif ax.score >= 55 %}text-warning{% else %}text-success{% endif %}">
                             {{ ax.score }}/100
                         </span>
+                        {% endif %}
                     </div>
                 </div>
             </div>

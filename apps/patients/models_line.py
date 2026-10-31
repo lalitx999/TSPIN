@@ -53,7 +53,7 @@ class LineUser(models.Model):
 
     @property
     def is_clinician_or_staff(self) -> bool:
-        return self.user is not None and getattr(self.user, 'role', '') in ['doctor', 'nurse', 'staff', 'admin']
+        return self.user is not None and getattr(self.user, 'role', '') in ['doctor', 'nurse', 'nursing_assistant', 'staff', 'admin']
 
 
 class LinePatientBinding(SoftDeleteModel):
@@ -306,7 +306,7 @@ class ClinicalReviewItem(SoftDeleteModel):
             if user_role not in ['doctor', 'admin']:
                 raise PermissionDenied("Only licensed physicians (Doctor role) can approve Level 2 Diagnostic entries.")
         elif self.review_type == self.ReviewTypeChoices.LEVEL_1_INTAKE:
-            if user_role not in ['doctor', 'nurse', 'admin']:
+            if user_role not in ['doctor', 'nurse', 'nursing_assistant', 'admin']:
                 raise PermissionDenied("Clinical staff authorization required (Nurse or Doctor role).")
 
         # บันทึก Audit

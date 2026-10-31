@@ -12,103 +12,20 @@
                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
                     <i class="fas fa-child me-1"></i> Virtual Physiological Twin
                 </span>
-                <span class="text-muted small">ระบบจำลองสรีรวิทยาเชิงคำนวณ</span>
             </div>
             <h1 class="h4 fw-bold mb-1 text-dark">แบบจำลอง Digital Twin สรีรวิทยาบุคคล</h1>
-            <p class="text-muted small mb-0">
-                ประมวลผลข้อมูล 39 แกน (12 โดเมน) และค่าแล็บจำลองสถานะอวัยวะและพลวัตของระบบชีววิทยาในร่างกาย
-            </p>
+            <p class="text-muted small mb-0">แสดงจุดเฝ้าระวังของอวัยวะจากผลประเมิน 39 แกนชีววิทยาของผู้ป่วยแต่ละราย</p>
         </div>
     </div>
 
-    <!-- Twin Visualization Canvas & Status Grid (Row 7/5) -->
-    <div class="row g-4">
-        <!-- 3D Twin Simulation Card (7 cols) -->
-        <div class="col-12 col-lg-7">
-            <div class="card shadow-sm border p-4 d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden" style="min-height: 460px;">
-                <div class="position-absolute top-0 start-0 m-3 z-1">
-                    <span class="badge bg-light text-dark border">
-                        <i class="fas fa-cube text-primary me-1"></i> 3D Bio-Avatar Active
-                    </span>
-                </div>
-
-                <!-- SVG Stylized Precision Human Body Outline -->
-                <div class="position-relative d-flex align-items-center justify-content-center" style="width: 240px; height: 360px;">
-                    <svg viewBox="0 0 200 400" class="w-100 h-100" style="stroke: #CBD5E1; stroke-width: 2; fill: #F8FAF6;">
-                        <!-- Head & Brain -->
-                        <circle cx="100" cy="45" r="28" />
-                        <!-- Neck -->
-                        <rect x="92" y="73" width="16" height="18" rx="4" />
-                        <!-- Torso -->
-                        <path d="M 60,95 Q 100,85 140,95 L 132,230 Q 100,235 68,230 Z" />
-                        <!-- Arms -->
-                        <path d="M 58,95 L 35,210 Q 30,225 35,235" stroke-linecap="round" />
-                        <path d="M 142,95 L 165,210 Q 170,225 165,235" stroke-linecap="round" />
-                        <!-- Legs -->
-                        <path d="M 80,230 L 75,370" stroke-linecap="round" />
-                        <path d="M 120,230 L 125,370" stroke-linecap="round" />
-                    </svg>
-
-                    <!-- Glowing Nodes -->
-                    <!-- Brain -->
-                    <div class="position-absolute rounded-circle bg-warning text-dark fw-bold d-flex align-items-center justify-content-center border border-2 border-white shadow-sm" style="top: 36px; left: 88px; width: 22px; height: 22px; font-size: 0.7rem;" title="HPA / Neuro Axis">!</div>
-
-                    <!-- Heart -->
-                    <div class="position-absolute rounded-circle bg-success border border-2 border-white shadow-sm" style="top: 105px; left: 102px; width: 16px; height: 16px;" title="Cardiovascular Tone"></div>
-
-                    <!-- Liver -->
-                    <div class="position-absolute rounded-circle bg-danger text-white fw-bold d-flex align-items-center justify-content-center border border-2 border-white shadow-sm" style="top: 135px; left: 78px; width: 22px; height: 22px; font-size: 0.7rem;" title="Hepatic Detox Overload">!</div>
-
-                    <!-- Gut -->
-                    <div class="position-absolute rounded-circle bg-warning border border-2 border-white shadow-sm" style="top: 168px; left: 94px; width: 16px; height: 16px;" title="Gut Barrier"></div>
-                </div>
-
-                <small class="text-muted mt-3 text-center" style="font-size: 0.75rem;">
-                    คลิกที่ตำแหน่งอวัยวะเพื่อดูตัวชี้วัดกลไกชีววิทยาและคะแนนความเสี่ยง
-                </small>
-            </div>
-        </div>
-
-        <!-- Organ Systems Heatmap (5 cols) -->
-        <div class="col-12 col-lg-5">
-            <div class="card shadow-sm border">
-                <div class="card-header bg-light py-2.5 px-3 border-bottom">
-                    <h6 class="fw-bold text-dark mb-0 small">สถานะระบบอวัยวะ (Systemic Vitality)</h6>
-                </div>
-                <div class="card-body p-3 d-flex flex-column gap-2.5">
-                    <div class="p-3 rounded-3 bg-danger-subtle border border-danger-subtle d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="small fw-bold text-danger d-block">HEPATIC / DETOX SYSTEM</span>
-                            <small class="text-muted">ภาระสารพิษตกค้างสูง, ALT/AST ปานกลาง</small>
-                        </div>
-                        <span class="fs-6 fw-bold text-danger font-monospace">82% Burden</span>
-                    </div>
-
-                    <div class="p-3 rounded-3 bg-warning-subtle border border-warning-subtle d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="small fw-bold text-warning-emphasis d-block">GASTROINTESTINAL &amp; GUT</span>
-                            <small class="text-muted">Leaky Gut Flag, Zonulin สูงกว่าปกติ</small>
-                        </div>
-                        <span class="fs-6 fw-bold text-warning-emphasis font-monospace">68% Risk</span>
-                    </div>
-
-                    <div class="p-3 rounded-3 bg-success-subtle border border-success-subtle d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="small fw-bold text-success d-block">CARDIOVASCULAR &amp; RENAL</span>
-                            <small class="text-muted">eGFR 98, ความดันโลหิตและชีพจรปกติ</small>
-                        </div>
-                        <span class="fs-6 fw-bold text-success font-monospace">Normal</span>
-                    </div>
-
-                    <div class="p-3 rounded-3 bg-success-subtle border border-success-subtle d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="small fw-bold text-success d-block">MITOCHONDRIAL ENERGY</span>
-                            <small class="text-muted">การเผาผลาญพลังงานเซลล์และ ATP เสถียร</small>
-                        </div>
-                        <span class="fs-6 fw-bold text-success font-monospace">Stable</span>
-                    </div>
-                </div>
-            </div>
+    {# หน้านี้ยังไม่ได้เชื่อมกับผลประเมินรายผู้ป่วย จึงไม่แสดงตัวเลขหรือจุดเตือนใด ๆ #}
+    <div class="card shadow-sm border">
+        <div class="card-body p-5 text-center text-muted">
+            <i class="fas fa-person-circle-question fs-1 mb-3 d-block text-secondary"></i>
+            <p class="mb-3">แบบจำลองรายผู้ป่วยยังไม่เปิดใช้งาน ระหว่างนี้ดูคะแนนจริงของผู้ป่วยได้ที่หน้าเรดาร์ 39 แกน</p>
+            <a href="{% url 'clinical:axis_graph' %}" class="btn btn-outline-primary">
+                <i class="fas fa-diagram-project me-1"></i> เปิดหน้าเรดาร์ 39 แกน
+            </a>
         </div>
     </div>
 

@@ -3,6 +3,7 @@ Unit & Security Tests for Patient EMR & Clinical Records (EP 3).
 Validates RBAC Access (Pillar 2), Live HTMX Search, SOAP Notes & BMI, and AuditLog (Pillar 8).
 """
 
+import os
 from datetime import date
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -194,3 +195,91 @@ class PatientEMRTests(TestCase):
             object_id=str(note.pk)
         ).first()
         self.assertIsNotNone(audit)
+
+
+class InvalidateSyncArtifactsCommandTests(TestCase):
+    """คะแนน/สถานะที่ sync เดาขึ้นเองต้องถูกยกเลิก แต่ห้ามแตะข้อมูลที่แพทย์บันทึกจริง"""
+
+    def setUp(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        from clinical.models import BiologicalRecord
+        from patients.management.commands.invalidate_sync_artifacts import SYNC_BASELINE_NOTE
+
+        self.legacy = Patient.objects.create(hn='HN-LEG-1', first_name='a', last_name='b', status='urgent', extra_data={'legacy_id': 1})
+        self.touched = Patient.objects.create(hn='HN-LEG-2', first_name='c', last_name='d', status='urgent', extra_data={'legacy_id': 2})
+        Patient.objects.filter(pk=self.touched.pk).update(updated_at=timezone.now() + timedelta(days=1))
+        self.native = Patient.objects.create(hn='HN-NEW-1', first_name='e', last_name='f', status='urgent')
+
+        self.fake = BiologicalRecord.objects.create(patient=self.legacy, is_baseline=True, notes=SYNC_BASELINE_NOTE, axis_1=88)
+        self.real = BiologicalRecord.objects.create(patient=self.legacy, is_baseline=True, notes='แพทย์ประเมินจริง', axis_1=70)
+
+    def test_dry_run_changes_nothing(self):
+        from django.core.management import call_command
+        from clinical.models import BiologicalRecord
+        call_command('invalidate_sync_artifacts', stdout=open(os.devnull, 'w'))
+        self.assertEqual(BiologicalRecord.objects.count(), 2)
+        self.legacy.refresh_from_db()
+        self.assertEqual(self.legacy.status, 'urgent')
+
+    def test_apply_hides_only_synthetic_records_and_untouched_legacy_status(self):
+        from django.core.management import call_command
+        from clinical.models import BiologicalRecord
+        from accounts.models import AuditLog
+        call_command('invalidate_sync_artifacts', apply=True, stdout=open(os.devnull, 'w'))
+
+        self.assertEqual(list(BiologicalRecord.objects.values_list('pk', flat=True)), [self.real.pk])
+        fake = BiologicalRecord.all_objects.get(pk=self.fake.pk)
+        self.assertTrue(fake.is_deleted)
+        self.assertIn('sync_real_patients', fake.invalidation_reason)
+
+        for p in (self.legacy, self.touched, self.native):
+            p.refresh_from_db()
+        self.assertEqual(self.legacy.status, 'pending')
+        self.assertEqual(self.touched.status, 'urgent')
+        self.assertEqual(self.native.status, 'urgent')
+        self.assertTrue(AuditLog.objects.filter(action='SYNC_ARTIFACTS_INVALIDATED').exists())
+
+
+class DoctorPortalPageRegressionTests(TestCase):
+    """หน้าที่เคยพัง: audit 500 เมื่อมี log ไม่มีผู้ใช้, layout ของ staff/boxes หาย"""
+
+    def setUp(self):
+        self.doctor = User.objects.create_user(username='dr_reg', password='DoctorPass2026!x', role=User.Role.DOCTOR)
+        self.client.force_login(self.doctor)
+
+    def test_audit_page_renders_with_anonymous_log(self):
+        AuditLog.objects.create(user=None, action='LOGIN_FAILED', model='User', object_id='x')
+        resp = self.client.get('/doctor/audit/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'ผู้ใช้ไม่ระบุตัวตน')
+
+    def test_staff_and_box_pages_keep_doctor_layout_styles(self):
+        for url in ('/staff/inbox/', '/staff/review-queue/', '/clinical/boxes/'):
+            resp = self.client.get(url)
+            self.assertEqual(resp.status_code, 200, url)
+            self.assertContains(resp, '.doctor-sidebar', msg_prefix=url)
+
+
+class PatientPortalDataIsolationTests(TestCase):
+    """บัญชีผู้ป่วยต้องเห็นเฉพาะข้อมูลของตัวเอง และไม่เห็นคะแนนที่ไม่ได้มาจากการประเมินจริง"""
+
+    def setUp(self):
+        from clinical.models import AnalysisRecord
+        self.other = Patient.objects.create(hn='HN-OTHER-1', first_name='คนอื่น', last_name='ในระบบ')
+        doctor = User.objects.create_user(username='dr_iso', password='DoctorPass2026!x', role=User.Role.DOCTOR)
+        AnalysisRecord.objects.create(patient=self.other, physician=doctor, status='approved', snapshot_scores={})
+        self.unlinked_user = User.objects.create_user(username='pt_unlinked', password='PatientPass2026!x', role=User.Role.PATIENT)
+        self.client.force_login(self.unlinked_user)
+
+    def test_unlinked_account_never_sees_another_patient(self):
+        for url in ('/patient/axes-result/', '/patient/digital-twin/', '/patient/history/', '/patient/download/'):
+            resp = self.client.get(url)
+            self.assertEqual(resp.status_code, 200, url)
+            self.assertNotContains(resp, 'HN-OTHER-1', msg_prefix=url)
+            self.assertNotContains(resp, 'คนอื่น', msg_prefix=url)
+
+    def test_unassessed_axes_show_no_scores(self):
+        resp = self.client.get('/patient/axes-result/')
+        self.assertContains(resp, 'ยังไม่ประเมิน')
+        self.assertNotContains(resp, '50/100')

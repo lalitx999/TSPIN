@@ -16,6 +16,7 @@ def patient_dashboard(request):
     """
     return render(request, 'portal_patient/dashboard.html', {
         'patient': request.user,
+        'patient_record': get_current_patient(request.user),
     })
 
 
@@ -42,6 +43,7 @@ def patient_checkin(request, session_id=None):
 
 import json
 import logging
+from typing import Optional
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -56,15 +58,15 @@ from accounts.models import AuditLog
 logger = logging.getLogger('tspi.portal.ai_intake')
 
 
-def get_current_patient(user) -> Patient:
-    """Helper ดึง Patient object ของผู้ใช้ปัจจุบันอย่างปลอดภัย"""
-    if hasattr(user, 'patient_record') and user.patient_record:
-        return user.patient_record
-    if user.email:
-        patient = Patient.objects.filter(email=user.email, is_deleted=False).first()
-        if patient:
-            return patient
-    return Patient.objects.filter(is_deleted=False).first()
+def get_current_patient(user) -> Optional[Patient]:
+    """
+    คืนเวชระเบียนที่ผูกกับบัญชีนี้โดยตรงเท่านั้น (Patient.user)
+    ไม่มีการเดาจากอีเมลหรือดึงผู้ป่วยคนอื่นมาแทน บัญชีที่ยังไม่ผูกเวชระเบียนจะได้ None
+    """
+    patient = getattr(user, 'patient_record', None)
+    if patient is None or patient.is_deleted:
+        return None
+    return patient
 
 
 @login_required
@@ -204,6 +206,8 @@ def patient_axes_result(request):
     bio_record = patient_obj.biological_records.order_by('-record_date').first() if patient_obj else None
 
     def get_status(score):
+        if score is None:
+            return "unassessed"
         if score >= 70:
             return "critical"
         elif score >= 50:
@@ -227,7 +231,7 @@ def patient_axes_result(request):
     axes_data = []
     for num in range(1, 40):
         name = CANONICAL_39_AXES.get(num, f"Axis {num}")
-        score = getattr(bio_record, f'axis_{num}', 50) if bio_record else 50
+        score = getattr(bio_record, f'axis_{num}', None) if bio_record else None
         status = get_status(score)
         desc = axis_desc_map.get(num, f"การประเมินการทำงานของแกนชีวภาพ {name} ตามมาตรฐาน TSPI Systems Biology")
 
@@ -259,28 +263,27 @@ def patient_digital_twin(request):
     bio_record = patient_obj.biological_records.order_by('-record_date').first() if patient_obj else None
 
     # Calculate organ stresses from real axes
-    liver_score = getattr(bio_record, 'axis_15', 50) if bio_record else 50
-    gut_score = getattr(bio_record, 'axis_17', 50) if bio_record else 50
-    immune_score = getattr(bio_record, 'axis_1', 50) if bio_record else 50
-    metabolic_score = getattr(bio_record, 'axis_5', 50) if bio_record else 50
-    energy_score = getattr(bio_record, 'axis_8', 50) if bio_record else 50
+    # None = ยังไม่ได้ประเมิน ไม่แสดงจุดเตือนและไม่สรุปว่าปกติ
+    liver_score = getattr(bio_record, 'axis_15', None) if bio_record else None
+    gut_score = getattr(bio_record, 'axis_17', None) if bio_record else None
+    immune_score = getattr(bio_record, 'axis_1', None) if bio_record else None
 
     organ_alerts = []
-    if liver_score >= 60:
+    if liver_score is not None and liver_score >= 60:
         organ_alerts.append({
             'organ': 'ตับและระบบขจัดสารพิษ (Liver & Detoxification)',
             'score': liver_score,
             'level': 'danger' if liver_score >= 70 else 'warning',
             'desc': 'ภาระการทำงานขับสารพิษสูง ควรเสริมสารสกัดปกป้องเซลล์ตับตามคำแนะนำแพทย์'
         })
-    if gut_score >= 60:
+    if gut_score is not None and gut_score >= 60:
         organ_alerts.append({
             'organ': 'ระบบทางเดินอาหารและเยื่อบุลำไส้ (Gut Barrier)',
             'score': gut_score,
             'level': 'danger' if gut_score >= 70 else 'warning',
             'desc': 'พบภาวะเยื่อบุลำไส้ซึมผ่านง่าย (Leaky Gut) อยู่ระหว่างโปรโตคอลฟื้นฟูเยื่อบุ'
         })
-    if immune_score >= 60:
+    if immune_score is not None and immune_score >= 60:
         organ_alerts.append({
             'organ': 'ระบบภูมิคุ้มกันและการอักเสบ (Immune Load)',
             'score': immune_score,
@@ -288,16 +291,9 @@ def patient_digital_twin(request):
             'desc': 'พบภาวะการอักเสบเรื้อรังระดับเซลล์ ควรหลีกเลี่ยงสารกระตุ้นการแพ้'
         })
 
-    if not organ_alerts:
-        organ_alerts.append({
-            'organ': 'สภาวะสรีรวิทยาทั่วไป (Homeostasis)',
-            'score': 45,
-            'level': 'success',
-            'desc': 'ระบบอวัยวะอยู่ในเกณฑ์สมดุล ไม่พบจุดวิกฤตที่ต้องเฝ้าระวังเป็นพิเศษ'
-        })
-
     return render(request, 'portal_patient/digital_twin.html', {
         'patient': patient_obj or request.user,
+        'has_bio_record': bool(bio_record),
         'organ_alerts': organ_alerts,
         'liver_score': liver_score,
         'gut_score': gut_score,
@@ -311,8 +307,12 @@ def patient_history(request):
     """
     ประวัติการรักษาและไทม์ไลน์สุขภาพ
     """
+    patient = get_current_patient(request.user)
+    histories = patient.histories.all().order_by('-visit_date')[:50] if patient else []
     return render(request, 'portal_patient/history.html', {
-        'patient': request.user,
+        'patient': patient or request.user,
+        'histories': histories,
+        'has_patient_record': bool(patient),
     })
 
 
@@ -321,7 +321,12 @@ def patient_download(request):
     """
     ดาวน์โหลดรายงานผลตรวจสุขภาพและ Precision Report
     """
-    reports = AnalysisRecord.objects.all().order_by('-analysis_date')[:10]
+    # เฉพาะรายงานของผู้ป่วยคนนี้ที่แพทย์อนุมัติแล้วเท่านั้น
+    patient = get_current_patient(request.user)
+    reports = (
+        AnalysisRecord.objects.filter(patient=patient, status__in=['approved', 'released']).order_by('-analysis_date')[:10]
+        if patient else AnalysisRecord.objects.none()
+    )
     return render(request, 'portal_patient/download.html', {
         'patient': request.user,
         'reports': reports,

@@ -88,6 +88,8 @@ CSP_CONNECT_SRC = ("'self'",)
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = 0.25  # 15 นาที (0.25 ชั่วโมง)
 AXES_RESET_ON_SUCCESS = True
+# ล็อกตามคู่ (username, IP): ถ้าล็อกตาม IP อย่างเดียว หลัง nginx ทุกคนจะเป็น IP เดียวกันและโดนล็อกพร้อมกัน
+AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
 AXES_LOCKOUT_TEMPLATE = 'accounts/lockout.html'
 AXES_ENABLE_ACCESS_FAILURE_LOG = True
 
@@ -186,7 +188,12 @@ AUTHENTICATION_BACKENDS = [
 # ==============================================================================
 LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', '')
-INTERNAL_API_TOKEN = os.environ.get('INTERNAL_API_TOKEN', 'tspi_internal_sec_token_9f83a21b9c74820d91ef_2026')
+# Shared secret for Django <-> FastAPI calls. No default: unset means internal calls fail closed.
+INTERNAL_API_TOKEN = os.environ.get('INTERNAL_API_TOKEN', '')
+AI_SERVICE_URL = os.environ.get('AI_SERVICE_URL', 'http://127.0.0.1:8088')
+
+# Blanks LLM provider keys during tests so the suite never calls paid APIs
+TEST_RUNNER = 'config.test_runner.OfflineAITestRunner'
 
 # ==============================================================================
 # 11. ENTERPRISE LOGGING (Rotating File Handlers)

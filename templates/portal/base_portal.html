@@ -193,9 +193,9 @@
                 <a href="{% url 'portal_patient:portal_appointments' %}">
                     <i class="fas fa-calendar-alt"></i> <span>นัดหมาย</span>
                 </a>
-                <a href="{% url 'portal_patient:portal_logout' %}" style="color: #fecdd3;">
+                <form method="post" action="{% url 'portal_patient:portal_logout' %}" style="display:inline;margin:0;">{% csrf_token %}<button type="submit" style="color: #fecdd3;background:none;border:0;padding:0;font:inherit;cursor:pointer;">
                     <i class="fas fa-sign-out-alt"></i> <span>ออกจากระบบ</span>
-                </a>
+                </button></form>
                 {% endif %}
             </nav>
         </div>

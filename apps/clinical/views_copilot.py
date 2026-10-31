@@ -4,7 +4,6 @@ Enforces Doctor-Only RBAC (HTTP 403), Rate Limiting (10 req/min per Doctor),
 Grounded Context Injection via CopilotContextBuilder, and High-Performance SSE Streaming.
 """
 
-import os
 import json
 import logging
 from typing import Generator
@@ -22,8 +21,6 @@ from clinical.services.copilot import CopilotContextBuilder
 
 logger = logging.getLogger('tspi.clinical.copilot')
 
-AI_SERVICE_URL = os.environ.get('AI_SERVICE_URL', 'http://127.0.0.1:8088')
-INTERNAL_API_TOKEN = os.environ.get('INTERNAL_API_TOKEN', 'tspi-internal-secret-token-2026')
 
 
 @doctor_only
@@ -85,7 +82,7 @@ def copilot_stream_chat_view(request):
 
     # 5. Generator yielding SSE Tokens from FastAPI
     def sse_proxy_generator() -> Generator[str, None, None]:
-        fastapi_url = f"{AI_SERVICE_URL}/api/v1/copilot/stream"
+        fastapi_url = f"{settings.AI_SERVICE_URL}/api/v1/copilot/stream"
         payload = {
             "message": user_query,
             "patient_id": patient_id,
@@ -95,7 +92,7 @@ def copilot_stream_chat_view(request):
         }
         headers = {
             "Content-Type": "application/json",
-            "X-Internal-Secret": INTERNAL_API_TOKEN,
+            "X-Internal-Token": settings.INTERNAL_API_TOKEN,
         }
 
         try:

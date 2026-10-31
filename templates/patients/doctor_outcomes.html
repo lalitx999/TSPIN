@@ -21,59 +21,6 @@
         </div>
     </div>
 
-    <!-- Case Study Spotlight (Case Nikom Psoriasis Recovery) -->
-    <div class="card shadow-sm border border-success" style="background-color: #FFFFFF;">
-        <div class="card-header bg-success text-white py-3 px-4 d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-2">
-                <i class="fas fa-award fs-5 text-warning"></i>
-                <span class="fw-bold fs-6 text-uppercase">เคสตัวอย่างทางคลินิก (Validated Case Study)</span>
-            </div>
-            <span class="badge bg-white text-success fw-bold font-monospace px-3 py-1.5">TSPI CLINICAL BENCHMARK</span>
-        </div>
-        <div class="card-body p-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-4">
-                <div>
-                    <h2 class="h5 fw-bold text-dark mb-2">เคสสะเก็ดเงินรุนแรง (Psoriasis Vulgaris) - คุณนิคม</h2>
-                    <p class="text-dark mb-0 fw-medium" style="max-width: 720px; line-height: 1.6;">
-                        ประวัติสะเก็ดเงินเรื้อรัง 8 ปี ภาระการอักเสบระบบสูง (hsCRP 8.4 mg/L, TNF-&alpha; สูง) ผนังลำไส้รั่ว (Leaky Gut) 
-                        ได้รับการฟื้นฟูด้วย TSPI 9-Step Protocol: Phase 1 (KERRA, MINOZA) และ Phase 2 (CINNARA, KURMA)
-                    </p>
-                </div>
-                <div class="text-md-end bg-success-subtle p-3 rounded-3 border border-success-subtle text-nowrap">
-                    <span class="fs-1 fw-bolder text-success font-monospace d-block">-82%</span>
-                    <strong class="text-dark fw-bold">PASI Score Reduction</strong>
-                </div>
-            </div>
-
-            <div class="row g-3 mt-3 pt-3 border-top">
-                <div class="col-6 col-md-3">
-                    <div class="p-3 rounded-3 bg-light border h-100">
-                        <span class="small text-muted d-block fw-semibold mb-1">ระยะเวลาการรักษา</span>
-                        <strong class="fs-5 text-dark font-monospace fw-bold">16 สัปดาห์</strong>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="p-3 rounded-3 bg-danger-subtle border border-danger-subtle h-100">
-                        <span class="small text-danger d-block fw-semibold mb-1">hsCRP ก่อน vs หลัง</span>
-                        <strong class="fs-5 text-danger font-monospace fw-bold">8.4 &rarr; 1.1 mg/L</strong>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="p-3 rounded-3 bg-success-subtle border border-success-subtle h-100">
-                        <span class="small text-success-emphasis d-block fw-semibold mb-1">การฟื้นฟูผนังลำไส้</span>
-                        <strong class="fs-5 text-success-emphasis fw-bold">Zonulin Normalized</strong>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="p-3 rounded-3 bg-primary-subtle border border-primary-subtle h-100">
-                        <span class="small text-primary d-block fw-semibold mb-1">สเตียรอยด์ที่ลดได้</span>
-                        <strong class="fs-5 text-primary font-monospace fw-bold">หยุดใช้ 100%</strong>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Active Patients Recovery Overview -->
     <div class="card shadow-sm border">
         <div class="card-header bg-light py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
@@ -86,9 +33,9 @@
                 <thead class="table-light text-dark border-bottom">
                     <tr>
                         <th class="px-4 py-3 fw-bold">คนไข้</th>
-                        <th class="px-3 py-3 fw-bold">โปรโตคอลปัจจุบัน</th>
-                        <th class="px-3 py-3 fw-bold" style="min-width: 180px;">ความก้าวหน้า</th>
-                        <th class="px-3 py-3 fw-bold">การตอบสนอง</th>
+                        <th class="px-3 py-3 fw-bold">สถานะ</th>
+                        <th class="px-3 py-3 fw-bold">จำนวนครั้งที่ประเมิน 39 แกน</th>
+                        <th class="px-3 py-3 fw-bold">ประเมินล่าสุด</th>
                         <th class="px-4 py-3 fw-bold text-end">ดูไทม์ไลน์</th>
                     </tr>
                 </thead>
@@ -100,20 +47,10 @@
                                 <small class="text-muted font-monospace fw-semibold">HN: {{ p.hn }}</small>
                             </td>
                             <td class="px-3 py-3 text-dark fw-medium">
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2">
-                                    Phase 1: Gut &amp; Detox
-                                </span>
-                                <small class="text-muted d-block mt-0.5">สัปดาห์ที่ 4</small>
+                                <span class="badge bg-light text-secondary border py-1 px-2">{{ p.get_status_display }}</span>
                             </td>
-                            <td class="px-3 py-3">
-                                <div class="progress" style="height: 10px; border-radius: 6px;">
-                                    <div class="progress-bar bg-success progress-bar-striped" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                                <small class="text-dark d-block mt-1 font-monospace fw-bold">65% Target Achieved</small>
-                            </td>
-                            <td class="px-3 py-3 text-success fw-bold">
-                                <i class="fas fa-arrow-down me-1"></i> การอักเสบลดลงต่อเนื่อง
-                            </td>
+                            <td class="px-3 py-3 font-monospace fw-bold text-dark">{{ p.assessment_count }} ครั้ง</td>
+                            <td class="px-3 py-3 font-monospace text-muted">{{ p.last_assessed|date:"d/m/Y" }}</td>
                             <td class="px-4 py-3 text-end">
                                 <a href="{% url 'clinical:axis_timeline' %}?patient_id={{ p.id }}" class="btn btn-sm btn-outline-primary fw-semibold px-3">
                                     <i class="fas fa-history me-1"></i> ไทม์ไลน์ 39 แกน

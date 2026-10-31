@@ -103,9 +103,12 @@
                 <span class="d-none d-sm-inline-block small text-muted">
                     คุณ {{ request.user.first_name|default:request.user.username }}
                 </span>
-                <a href="{% url 'accounts:logout' %}" class="btn btn-sm btn-outline-danger">
-                    <i class="fas fa-sign-out-alt me-1"></i> ออกจากระบบ
-                </a>
+                <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-sign-out-alt me-1"></i> ออกจากระบบ
+                    </button>
+                </form>
             </div>
         </div>
     </header>

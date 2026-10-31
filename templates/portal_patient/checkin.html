@@ -20,15 +20,13 @@
                     <span class="text-muted">คนไข้:</span>
                     <span class="fw-semibold text-dark">{{ request.user.get_full_name|default:request.user.username }}</span>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <span class="text-muted">สถานะคิวตรวจ:</span>
-                    <span class="fw-semibold text-success">พร้อมเข้ารับการตรวจ</span>
-                </div>
             </div>
 
-            <button type="button" onclick="alert('เช็คอินเรียบร้อยแล้วครับ กรุณานั่งรอเจ้าหน้าที่เรียกชื่อตามลำดับคิว')" class="btn btn-primary w-100 py-2.5">
-                <i class="fas fa-check-circle me-1"></i> ยืนยันการมาถึงคลินิก (Check-in Now)
+            {# ระบบเช็คอินออนไลน์ยังไม่บันทึกคิวจริง (เฟส 3) จึงไม่แสดงว่าเช็คอินสำเร็จ #}
+            <button type="button" class="btn btn-secondary w-100 py-2.5" disabled>
+                <i class="fas fa-clock me-1"></i> เช็คอินออนไลน์ยังไม่เปิดให้บริการ
             </button>
+            <p class="small text-muted mt-2 mb-0">กรุณาแจ้งเจ้าหน้าที่ที่เคาน์เตอร์เมื่อมาถึงคลินิก</p>
         </div>
     </div>
 

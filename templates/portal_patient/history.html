@@ -15,20 +15,31 @@
         </div>
     </div>
 
-    <!-- Timeline List -->
+    <!-- Timeline List (จากบันทึกการตรวจจริงในเวชระเบียน) -->
     <div class="d-flex flex-column gap-3">
+        {% for h in histories %}
         <div class="card border-0 shadow-xs">
             <div class="card-body p-4">
                 <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="small font-monospace fw-bold text-primary">24 ตุลาคม 2026</span>
-                    <span class="badge bg-success-subtle text-success">ตรวจรักษาเสร็จสิ้น</span>
+                    <span class="small font-monospace fw-bold text-primary">{{ h.visit_date|date:"j F Y" }}</span>
+                    {% if h.doctor %}<span class="small text-muted">{{ h.doctor.get_full_name|default:h.doctor.username }}</span>{% endif %}
                 </div>
-                <h6 class="fw-bold text-dark mb-2">การตรวจติดตามผล Phase 1: Deep Assessment & Detox</h6>
-                <p class="small text-muted mb-0 lh-base">
-                    แพทย์ผู้ตรวจประเมินผลแล็บ hs-CRP และตรวจระดับ Zonulin อาการผื่นคันตอบสนองดีขึ้น ได้รับสูตรตำรับ KERRA และ MINOZA ต่อเนื่องอีก 4 สัปดาห์
-                </p>
+                {% if h.subjective %}<p class="small text-dark mb-1 lh-base"><span class="fw-bold">อาการ:</span> {{ h.subjective }}</p>{% endif %}
+                {% if h.plan %}<p class="small text-muted mb-0 lh-base"><span class="fw-bold">แผนการดูแล:</span> {{ h.plan }}</p>{% endif %}
             </div>
         </div>
+        {% empty %}
+        <div class="card border-0 shadow-xs">
+            <div class="card-body p-5 text-center text-muted">
+                <i class="fas fa-notes-medical fs-2 mb-2 d-block text-secondary"></i>
+                {% if has_patient_record %}
+                <p class="small mb-0">ยังไม่มีบันทึกการตรวจรักษา เมื่อแพทย์บันทึกผลการตรวจจะแสดงที่นี่</p>
+                {% else %}
+                <p class="small mb-0">บัญชีนี้ยังไม่ได้เชื่อมกับเวชระเบียนของคลินิก กรุณาติดต่อเจ้าหน้าที่</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
     </div>
 
 </div>

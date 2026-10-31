@@ -258,10 +258,13 @@
             </a>
 
             <div class="pt-2 mt-2 border-top">
-                <a href="{% url 'accounts:logout' %}" class="doctor-nav-item text-danger">
-                    <i class="fas fa-power-off"></i>
-                    <span>ออกจากระบบ (Logout)</span>
-                </a>
+                <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="doctor-nav-item text-danger" style="background:none;border:0;width:100%;text-align:left;">
+                        <i class="fas fa-power-off"></i>
+                        <span>ออกจากระบบ (Logout)</span>
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -336,9 +339,12 @@
             <a href="{% url 'clinical:report_dashboard' %}" class="doctor-nav-item {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-file-pdf"></i> ออกรายงาน Precision Report
             </a>
-            <a href="{% url 'accounts:logout' %}" class="doctor-nav-item text-danger mt-3 pt-2 border-top">
-                <i class="fas fa-power-off"></i> ออกจากระบบ (Logout)
-            </a>
+            <form method="post" action="{% url 'accounts:logout' %}" class="m-0 mt-3 pt-2 border-top">
+                {% csrf_token %}
+                <button type="submit" class="doctor-nav-item text-danger" style="background:none;border:0;width:100%;text-align:left;">
+                    <i class="fas fa-power-off"></i> ออกจากระบบ (Logout)
+                </button>
+            </form>
         </div>
     </div>
 
@@ -392,7 +398,7 @@
                         <li><a class="dropdown-item py-2" href="{% url 'patients:dashboard' %}"><i class="fas fa-tachometer-alt text-primary me-2"></i>Dashboard ภาพรวม</a></li>
                         <li><a class="dropdown-item py-2" href="{% url 'patients:doctor_settings' %}"><i class="fas fa-cog text-primary me-2"></i>ตั้งค่าคลินิก</a></li>
                         <li><hr class="dropdown-divider my-1"></li>
-                        <li><a class="dropdown-item py-2 text-danger" href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>ออกจากระบบ</a></li>
+                        <li><form method="post" action="{% url 'accounts:logout' %}" class="m-0">{% csrf_token %}<button type="submit" class="dropdown-item py-2 text-danger"><i class="fas fa-sign-out-alt me-2"></i>ออกจากระบบ</button></form></li>
                     </ul>
                 </div>
             </div>

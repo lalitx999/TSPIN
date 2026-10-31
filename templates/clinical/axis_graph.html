@@ -100,15 +100,19 @@
                             <span class="fw-medium text-dark" style="font-size: 0.8rem;">
                                 D{{ dom.domain_id }}: {{ dom.title }}
                             </span>
+                            {% if dom.average_score is None %}
+                            <span class="badge font-monospace bg-light text-secondary border">ยังไม่ประเมิน</span>
+                            {% else %}
                             <span class="badge font-monospace {% if dom.average_score >= 70 %}bg-danger-subtle text-danger border border-danger-subtle{% elif dom.average_score >= 40 %}bg-warning-subtle text-warning-emphasis border border-warning-subtle{% else %}bg-success-subtle text-success border border-success-subtle{% endif %}">
                                 {{ dom.average_score }}
                             </span>
+                            {% endif %}
                         </div>
                         <div class="progress" style="height: 6px;">
                             <div class="progress-bar {% if dom.average_score >= 70 %}bg-danger{% elif dom.average_score >= 40 %}bg-warning{% else %}bg-primary{% endif %}" 
                                  role="progressbar" 
-                                 style="width: {{ dom.average_score }}%;"
-                                 aria-valuenow="{{ dom.average_score }}" 
+                                 style="width: {{ dom.average_score|default_if_none:0 }}%;"
+                                 aria-valuenow="{{ dom.average_score|default_if_none:0 }}" 
                                  aria-valuemin="0" 
                                  aria-valuemax="100">
                             </div>

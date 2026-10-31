@@ -46,15 +46,15 @@
                                 <small class="text-muted font-monospace">HN: {{ p.hn }}</small>
                             </td>
                             <td class="px-3 py-2.5 text-muted">
-                                {{ p.chief_complaint|default:"Psoriasis, Metabolic syndrome"|truncatechars:40 }}
+                                {{ p.chief_complaint|default:"—"|truncatechars:40 }}
                             </td>
                             <td class="px-3 py-2.5">
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
-                                    Phase 1: Deep Assessment
+                                <span class="badge bg-light text-secondary border">
+                                    {{ p.get_status_display }}
                                 </span>
                             </td>
                             <td class="px-3 py-2.5 font-monospace text-muted">
-                                A01, A05, A19
+                                {% if p.focus_axes %}{{ p.focus_axes|join:", " }}{% elif p.has_assessment %}ไม่มีแกนเกินเกณฑ์{% else %}ยังไม่ประเมิน{% endif %}
                             </td>
                             <td class="px-3 py-2.5 text-end">
                                 <div class="btn-group btn-group-sm">

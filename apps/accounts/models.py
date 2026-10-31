@@ -16,6 +16,7 @@ class User(AbstractUser):
         ADMIN = 'admin', 'ผู้ดูแลระบบ (Admin)'
         DOCTOR = 'doctor', 'แพทย์ผู้รักษา (Doctor)'
         NURSE = 'nurse', 'พยาบาล (Nurse)'
+        NURSING_ASSISTANT = 'nursing_assistant', 'ผู้ช่วยพยาบาล (Nursing Assistant)'
         STAFF = 'staff', 'เจ้าหน้าที่คลินิก (Staff)'
         PATIENT = 'patient', 'คนไข้ (Patient)'
 
@@ -80,7 +81,7 @@ class User(AbstractUser):
     @property
     def is_clinical_staff(self):
         """ตรวจสอบว่าเป็นบุคลากรทางการแพทย์ (หมอ/พยาบาล/แอดมิน) หรือไม่"""
-        return self.role in [self.Role.ADMIN, self.Role.DOCTOR, self.Role.NURSE]
+        return self.role in [self.Role.ADMIN, self.Role.DOCTOR, self.Role.NURSE, self.Role.NURSING_ASSISTANT]
 
     @property
     def is_doctor(self):

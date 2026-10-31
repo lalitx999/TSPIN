@@ -108,10 +108,10 @@
                                 <span class="badge bg-light text-dark border">Follow-up</span>
                             {% endif %}
                         </td>
-                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-danger">{{ rec.axis_1 }}</td>
-                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-info-emphasis">{{ rec.axis_5 }}</td>
-                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-primary">{{ rec.axis_8 }}</td>
-                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-warning-emphasis">{{ rec.axis_15 }}</td>
+                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-danger">{{ rec.axis_1|default_if_none:"—" }}</td>
+                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-info-emphasis">{{ rec.axis_5|default_if_none:"—" }}</td>
+                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-primary">{{ rec.axis_8|default_if_none:"—" }}</td>
+                        <td class="px-3 py-2.5 text-center font-monospace fw-bold text-warning-emphasis">{{ rec.axis_15|default_if_none:"—" }}</td>
                         <td class="px-3 py-2.5 text-muted text-truncate" style="max-width: 250px;">{{ rec.notes|default:"-"|truncatewords:8 }}</td>
                     </tr>
                     {% empty %}

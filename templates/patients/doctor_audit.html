@@ -47,7 +47,7 @@
                                 {{ log.timestamp|date:"d/m/Y H:i:s" }}
                             </td>
                             <td class="px-3 py-2.5 fw-bold text-dark">
-                                {{ log.user.get_full_name|default:log.user.username }}
+                                {% if log.user %}{{ log.user.get_full_name|default:log.user.username }}{% else %}<span class="text-muted">ระบบ / ผู้ใช้ไม่ระบุตัวตน</span>{% endif %}
                             </td>
                             <td class="px-3 py-2.5">
                                 <span class="badge bg-light text-dark border font-monospace">

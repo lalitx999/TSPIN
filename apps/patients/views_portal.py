@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpRequest, HttpResponseForbidden, Http404
 from django.contrib.auth import login, logout, authenticate
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 
 from accounts.models import User, AuditLog
@@ -110,8 +111,9 @@ def portal_login_view(request: HttpRequest) -> HttpResponse:
     return render(request, 'portal/portal_login.html')
 
 
+@require_POST
 def portal_logout_view(request: HttpRequest) -> HttpResponse:
-    """ออกจากระบบ Patient Portal"""
+    """ออกจากระบบ Patient Portal (POST เท่านั้น กันเว็บอื่นสั่ง logout ผ่านลิงก์)"""
     patient_id = request.session.get('portal_patient_id')
     if patient_id:
         del request.session['portal_patient_id']

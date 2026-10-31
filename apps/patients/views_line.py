@@ -18,6 +18,7 @@ from patients.models import Patient, PatientLinkingToken, Appointment
 from clinical.models import AnalysisRecord, Box
 from clinical.services_box import BoxBuilderService
 from patients.line_service import LineSecurity, LineFlexMessageBuilder, LineMessagingService
+from patients.views_line_internal import ingest_line_event
 
 logger = logging.getLogger(__name__)
 
@@ -119,6 +120,9 @@ def _dispatch_line_event(request: HttpRequest, event: dict):
             LineMessagingService.reply_message(reply_token, [msg])
 
     elif event_type == 'message':
+        # บันทึกทุกข้อความเข้า Unified Inbox / Clinical Review Queue (Caregiver Hub)
+        ingest_line_event(event)
+
         message_obj = event.get('message', {})
         if message_obj.get('type') == 'text':
             text = (message_obj.get('text') or '').strip().lower()

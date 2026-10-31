@@ -112,15 +112,43 @@ class PatientLoginForm(forms.Form):
         self.request = request
         super().__init__(*args, **kwargs)
 
+    @staticmethod
+    def resolve_username(raw_identifier: str) -> str:
+        """
+        แปลง HN (มี/ไม่มีขีด) หรือเลขบัตร ปชช. 13 หลัก เป็น username ของบัญชีที่ผูกกับเวชระเบียนนั้น
+        ถ้าไม่พบเวชระเบียนที่ผูกบัญชี จะใช้ค่าที่กรอกเป็น username ตรง ๆ
+        """
+        import hashlib
+        from django.db.models import Value
+        from django.db.models.functions import Replace, Upper
+        from patients.models import Patient
+
+        raw = raw_identifier.strip()
+        normalized = raw.replace('-', '').replace(' ', '').upper()
+        if not normalized:
+            return raw
+
+        patients = Patient.objects.filter(user__isnull=False)
+        if normalized.isdigit() and len(normalized) == 13:
+            patient = patients.filter(id_card_hash=hashlib.sha256(normalized.encode('utf-8')).hexdigest()).first()
+        else:
+            patient = (
+                patients.annotate(hn_norm=Upper(Replace(Replace('hn', Value('-'), Value('')), Value(' '), Value(''))))
+                .filter(hn_norm=normalized)
+                .first()
+            )
+        return patient.user.username if patient else raw
+
     def clean(self):
         cleaned_data = super().clean()
-        identifier = cleaned_data.get('identifier', '').strip().replace('-', '').replace(' ', '')
+        identifier = cleaned_data.get('identifier', '').strip()
         password = cleaned_data.get('password', '')
 
         if not identifier or not password:
             return cleaned_data
 
-        user = authenticate(request=self.request, username=identifier, password=password)
+        username = self.resolve_username(identifier)
+        user = authenticate(request=self.request, username=username, password=password)
         if not user:
             raise ValidationError("ข้อมูลประจำตัวหรือรหัสผ่านไม่ถูกต้อง")
 

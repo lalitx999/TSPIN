@@ -43,48 +43,54 @@ class BiologicalRecord(SoftDeleteModel):
     notes = models.TextField(blank=True, help_text="บันทึกความเห็นทางคลินิกและสมมติฐานแพทย์")
 
     # 39 Biological Axes (Indexed for fast aggregation & timeline)
-    axis_1 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_2 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_3 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_4 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_5 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_6 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_7 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_8 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_9 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_10 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_11 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_12 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_13 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_14 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_15 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_16 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_17 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_18 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_19 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_20 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_21 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_22 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_23 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_24 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_25 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_26 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_27 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_28 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_29 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_30 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_31 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_32 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_33 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_34 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_35 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_36 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_37 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_38 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    axis_39 = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    # None = ยังไม่ได้ประเมิน ห้ามมีค่า default เพราะจะกลายเป็นคะแนนปลอมที่แยกไม่ออกจากผลจริง
+    axis_1 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_2 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_3 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_4 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_5 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_6 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_7 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_8 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_9 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_10 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_11 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_12 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_13 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_14 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_15 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_16 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_17 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_18 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_19 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_20 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_21 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_22 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_23 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_24 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_25 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_26 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_27 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_28 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_29 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_30 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_31 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_32 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_33 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_34 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_35 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_36 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_37 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_38 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    axis_39 = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     # Raw Sub-axes or Omics Metadata
     sub_axes_json = models.JSONField(default=dict, blank=True, help_text="คะแนนระดับ Sub-axes A, B, C (ถ้ามี)")
+
+    invalidation_reason = models.TextField(
+        blank=True,
+        help_text="เหตุผลที่ระเบียนนี้ถูกยกเลิก (เช่น คะแนนที่ระบบสร้างขึ้นเองตอนนำเข้า ไม่ใช่ผลประเมินจริง)"
+    )
 
     class Meta:
         app_label = 'clinical'
@@ -98,7 +104,7 @@ class BiologicalRecord(SoftDeleteModel):
         return f"39-Axes Record: {self.patient.hn} on {self.record_date:%d/%m/%Y}"
 
     def to_scores_dict(self):
-        """แปลงคะแนน 39 แกนเป็น Dictionary {1: 50, 2: 75, ...}"""
+        """แปลงคะแนน 39 แกนเป็น Dictionary {1: 50, 2: 75, 3: None, ...} (None = ยังไม่ได้ประเมิน)"""
         return {i: getattr(self, f"axis_{i}") for i in range(1, 40)}
 
     def to_radar_list(self):
@@ -110,7 +116,7 @@ class BiologicalRecord(SoftDeleteModel):
         high_axes = []
         for i in range(1, 40):
             score = getattr(self, f"axis_{i}")
-            if score >= threshold:
+            if score is not None and score >= threshold:
                 high_axes.append({'axis_id': i, 'score': score})
         return sorted(high_axes, key=lambda x: x['score'], reverse=True)
 

@@ -10,6 +10,7 @@ LINE webhooks are received by Django directly, not by this service.
 """
 
 import os
+import re
 import json
 import asyncio
 import logging
@@ -57,8 +58,10 @@ KNOWLEDGE_STORE: Dict[str, Any] = {
     'axes': [],
     'domains': [],
     'modules': [],
-    'txt_snippets': []
+    'txt_snippets': [],
+    'clinic_info': [],
 }
+CLINIC_INFO_FILE = Path(__file__).resolve().parent / 'knowledge' / 'clinic_info.md'
 
 
 def load_knowledge():
@@ -95,11 +98,29 @@ def load_knowledge():
                 KNOWLEDGE_STORE['txt_snippets'].append("".join(current_chunk))
 
 
+def load_clinic_info():
+    """แบ่งไฟล์ข้อมูลคลินิกเป็นหัวข้อ (## ...) ให้ผู้ช่วย AI ค้นได้"""
+    KNOWLEDGE_STORE['clinic_info'] = []
+    if not CLINIC_INFO_FILE.exists():
+        return
+    title, lines = None, []
+    for line in CLINIC_INFO_FILE.read_text(encoding='utf-8').splitlines():
+        if line.startswith('## '):
+            if title:
+                KNOWLEDGE_STORE['clinic_info'].append({'title': title, 'text': "\n".join(lines).strip()})
+            title, lines = line[3:].strip(), []
+        elif title:
+            lines.append(line)
+    if title:
+        KNOWLEDGE_STORE['clinic_info'].append({'title': title, 'text': "\n".join(lines).strip()})
+
+
 @app.on_event("startup")
 async def startup_event():
     if not config.INTERNAL_API_TOKEN:
         logger.critical("INTERNAL_API_TOKEN is not set: all routes except /health will return 401.")
     load_knowledge()
+    load_clinic_info()
 
 
 class ChatRequest(BaseModel):
@@ -541,31 +562,35 @@ async def guardrail_verify_endpoint(
     }
 
 
+# คำสำคัญทางคลินิก (ไทย/อังกฤษ) -> แกนชีวภาพ ใช้ทั้งค้นแกนและตัดสินว่าคำถามอยู่ในขอบเขตความรู้ของ TSPI หรือไม่
+TOPIC_KEYWORDS = {
+    'อักเสบ': 1, 'inflammation': 1, 'crp': 1, 'ปวด': 1,
+    'ภูมิคุ้มกัน': 2, 'autoimmune': 2, 'สะเก็ดเงิน': 2, 'psoriasis': 2,
+    'ไวรัส': 3, 'แบคทีเรีย': 3, 'ติดเชื้อ': 3,
+    'น้ำตาล': 5, 'เบาหวาน': 5, 'insulin': 5, 'glucose': 5,
+    'ไขมัน': 6, 'คอเลสเตอรอล': 6, 'ตับคั่งไขมัน': 6, 'lipid': 6,
+    'พลังงาน': 7, 'mTOR': 7, 'ampk': 7,
+    'ไมโทคอนเดรีย': 8, 'mitochondria': 8, 'atp': 8, 'เพลีย': 8,
+    'ดีเอ็นเอ': 11, 'dna': 11, 'แก่': 14, 'senescence': 14,
+    'ตับ': 15, 'สารพิษ': 15, 'detox': 15, 'ขับของเสีย': 15,
+    'ลำไส้': 16, 'ท้องผูก': 16, 'ย่อย': 16, 'leaky gut': 16, 'ลำไส้รั่ว': 16,
+    'หลอดเลือด': 20, 'ความดัน': 20, 'vascular': 20,
+    'แผล': 24, 'ซ่อมแซม': 24, 'คอลลาเจน': 25,
+    'กล้ามเนื้อ': 28, 'กระดูก': 26,
+    'ฮอร์โมน': 31, 'ไทรอยด์': 33, 'thyroid': 33,
+    'นอน': 34, 'เครียด': 34, 'สมอง': 34, 'ความจำ': 34,
+    'ไต': 35, 'หัวใจ': 35,
+    'มะเร็ง': 37, 'ก้อนเนื้อ': 37, 'เนื้องอก': 37, 'cancer': 37, 'oncology': 37
+}
+
+
 def search_relevant_axes(query: str) -> List[Dict[str, Any]]:
     """Search 39 Axes based on clinical keywords in query."""
     q_lower = query.lower()
     matches = []
     
     # Specific clinical keyword mappings
-    topic_mapping = {
-        'อักเสบ': 1, 'inflammation': 1, 'crp': 1, 'ปวด': 1,
-        'ภูมิคุ้มกัน': 2, 'autoimmune': 2, 'สะเก็ดเงิน': 2, 'psoriasis': 2,
-        'ไวรัส': 3, 'แบคทีเรีย': 3, 'ติดเชื้อ': 3,
-        'น้ำตาล': 5, 'เบาหวาน': 5, 'insulin': 5, 'glucose': 5,
-        'ไขมัน': 6, 'คอเลสเตอรอล': 6, 'ตับคั่งไขมัน': 6, 'lipid': 6,
-        'พลังงาน': 7, 'mTOR': 7, 'ampk': 7,
-        'ไมโทคอนเดรีย': 8, 'mitochondria': 8, 'atp': 8, 'เพลีย': 8,
-        'ดีเอ็นเอ': 11, 'dna': 11, 'แก่': 14, 'senescence': 14,
-        'ตับ': 15, 'สารพิษ': 15, 'detox': 15, 'ขับของเสีย': 15,
-        'ลำไส้': 16, 'ท้องผูก': 16, 'ย่อย': 16, 'leaky gut': 16, 'ลำไส้รั่ว': 16,
-        'หลอดเลือด': 20, 'ความดัน': 20, 'vascular': 20,
-        'แผล': 24, 'ซ่อมแซม': 24, 'คอลลาเจน': 25,
-        'กล้ามเนื้อ': 28, 'กระดูก': 26,
-        'ฮอร์โมน': 31, 'ไทรอยด์': 33, 'thyroid': 33,
-        'นอน': 34, 'เครียด': 34, 'สมอง': 34, 'ความจำ': 34,
-        'ไต': 35, 'หัวใจ': 35,
-        'มะเร็ง': 37, 'ก้อนเนื้อ': 37, 'เนื้องอก': 37, 'cancer': 37, 'oncology': 37
-    }
+    topic_mapping = TOPIC_KEYWORDS
 
     matched_axis_ids = set()
     for kw, ax_id in topic_mapping.items():
@@ -823,6 +848,115 @@ async def rag_knowledge_query(
         "total_axes": 39,
         "results": results
     }
+
+
+# ==============================================================================
+# ผู้ช่วย AI สำหรับผู้ป่วย (หน้าเว็บแบบแชท): ตอบจากฐานความรู้ของ TSPI เท่านั้น
+# LLM ภายนอกมีหน้าที่เรียบเรียงภาษา ไม่ใช่แหล่งข้อมูล; ไม่พบความรู้ที่เกี่ยวข้อง = ปฏิเสธโดยไม่เรียก LLM
+# ==============================================================================
+ASSISTANT_SCOPE_TEXT = "สุขภาพเชิงระบบ 39 แกนชีววิทยา ผลิตภัณฑ์ และบริการของคลินิก"
+ASSISTANT_REFUSAL = (
+    "ขออภัยค่ะ ผู้ช่วยนี้ตอบได้เฉพาะเรื่อง" + ASSISTANT_SCOPE_TEXT +
+    " ตามข้อมูลของคลินิกเท่านั้น ลองถามเรื่องอาการหรือระบบร่างกายที่สนใจ หรือทักเจ้าหน้าที่ทาง LINE ได้เลยค่ะ"
+)
+ASSISTANT_EMERGENCY = (
+    "อาการที่เล่ามาอาจเป็นภาวะฉุกเฉิน กรุณาโทร 1669 หรือไปโรงพยาบาลที่ใกล้ที่สุดทันทีค่ะ "
+    "ผู้ช่วย AI ไม่สามารถประเมินภาวะฉุกเฉินแทนแพทย์ได้"
+)
+ASSISTANT_EMERGENCY_KEYWORDS = ('แน่นหน้าอก', 'เจ็บหน้าอก', 'หายใจไม่ออก', 'หายใจลำบาก', 'หมดสติ', 'ปากเบี้ยว',
+                                'แขนขาอ่อนแรง', 'ชัก', 'ไอเป็นเลือด', 'อาเจียนเป็นเลือด', 'ฆ่าตัวตาย', 'แพ้ยารุนแรง')
+ASSISTANT_SYSTEM_PROMPT = (
+    "คุณคือผู้ช่วยให้ข้อมูลของคลินิก TSPI ตอบเป็นภาษาไทย สุภาพ เข้าใจง่ายสำหรับผู้สูงอายุ ไม่เกิน 6 ประโยค\n"
+    "กฎที่ห้ามละเมิด:\n"
+    "1. ใช้ข้อมูลจาก <ความรู้> ที่ให้มาเท่านั้น ห้ามใช้ความรู้ทั่วไปของคุณเพิ่มเติม ถ้าความรู้ไม่พอให้ตอบว่าไม่มีข้อมูลและแนะนำให้ติดต่อคลินิก\n"
+    "2. ห้ามวินิจฉัยโรค ห้ามแนะนำยา ขนาดยา หรือบอกว่าผู้ใช้ควรใช้ผลิตภัณฑ์ใด การเลือกผลิตภัณฑ์ต้องผ่านแพทย์\n"
+    "3. ถ้าคำถามไม่เกี่ยวกับ " + ASSISTANT_SCOPE_TEXT + " ให้ปฏิเสธอย่างสุภาพ\n"
+    "4. อ้างอิงแหล่งด้วยหมายเลข เช่น [1] ตามหัวข้อความรู้ที่ใช้\n"
+    "5. ถ้าผู้ใช้เล่าอาการ ให้ถามข้อมูลเพิ่มที่แพทย์ต้องใช้ 1 คำถาม (ระยะเวลา ความรุนแรง อาการร่วม) และแนะนำให้กด \"ส่งให้คลินิก\" เมื่อเล่าครบ"
+)
+
+
+def _assistant_keywords(text: str) -> List[str]:
+    q = text.lower()
+    keys = [kw.lower() for kw in TOPIC_KEYWORDS if kw.lower() in q]
+    keys += [w for w in re.findall(r"[a-z0-9][a-z0-9\-]{2,}", q)]
+    for mod in KNOWLEDGE_STORE['modules']:
+        code = str(mod.get('Code /_Product ID') or '').strip().lower()
+        if len(code) >= 2 and code in q:
+            keys.append(code)
+    for info in KNOWLEDGE_STORE['clinic_info']:
+        for word in ('คลินิก', 'นัด', 'ติดต่อ', 'เวลา', 'ผลิตภัณฑ์', 'สั่งซื้อ', 'ราคา', 'ประเมิน', '39 แกน', 'แกน'):
+            if word in q and word in (info['title'] + info['text']):
+                keys.append(word)
+    return list(dict.fromkeys(keys))
+
+
+def retrieve_tspi_knowledge(question: str, limit: int = 4) -> List[Dict[str, str]]:
+    """ค้นความรู้ของ TSPI (ข้อมูลคลินิก, 39 แกน, เอกสารความรู้) ตามคำสำคัญ ไม่มีคำตรง = คืนรายการว่าง"""
+    keys = _assistant_keywords(question)
+    if not keys:
+        return []
+    found: List[Dict[str, Any]] = []
+    for info in KNOWLEDGE_STORE['clinic_info']:
+        score = sum((info['title'] + info['text']).lower().count(k) for k in keys)
+        if score:
+            found.append({'title': f"ข้อมูลคลินิก: {info['title']}", 'text': info['text'], 'score': score + 5})
+    axis_ids = {TOPIC_KEYWORDS[k] for k in TOPIC_KEYWORDS if k.lower() in keys}
+    for ax in KNOWLEDGE_STORE['axes']:
+        name = str(ax.get('name', ''))
+        if ax.get('axis_id') in axis_ids or any(k in name.lower() for k in keys if len(k) > 3):
+            text = json.dumps({k: ax.get(k) for k in ('name', 'domain_title', 'sub_axes', 'description') if ax.get(k)},
+                              ensure_ascii=False)[:1200]
+            found.append({'title': f"แกนที่ {ax.get('axis_id')}: {name}", 'text': text, 'score': 4})
+    for i, snippet in enumerate(KNOWLEDGE_STORE['txt_snippets']):
+        score = sum(snippet.lower().count(k) for k in keys)
+        if score >= 2:
+            found.append({'title': f"คลังความรู้ TSPI ส่วนที่ {i + 1}", 'text': snippet[:1200], 'score': min(score, 6)})
+    found.sort(key=lambda x: -x['score'])
+    return [{'title': f['title'], 'text': f['text']} for f in found[:limit]]
+
+
+class AssistantMessage(BaseModel):
+    role: str
+    content: str
+
+
+class AssistantChatRequest(BaseModel):
+    messages: List[AssistantMessage] = Field(..., description="บทสนทนาล่าสุด (ข้อความสุดท้ายคือคำถามของผู้ใช้)")
+
+
+@app.post("/api/ai/assistant/chat")
+async def assistant_chat_endpoint(req: AssistantChatRequest):
+    """
+    แชทผู้ช่วยสำหรับผู้ป่วย: ฉุกเฉิน -> ข้อความ 1669 ทันที, นอกขอบเขต -> ปฏิเสธ (ไม่เรียก LLM),
+    ในขอบเขต -> LLM เรียบเรียงจากความรู้ที่ค้นได้ แล้วผ่าน Guardrail ห้ามวินิจฉัย
+    """
+    history = [m for m in req.messages if m.role in ('user', 'assistant') and m.content.strip()][-8:]
+    if not history or history[-1].role != 'user':
+        raise HTTPException(status_code=400, detail="ข้อความสุดท้ายต้องเป็นคำถามของผู้ใช้")
+    question = TextDeidentifier.sanitize(history[-1].content)["sanitized_text"][:2000]
+
+    if any(k in question for k in ASSISTANT_EMERGENCY_KEYWORDS):
+        return {"answer": ASSISTANT_EMERGENCY, "kind": "emergency", "sources": [], "usage": {}}
+
+    context = retrieve_tspi_knowledge(question)
+    if not context:
+        return {"answer": ASSISTANT_REFUSAL, "kind": "out_of_scope", "sources": [], "usage": {}}
+
+    knowledge = "\n\n".join(f"[{i + 1}] {c['title']}\n{c['text']}" for i, c in enumerate(context))
+    messages = [{"role": "system", "content": ASSISTANT_SYSTEM_PROMPT}]
+    for m in history[:-1]:
+        messages.append({"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]})
+    messages.append({"role": "user", "content": f"<ความรู้>\n{knowledge}\n</ความรู้>\n\nคำถาม: {question}"})
+
+    res = await gateway.call_chat(config.SOAP_PROVIDER, messages=messages, temperature=0.2, max_tokens=700)
+    meta = {"provider": res.get("provider", config.SOAP_PROVIDER), "model": res.get("model", ""), "usage": res.get("usage", {})}
+    answer = (res.get("content") or "").strip() if res.get("success") else ""
+    if not answer:
+        return {"answer": "ขออภัยค่ะ ระบบผู้ช่วยไม่พร้อมใช้งานชั่วคราว กรุณาลองใหม่ภายหลัง หรือทักเจ้าหน้าที่ทาง LINE",
+                "kind": "unavailable", "sources": [c['title'] for c in context], **meta}
+    guarded = ClinicalGuardrail.sanitize_and_guard(answer)
+    return {"answer": guarded["safe_text"], "kind": "answer", "sources": [c['title'] for c in context], **meta}
 
 
 if __name__ == "__main__":

@@ -142,3 +142,35 @@ class AIUsageLog(models.Model):
         app_label = 'intelligence'
         db_table = 'ai_usage_logs'
         ordering = ['-created_at']
+
+
+class AssistantThread(models.Model):
+    """ห้องแชทผู้ช่วย AI ของผู้ป่วย (หน้าเว็บแบบ ChatGPT) หนึ่งห้องต่อหนึ่งเรื่องที่คุย"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='assistant_threads')
+    title = models.CharField(max_length=120, default='แชทใหม่')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    # ส่งให้คลินิกแล้ว = เป็นส่วนหนึ่งของเวชระเบียน ลบจริงไม่ได้ ผู้ใช้ทำได้แค่ซ่อน
+    submitted_box = models.OneToOneField('clinical.Box', on_delete=models.SET_NULL, null=True, blank=True,
+                                         related_name='assistant_thread')
+    hidden_by_user = models.BooleanField(default=False)
+
+    class Meta:
+        app_label = 'intelligence'
+        db_table = 'ai_assistant_threads'
+        ordering = ['-updated_at']
+
+
+class AssistantMessage(models.Model):
+    ROLE_CHOICES = [('user', 'ผู้ใช้'), ('assistant', 'ผู้ช่วย AI')]
+    thread = models.ForeignKey(AssistantThread, on_delete=models.CASCADE, related_name='messages')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    content = models.TextField()
+    kind = models.CharField(max_length=20, blank=True, help_text="answer / out_of_scope / emergency / unavailable")
+    sources = models.JSONField(default=list, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        app_label = 'intelligence'
+        db_table = 'ai_assistant_messages'
+        ordering = ['created_at']

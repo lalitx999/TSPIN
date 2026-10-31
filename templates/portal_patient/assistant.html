@@ -1,0 +1,187 @@
+{% extends 'layouts/patient_base.html' %}
+
+{% block title %}ผู้ช่วย AI | TSPI Health{% endblock %}
+
+{% block extra_patient_head %}
+<style>
+    .asst-wrap { display: flex; gap: 1rem; height: calc(100vh - 170px); min-height: 520px; }
+    .asst-side { width: 280px; flex-shrink: 0; background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; }
+    .asst-main { flex: 1; background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; }
+    .asst-thread { padding: .7rem .9rem; border-radius: 10px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; gap: .5rem; }
+    .asst-thread:hover { background: #F1F5F9; }
+    .asst-thread.active { background: #DCFCE7; font-weight: 600; }
+    .asst-msgs { flex: 1; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+    .asst-bubble { max-width: 82%; padding: .9rem 1.1rem; border-radius: 16px; font-size: 1.05rem; line-height: 1.7; word-break: break-word; }
+    .asst-text { white-space: pre-wrap; }
+    .asst-user { align-self: flex-end; background: #2E7D32; color: #fff; border-bottom-right-radius: 4px; }
+    .asst-bot { align-self: flex-start; background: #F1F5F9; color: #0F172A; border-bottom-left-radius: 4px; }
+    .asst-bot.emergency { background: #FEE2E2; color: #991B1B; font-weight: 600; }
+    .asst-input { border-top: 1px solid #E2E8F0; padding: .9rem; display: flex; gap: .6rem; align-items: flex-end; }
+    .asst-input textarea { font-size: 1.05rem; resize: none; }
+    @media (max-width: 991px) {
+        .asst-wrap { height: calc(100vh - 210px); }
+        .asst-side { position: fixed; inset: 0 auto 0 0; z-index: 1050; width: 85%; max-width: 320px; border-radius: 0; transform: translateX(-100%); transition: transform .2s; }
+        .asst-side.open { transform: translateX(0); }
+        .asst-bubble { max-width: 92%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="assistantApp()" x-init="init()">
+    <div class="asst-wrap">
+        <!-- รายการแชท -->
+        <aside class="asst-side" :class="{ 'open': sideOpen }">
+            <div class="p-3 border-bottom">
+                <button type="button" class="btn btn-success w-100 py-2 fs-6" @click="newThread()">
+                    <i class="fas fa-plus me-1"></i> เริ่มแชทใหม่
+                </button>
+            </div>
+            <div class="flex-grow-1 overflow-auto p-2">
+                <template x-for="t in threads" :key="t.id">
+                    <div class="asst-thread" :class="{ 'active': current && current.id === t.id }" @click="openThread(t.id)">
+                        <i class="far fa-comment text-muted"></i>
+                        <span class="flex-grow-1 text-truncate" x-text="t.title"></span>
+                        <i class="fas fa-check-circle text-success" x-show="t.submitted" title="ส่งให้คลินิกแล้ว"></i>
+                    </div>
+                </template>
+                <p class="text-muted small text-center mt-3" x-show="threads.length === 0">ยังไม่มีแชท</p>
+            </div>
+            <div class="p-3 border-top small text-muted lh-sm">
+                ผู้ช่วยตอบจากข้อมูลของคลินิก TSPI เท่านั้น ไม่ใช่การวินิจฉัยของแพทย์
+            </div>
+        </aside>
+
+        <!-- ห้องแชท -->
+        <section class="asst-main">
+            <div class="d-flex align-items-center gap-2 px-3 py-2 border-bottom">
+                <button type="button" class="btn btn-light d-lg-none" @click="sideOpen = !sideOpen" aria-label="รายการแชท">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <strong class="flex-grow-1 text-truncate fs-6" x-text="current ? current.title : 'ผู้ช่วย AI ของคลินิก'"></strong>
+                <template x-if="current">
+                    <div class="d-flex gap-1">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" @click="rename()" title="เปลี่ยนชื่อ"><i class="fas fa-pen"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" @click="remove()" title="ลบแชท"><i class="fas fa-trash"></i></button>
+                    </div>
+                </template>
+            </div>
+
+            <div class="asst-msgs" x-ref="msgs">
+                <template x-if="!current || messages.length === 0">
+                    <div class="text-center text-muted my-auto px-3">
+                        <i class="fas fa-user-nurse fs-1 text-success mb-3 d-block"></i>
+                        <p class="fs-5 mb-2">สวัสดีค่ะ มีอะไรให้ช่วยไหมคะ</p>
+                        <p class="mb-3">ถามเรื่องอาการ ระบบร่างกาย 39 แกน ผลิตภัณฑ์ หรือการนัดหมายของคลินิกได้เลย</p>
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <template x-for="q in examples">
+                                <button type="button" class="btn btn-outline-success" @click="draft = q; send()" x-text="q"></button>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+                <template x-for="m in messages" :key="m.id">
+                    <div class="asst-bubble" :class="m.role === 'user' ? 'asst-user' : ('asst-bot' + (m.kind === 'emergency' ? ' emergency' : ''))">
+                        <div class="asst-text" x-text="m.content"></div>
+                        <template x-if="m.sources && m.sources.length">
+                            <div class="mt-2 pt-2 border-top small text-muted">
+                                อ้างอิง: <template x-for="(s, i) in m.sources"><span x-text="'[' + (i + 1) + '] ' + s + '  '"></span></template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <div class="asst-bubble asst-bot text-muted" x-show="sending"><i class="fas fa-ellipsis-h fa-fade"></i> กำลังตอบ…</div>
+            </div>
+
+            <div class="px-3 pb-2" x-show="current && messages.length > 1">
+                <template x-if="current && current.submitted">
+                    <div class="alert alert-success py-2 mb-0 small"><i class="fas fa-check-circle me-1"></i> ส่งให้คลินิกแล้ว ทีมแพทย์จะตรวจและติดต่อกลับ</div>
+                </template>
+                <template x-if="current && !current.submitted">
+                    <button type="button" class="btn btn-outline-primary w-100" @click="submit()" :disabled="sending">
+                        <i class="fas fa-paper-plane me-1"></i> เล่าอาการครบแล้ว ส่งให้คลินิก
+                    </button>
+                </template>
+            </div>
+
+            <form class="asst-input" @submit.prevent="send()">
+                <textarea class="form-control" rows="2" maxlength="1500" placeholder="พิมพ์คำถามหรือเล่าอาการ…"
+                          x-model="draft" @keydown.enter.prevent="if (!$event.shiftKey) send()" :disabled="sending"></textarea>
+                <button type="submit" class="btn btn-success px-4 py-2 fs-6" :disabled="sending || !draft.trim()">ส่ง</button>
+            </form>
+            <p class="text-danger small px-3 pb-2 mb-0" x-show="error" x-text="error"></p>
+        </section>
+    </div>
+</div>
+
+<script>
+function assistantApp() {
+    const csrf = '{{ csrf_token }}';
+    const base = '/patient/api/assistant/threads/';
+    const post = (url, body) => fetch(url, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf }, body: JSON.stringify(body || {})
+    }).then(r => r.json().then(d => ({ ok: r.ok, d })));
+
+    return {
+        threads: [], current: null, messages: [], draft: '', sending: false, error: '', sideOpen: false,
+        examples: ['ลำไส้รั่วคืออะไร', 'อ่อนเพลียบ่อย เกี่ยวกับระบบไหน', 'นัดหมายคลินิกได้อย่างไร'],
+
+        async init() {
+            const r = await fetch(base).then(r => r.json());
+            this.threads = r.threads || [];
+            if (this.threads.length) this.openThread(this.threads[0].id);
+        },
+        async openThread(id) {
+            const r = await fetch(base + id + '/').then(r => r.json());
+            this.current = r.thread; this.messages = r.messages || []; this.sideOpen = false; this.error = '';
+            this.$nextTick(() => this.scroll());
+        },
+        async newThread() {
+            const { d } = await post(base + 'new/');
+            this.threads.unshift(d.thread); this.current = d.thread; this.messages = []; this.sideOpen = false;
+        },
+        async send() {
+            const text = this.draft.trim();
+            if (!text || this.sending) return;
+            if (!this.current) await this.newThread();
+            this.sending = true; this.error = '';
+            this.messages.push({ id: 'tmp', role: 'user', content: text, sources: [] });
+            this.draft = ''; this.$nextTick(() => this.scroll());
+            const { ok, d } = await post(base + this.current.id + '/send/', { text });
+            this.messages = this.messages.filter(m => m.id !== 'tmp');
+            if (ok) {
+                this.messages.push(...d.messages);
+                this.current = d.thread;
+                this.threads = [d.thread, ...this.threads.filter(t => t.id !== d.thread.id)];
+            } else {
+                this.error = d.error || 'ส่งข้อความไม่สำเร็จ'; this.draft = text;
+            }
+            this.sending = false; this.$nextTick(() => this.scroll());
+        },
+        async rename() {
+            const title = prompt('ตั้งชื่อแชทใหม่', this.current.title);
+            if (!title) return;
+            const { ok, d } = await post(base + this.current.id + '/rename/', { title });
+            if (ok) { this.current = d.thread; this.threads = this.threads.map(t => t.id === d.thread.id ? d.thread : t); }
+        },
+        async remove() {
+            const msg = this.current.submitted
+                ? 'แชทนี้ส่งให้คลินิกแล้ว จะซ่อนจากรายการของคุณ (คลินิกยังเก็บไว้ในเวชระเบียน) ต้องการซ่อนไหม?'
+                : 'ลบแชทนี้ถาวรใช่ไหม?';
+            if (!confirm(msg)) return;
+            await post(base + this.current.id + '/delete/');
+            this.threads = this.threads.filter(t => t.id !== this.current.id);
+            this.current = null; this.messages = [];
+            if (this.threads.length) this.openThread(this.threads[0].id);
+        },
+        async submit() {
+            if (!confirm('ส่งบทสนทนานี้ให้ทีมแพทย์ตรวจใช่ไหม?')) return;
+            const { ok, d } = await post(base + this.current.id + '/submit/');
+            if (ok) { this.current = d.thread; this.threads = this.threads.map(t => t.id === d.thread.id ? d.thread : t); }
+            else { this.error = d.error || 'ส่งไม่สำเร็จ'; }
+        },
+        scroll() { const el = this.$refs.msgs; if (el) el.scrollTop = el.scrollHeight; },
+    };
+}
+</script>
+{% endblock %}

@@ -498,7 +498,7 @@ async function handleClaim(e) {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            window.location.href = data.redirect_url || '{% url 'portal_patient:patient_ai_intake' %}';
+            window.location.href = data.redirect_url || '{% url 'portal_patient:assistant' %}';
         } else {
             showAlert(data.message || 'การยืนยันตัวตนไม่สำเร็จ กรุณาตรวจสอบเบอร์โทรศัพท์ 4 ตัวท้าย');
         }
@@ -543,7 +543,7 @@ async function handleNewPatient(e) {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            window.location.href = data.redirect_url || '{% url 'portal_patient:patient_ai_intake' %}';
+            window.location.href = data.redirect_url || '{% url 'portal_patient:assistant' %}';
         } else {
             showAlert(data.message || 'ไม่สามารถลงทะเบียนได้ กรุณาตรวจสอบข้อมูล');
         }

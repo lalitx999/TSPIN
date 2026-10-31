@@ -5,6 +5,7 @@ Patient Portal & LINE OA URL Configuration.
 from django.urls import path
 from . import views
 from . import views_onboarding
+from . import views_assistant
 from patients.views_portal import (
     portal_login_view,
     portal_logout_view,
@@ -41,6 +42,15 @@ urlpatterns = [
 
     # Patient Experience & AI Intake Routes (Prevent 404s)
     path('ai-intake/', views.patient_ai_intake, name='patient_ai_intake'),
+    # ผู้ช่วย AI แบบแชท (ตอบจากฐานความรู้ของ TSPI)
+    path('assistant/', views_assistant.assistant_page_view, name='assistant'),
+    path('api/assistant/threads/', views_assistant.assistant_threads_api, name='assistant_threads_api'),
+    path('api/assistant/threads/new/', views_assistant.assistant_new_thread_api, name='assistant_new_thread_api'),
+    path('api/assistant/threads/<int:thread_id>/', views_assistant.assistant_thread_messages_api, name='assistant_thread_api'),
+    path('api/assistant/threads/<int:thread_id>/send/', views_assistant.assistant_send_api, name='assistant_send_api'),
+    path('api/assistant/threads/<int:thread_id>/rename/', views_assistant.assistant_rename_api, name='assistant_rename_api'),
+    path('api/assistant/threads/<int:thread_id>/delete/', views_assistant.assistant_delete_api, name='assistant_delete_api'),
+    path('api/assistant/threads/<int:thread_id>/submit/', views_assistant.assistant_submit_api, name='assistant_submit_api'),
     path('api/ai-intake/chat/', views.patient_ai_intake_chat_api, name='ai_intake_chat_api'),
     path('api/ai-intake/fallback/', views.patient_ai_intake_fallback_api, name='ai_intake_fallback_api'),
     path('checkin/', views.patient_checkin, name='patient_checkin'),

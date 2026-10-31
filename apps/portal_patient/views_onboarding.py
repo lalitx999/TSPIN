@@ -233,7 +233,7 @@ def onboarding_claim_account_api(request):
 
     return JsonResponse({
         'success': True,
-        'redirect_url': reverse('portal_patient:patient_ai_intake')
+        'redirect_url': reverse('portal_patient:assistant')
     })
 
 
@@ -332,5 +332,5 @@ def onboarding_new_patient_api(request):
     return JsonResponse({
         'success': True,
         'hn': patient.hn,
-        'redirect_url': reverse('portal_patient:patient_ai_intake')
+        'redirect_url': reverse('portal_patient:assistant')
     })

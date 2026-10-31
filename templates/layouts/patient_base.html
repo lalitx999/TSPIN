@@ -90,7 +90,7 @@
             <!-- Desktop Nav -->
             <nav class="d-none d-lg-flex align-items-center gap-2">
                 <a href="{% url 'portal_patient:dashboard' %}" class="patient-nav-link">แดชบอร์ด</a>
-                <a href="{% url 'portal_patient:patient_ai_intake' %}" class="patient-nav-link">ซักประวัติ AI</a>
+                <a href="{% url 'portal_patient:assistant' %}" class="patient-nav-link">ผู้ช่วย AI</a>
                 <a href="{% url 'portal_patient:patient_axes_result' %}" class="patient-nav-link">ผล 39 แกน</a>
                 <a href="{% url 'portal_patient:patient_digital_twin' %}" class="patient-nav-link">Digital Twin</a>
                 <a href="{% url 'portal_patient:portal_appointments' %}" class="patient-nav-link">นัดหมาย</a>
@@ -124,7 +124,7 @@
             <i class="fas fa-home fs-6"></i>
             <span>หน้าหลัก</span>
         </a>
-        <a href="{% url 'portal_patient:patient_ai_intake' %}">
+        <a href="{% url 'portal_patient:assistant' %}">
             <i class="fas fa-comment-medical fs-6"></i>
             <span>ปรึกษา AI</span>
         </a>

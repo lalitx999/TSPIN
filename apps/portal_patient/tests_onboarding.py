@@ -112,7 +112,7 @@ class PatientOnboardingTests(TestCase):
         data = response.json()
         self.assertTrue(data['success'])
         self.assertTrue(data['hn'].startswith('HN'))
-        self.assertEqual(data['redirect_url'], reverse('portal_patient:patient_ai_intake'))
+        self.assertEqual(data['redirect_url'], reverse('portal_patient:assistant'))
 
         # Verify database record exists
         created_patient = Patient.objects.filter(phone='0891234567').first()

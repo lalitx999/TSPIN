@@ -182,9 +182,15 @@
                 <button type="button" class="btn btn-outline-secondary" @click="navigator.clipboard.writeText(transcript); alert('คัดลอกข้อความแล้ว');">
                     <i class="fas fa-copy me-1"></i> คัดลอกข้อความ
                 </button>
-                <button type="button" class="btn btn-primary">
-                    <i class="fas fa-magic me-1"></i> ให้ AI แปลงเป็นบันทึก SOAP
-                </button>
+                <form method="post" action="{% url 'clinical:voice_soap' %}" class="m-0">
+                    {% csrf_token %}
+                    <input type="hidden" name="patient_id" :value="selectedPatient">
+                    <input type="hidden" name="transcript" :value="transcript">
+                    <button type="submit" class="btn btn-primary" :disabled="!selectedPatient || !transcript.trim()"
+                            :title="!selectedPatient ? 'กรุณาเลือกคนไข้ก่อน' : ''">
+                        <i class="fas fa-magic me-1"></i> ให้ AI แปลงเป็นบันทึก SOAP
+                    </button>
+                </form>
             </div>
         </div>
     </div>

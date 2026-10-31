@@ -206,6 +206,7 @@ function liffBindingFlow() {
         pictureUrl: '',
         token: '',
         maskedEmail: '',
+        idToken: '',
         otpCode: '',
         isLoading: false,
         errorMessage: '',
@@ -216,7 +217,13 @@ function liffBindingFlow() {
             if (this.liffId && typeof liff !== 'undefined') {
                 liff.init({ liffId: this.liffId })
                     .then(() => {
+                        if (!liff.isLoggedIn()) {
+                            liff.login();
+                            return;
+                        }
                         if (liff.isLoggedIn()) {
+                            // เซิร์ฟเวอร์ตรวจ ID token กับ LINE เอง ไม่เชื่อ userId ที่หน้าเว็บส่งไป
+                            this.idToken = liff.getIDToken() || '';
                             liff.getProfile().then(profile => {
                                 this.lineUserId = profile.userId;
                                 this.displayName = profile.displayName;
@@ -242,7 +249,7 @@ function liffBindingFlow() {
                 body: JSON.stringify({
                     identifier: this.identifier,
                     role: this.role,
-                    line_user_id: this.lineUserId
+                    line_user_id: this.lineUserId, id_token: this.idToken
                 })
             })
             .then(res => res.json().then(data => ({ status: res.status, data })))
@@ -278,7 +285,7 @@ function liffBindingFlow() {
             fetch('{% url "portal_patient:liff_register_api" %}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...this.reg, line_user_id: this.lineUserId })
+                body: JSON.stringify({ ...this.reg, line_user_id: this.lineUserId, id_token: this.idToken })
             })
             .then(res => res.json())
             .then(data => this.handleOtpResponse(data))
@@ -300,7 +307,7 @@ function liffBindingFlow() {
                 body: JSON.stringify({
                     token: this.token,
                     otp: this.otpCode,
-                    line_user_id: this.lineUserId,
+                    line_user_id: this.lineUserId, id_token: this.idToken,
                     display_name: this.displayName,
                     picture_url: this.pictureUrl,
                     role: this.role
@@ -335,7 +342,7 @@ function liffBindingFlow() {
                 },
                 body: JSON.stringify({
                     token: this.token,
-                    line_user_id: this.lineUserId,
+                    line_user_id: this.lineUserId, id_token: this.idToken,
                     display_name: this.displayName,
                     picture_url: this.pictureUrl,
                     role: this.role

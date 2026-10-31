@@ -191,6 +191,8 @@ AUTHENTICATION_BACKENDS = [
 # ==============================================================================
 LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', '')
+# LIFF app id ("{channelId}-{suffix}"): ใช้ตรวจ ID token ของผู้ใช้ LINE ในฟอร์มยืนยันตัวตน
+LINE_LIFF_ID = os.environ.get('LINE_LIFF_ID', '')
 # อีเมล (OTP ยืนยันตัวตนผ่าน LINE) ใช้ SMTP ของ Hostinger: ตั้งค่าใน .env
 # ถ้าไม่ตั้ง EMAIL_HOST จะพิมพ์อีเมลออก console (ใช้ตอนพัฒนา)
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
@@ -224,6 +226,8 @@ INTERNAL_API_TOKEN = os.environ.get('INTERNAL_API_TOKEN', '')
 AI_SERVICE_URL = os.environ.get('AI_SERVICE_URL', 'http://127.0.0.1:8088')
 # ผู้ให้บริการที่ใช้ร่าง SOAP (ต้องตรงกับ AI service) ใช้ตรวจงบก่อนเรียก
 AI_SOAP_PROVIDER = os.environ.get('AI_SOAP_PROVIDER', 'groq').strip().lower()
+# ให้บอท LINE ถามต่อด้วย AI (ใช้งบ) ปิดไว้เป็นค่าเริ่มต้น
+AI_INTAKE_BOT_ENABLED = os.environ.get('AI_INTAKE_BOT_ENABLED', 'False').lower() in ('true', '1')
 
 # Blanks LLM provider keys during tests so the suite never calls paid APIs
 TEST_RUNNER = 'config.test_runner.OfflineAITestRunner'

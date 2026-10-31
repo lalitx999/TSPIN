@@ -13,6 +13,15 @@ SECRET_KEY = os.getenv(
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'testserver']
 
+# ทดสอบ LINE กับมือถือจริงผ่าน tunnel: DEV_TUNNEL_HOSTS=.trycloudflare.com
+# host เหล่านี้เข้าได้เฉพาะ LINE webhook / LIFF (ดู DevTunnelGuardMiddleware)
+DEV_TUNNEL_HOSTS = tuple(h.strip().lower() for h in os.getenv('DEV_TUNNEL_HOSTS', '').split(',') if h.strip())
+ALLOWED_HOSTS += list(DEV_TUNNEL_HOSTS)
+if DEV_TUNNEL_HOSTS:
+    MIDDLEWARE = ['accounts.middleware.DevTunnelGuardMiddleware'] + MIDDLEWARE
+    # LIFF เปิดผ่าน https ของ tunnel และส่ง X-Forwarded-Proto มา
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Database: PostgreSQL with SQLite fallback for offline development
 DB_NAME = os.getenv('DB_NAME', 'drpatrcl_sys')
 DB_USER = os.getenv('DB_USER', 'postgres')

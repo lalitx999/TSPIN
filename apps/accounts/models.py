@@ -63,6 +63,11 @@ class User(AbstractUser):
         help_text="Cryptographic Hash (bcrypt/argon2) สำหรับปลดล็อกกล่องประวัติคนไข้ส่วนตัว"
     )
 
+    can_reply_line_chat = models.BooleanField(
+        default=False,
+        help_text="ตอบแชท LINE OA จากหน้า Inbox ได้ (owner/แพทย์ได้เสมอ; แอดมิน/พยาบาลต้องเปิดสิทธิ์รายคน)"
+    )
+
     must_change_password = models.BooleanField(
         default=True,
         help_text="บังคับเปลี่ยนรหัสผ่านในการเข้าใช้งานครั้งแรก"
@@ -82,6 +87,15 @@ class User(AbstractUser):
     def is_clinical_staff(self):
         """ตรวจสอบว่าเป็นบุคลากรทางการแพทย์ (หมอ/พยาบาล/แอดมิน) หรือไม่"""
         return self.role in [self.Role.ADMIN, self.Role.DOCTOR, self.Role.NURSE, self.Role.NURSING_ASSISTANT]
+
+    @property
+    def may_reply_line_chat(self) -> bool:
+        """
+        สิทธิ์ LINE OA 4 ระดับ: owner (superuser) > แพทย์ > แอดมินที่ตอบแชทได้ > แอดมินที่ดูได้อย่างเดียว
+        """
+        if not self.is_active or not (self.is_clinical_staff or self.is_superuser):
+            return False
+        return self.is_superuser or self.role == self.Role.DOCTOR or self.can_reply_line_chat
 
     @property
     def is_doctor(self):

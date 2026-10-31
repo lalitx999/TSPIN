@@ -178,6 +178,14 @@ class CommunicationRecord(models.Model):
     direction = models.CharField(max_length=15, choices=DirectionChoices.choices, default=DirectionChoices.INCOMING)
     message_type = models.CharField(max_length=20, choices=MessageTypeChoices.choices, default=MessageTypeChoices.TEXT)
     content = models.TextField(blank=True, help_text="เนื้อหาข้อความหรือคำอธิบาย")
+    sent_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='line_messages_sent',
+        help_text="บุคลากรที่ส่งข้อความขาออกจากหน้า Inbox",
+    )
     media_url = models.URLField(max_length=1000, blank=True, help_text="URL ไฟล์ภาพ/เอกสารที่จัดเก็บบน Server")
     raw_payload = models.JSONField(default=dict, blank=True, help_text="Raw JSON Webhook จาก LINE Platform")
     is_clinical_candidate = models.BooleanField(

@@ -418,3 +418,59 @@ def staff_reject_review_item_api(request: HttpRequest, item_id: int) -> JsonResp
     except Exception as e:
         logger.error(f"[Staff UI] Error rejecting review item #{item_id}: {e}", exc_info=True)
         return JsonResponse({'status': 'error', 'message': f'เกิดข้อผิดพลาด: {str(e)}'}, status=500)
+
+
+LINE_TEXT_MAX = 2000
+
+
+@clinical_staff_required
+@require_POST
+def staff_inbox_reply_action(request: HttpRequest) -> HttpResponse:
+    """
+    ตอบแชท LINE จากหน้า Inbox (Push Message) เฉพาะผู้มีสิทธิ์ตอบแชท
+    บันทึกเป็น CommunicationRecord ขาออกพร้อมผู้ส่ง และ AuditLog
+    """
+    from django.contrib import messages as flash
+    from django.urls import reverse
+    import uuid
+    from patients.line_service import LineMessagingService
+
+    line_user_id = request.POST.get('line_user_id', '').strip()
+    text = request.POST.get('text', '').strip()
+    back = f"{reverse('root_staff_inbox')}?user_id={line_user_id}"
+
+    if not request.user.may_reply_line_chat:
+        AuditLog.objects.create(
+            user=request.user, action='LINE_REPLY_DENIED', model='LineUser', object_id=line_user_id,
+            client_ip=request.META.get('REMOTE_ADDR'), user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+        )
+        raise PermissionDenied("บัญชีนี้ไม่มีสิทธิ์ตอบแชท LINE")
+
+    line_user = get_object_or_404(LineUser, line_user_id=line_user_id)
+    if not text:
+        flash.error(request, "กรุณาพิมพ์ข้อความ")
+        return redirect(back)
+    if len(text) > LINE_TEXT_MAX:
+        flash.error(request, f"ข้อความยาวเกิน {LINE_TEXT_MAX} ตัวอักษร")
+        return redirect(back)
+
+    if not LineMessagingService.push_message(line_user.line_user_id, [{"type": "text", "text": text}]):
+        flash.error(request, "ส่งข้อความไป LINE ไม่สำเร็จ กรุณาลองใหม่")
+        return redirect(back)
+
+    record = CommunicationRecord.objects.create(
+        line_message_id=f"out_{uuid.uuid4().hex}",
+        line_user=line_user,
+        patient=line_user.active_patient,
+        direction=CommunicationRecord.DirectionChoices.OUTGOING,
+        message_type=CommunicationRecord.MessageTypeChoices.TEXT,
+        content=text,
+        sent_by=request.user,
+        raw_payload={},
+    )
+    AuditLog.objects.create(
+        user=request.user, action='LINE_REPLY_SENT', model='CommunicationRecord', object_id=str(record.pk),
+        changes={'line_user_id': line_user.line_user_id, 'length': len(text)},
+        client_ip=request.META.get('REMOTE_ADDR'), user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+    )
+    return redirect(back)

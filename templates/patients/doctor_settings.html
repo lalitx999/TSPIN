@@ -87,6 +87,41 @@
     </div>
     {% endif %}
 
+    {% if chat_staff %}
+    <!-- สิทธิ์ตอบแชท LINE OA (เฉพาะ owner) -->
+    <div class="card shadow-sm border">
+        <div class="card-header bg-light py-2.5 px-3 border-bottom">
+            <h6 class="fw-bold text-dark mb-0 small"><i class="fab fa-line me-1"></i> สิทธิ์ตอบแชท LINE OA</h6>
+        </div>
+        <div class="card-body p-3">
+            <p class="small text-muted mb-2">Owner และแพทย์ตอบแชทได้เสมอ ส่วนแอดมิน/พยาบาล/ผู้ช่วยพยาบาลที่ไม่ได้เลือก จะดูแชทได้อย่างเดียว</p>
+            <form method="post" action="{% url 'patients:doctor_settings' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="set_chat_permissions">
+                <table class="table table-sm align-middle small mb-3">
+                    <thead class="table-light"><tr><th>บัญชี</th><th>บทบาท</th><th class="text-center">ตอบแชทได้</th></tr></thead>
+                    <tbody>
+                    {% for u in chat_staff %}
+                        <tr>
+                            <td>{{ u.get_full_name|default:u.username }} <span class="text-muted">({{ u.email|default:u.username }})</span></td>
+                            <td>{% if u.is_superuser %}Owner{% else %}{{ u.get_role_display }}{% endif %}</td>
+                            <td class="text-center">
+                                {% if u.is_superuser or u.role == 'doctor' %}
+                                    <input type="checkbox" class="form-check-input" checked disabled title="ได้เสมอ">
+                                {% else %}
+                                    <input type="checkbox" class="form-check-input" name="can_reply" value="{{ u.pk }}" {% if u.can_reply_line_chat %}checked{% endif %}>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save me-1"></i> บันทึกสิทธิ์</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- รหัสเปิดกล่องส่วนตัว: ใช้ปลดล็อกกล่องประวัติ/รอบซักประวัติ LINE -->
     <div class="card shadow-sm border" id="box-password">
         <div class="card-header bg-light py-2.5 px-3 border-bottom">

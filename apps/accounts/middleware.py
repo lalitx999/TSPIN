@@ -80,3 +80,26 @@ class ForcePasswordChangeMiddleware:
         ):
             return redirect('accounts:password_change')
         return self.get_response(request)
+
+
+class DevTunnelGuardMiddleware:
+    """
+    ตอนพัฒนาที่เปิด tunnel (cloudflared/ngrok) ให้ LINE ส่ง webhook เข้าเครื่อง:
+    request ที่มาทาง host ของ tunnel ใช้ได้เฉพาะ path ของ LINE webhook และหน้า LIFF เท่านั้น
+    หน้าอื่น (เวชระเบียน, admin, ฯลฯ) ตอบ 404 เพื่อไม่ให้ข้อมูลผู้ป่วยในเครื่อง dev หลุดออกอินเทอร์เน็ต
+    ทำงานเฉพาะเมื่อตั้ง DEV_TUNNEL_HOSTS
+    """
+    PUBLIC_PREFIXES = ('/line/webhook/', '/liff/', '/patient/line/liff/', '/static/', '/health/')
+
+    def __init__(self, get_response):
+        from django.conf import settings
+        self.get_response = get_response
+        self.tunnel_hosts = tuple(getattr(settings, 'DEV_TUNNEL_HOSTS', ()))
+
+    def __call__(self, request):
+        if self.tunnel_hosts:
+            host = request.META.get('HTTP_HOST', '').split(':')[0].lower()
+            if host.endswith(self.tunnel_hosts) and not request.path.startswith(self.PUBLIC_PREFIXES):
+                from django.http import HttpResponseNotFound
+                return HttpResponseNotFound('Not Found')
+        return self.get_response(request)

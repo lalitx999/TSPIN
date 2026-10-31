@@ -32,6 +32,7 @@ urlpatterns = [
     path('intake/<uuid:box_id>/summarize/', views_intake.intake_summarize_action, name='intake_summarize'),
     path('intake/<uuid:box_id>/commit/', views_intake.intake_commit_action, name='intake_commit'),
     path('intake/<uuid:box_id>/media/<str:media_id>/', views_intake.intake_media_view, name='intake_media'),
+    path('voice-soap/', views_intake.voice_soap_action, name='voice_soap'),
 
     path('reports/', views_report.report_dashboard_view, name='report_dashboard'),
     path('reports/create/<int:patient_id>/', views_report.report_create_view, name='report_create'),

@@ -232,3 +232,84 @@ class AIBudgetTests(IntakeTestBase):
         with patch('clinical.services_intake.httpx.post', return_value=fake):
             services_intake.summarize_with_ai(self.box, self.nurse)
         self.assertEqual(AIUsageLog.objects.get().prompt_tokens, 50)
+
+
+class Phase3ChatAndVoiceTests(IntakeTestBase):
+    def setUp(self):
+        super().setUp()
+        from patients.models import LineUser
+        self.line_user = LineUser.objects.create(line_user_id='U_INTAKE_1', display_name='สมหญิง', active_patient=self.patient)
+        self.nurse = User.objects.create_user(username='nurse_p3', password='NursePass2026!x', role=User.Role.NURSE)
+        self.doctor = User.objects.create_user(username='dr_p3', password='DoctorPass2026!x', role=User.Role.DOCTOR)
+
+    def _reply(self, user, text='นัดตรวจพรุ่งนี้ 10 โมงนะคะ'):
+        self.client.force_login(user)
+        with patch('patients.line_service.LineMessagingService.push_message', return_value=True) as push:
+            resp = self.client.post(reverse('root_staff_inbox_reply'), {'line_user_id': 'U_INTAKE_1', 'text': text})
+        return resp, push
+
+    def test_nurse_without_permission_cannot_reply(self):
+        from patients.models import CommunicationRecord
+        resp, push = self._reply(self.nurse)
+        self.assertEqual(resp.status_code, 403)
+        push.assert_not_called()
+        self.assertFalse(CommunicationRecord.objects.filter(direction='OUTGOING').exists())
+
+    def test_doctor_reply_is_pushed_and_recorded(self):
+        from patients.models import CommunicationRecord
+        resp, push = self._reply(self.doctor)
+        self.assertEqual(resp.status_code, 302)
+        push.assert_called_once()
+        rec = CommunicationRecord.objects.get(direction='OUTGOING')
+        self.assertEqual(rec.sent_by, self.doctor)
+        self.assertEqual(rec.patient, self.patient)
+
+    def test_owner_grants_chat_permission_to_nurse(self):
+        owner = User.objects.create_superuser(username='owner_p3', password='OwnerPass2026!x', email='o@x.test')
+        self.client.force_login(owner)
+        self.client.post(reverse('patients:doctor_settings'), {'action': 'set_chat_permissions', 'can_reply': [str(self.nurse.pk)]})
+        self.nurse.refresh_from_db()
+        self.assertTrue(self.nurse.may_reply_line_chat)
+        _, push = self._reply(self.nurse)
+        push.assert_called_once()
+
+    def test_non_owner_cannot_change_chat_permissions(self):
+        self.client.force_login(self.doctor)
+        resp = self.client.post(reverse('patients:doctor_settings'), {'action': 'set_chat_permissions', 'can_reply': [str(self.nurse.pk)]})
+        self.assertEqual(resp.status_code, 403)
+        self.nurse.refresh_from_db()
+        self.assertFalse(self.nurse.can_reply_line_chat)
+
+    def test_voice_dictation_creates_unlocked_box_with_ai_draft(self):
+        self.client.force_login(self.doctor)
+        fake = MagicMock(status_code=200)
+        fake.json.return_value = {'success': True, 'is_fallback': False, 'gateway': 'groq:test',
+                                  'soap': {'subjective': 'ปวดหลัง', 'objective': '', 'assessment': '', 'plan': 'ติดตาม'}}
+        with patch('clinical.services_intake.httpx.post', return_value=fake):
+            resp = self.client.post(reverse('clinical:voice_soap'), {'patient_id': self.patient.pk, 'transcript': 'คนไข้ปวดหลังสามวัน'})
+        box = Box.objects.get(source=Box.Source.CLINIC)
+        self.assertRedirects(resp, reverse('clinical:intake_detail', args=[box.id]), fetch_redirect_response=False)
+        self.assertEqual(box.contents['soap']['plan'], 'ติดตาม')
+        detail = self.client.get(reverse('clinical:intake_detail', args=[box.id]))
+        self.assertContains(detail, 'คนไข้ปวดหลังสามวัน')  # ผู้บันทึกเปิดได้ทันที
+
+    @override_settings(AI_INTAKE_BOT_ENABLED=True)
+    def test_ai_followup_question_replied_and_capped(self):
+        fake = MagicMock(status_code=200)
+        fake.json.return_value = {'success': True, 'question': 'ปวดมานานเท่าไหร่แล้วคะ', 'provider': 'groq',
+                                  'model': 'm', 'usage': {'prompt_tokens': 10, 'completion_tokens': 5}}
+        with patch('clinical.services_intake.httpx.post', return_value=fake) as post, \
+             patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            for i in range(7):
+                _signed_post(self.client, [_text_event('U_INTAKE_1', f'f{i}', f'ปวดหัวมาก ครั้งที่ {i}')])
+        self.assertEqual(post.call_count, services_intake.MAX_AI_FOLLOWUPS_PER_SESSION)
+        sent = post.call_args.kwargs['json']['transcript']
+        self.assertIn('ผู้ป่วย:', sent)
+        box = Box.objects.get(patient=self.patient, source=Box.Source.LINE)
+        self.assertEqual(sum(1 for m in box.contents['messages'] if m['sender'] == 'bot'), 5)
+        self.assertIn('ปวดมานานเท่าไหร่แล้วคะ', reply.call_args_list[0].args[1][0]['text'])
+
+    def test_ai_followup_off_by_default(self):
+        with patch('clinical.services_intake.httpx.post') as post:
+            _signed_post(self.client, [_text_event('U_INTAKE_1', 'off1', 'ปวดท้อง')])
+        post.assert_not_called()

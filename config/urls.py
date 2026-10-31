@@ -62,6 +62,7 @@ urlpatterns = [
     path('staff/inbox/', views_staff.staff_inbox_view, name='root_staff_inbox'),
     path('staff/review-queue/', views_staff.staff_review_queue_view, name='root_staff_review_queue'),
     path('staff/api/inbox/create-review-item/', views_staff.staff_create_review_from_message_api, name='root_api_create_review_from_message'),
+    path('staff/inbox/reply/', views_staff.staff_inbox_reply_action, name='root_staff_inbox_reply'),
     path('staff/api/review-queue/poll/', views_staff.staff_review_queue_poll_api, name='root_api_review_queue_poll'),
     path('staff/api/review-item/<int:item_id>/approve/', views_staff.staff_approve_review_item_api, name='root_api_approve_review_item'),
     path('staff/api/review-item/<int:item_id>/reject/', views_staff.staff_reject_review_item_api, name='root_api_reject_review_item'),

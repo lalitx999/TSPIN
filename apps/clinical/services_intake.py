@@ -29,6 +29,7 @@ logger = logging.getLogger('tspi.clinical.intake')
 SESSION_IDLE_LIMIT = timedelta(hours=24)
 SOAP_FIELDS = ('subjective', 'objective', 'assessment', 'plan')
 MEDIA_LABELS = {'image': 'รูปภาพ', 'audio': 'ข้อความเสียง', 'video': 'วิดีโอ', 'file': 'ไฟล์'}
+SENDER_LABELS = {'patient': 'ผู้ป่วย', 'bot': 'ผู้ช่วยซักประวัติ', 'staff': 'บุคลากร'}
 
 
 def open_session(patient, source: str) -> Box:
@@ -86,10 +87,11 @@ def close_session(box: Box, reason: str = 'patient_done') -> Box:
 def transcript_text(box: Box) -> str:
     lines = []
     for m in (box.contents or {}).get('messages', []):
+        who = SENDER_LABELS.get(m.get('sender'), 'ผู้ป่วย')
         if m.get('kind') == 'text' and m.get('text'):
-            lines.append(m['text'])
+            lines.append(f"{who}: {m['text']}")
         elif m.get('kind') != 'text':
-            lines.append(f"[ผู้ป่วยส่ง{MEDIA_LABELS.get(m.get('kind'), 'ไฟล์')}]")
+            lines.append(f"{who}: [ส่ง{MEDIA_LABELS.get(m.get('kind'), 'ไฟล์')}]")
     return "\n".join(lines)
 
 
@@ -144,6 +146,46 @@ def summarize_with_ai(box: Box, user) -> Tuple[bool, str]:
     AuditLog.objects.create(user=user, action='INTAKE_AI_SUMMARY_CREATED', model='Box', object_id=str(box.id),
                             changes={'gateway': data.get('gateway', '')})
     return True, ''
+
+
+MAX_AI_FOLLOWUPS_PER_SESSION = 5
+
+
+def ai_followup_question(box: Box) -> Optional[str]:
+    """
+    ให้ AI ถามต่อ 1 ข้อ (เปิดด้วย AI_INTAKE_BOT_ENABLED) จำกัดจำนวนต่อรอบและตรวจงบก่อนเรียก
+    ล้มเหลวเมื่อไหร่คืน None ให้บอทใช้ข้อความตอบรับแบบเดิม
+    """
+    if not settings.AI_INTAKE_BOT_ENABLED:
+        return None
+    contents = box.contents or {}
+    if contents.get('ai_followups', 0) >= MAX_AI_FOLLOWUPS_PER_SESSION:
+        return None
+    provider = settings.AI_SOAP_PROVIDER
+    if not ai_budget.check_budget(provider)[0]:
+        return None
+    try:
+        resp = httpx.post(
+            f"{settings.AI_SERVICE_URL}/api/ai/intake/followup",
+            json={'transcript': TextDeidentifier.sanitize(transcript_text(box))['sanitized_text']},
+            headers={'X-Internal-Token': settings.INTERNAL_API_TOKEN},
+            timeout=20.0,
+        )
+        data = resp.json() if resp.status_code == 200 else {}
+    except (httpx.HTTPError, ValueError) as exc:
+        logger.warning(f"[Intake AI] follow-up failed for box {box.id}: {exc}")
+        return None
+    if any((data.get('usage') or {}).values()):
+        ai_budget.record_usage(data.get('provider') or provider, data.get('model', ''), data['usage'], 'intake_followup')
+    question = (data.get('question') or '').strip() if data.get('success') else ''
+    if not question:
+        return None
+    contents = dict(box.contents or {})
+    contents['ai_followups'] = contents.get('ai_followups', 0) + 1
+    box.contents = contents
+    box.save(update_fields=['contents', 'signature'])
+    append_message(box, 'text', text=question, sender='bot')
+    return question
 
 
 def commit_to_emr(box: Box, user, soap: Dict[str, str]) -> PatientHistory:

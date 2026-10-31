@@ -868,6 +868,14 @@ class AIServiceAuthTests(TestCase):
                                     headers={'X-Internal-Token': ai_config.INTERNAL_API_TOKEN})
         self.assertEqual(resp.status_code, 404)
 
+    def test_intake_followup_offline_returns_no_question(self):
+        from ai_service.config import config as ai_config
+        headers = {'X-Internal-Token': ai_config.INTERNAL_API_TOKEN}
+        self.assertEqual(self.api_client.post('/api/ai/intake/followup', json={'transcript': 'x'}).status_code, 401)
+        resp = self.api_client.post('/api/ai/intake/followup', json={'transcript': 'ผู้ป่วย: ปวดหัว'}, headers=headers)
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(resp.json()['success'])  # ไม่มีคีย์ในเทสต์ -> ไม่มีคำถาม ไม่ใช้แม่แบบแทน
+
     def test_copilot_never_falls_back_to_default_products(self):
         from unittest.mock import patch
         from ai_service import main as ai_main
@@ -991,3 +999,23 @@ class ForcedPasswordChangeTests(TestCase):
             'email_or_username': 'prov@tspi.test', 'password': 'InitialPass2026!x',
         })
         self.assertNotIn('evil.example', resp['Location'])
+
+
+class DevTunnelGuardTests(TestCase):
+    """ทาง tunnel เปิดได้เฉพาะ LINE webhook / LIFF หน้าอื่นต้อง 404 แม้ล็อกอินแล้ว"""
+
+    def test_only_line_paths_reachable_via_tunnel_host(self):
+        from django.conf import settings
+        tunnel = 'abc-def.trycloudflare.com'
+        with self.settings(DEV_TUNNEL_HOSTS=('.trycloudflare.com',), ALLOWED_HOSTS=['.trycloudflare.com', 'testserver'],
+                           MIDDLEWARE=['accounts.middleware.DevTunnelGuardMiddleware'] + list(settings.MIDDLEWARE)):
+            doctor = User.objects.create_user(username='dr_tunnel', password='DoctorPass2026!x', role=User.Role.DOCTOR)
+            client = Client(HTTP_HOST=tunnel)
+            client.force_login(doctor)
+            for path in ('/doctor/patients/', '/admin/', '/accounts/login/', '/clinical/intake/'):
+                self.assertEqual(client.get(path).status_code, 404, path)
+            self.assertNotEqual(client.get('/liff/bind/').status_code, 404)
+            # localhost ยังใช้ได้ตามปกติ
+            local = Client()
+            local.force_login(doctor)
+            self.assertEqual(local.get('/doctor/patients/').status_code, 200)

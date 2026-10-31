@@ -25,6 +25,7 @@ from django.db import transaction
 from django.db.models import Value
 from django.db.models.functions import Replace, Upper
 import hashlib
+import httpx
 
 from accounts.models import AuditLog
 from accounts.views import get_client_ip
@@ -55,6 +56,35 @@ def liff_binding_page_view(request: HttpRequest) -> HttpResponse:
         'liff_id': liff_id,
         'roles': roles,
     })
+
+
+def resolve_line_user_id(body: dict):
+    """
+    ระบุตัวผู้ใช้ LINE จาก LIFF ID token ที่ LINE ลงนาม (ไม่เชื่อ line_user_id ที่หน้าเว็บส่งมาเอง)
+    ตั้ง LINE_LIFF_ID แล้ว: ต้องมี id_token และ LINE ต้องยืนยันว่าออกให้ channel นี้
+    ยังไม่ตั้ง: ยอมรับ line_user_id จากหน้าเว็บเฉพาะตอน DEBUG (โหมดจำลอง) เท่านั้น
+    คืน (line_user_id, None) หรือ ('', JsonResponse error)
+    """
+    liff_id = getattr(settings, 'LINE_LIFF_ID', '')
+    if not liff_id:
+        if settings.DEBUG:
+            return body.get('line_user_id', '').strip(), None
+        return '', JsonResponse({'status': 'error', 'message': 'ระบบยังไม่ได้ตั้งค่า LINE LIFF'}, status=503)
+
+    id_token = (body.get('id_token') or '').strip()
+    if not id_token:
+        return '', JsonResponse({'status': 'error', 'message': 'กรุณาเปิดหน้านี้จากแอป LINE'}, status=401)
+    channel_id = liff_id.split('-', 1)[0]
+    try:
+        resp = httpx.post('https://api.line.me/oauth2/v2.1/verify',
+                          data={'id_token': id_token, 'client_id': channel_id}, timeout=5.0)
+        claims = resp.json() if resp.status_code == 200 else {}
+    except (httpx.HTTPError, ValueError):
+        claims = {}
+    if not claims.get('sub'):
+        logger.warning("[LIFF] ID token verification failed")
+        return '', JsonResponse({'status': 'error', 'message': 'ยืนยันตัวตน LINE ไม่สำเร็จ กรุณาเปิดหน้านี้ใหม่จากแอป LINE'}, status=401)
+    return claims['sub'], None
 
 
 def _find_patient(identifier: str):
@@ -144,7 +174,9 @@ def liff_request_otp_api(request: HttpRequest) -> JsonResponse:
         return JsonResponse({'status': 'error', 'message': 'รูปแบบข้อมูล JSON ไม่ถูกต้อง'}, status=400)
 
     identifier = (body.get('identifier') or body.get('hn') or '').strip()
-    line_user_id = body.get('line_user_id', '').strip()
+    line_user_id, identity_error = resolve_line_user_id(body)
+    if identity_error:
+        return identity_error
     if not identifier:
         return JsonResponse({'status': 'error', 'message': 'กรุณาระบุ HN หรือเลขบัตรประชาชน 13 หลัก'}, status=400)
 
@@ -178,7 +210,9 @@ def liff_register_api(request: HttpRequest) -> JsonResponse:
     national_id = body.get('national_id', '').replace('-', '').replace(' ', '')
     phone = body.get('phone', '').replace('-', '').replace(' ', '')
     email = body.get('email', '').strip().lower()
-    line_user_id = body.get('line_user_id', '').strip()
+    line_user_id, identity_error = resolve_line_user_id(body)
+    if identity_error:
+        return identity_error
 
     if not (first_name and last_name and phone and email):
         return JsonResponse({'status': 'error', 'message': 'กรุณากรอกชื่อ นามสกุล เบอร์โทร และอีเมลให้ครบ'}, status=400)
@@ -253,7 +287,9 @@ def liff_verify_otp_api(request: HttpRequest) -> JsonResponse:
 
     token_str = body.get('token', '').strip()
     otp_code = body.get('otp', '').strip()
-    line_user_id = body.get('line_user_id', '').strip()
+    line_user_id, identity_error = resolve_line_user_id(body)
+    if identity_error:
+        return identity_error
     display_name = body.get('display_name', '').strip()
     picture_url = body.get('picture_url', '').strip()
     role = body.get('role', LinePatientBinding.RoleChoices.SELF).strip()
@@ -388,7 +424,9 @@ def liff_request_staff_assisted_api(request: HttpRequest) -> JsonResponse:
         return JsonResponse({'status': 'error', 'message': 'รูปแบบข้อมูล JSON ไม่ถูกต้อง'}, status=400)
 
     token_str = body.get('token', '').strip()
-    line_user_id = body.get('line_user_id', '').strip()
+    line_user_id, identity_error = resolve_line_user_id(body)
+    if identity_error:
+        return identity_error
     display_name = body.get('display_name', '').strip()
     picture_url = body.get('picture_url', '').strip()
     role = body.get('role', LinePatientBinding.RoleChoices.SELF).strip()

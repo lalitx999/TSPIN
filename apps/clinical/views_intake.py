@@ -18,7 +18,7 @@ from clinical import media_store, services_intake
 from clinical.models import Box
 from clinical.views_box import is_box_unlocked
 
-INTAKE_SOURCES = (Box.Source.LINE, Box.Source.WEB)
+INTAKE_SOURCES = (Box.Source.LINE, Box.Source.WEB, Box.Source.CLINIC)
 STATUS_TABS = {
     'waiting': ('รอตรวจ', [Box.Status.DONE]),
     'open': ('กำลังคุย', [Box.Status.DRAFT]),
@@ -130,3 +130,38 @@ def intake_media_view(request: HttpRequest, box_id, media_id: str) -> HttpRespon
     response['Content-Disposition'] = 'inline'
     response['X-Content-Type-Options'] = 'nosniff'
     return response
+
+
+@require_POST
+@clinical_staff_required
+def voice_soap_action(request: HttpRequest) -> HttpResponse:
+    """
+    บันทึกเสียงแพทย์ (ถอดความในเบราว์เซอร์) -> กล่องช่องทางคลินิก -> AI ร่าง SOAP -> หน้าตรวจทาน/บันทึกเข้าเวชระเบียน
+    ผู้บันทึกเป็นเจ้าของเนื้อหาเอง จึงปลดล็อกกล่องนี้ให้ในเซสชันทันที
+    """
+    from patients.models import Patient
+    patient = get_object_or_404(Patient, pk=request.POST.get('patient_id') or 0)
+    transcript = request.POST.get('transcript', '').strip()
+    if not transcript:
+        messages.error(request, "ยังไม่มีข้อความจากการบันทึกเสียง")
+        return redirect('patients:doctor_voice_form')
+
+    box = Box.objects.create(
+        patient=patient, source=Box.Source.CLINIC, status=Box.Status.DONE,
+        contents={'messages': [], 'soap': {}, 'soap_source': 'none', 'origin': 'voice_dictation'},
+        last_activity_at=timezone.now(), processed_at=timezone.now(), opened_by=request.user, opened_at=timezone.now(),
+    )
+    services_intake.append_message(box, 'text', text=transcript, sender='staff')
+    request.session[f"box_unlocked_{box.id}"] = True
+    AuditLog.objects.create(
+        user=request.user, action='VOICE_DICTATION_CAPTURED', model='Box', object_id=str(box.id),
+        changes={'patient_hn': patient.hn, 'length': len(transcript)},
+        client_ip=get_client_ip(request), user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+    )
+
+    ok, error = services_intake.summarize_with_ai(box, request.user)
+    if ok:
+        messages.success(request, "AI ร่าง SOAP จากเสียงบันทึกแล้ว กรุณาตรวจทานก่อนบันทึกเข้าเวชระเบียน")
+    else:
+        messages.warning(request, f"{error} สามารถพิมพ์ SOAP เองแล้วบันทึกได้")
+    return redirect('clinical:intake_detail', box_id=box.id)

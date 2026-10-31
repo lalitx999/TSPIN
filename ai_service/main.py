@@ -421,6 +421,42 @@ async def generate_soap_endpoint(
     }
 
 
+class IntakeFollowupRequest(BaseModel):
+    transcript: str = Field(..., description="บทสนทนาที่ลบข้อมูลระบุตัวตนแล้ว")
+
+
+INTAKE_FOLLOWUP_PROMPT = (
+    "คุณคือผู้ช่วยพยาบาลของคลินิก ทำหน้าที่ซักประวัติผ่านแชท LINE เป็นภาษาไทยสุภาพ "
+    "อ่านข้อความของผู้ป่วยแล้วถามคำถามต่อเพียง 1 ข้อ สั้นไม่เกิน 2 ประโยค เพื่อให้ได้ข้อมูลที่แพทย์ต้องใช้ "
+    "เช่น ระยะเวลา ความรุนแรง ตำแหน่ง ปัจจัยกระตุ้น อาการร่วม ยาที่ใช้อยู่ "
+    "ห้ามวินิจฉัยโรค ห้ามแนะนำยาหรือการรักษา ห้ามสัญญาผลการรักษา "
+    "ถ้าข้อมูลครบพอแล้ว ให้ขอบคุณและบอกให้กดปุ่ม \"เสร็จแล้ว\" "
+    "ถ้ามีอาการที่อาจเป็นภาวะฉุกเฉิน ให้แนะนำโทร 1669 ทันที"
+)
+
+
+@app.post("/api/ai/intake/followup")
+async def intake_followup_endpoint(req: IntakeFollowupRequest):
+    """คำถามซักประวัติต่อ 1 ข้อสำหรับบอท LINE (ข้อความเข้ามาต้องลบข้อมูลระบุตัวตนแล้ว)"""
+    res = await gateway.call_chat(
+        config.SOAP_PROVIDER,
+        messages=[
+            {"role": "system", "content": INTAKE_FOLLOWUP_PROMPT},
+            {"role": "user", "content": TextDeidentifier.sanitize(req.transcript)["sanitized_text"][-4000:]},
+        ],
+        temperature=0.3,
+        max_tokens=200,
+    )
+    question = (res.get("content") or "").strip() if res.get("success") else ""
+    return {
+        "success": bool(question),
+        "question": question[:500],
+        "provider": res.get("provider", config.SOAP_PROVIDER),
+        "model": res.get("model", ""),
+        "usage": res.get("usage", {}),
+    }
+
+
 class LibrarySearchRequest(BaseModel):
     query: str = Field(..., description="คำค้นหาอาการหรือแกนชีวภาพ")
     lab_markers: Optional[List[Dict[str, Any]]] = Field(default=[], description="ผลแล็บเพื่อแมปกับแกน")

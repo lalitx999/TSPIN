@@ -6,6 +6,7 @@ Enforces HTMX Live Search, SOAP Note Logging, and Full AuditLog.
 from datetime import date, datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
@@ -438,12 +439,10 @@ def doctor_tspi_brain(request):
 @clinical_staff_required
 def doctor_chats(request):
     """
-    ห้องแชทสื่อสารระหว่างแพทย์กับคนไข้ผ่าน LINE OA (/doctor/chats/)
+    ห้องแชทผ่าน LINE OA (/doctor/chats/) — เดิมเป็นหน้าจำลองที่ไม่ได้ส่งข้อความจริง
+    ส่งต่อไปยัง Unified Inbox ที่อ่าน/ตอบแชทจริง
     """
-    patients = Patient.objects.all().order_by('-updated_at')[:10]
-    return render(request, 'patients/doctor_chats.html', {
-        'patients': patients,
-    })
+    return redirect('root_staff_inbox')
 
 
 @clinical_staff_required
@@ -463,6 +462,26 @@ def doctor_settings(request):
     ตั้งค่าบัญชีแพทย์ ลายเซ็นดิจิทัล และข้อมูลคลินิก (/doctor/settings/)
     รองรับการตั้ง/เปลี่ยนรหัสเปิดกล่องส่วนตัว (ต้องยืนยันด้วยรหัสผ่านเข้าสู่ระบบ)
     """
+    if request.method == 'POST' and request.POST.get('action') == 'set_chat_permissions':
+        if not request.user.is_superuser:
+            raise PermissionDenied("เฉพาะเจ้าของระบบ (owner) เท่านั้น")
+        from accounts.models import User
+        allowed_ids = {int(x) for x in request.POST.getlist('can_reply') if x.isdigit()}
+        changed = []
+        for staff in User.objects.filter(is_superuser=False, role__in=['admin', 'nurse', 'nursing_assistant', 'staff']):
+            new_value = staff.pk in allowed_ids
+            if staff.can_reply_line_chat != new_value:
+                staff.can_reply_line_chat = new_value
+                staff.save(update_fields=['can_reply_line_chat'])
+                changed.append({'user': staff.username, 'can_reply_line_chat': new_value})
+        AuditLog.objects.create(
+            user=request.user, action='LINE_CHAT_PERMISSIONS_UPDATED', model='User', object_id='bulk',
+            changes={'changed': changed}, client_ip=request.META.get('REMOTE_ADDR'),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+        )
+        messages.success(request, f"บันทึกสิทธิ์ตอบแชทแล้ว ({len(changed)} รายการเปลี่ยน)")
+        return redirect('patients:doctor_settings')
+
     if request.method == 'POST' and request.POST.get('action') == 'set_box_password':
         new_pw = request.POST.get('box_password', '')
         if not request.user.check_password(request.POST.get('current_password', '')):
@@ -486,7 +505,11 @@ def doctor_settings(request):
     if request.user.is_superuser or request.user.role == 'admin':
         from intelligence.ai_budget import monthly_summary
         ai_usage = monthly_summary()
-    return render(request, 'patients/doctor_settings.html', {'ai_usage': ai_usage})
+    chat_staff = None
+    if request.user.is_superuser:
+        from accounts.models import User
+        chat_staff = User.objects.filter(is_active=True, role__in=['doctor', 'admin', 'nurse', 'nursing_assistant', 'staff']).order_by('role', 'username')
+    return render(request, 'patients/doctor_settings.html', {'ai_usage': ai_usage, 'chat_staff': chat_staff})
 
 
 @clinical_staff_required

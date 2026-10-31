@@ -220,7 +220,7 @@
                         </div>
                         {% else %}
                         <div class="text-end text-white-50 font-monospace mt-1" style="font-size: 0.65rem;">
-                            {{ msg.created_at|date:"d/m H:i" }} น.
+                            {% if msg.sent_by %}{{ msg.sent_by.get_full_name|default:msg.sent_by.username }} · {% endif %}{{ msg.created_at|date:"d/m H:i" }} น.
                         </div>
                         {% endif %}
                     </div>
@@ -235,12 +235,22 @@
 
             <!-- Footer / Message Input Preview -->
             <div class="p-3 bg-white border-top">
-                <div class="d-flex align-items-center gap-2">
-                    <input type="text" class="form-control" placeholder="พิมพ์ข้อความตอบกลับไปยัง LINE OA ของคนไข้..." disabled>
-                    <button class="btn btn-primary" type="button" disabled title="การส่งข้อความตอบกลับโดยตรงจะเปิดใช้งานใน Phase 3">
+                {% if request.user.may_reply_line_chat %}
+                <form method="post" action="{% url 'root_staff_inbox_reply' %}" class="d-flex align-items-center gap-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="line_user_id" value="{{ current_line_user.line_user_id }}">
+                    <input type="text" name="text" class="form-control" maxlength="2000" required
+                           placeholder="พิมพ์ข้อความตอบกลับไปยัง LINE ของ {{ current_line_user.display_name }}...">
+                    <button class="btn btn-primary" type="submit" title="ส่งข้อความ">
                         <i class="fas fa-paper-plane"></i>
                     </button>
+                </form>
+                {% else %}
+                <div class="d-flex align-items-center gap-2">
+                    <input type="text" class="form-control" placeholder="บัญชีนี้ดูแชทได้อย่างเดียว ไม่มีสิทธิ์ตอบ" disabled>
+                    <button class="btn btn-secondary" type="button" disabled><i class="fas fa-lock"></i></button>
                 </div>
+                {% endif %}
                 <div class="form-text text-muted small mt-1" style="font-size: 0.75rem;">
                     <i class="fas fa-shield-alt text-success me-1"></i> Unified Inbox ระบบเชื่อมต่อข้อความอย่างปลอดภัยตามมาตรฐาน PDPA ไม่บันทึกข้อมูลอ่อนไหวโดยไม่ได้รับความยินยอม
                 </div>

@@ -12,7 +12,7 @@
                 <h1 class="h4 fw-bold mb-1 mt-1 text-dark">{{ box.patient.full_name }}</h1>
                 <div class="small text-muted">
                     HN: <span class="font-monospace">{{ box.patient.hn }}</span> &bull;
-                    {% if box.source == 'LINE' %}LINE{% else %}เว็บ{% endif %} &bull;
+                    {% if box.source == 'LINE' %}LINE{% elif box.source == 'CLINIC' %}บันทึกเสียงแพทย์{% else %}เว็บ{% endif %} &bull;
                     {{ box.get_status_display }}
                     {% if box.contents.red_flag %}<span class="badge bg-danger ms-1">อาการฉุกเฉิน</span>{% endif %}
                 </div>
@@ -55,7 +55,10 @@
                 <div class="card-body p-3 d-flex flex-column gap-2" style="max-height: 640px; overflow-y: auto;">
                     {% for m in chat_messages %}
                     <div class="p-2.5 rounded-3 border bg-white small">
-                        <div class="text-muted mb-1" style="font-size: 0.7rem;">{{ m.at_display|date:"d/m/Y H:i" }}</div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem;">
+                            {% if m.sender == 'bot' %}<span class="badge bg-secondary-subtle text-secondary border me-1">ผู้ช่วยซักประวัติ (AI)</span>{% elif m.sender == 'staff' %}<span class="badge bg-primary-subtle text-primary border me-1">บุคลากร</span>{% endif %}
+                            {{ m.at_display|date:"d/m/Y H:i" }}
+                        </div>
                         {% if m.kind == 'text' %}
                             <div style="white-space: pre-line;">{{ m.text }}</div>
                         {% elif not m.media %}

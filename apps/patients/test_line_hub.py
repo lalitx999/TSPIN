@@ -11,7 +11,7 @@ Verifies:
 import json
 from django.core.cache import cache
 from datetime import date, timedelta
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.db import IntegrityError
@@ -28,6 +28,7 @@ from patients.models import (
 )
 
 
+@override_settings(DEBUG=True, LINE_LIFF_ID='')  # โหมดจำลอง: ยังไม่ตั้ง LIFF จึงรับ line_user_id จากหน้าเว็บ
 class LineOACaregiverHubTests(TestCase):
     def setUp(self):
         cache.clear()
@@ -494,3 +495,41 @@ class LineOACaregiverHubTests(TestCase):
         self.assertEqual(audit.changes['verified_method'], 'STAFF_ASSISTED')
         self.assertEqual(audit.changes['hn'], self.father.hn)
 
+
+
+@override_settings(LINE_LIFF_ID='1234567890-AbCdEfGh')
+class LiffIdTokenVerificationTests(TestCase):
+    """ตั้ง LIFF แล้ว ต้องยืนยันตัวผู้ใช้ LINE ด้วย ID token ที่ LINE ลงนามเท่านั้น"""
+
+    def setUp(self):
+        cache.clear()
+        self.patient = Patient.objects.create(hn='HN-LIFF-01', first_name='ทดสอบ', last_name='ไลฟ์', phone='0812223333')
+
+    def _verify(self, extra):
+        token_obj, otp = PatientLinkingToken.create_otp_token(self.patient)
+        body = {'token': token_obj.token, 'otp': otp, 'line_user_id': 'U_FORGED_BY_CLIENT', **extra}
+        return self.client.post(reverse('root_liff_verify_otp_api'), data=json.dumps(body), content_type='application/json')
+
+    def test_missing_id_token_rejected(self):
+        resp = self._verify({})
+        self.assertEqual(resp.status_code, 401)
+        self.assertFalse(LinePatientBinding.objects.exists())
+
+    def test_binding_uses_line_verified_subject_not_client_value(self):
+        from unittest.mock import MagicMock, patch
+        fake = MagicMock(status_code=200)
+        fake.json.return_value = {'sub': 'U_VERIFIED_BY_LINE', 'aud': '1234567890'}
+        with patch('patients.views_liff.httpx.post', return_value=fake) as post:
+            resp = self._verify({'id_token': 'signed.jwt.value'})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(post.call_args.kwargs['data']['client_id'], '1234567890')
+        binding = LinePatientBinding.objects.get(patient=self.patient)
+        self.assertEqual(binding.line_user.line_user_id, 'U_VERIFIED_BY_LINE')
+
+    def test_invalid_id_token_rejected(self):
+        from unittest.mock import MagicMock, patch
+        fake = MagicMock(status_code=400)
+        fake.json.return_value = {'error': 'invalid_request'}
+        with patch('patients.views_liff.httpx.post', return_value=fake):
+            resp = self._verify({'id_token': 'tampered'})
+        self.assertEqual(resp.status_code, 401)

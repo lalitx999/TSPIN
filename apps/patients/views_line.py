@@ -220,6 +220,10 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
         return
     if is_urgent:
         LineMessagingService.reply_message(reply_token, [_done_quick_reply(EMERGENCY_TEXT)])
+        return
+    question = services_intake.ai_followup_question(box)
+    if question:
+        LineMessagingService.reply_message(reply_token, [_done_quick_reply(question)])
     elif is_first:
         LineMessagingService.reply_message(reply_token, [_done_quick_reply(
             "รับทราบครับ เล่าเพิ่มเติมได้เรื่อย ๆ ส่งรูปหรือข้อความเสียงได้ เมื่อครบแล้วกด \"เสร็จแล้ว\""

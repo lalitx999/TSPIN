@@ -83,6 +83,9 @@
                 <template x-for="m in messages" :key="m.id">
                     <div class="asst-bubble" :class="m.role === 'user' ? 'asst-user' : ('asst-bot' + (m.kind === 'emergency' ? ' emergency' : ''))">
                         <div class="asst-text" x-text="m.content"></div>
+                        <div class="mt-2 pt-2 border-top small text-muted" x-show="m.kind === 'general'">
+                            <i class="fas fa-robot me-1"></i> ข้อมูลทั่วไปจาก AI ยังไม่มีในเอกสารของคลินิก
+                        </div>
                         <template x-if="m.sources && m.sources.length">
                             <div class="mt-2 pt-2 border-top small text-muted">
                                 อ้างอิง: <template x-for="(s, i) in m.sources"><span x-text="'[' + (i + 1) + '] ' + s + '  '"></span></template>

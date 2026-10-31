@@ -851,13 +851,16 @@ async def rag_knowledge_query(
 
 
 # ==============================================================================
-# ผู้ช่วย AI สำหรับผู้ป่วย (หน้าเว็บแบบแชท): ตอบจากฐานความรู้ของ TSPI เท่านั้น
-# LLM ภายนอกมีหน้าที่เรียบเรียงภาษา ไม่ใช่แหล่งข้อมูล; ไม่พบความรู้ที่เกี่ยวข้อง = ปฏิเสธโดยไม่เรียก LLM
+# ผู้ช่วย AI สำหรับผู้ป่วย (หน้าเว็บแบบแชท)
+# เอกสารของ TSPI เป็นแหล่งหลักและอ้างอิงด้วย [n]; LLM ภายนอกเสริมความรู้ทั่วไปได้แต่ต้องแยกหัวข้อชัดเจน
+# เรื่องที่ไม่เกี่ยวกับสุขภาพ LLM ตอบรหัส OUT_OF_SCOPE แล้วเราแทนด้วยข้อความปฏิเสธ
 # ==============================================================================
-ASSISTANT_SCOPE_TEXT = "สุขภาพเชิงระบบ 39 แกนชีววิทยา ผลิตภัณฑ์ และบริการของคลินิก"
+ASSISTANT_SCOPE_TEXT = "สุขภาพ โรค การรักษา 39 แกนชีววิทยา ผลิตภัณฑ์ และบริการของคลินิก"
+ASSISTANT_OUT_OF_SCOPE_TOKEN = "OUT_OF_SCOPE"
+ASSISTANT_GENERAL_HEADING = "ข้อมูลทั่วไปเพิ่มเติม (จาก AI ไม่ใช่เอกสารของคลินิก):"
 ASSISTANT_REFUSAL = (
     "ขออภัยค่ะ ผู้ช่วยนี้ตอบได้เฉพาะเรื่อง" + ASSISTANT_SCOPE_TEXT +
-    " ตามข้อมูลของคลินิกเท่านั้น ลองถามเรื่องอาการหรือระบบร่างกายที่สนใจ หรือทักเจ้าหน้าที่ทาง LINE ได้เลยค่ะ"
+    " ลองถามเรื่องโรค อาการ หรือการรักษาที่สนใจ หรือทักเจ้าหน้าที่ทาง LINE ได้เลยค่ะ"
 )
 ASSISTANT_EMERGENCY = (
     "อาการที่เล่ามาอาจเป็นภาวะฉุกเฉิน กรุณาโทร 1669 หรือไปโรงพยาบาลที่ใกล้ที่สุดทันทีค่ะ "
@@ -866,13 +869,14 @@ ASSISTANT_EMERGENCY = (
 ASSISTANT_EMERGENCY_KEYWORDS = ('แน่นหน้าอก', 'เจ็บหน้าอก', 'หายใจไม่ออก', 'หายใจลำบาก', 'หมดสติ', 'ปากเบี้ยว',
                                 'แขนขาอ่อนแรง', 'ชัก', 'ไอเป็นเลือด', 'อาเจียนเป็นเลือด', 'ฆ่าตัวตาย', 'แพ้ยารุนแรง')
 ASSISTANT_SYSTEM_PROMPT = (
-    "คุณคือผู้ช่วยให้ข้อมูลของคลินิก TSPI ตอบเป็นภาษาไทย สุภาพ เข้าใจง่ายสำหรับผู้สูงอายุ ไม่เกิน 6 ประโยค\n"
+    "คุณคือผู้ช่วยให้ข้อมูลสุขภาพของคลินิก TSPI ตอบเป็นภาษาไทย สุภาพ เข้าใจง่ายสำหรับผู้สูงอายุ ไม่เกิน 8 ประโยค\n"
     "กฎที่ห้ามละเมิด:\n"
-    "1. ใช้ข้อมูลจาก <ความรู้> ที่ให้มาเท่านั้น ห้ามใช้ความรู้ทั่วไปของคุณเพิ่มเติม ถ้าความรู้ไม่พอให้ตอบว่าไม่มีข้อมูลและแนะนำให้ติดต่อคลินิก\n"
-    "2. ห้ามวินิจฉัยโรค ห้ามแนะนำยา ขนาดยา หรือบอกว่าผู้ใช้ควรใช้ผลิตภัณฑ์ใด การเลือกผลิตภัณฑ์ต้องผ่านแพทย์\n"
-    "3. ถ้าคำถามไม่เกี่ยวกับ " + ASSISTANT_SCOPE_TEXT + " ให้ปฏิเสธอย่างสุภาพ\n"
-    "4. อ้างอิงแหล่งด้วยหมายเลข เช่น [1] ตามหัวข้อความรู้ที่ใช้\n"
-    "5. ถ้าผู้ใช้เล่าอาการ ให้ถามข้อมูลเพิ่มที่แพทย์ต้องใช้ 1 คำถาม (ระยะเวลา ความรุนแรง อาการร่วม) และแนะนำให้กด \"ส่งให้คลินิก\" เมื่อเล่าครบ"
+    "1. ถ้าคำถามไม่เกี่ยวกับ " + ASSISTANT_SCOPE_TEXT + " ให้ตอบคำเดียวว่า " + ASSISTANT_OUT_OF_SCOPE_TOKEN + "\n"
+    "2. ตอบจาก <ความรู้> ของคลินิกก่อนเสมอ และอ้างอิงด้วยหมายเลข เช่น [1] ทุกประโยคที่มาจากความรู้นั้น\n"
+    "3. ถ้าความรู้ของคลินิกไม่พอหรือไม่มี ให้เสริมด้วยความรู้ทางการแพทย์ทั่วไปที่เป็นที่ยอมรับ โดยขึ้นบรรทัดใหม่ว่า \""
+    + ASSISTANT_GENERAL_HEADING + "\" แล้วจึงเขียน ห้ามใส่หมายเลขอ้างอิงในส่วนนี้ และห้ามอ้างว่าเป็นข้อมูลของคลินิก\n"
+    "4. ห้ามวินิจฉัยโรค ห้ามแนะนำยา ขนาดยา หรือบอกว่าผู้ใช้ควรใช้ผลิตภัณฑ์ใด การรักษาและการเลือกผลิตภัณฑ์ต้องผ่านแพทย์\n"
+    "5. ถ้าผู้ใช้เล่าอาการ ให้ถามข้อมูลเพิ่มที่แพทย์ต้องใช้ 1 คำถาม (ระยะเวลา ความรุนแรง อาการร่วม) และแนะนำให้ปรึกษาแพทย์ของคลินิก"
 )
 
 
@@ -928,8 +932,9 @@ class AssistantChatRequest(BaseModel):
 @app.post("/api/ai/assistant/chat")
 async def assistant_chat_endpoint(req: AssistantChatRequest):
     """
-    แชทผู้ช่วยสำหรับผู้ป่วย: ฉุกเฉิน -> ข้อความ 1669 ทันที, นอกขอบเขต -> ปฏิเสธ (ไม่เรียก LLM),
-    ในขอบเขต -> LLM เรียบเรียงจากความรู้ที่ค้นได้ แล้วผ่าน Guardrail ห้ามวินิจฉัย
+    แชทผู้ช่วยสำหรับผู้ป่วย: ฉุกเฉิน -> ข้อความ 1669 ทันที (ไม่เรียก LLM),
+    อื่น ๆ -> LLM ตอบจากเอกสาร TSPI ที่ค้นได้ (อ้างอิง [n]) เสริมความรู้ทั่วไปแยกหัวข้อ, นอกเรื่องสุขภาพ -> ปฏิเสธ,
+    แล้วผ่าน Guardrail ห้ามวินิจฉัย
     """
     history = [m for m in req.messages if m.role in ('user', 'assistant') and m.content.strip()][-8:]
     if not history or history[-1].role != 'user':
@@ -940,23 +945,25 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
         return {"answer": ASSISTANT_EMERGENCY, "kind": "emergency", "sources": [], "usage": {}}
 
     context = retrieve_tspi_knowledge(question)
-    if not context:
-        return {"answer": ASSISTANT_REFUSAL, "kind": "out_of_scope", "sources": [], "usage": {}}
-
-    knowledge = "\n\n".join(f"[{i + 1}] {c['title']}\n{c['text']}" for i, c in enumerate(context))
+    knowledge = "\n\n".join(f"[{i + 1}] {c['title']}\n{c['text']}" for i, c in enumerate(context)) \
+        or "(ไม่พบเอกสารของคลินิกที่ตรงกับคำถามนี้)"
     messages = [{"role": "system", "content": ASSISTANT_SYSTEM_PROMPT}]
     for m in history[:-1]:
         messages.append({"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]})
     messages.append({"role": "user", "content": f"<ความรู้>\n{knowledge}\n</ความรู้>\n\nคำถาม: {question}"})
 
-    res = await gateway.call_chat(config.SOAP_PROVIDER, messages=messages, temperature=0.2, max_tokens=700)
+    res = await gateway.call_chat(config.SOAP_PROVIDER, messages=messages, temperature=0.2, max_tokens=900)
     meta = {"provider": res.get("provider", config.SOAP_PROVIDER), "model": res.get("model", ""), "usage": res.get("usage", {})}
     answer = (res.get("content") or "").strip() if res.get("success") else ""
+    sources = [c['title'] for c in context]
     if not answer:
         return {"answer": "ขออภัยค่ะ ระบบผู้ช่วยไม่พร้อมใช้งานชั่วคราว กรุณาลองใหม่ภายหลัง หรือทักเจ้าหน้าที่ทาง LINE",
-                "kind": "unavailable", "sources": [c['title'] for c in context], **meta}
+                "kind": "unavailable", "sources": sources, **meta}
+    if ASSISTANT_OUT_OF_SCOPE_TOKEN in answer[:40]:
+        return {"answer": ASSISTANT_REFUSAL, "kind": "out_of_scope", "sources": [], **meta}
     guarded = ClinicalGuardrail.sanitize_and_guard(answer)
-    return {"answer": guarded["safe_text"], "kind": "answer", "sources": [c['title'] for c in context], **meta}
+    # answer = มีเอกสารคลินิกรองรับ, general = ความรู้ทั่วไปจาก AI ล้วน
+    return {"answer": guarded["safe_text"], "kind": "answer" if sources else "general", "sources": sources, **meta}
 
 
 if __name__ == "__main__":

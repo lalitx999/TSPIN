@@ -188,8 +188,8 @@
 <body>
 
     <!-- Header Navbar (Bootstrap 5) -->
-    <nav class="navbar navbar-expand-lg navbar-clinic sticky-top py-2">
-        <div class="container-xl">
+    <nav class="navbar navbar-expand-xl navbar-clinic sticky-top py-2">
+        <div class="container-xxl">
             <!-- Brand Logo -->
             <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'core:home' %}">
                 <div class="d-flex align-items-center justify-content-center text-white bg-primary-clinic rounded-3" style="width: 38px; height: 38px;">
@@ -242,13 +242,13 @@
                 </ul>
 
                 <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+                    <a href="{% url 'core:assistant' %}" class="btn btn-primary btn-sm px-3 fw-bold shadow-sm" style="border-radius: 2rem;">
+                        <i class="fas fa-comment-medical"></i> คุยกับ AI
+                    </a>
                     <a href="{% url 'accounts:patient_login' %}" class="btn btn-outline-secondary btn-sm px-3 border-0 text-muted">
-                        <i class="fas fa-sign-in-alt me-1"></i> เข้าสู่ระบบ
+                        เข้าสู่ระบบ
                     </a>
-                    <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-primary btn-sm px-3 fw-bold d-inline-flex align-items-center gap-2 shadow-sm" style="border-radius: 2rem;">
-                        <i class="fas fa-play-circle"></i>
-                        <span>เริ่มต้นใช้งาน</span>
-                    </a>
+                    <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-outline-primary btn-sm px-3 fw-bold" style="border-radius: 2rem;">ลงทะเบียน</a>
                 </div>
             </div>
         </div>

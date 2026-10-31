@@ -1,7 +1,7 @@
 /*
  * ใบไม้เรืองแสง 3 มิติ (Botanical network) สำหรับหน้าแรก
  * ใบไม้ 1 ใบ: เส้นกลางใบ + เส้นใบแขนง 39 เส้น ปลายเส้นคือจุดของ 39 แกนชีววิทยา
- * มีละอองเซลล์ลอยรอบ ๆ หมุนช้า ๆ ลากเมาส์/นิ้วเพื่อหมุนได้
+ * มีละอองเซลล์ลอยรอบ ๆ โยกไปมาเบา ๆ (ไม่หมุนจนเห็นสันใบ) ลากเมาส์/นิ้วเพื่อหมุนได้
  * เขียนด้วย canvas 2D ล้วน (ไม่ใช้ไลบรารีภายนอก) และหยุดเคลื่อนไหวเมื่อผู้ใช้ตั้งค่าลดการเคลื่อนไหว
  */
 (function () {
@@ -58,7 +58,7 @@
         }
 
         // ---------- การหมุนและฉาย 3 มิติ -> 2 มิติ ----------
-        var rotY = -0.5, rotX = 0.35, tilt = -0.35, dragging = false, lastX = 0, lastY = 0, velocity = 0.0025;
+        var baseY = 0, rotY = 0, rotX = 0.25, tilt = -0.18, dragging = false, lastX = 0, lastY = 0;
 
         function project(p) {
             var x = p[0], y = p[1], z = p[2];
@@ -89,7 +89,7 @@
             W = rect.width; H = rect.height;
             canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            scale = Math.min(W, H) * 0.42;
+            scale = Math.min(W, H) * 0.5;
         }
 
         var time = 0;
@@ -145,7 +145,7 @@
         }
 
         function frame() {
-            if (!dragging) rotY += velocity;
+            if (!dragging) rotY = baseY + 0.45 * Math.sin(time * 0.008);  // โยกซ้ายขวา ±25°
             time += 1;
             draw();
             if (!reduced) requestAnimationFrame(frame);
@@ -157,7 +157,7 @@
         window.addEventListener('pointermove', function (e) {
             if (!dragging) return;
             var p = pointer(e);
-            rotY += (p[0] - lastX) * 0.008;
+            baseY += (p[0] - lastX) * 0.008; rotY = baseY;
             rotX = Math.max(-1.0, Math.min(1.0, rotX + (p[1] - lastY) * 0.006));
             lastX = p[0]; lastY = p[1];
             if (reduced) draw();

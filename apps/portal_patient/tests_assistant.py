@@ -15,7 +15,7 @@ from patients.models import Patient
 
 
 class AssistantServiceTests(TestCase):
-    """AI service endpoint: ฉุกเฉินและนอกเรื่องไม่เรียก LLM, ในเรื่องส่งความรู้ของ TSPI ให้ LLM เรียบเรียง"""
+    """AI service endpoint: ฉุกเฉินไม่เรียก LLM, เอกสาร TSPI เป็นหลัก + ความรู้ทั่วไปแยกหัวข้อ, นอกเรื่องปฏิเสธ"""
 
     def setUp(self):
         from starlette.testclient import TestClient
@@ -30,11 +30,24 @@ class AssistantServiceTests(TestCase):
         return self.client_ai.post('/api/ai/assistant/chat', headers=self.headers,
                                    json={'messages': [{'role': 'user', 'content': text}]}).json()
 
-    def test_off_topic_refused_without_llm(self):
-        with patch('ai_service.main.gateway.call_chat', new=AsyncMock()) as llm:
+    def _llm(self, content):
+        return AsyncMock(return_value={'success': True, 'content': content, 'provider': 'groq', 'model': 'm',
+                                       'usage': {'prompt_tokens': 100, 'completion_tokens': 20}})
+
+    def test_off_topic_refused(self):
+        with patch('ai_service.main.gateway.call_chat', new=self._llm('OUT_OF_SCOPE')):
             data = self._ask('ช่วยเขียนโค้ด python ให้หน่อย')
         self.assertEqual(data['kind'], 'out_of_scope')
-        llm.assert_not_called()
+        self.assertNotIn('OUT_OF_SCOPE', data['answer'])
+
+    def test_health_question_without_clinic_docs_gets_general_answer(self):
+        fake = self._llm('ข้อมูลทั่วไปเพิ่มเติม (จาก AI ไม่ใช่เอกสารของคลินิก):\nไข้หวัดมักหายเองใน 7 วัน')
+        with patch('ai_service.main.gateway.call_chat', new=fake), \
+                patch('ai_service.main.retrieve_tspi_knowledge', return_value=[]):
+            data = self._ask('ไข้หวัดหายเองได้ไหม')
+        self.assertEqual(data['kind'], 'general')
+        self.assertEqual(data['sources'], [])
+        self.assertIn('ไม่พบเอกสารของคลินิก', fake.call_args.kwargs['messages'][-1]['content'])
 
     def test_emergency_answered_without_llm(self):
         with patch('ai_service.main.gateway.call_chat', new=AsyncMock()) as llm:
@@ -44,8 +57,7 @@ class AssistantServiceTests(TestCase):
         llm.assert_not_called()
 
     def test_in_scope_question_grounded_in_tspi_knowledge(self):
-        fake = AsyncMock(return_value={'success': True, 'content': 'ลำไส้รั่วคือภาวะที่เยื่อบุลำไส้ซึมผ่านง่าย [1]',
-                                       'provider': 'groq', 'model': 'm', 'usage': {'prompt_tokens': 100, 'completion_tokens': 20}})
+        fake = self._llm('ลำไส้รั่วคือภาวะที่เยื่อบุลำไส้ซึมผ่านง่าย [1]')
         with patch('ai_service.main.gateway.call_chat', new=fake):
             data = self._ask('ลำไส้รั่วคืออะไร 0812345678')
         self.assertEqual(data['kind'], 'answer')
@@ -53,7 +65,7 @@ class AssistantServiceTests(TestCase):
         prompt = fake.call_args.kwargs['messages'][-1]['content']
         self.assertIn('<ความรู้>', prompt)
         self.assertNotIn('0812345678', prompt)  # ลบข้อมูลระบุตัวตนก่อนส่ง LLM
-        self.assertIn('ห้ามใช้ความรู้ทั่วไป', fake.call_args.kwargs['messages'][0]['content'])
+        self.assertIn('ห้ามอ้างว่าเป็นข้อมูลของคลินิก', fake.call_args.kwargs['messages'][0]['content'])
 
 
 class AssistantThreadApiTests(TestCase):

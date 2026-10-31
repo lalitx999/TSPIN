@@ -13,6 +13,7 @@ urlpatterns = [
     path('protocol/', views.protocol_view, name='protocol'),
     path('research/', views.research_view, name='research'),
     path('about/', views.about, name='about'),
+    path('ai/', views.assistant_view, name='assistant'),
     path('guide/', views.guide_view, name='guide'),
     path('install/', views.install_view, name='install'),
     path('legal/privacy/', views.privacy_policy, name='privacy'),

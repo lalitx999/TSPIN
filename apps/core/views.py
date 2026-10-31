@@ -120,6 +120,10 @@ def about(request):
     """About TSPI Clinic & Dr. Patt Systems Biology Precision Medicine"""
     return render(request, 'core/about.html')
 
+def assistant_view(request):
+    """คุยกับผู้ช่วย AI (ไม่ต้องลงทะเบียน) ใช้ API guest_assistant_api"""
+    return render(request, 'core/assistant.html')
+
 def guide_view(request):
     """Patient & User Onboarding Guide (Step 01 - Step 06)"""
     return render(request, 'core/guide.html')

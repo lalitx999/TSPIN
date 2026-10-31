@@ -184,11 +184,12 @@ class GuestAssistantApiTests(TestCase):
                                     content_type='application/json')
         return resp, post
 
-    def test_homepage_has_chat_and_no_threejs(self):
+    def test_homepage_links_to_ai_chat_page(self):
         resp = self.client.get('/')
-        self.assertContains(resp, 'guestChat()')
+        self.assertContains(resp, reverse('core:assistant'))
         self.assertContains(resp, 'data-botanical3d')
         self.assertNotContains(resp, 'three.min.js')
+        self.assertContains(self.client.get(reverse('core:assistant')), 'guestChat()')
 
     def test_anonymous_question_answered_and_nothing_stored(self):
         from intelligence.models import AssistantMessage, AssistantThread

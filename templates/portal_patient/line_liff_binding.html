@@ -45,27 +45,16 @@
                 <button type="button" class="btn-close" @click="errorMessage = ''" aria-label="Close"></button>
             </div>
 
-            <!-- STEP 1: Enter HN & Phone & Role -->
+            <!-- STEP 1: เลขบัตร ปชช. หรือ HN -->
             <form x-show="step === 1" @submit.prevent="requestOtp()">
                 <div class="mb-3">
                     <label class="form-label fw-bold text-dark small mb-1">
-                        <i class="fas fa-id-card text-primary me-1"></i> หมายเลขประจำตัวผู้ป่วย (HN)
+                        <i class="fas fa-id-card text-primary me-1"></i> เลขบัตรประชาชน 13 หลัก หรือ HN
                     </label>
-                    <input type="text" class="form-control form-control-lg rounded-3 fs-6" 
-                           placeholder="เช่น HN-2026-0001" x-model="hn" required>
+                    <input type="text" class="form-control form-control-lg rounded-3 fs-6" inputmode="text"
+                           placeholder="เช่น 1-1004-00123-45-6 หรือ HN-2026-0001" x-model="identifier" required>
                     <div class="form-text text-muted" style="font-size: 0.8rem;">
-                        ตรวจสอบได้จากใบนัดหมายหรือหน้าซองยาของคลินิก
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark small mb-1">
-                        <i class="fas fa-phone-alt text-primary me-1"></i> เบอร์โทรศัพท์ที่ลงทะเบียนไว้
-                    </label>
-                    <input type="tel" class="form-control form-control-lg rounded-3 fs-6" 
-                           placeholder="เช่น 0812345678" x-model="phone" required>
-                    <div class="form-text text-muted" style="font-size: 0.8rem;">
-                        ระบบจะส่งรหัสยืนยัน OTP ไปยังเบอร์นี้เพื่อความปลอดภัยตาม PDPA
+                        ระบบจะส่งรหัส OTP ไปที่อีเมลที่ลงทะเบียนไว้กับคลินิก
                     </div>
                 </div>
 
@@ -99,12 +88,38 @@
                 </button>
             </form>
 
+            <!-- STEP 1b: ลงทะเบียนผู้รับบริการใหม่ (เมื่อไม่พบเวชระเบียน) -->
+            <form x-show="step === 'register'" @submit.prevent="register()" x-cloak>
+                <p class="small text-muted mb-3">ไม่พบเวชระเบียน กรุณากรอกข้อมูลเพื่อลงทะเบียน ระบบจะส่งรหัส OTP ไปยืนยันอีเมล</p>
+                <input type="text" class="form-control mb-2" placeholder="ชื่อ" x-model="reg.first_name" required>
+                <input type="text" class="form-control mb-2" placeholder="นามสกุล" x-model="reg.last_name" required>
+                <input type="text" class="form-control mb-2" placeholder="เลขบัตรประชาชน 13 หลัก" inputmode="numeric" x-model="reg.national_id" required>
+                <input type="tel" class="form-control mb-2" placeholder="เบอร์โทรศัพท์" x-model="reg.phone" required>
+                <input type="email" class="form-control mb-2" placeholder="อีเมล" x-model="reg.email" required>
+                <div class="form-check small mb-3">
+                    <input class="form-check-input" type="checkbox" id="pdpa" x-model="reg.pdpa_consent" required>
+                    <label class="form-check-label" for="pdpa">ยินยอมให้คลินิกเก็บและใช้ข้อมูลสุขภาพเพื่อการรักษา ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล</label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 rounded-3 fw-bold mb-2" :disabled="isLoading">ลงทะเบียนและรับรหัส OTP</button>
+                <button type="button" class="btn btn-outline-secondary w-100 rounded-3 btn-sm" @click="step = 1">ย้อนกลับ</button>
+            </form>
+
+            <!-- STEP 1c: ไม่มีอีเมลในเวชระเบียน -> ยืนยันกับเจ้าหน้าที่ -->
+            <div x-show="step === 'staff'" class="text-center" x-cloak>
+                <p class="small text-muted mb-3" x-text="infoMessage"></p>
+                <button type="button" class="btn btn-outline-info text-dark w-100 rounded-3 fw-semibold mb-2"
+                        @click="requestStaffAssisted()" :disabled="isLoading">
+                    <i class="fas fa-user-nurse me-1 text-primary"></i> ขอให้เจ้าหน้าที่ยืนยันตัวตน
+                </button>
+                <button type="button" class="btn btn-outline-secondary w-100 rounded-3 btn-sm" @click="step = 1">ย้อนกลับ</button>
+            </div>
+
             <!-- STEP 2: Verify OTP -->
             <form x-show="step === 2" @submit.prevent="verifyOtp()" x-cloak>
                 <div class="text-center mb-3">
-                    <div class="text-muted small mb-1">รหัสยืนยันถูกส่งไปยังเบอร์</div>
-                    <div class="fw-bold fs-5 font-monospace text-primary" x-text="maskedPhone"></div>
-                    <div class="text-muted" style="font-size: 0.75rem;">รหัสมีอายุการใช้งาน 15 นาที</div>
+                    <div class="text-muted small mb-1">รหัสยืนยันถูกส่งไปที่อีเมล</div>
+                    <div class="fw-bold fs-6 font-monospace text-primary" x-text="maskedEmail"></div>
+                    <div class="text-muted" style="font-size: 0.75rem;">รหัสมีอายุ 10 นาที หากไม่พบ ให้ดูในกล่องจดหมายขยะ</div>
                 </div>
 
                 <div class="mb-4">
@@ -113,11 +128,6 @@
                     </label>
                     <input type="text" class="form-control form-control-lg rounded-3 text-center font-monospace fw-bold fs-3 letter-spacing-2" 
                            placeholder="••••••" maxlength="6" x-model="otpCode" required autofocus>
-                    <div class="text-center mt-2" x-show="debugOtp">
-                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning" style="font-size: 0.75rem;">
-                            <i class="fas fa-flask me-1"></i> Sandbox OTP: <strong x-text="debugOtp"></strong>
-                        </span>
-                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 shadow-xs fw-bold mb-2" :disabled="isLoading">
@@ -132,7 +142,7 @@
                 <!-- Staff-Assisted Fallback Option -->
                 <div class="pt-3 border-top text-center">
                     <div class="text-muted small mb-2" style="font-size: 0.8rem;">
-                        <i class="fas fa-info-circle me-1 text-primary"></i> ไม่ได้รับ SMS หรือยังไม่ได้ลงทะเบียนเบอร์?
+                        <i class="fas fa-info-circle me-1 text-primary"></i> ไม่ได้รับอีเมล?
                     </div>
                     <button type="button" class="btn btn-outline-info text-dark w-100 rounded-3 btn-sm fw-semibold" 
                             @click="requestStaffAssisted()" :disabled="isLoading">
@@ -187,15 +197,15 @@ function liffBindingFlow() {
     return {
         liffId: '{{ liff_id|default:"" }}',
         step: 1,
-        hn: '',
-        phone: '',
+        identifier: '',
+        reg: { first_name: '', last_name: '', national_id: '', phone: '', email: '', pdpa_consent: false },
+        infoMessage: '',
         role: 'SELF',
         lineUserId: 'U' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
         displayName: 'ผู้ติดต่อ LINE',
         pictureUrl: '',
         token: '',
-        maskedPhone: '',
-        debugOtp: '',
+        maskedEmail: '',
         otpCode: '',
         isLoading: false,
         errorMessage: '',
@@ -230,25 +240,49 @@ function liffBindingFlow() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    hn: this.hn,
-                    phone: this.phone,
+                    identifier: this.identifier,
                     role: this.role,
                     line_user_id: this.lineUserId
                 })
             })
             .then(res => res.json().then(data => ({ status: res.status, data })))
-            .then(({ status, data }) => {
-                this.isLoading = false;
-                if (status === 200 && data.status === 'ok') {
-                    this.token = data.token;
-                    this.maskedPhone = data.masked_phone;
-                    this.debugOtp = data.debug_otp || '';
-                    this.step = 2;
-                } else {
-                    this.errorMessage = data.message || 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล';
-                }
-            })
+            .then(({ status, data }) => this.handleOtpResponse(data))
             .catch(err => {
+                this.isLoading = false;
+                this.errorMessage = 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง';
+            });
+        },
+
+        handleOtpResponse(data) {
+            this.isLoading = false;
+            if (data.status === 'ok') {
+                this.token = data.token;
+                this.maskedEmail = data.masked_email;
+                this.step = 2;
+            } else if (data.status === 'staff_required') {
+                this.token = data.token;
+                this.infoMessage = data.message;
+                this.step = 'staff';
+            } else if (data.status === 'not_found') {
+                if (/^[0-9-\s]{13,17}$/.test(this.identifier)) this.reg.national_id = this.identifier;
+                this.step = 'register';
+            } else {
+                this.errorMessage = data.message || 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล';
+                if (data.status === 'exists') this.step = 1;
+            }
+        },
+
+        register() {
+            this.isLoading = true;
+            this.errorMessage = '';
+            fetch('{% url "portal_patient:liff_register_api" %}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...this.reg, line_user_id: this.lineUserId })
+            })
+            .then(res => res.json())
+            .then(data => this.handleOtpResponse(data))
+            .catch(() => {
                 this.isLoading = false;
                 this.errorMessage = 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง';
             });
@@ -314,7 +348,7 @@ function liffBindingFlow() {
                     this.successMessage = data.message;
                     this.boundPatient = {
                         name: 'รอการยืนยันจากพยาบาลที่เคาน์เตอร์',
-                        hn: this.hn,
+                        hn: this.identifier,
                         role: 'รอตรวจสอบ'
                     };
                     this.step = 3;

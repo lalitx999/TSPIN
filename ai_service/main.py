@@ -411,7 +411,13 @@ async def generate_soap_endpoint(
             "status": guarded_assessment["guardrail_status"],
             "redacted_violations": guarded_assessment["violated_patterns"]
         },
-        "gateway": soap_res.get("gateway", "groq")
+        "gateway": soap_res.get("gateway", "groq"),
+        # True = LLM ไม่ได้ตอบ (ไม่มี key/ล่ม/parse ไม่ได้) ร่างนี้เป็นแม่แบบ ห้ามนำไปแสดงเป็นผล AI
+        "is_fallback": bool(soap_res.get("is_fallback")),
+        # ข้อมูลการใช้ token ให้ Django บันทึกและคุมงบต่อผู้ให้บริการ
+        "provider": soap_res.get("provider", ""),
+        "model": soap_res.get("model", ""),
+        "usage": soap_res.get("usage", {}),
     }
 
 

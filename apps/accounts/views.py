@@ -5,6 +5,10 @@ Enforces Rate Limiting, Session Fixation Rotation, and Full AuditLog (Pillars 1,
 
 import hashlib
 from django.conf import settings
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib import messages
@@ -12,6 +16,12 @@ from django.views.decorators.http import require_http_methods
 from django_ratelimit.decorators import ratelimit
 from accounts.models import AuditLog, User
 from accounts.forms import DoctorLoginForm, PatientLoginForm, PatientRegistrationForm
+
+def _is_safe_next(request, next_url) -> bool:
+    """ต้องเป็น URL ภายในระบบ (startswith('/') อย่างเดียวยอมให้ //evil.com ผ่านได้)"""
+    return bool(next_url) and url_has_allowed_host_and_scheme(
+        next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure())
+
 
 def get_client_ip(request):
     """
@@ -61,8 +71,12 @@ def doctor_login_view(request):
             )
 
             messages.success(request, f"ยินดีต้อนรับ นพ./พญ. {user.get_full_name() or user.username}")
+            if user.must_change_password:
+                # บัญชีที่ผู้ดูแลตั้งรหัสให้ ต้องเปลี่ยนรหัสก่อนใช้งาน (middleware กันไม่ให้ไปหน้าอื่น)
+                request.session['force_password_change'] = True
+                return redirect('accounts:password_change')
             next_url = request.GET.get('next')
-            if next_url and next_url.startswith('/'):
+            if _is_safe_next(request, next_url):
                 return redirect(next_url)
             return redirect('patients:dashboard')
     else:
@@ -104,7 +118,7 @@ def patient_login_view(request):
 
             messages.success(request, f"ยินดีต้อนรับ คุณ{user.get_full_name() or user.username}")
             next_url = request.GET.get('next')
-            if next_url and next_url.startswith('/'):
+            if _is_safe_next(request, next_url):
                 return redirect(next_url)
             return redirect('portal_patient:dashboard')
     else:
@@ -186,3 +200,26 @@ def lockout_view(request, credentials=None):
         'cooloff_minutes': 15,
         'client_ip': get_client_ip(request)
     }, status=429)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def password_change_view(request):
+    """เปลี่ยนรหัสผ่าน (บังคับครั้งแรกสำหรับบัญชีที่ผู้ดูแลตั้งรหัสให้) ตรวจตามนโยบายรหัสผ่านของระบบ"""
+    form = PasswordChangeForm(request.user, request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        user = form.save()
+        user.must_change_password = False
+        user.save(update_fields=['must_change_password'])
+        update_session_auth_hash(request, user)
+        request.session.pop('force_password_change', None)
+        AuditLog.objects.create(
+            user=user, action="PASSWORD_CHANGED", model="User", object_id=str(user.pk),
+            client_ip=get_client_ip(request), user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+        )
+        messages.success(request, "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว")
+        return redirect('patients:dashboard' if user.is_clinical_staff else 'portal_patient:dashboard')
+    return render(request, 'accounts/password_change.html', {
+        'form': form,
+        'forced': request.session.get('force_password_change', False),
+    })

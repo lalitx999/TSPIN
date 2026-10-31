@@ -3,6 +3,7 @@ from . import views
 from . import views_report
 from . import views_copilot
 from . import views_box
+from . import views_intake
 
 app_name = 'clinical'
 
@@ -25,6 +26,13 @@ urlpatterns = [
     path('boxes/<uuid:box_id>/break-glass/', views_box.box_break_glass_action, name='box_break_glass'),
 
     # Precision Reports & WeasyPrint PDF Generation (EP 6)
+    # ซักถามพูดคุยผ่าน LINE / AI Intake (รอบซักประวัติ = Box)
+    path('intake/', views_intake.intake_list_view, name='intake_list'),
+    path('intake/<uuid:box_id>/', views_intake.intake_detail_view, name='intake_detail'),
+    path('intake/<uuid:box_id>/summarize/', views_intake.intake_summarize_action, name='intake_summarize'),
+    path('intake/<uuid:box_id>/commit/', views_intake.intake_commit_action, name='intake_commit'),
+    path('intake/<uuid:box_id>/media/<str:media_id>/', views_intake.intake_media_view, name='intake_media'),
+
     path('reports/', views_report.report_dashboard_view, name='report_dashboard'),
     path('reports/create/<int:patient_id>/', views_report.report_create_view, name='report_create'),
     path('reports/<int:analysis_id>/preview/', views_report.report_preview_html_view, name='report_preview'),

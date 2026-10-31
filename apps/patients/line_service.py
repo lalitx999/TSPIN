@@ -11,7 +11,7 @@ import json
 import logging
 import urllib.request
 import urllib.error
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -354,3 +354,28 @@ class LineMessagingService:
         except Exception as e:
             logger.error(f"[LINE Reply Error] Failed to reply message: {e}")
             return False
+
+    @classmethod
+    def get_message_content(cls, message_id: str, max_bytes: int = 25 * 1024 * 1024) -> Optional[Tuple[bytes, str]]:
+        """
+        ดาวน์โหลดไฟล์ (รูป/เสียง/วิดีโอ/ไฟล์) ที่ผู้ใช้ส่งมา
+        LINE เก็บไฟล์ไว้ให้ดึงได้ระยะสั้นเท่านั้น ต้องเรียกทันทีที่ webhook เข้ามา
+        คืนค่า (bytes, content_type) หรือ None ถ้าดึงไม่สำเร็จ
+        """
+        token = getattr(settings, 'LINE_CHANNEL_ACCESS_TOKEN', '')
+        if not token:
+            logger.info(f"[LINE MOCK CONTENT] message_id={message_id} (no access token configured)")
+            return None
+
+        url = f"https://api-data.line.me/v2/bot/message/{message_id}/content"
+        req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"}, method='GET')
+        try:
+            with urllib.request.urlopen(req, timeout=15) as response:
+                data = response.read(max_bytes + 1)
+                if len(data) > max_bytes:
+                    logger.warning(f"[LINE Content] message_id={message_id} exceeds {max_bytes} bytes, skipped")
+                    return None
+                return data, response.headers.get('Content-Type', 'application/octet-stream')
+        except Exception as e:
+            logger.error(f"[LINE Content Error] Failed to fetch content for {message_id}: {e}")
+            return None

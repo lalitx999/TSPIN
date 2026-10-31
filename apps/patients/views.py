@@ -461,8 +461,32 @@ def doctor_audit(request):
 def doctor_settings(request):
     """
     ตั้งค่าบัญชีแพทย์ ลายเซ็นดิจิทัล และข้อมูลคลินิก (/doctor/settings/)
+    รองรับการตั้ง/เปลี่ยนรหัสเปิดกล่องส่วนตัว (ต้องยืนยันด้วยรหัสผ่านเข้าสู่ระบบ)
     """
-    return render(request, 'patients/doctor_settings.html')
+    if request.method == 'POST' and request.POST.get('action') == 'set_box_password':
+        new_pw = request.POST.get('box_password', '')
+        if not request.user.check_password(request.POST.get('current_password', '')):
+            messages.error(request, "รหัสผ่านเข้าสู่ระบบไม่ถูกต้อง")
+        elif len(new_pw) < 8:
+            messages.error(request, "รหัสเปิดกล่องต้องมีอย่างน้อย 8 ตัวอักษร")
+        elif new_pw != request.POST.get('box_password_confirm', ''):
+            messages.error(request, "รหัสเปิดกล่องทั้งสองช่องไม่ตรงกัน")
+        elif request.user.check_password(new_pw):
+            messages.error(request, "รหัสเปิดกล่องต้องไม่ซ้ำกับรหัสผ่านเข้าสู่ระบบ")
+        else:
+            request.user.set_box_password(new_pw)
+            AuditLog.objects.create(
+                user=request.user, action='BOX_PASSWORD_SET', model='User', object_id=str(request.user.pk),
+                client_ip=request.META.get('REMOTE_ADDR'), user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+            )
+            messages.success(request, "บันทึกรหัสเปิดกล่องเรียบร้อยแล้ว")
+        return redirect('patients:doctor_settings')
+
+    ai_usage = None
+    if request.user.is_superuser or request.user.role == 'admin':
+        from intelligence.ai_budget import monthly_summary
+        ai_usage = monthly_summary()
+    return render(request, 'patients/doctor_settings.html', {'ai_usage': ai_usage})
 
 
 @clinical_staff_required

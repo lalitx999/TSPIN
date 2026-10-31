@@ -18,6 +18,24 @@ from intelligence.models import AIConsultationSession, AIConsultationMessage, Ag
 from intelligence.services import DeterministicLabParser, ClinicalCopilotEngine, ClinicalSafetyChecker
 
 
+def _recently_updated_patients(limit: int = 5):
+    """คนไข้ที่มีข้อมูลเข้าล่าสุด (รอบซักประวัติ LINE/เว็บ หรือบันทึก SOAP) เรียงจากใหม่ไปเก่า"""
+    from django.db.models import Max
+    from django.db.models.functions import Coalesce, Greatest
+    from django.utils import timezone
+    epoch = timezone.make_aware(timezone.datetime(2000, 1, 1))
+    return list(
+        Patient.objects
+        .annotate(
+            last_box=Coalesce(Max('intake_boxes__last_activity_at'), epoch),
+            last_note=Coalesce(Max('histories__visit_date'), epoch),
+        )
+        .annotate(last_data=Greatest('last_box', 'last_note'))
+        .filter(last_data__gt=epoch)
+        .order_by('-last_data')[:limit]
+    )
+
+
 @clinical_staff_required
 def ai_physician_view(request):
     """
@@ -27,9 +45,16 @@ def ai_physician_view(request):
     patient_id = request.GET.get('patient_id')
     patient = None
     latest_record = None
+    recent_patients = _recently_updated_patients(limit=5)
+    auto_selected = False
 
     if patient_id:
         patient = get_object_or_404(Patient, pk=patient_id)
+    elif recent_patients and request.GET.get('general') != '1':
+        # เลือกคนไข้ล่าสุดที่มีข้อมูลเข้าให้ แต่ยังไม่วิเคราะห์จนกว่าแพทย์จะกดส่งคำถามเอง
+        patient = recent_patients[0]
+        auto_selected = True
+    if patient:
         latest_record = patient.biological_records.first()
 
     # ดึงเซสชันล่าสุดของแพทย์สำหรับคนไข้รายนี้ หรือสร้างเซสชันใหม่
@@ -54,6 +79,8 @@ def ai_physician_view(request):
 
     return render(request, 'intelligence/ai_physician.html', {
         'patient': patient,
+        'auto_selected': auto_selected,
+        'recent_patients': recent_patients,
         'latest_record': latest_record,
         'session': session,
         'past_messages': past_messages,

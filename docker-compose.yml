@@ -55,6 +55,8 @@ services:
       DB_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      AI_SERVICE_URL: http://ai:8088
+      PRIVATE_MEDIA_ROOT: /app/private_media
       GUNICORN_WORKERS: 3
       GUNICORN_THREADS: 2
     depends_on:
@@ -62,9 +64,33 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      ai:
+        condition: service_started
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
+      - private_media:/app/private_media
+    networks:
+      - tspi_internal
+
+  # ============================================================================
+  # 3b. AI SERVICE (FastAPI) — internal only, no published ports.
+  #     Every route except /health requires X-Internal-Token (INTERNAL_API_TOKEN in .env)
+  # ============================================================================
+  ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tspi_ai
+    restart: unless-stopped
+    env_file:
+      - .env
+    entrypoint: ["uvicorn", "ai_service.main:app", "--host", "0.0.0.0", "--port", "8088", "--workers", "2"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     networks:
       - tspi_internal
 
@@ -99,4 +125,6 @@ volumes:
   static_volume:
     driver: local
   media_volume:
+    driver: local
+  private_media:
     driver: local

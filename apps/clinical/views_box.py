@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from accounts.decorators import clinical_staff_required, doctor_only
 from accounts.models import AuditLog
@@ -19,6 +20,21 @@ from accounts.views import get_client_ip
 from clinical.models import Box
 
 logger = logging.getLogger("tspi.box_portal")
+
+
+def _back_to_box(request: HttpRequest, box: Box) -> HttpResponse:
+    """กลับไปหน้าที่ส่งฟอร์มมา (เช่นหน้า LINE intake) ถ้าเป็น URL ภายในระบบ ไม่งั้นกลับหน้าดูกล่อง"""
+    next_url = request.POST.get('next', '')
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        return redirect(next_url)
+    return redirect('clinical:box_detail', box_id=box.id)
+
+
+def is_box_unlocked(request: HttpRequest, box: Box) -> bool:
+    """ปลดล็อกในเซสชันนี้แล้ว (รหัสเปิดกล่อง/Break-Glass) หรือเป็นผู้เปิดกล่องที่ตรวจเสร็จแล้ว"""
+    return bool(request.session.get(f"box_unlocked_{box.id}")) or (
+        box.opened_by_id == request.user.pk and box.status == Box.Status.REVIEWED
+    )
 
 
 @clinical_staff_required
@@ -71,8 +87,7 @@ def box_detail_view(request: HttpRequest, box_id) -> HttpResponse:
     box = get_object_or_404(Box.objects.select_related('patient', 'opened_by'), pk=box_id)
     is_valid_hmac = box.verify_integrity()
 
-    session_key = f"box_unlocked_{box.id}"
-    is_unlocked = request.session.get(session_key, False) or (box.opened_by == request.user and box.status == Box.Status.REVIEWED)
+    is_unlocked = is_box_unlocked(request, box)
 
     # If unlocked, unpack contents for the clinical viewer
     contents = box.contents or {}
@@ -119,13 +134,13 @@ def box_unlock_action(request: HttpRequest, box_id) -> HttpResponse:
             user_agent=request.META.get('HTTP_USER_AGENT', '')[:500]
         )
         messages.error(request, "ท่านกรอกรหัสผ่านผิดเกินกำหนด (5 ครั้ง) ระบบระงับชั่วคราวเป็นเวลา 5 นาที (ใช้ Break-Glass Protocol หากมีเหตุฉุกเฉิน)")
-        return redirect('clinical:box_detail', box_id=box.id)
+        return _back_to_box(request, box)
 
     password = request.POST.get('box_password', '').strip()
 
     if not request.user.has_box_password:
         messages.error(request, "ท่านยังไม่ได้ตั้งรหัสผ่านเปิดกล่องส่วนตัว กรุณาตั้งรหัสผ่านก่อนเข้าใช้งาน")
-        return redirect('clinical:box_detail', box_id=box.id)
+        return _back_to_box(request, box)
 
     # Verify Personal Box Password
     if not request.user.check_box_password(password):
@@ -144,7 +159,7 @@ def box_unlock_action(request: HttpRequest, box_id) -> HttpResponse:
             messages.error(request, f"รหัสผ่านเปิดกล่องส่วนตัวไม่ถูกต้อง (เหลือโอกาสอีก {remaining} ครั้ง)")
         else:
             messages.error(request, "รหัสผ่านเปิดกล่องส่วนตัวไม่ถูกต้อง ระบบระงับการลองเป็นเวลา 5 นาที")
-        return redirect('clinical:box_detail', box_id=box.id)
+        return _back_to_box(request, box)
 
     # Unlock Successful -> Clear rate limiter
     cache.delete(cache_key)
@@ -167,7 +182,7 @@ def box_unlock_action(request: HttpRequest, box_id) -> HttpResponse:
     )
 
     messages.success(request, f"ปลดล็อกกล่องประวัติคนไข้ ({box.id.hex[:8]}) เรียบร้อยแล้ว")
-    return redirect('clinical:box_detail', box_id=box.id)
+    return _back_to_box(request, box)
 
 
 @require_POST
@@ -178,12 +193,20 @@ def box_decision_action(request: HttpRequest, box_id) -> HttpResponse:
     Transitions Box status to 'reviewed'.
     """
     box = get_object_or_404(Box, pk=box_id)
+    # ต้องปลดล็อกกล่องก่อน (รหัสเปิดกล่องส่วนตัวหรือ Break-Glass) เหมือนหน้าดูกล่อง ยิง POST ตรงข้ามไม่ได้
+    if not is_box_unlocked(request, box):
+        AuditLog.objects.create(
+            user=request.user, action="BOX_DECISION_DENIED_LOCKED", model="Box", object_id=str(box.id),
+            client_ip=get_client_ip(request), user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+        )
+        messages.error(request, "กรุณาปลดล็อกกล่องก่อนบันทึกคำสั่งการรักษา")
+        return _back_to_box(request, box)
     decision = request.POST.get('decision', '').strip()
     doctor_notes = request.POST.get('doctor_notes', '').strip()
 
     if decision not in Box.Decision.values:
         messages.error(request, "คำวินิจฉัย/การสั่งการไม่ถูกต้อง")
-        return redirect('clinical:box_detail', box_id=box.id)
+        return _back_to_box(request, box)
 
     box.decision = decision
     box.doctor_notes = doctor_notes
@@ -201,7 +224,7 @@ def box_decision_action(request: HttpRequest, box_id) -> HttpResponse:
     )
 
     messages.success(request, f"บันทึกคำสั่งการรักษาสำหรับกล่อง {box.id.hex[:8]} เรียบร้อยแล้ว")
-    return redirect('clinical:box_detail', box_id=box.id)
+    return _back_to_box(request, box)
 
 
 @require_POST
@@ -217,7 +240,7 @@ def box_break_glass_action(request: HttpRequest, box_id) -> HttpResponse:
 
     if not reason or len(reason) < 10:
         messages.error(request, "การเปิดกล่องฉุกเฉิน (Break-Glass) ต้องระบุเหตุผลความจำเป็นทางคลินิกอย่างละเอียด (อย่างน้อย 10 ตัวอักษร)")
-        return redirect('clinical:box_detail', box_id=box.id)
+        return _back_to_box(request, box)
 
     box.is_break_glass = True
     box.break_glass_reason = reason
@@ -247,4 +270,4 @@ def box_break_glass_action(request: HttpRequest, box_id) -> HttpResponse:
 
     logger.warning(f"[BREAK-GLASS ALERT] Box {box.id} unlocked by {request.user.username}. Reason: {reason}")
     messages.warning(request, f"🚨 ปลดล็อกกล่องฉุกเฉิน (Break-Glass) สำเร็จ — มีการบันทึก Audit Log ระดับวิกฤตเรียบร้อยแล้ว")
-    return redirect('clinical:box_detail', box_id=box.id)
+    return _back_to_box(request, box)

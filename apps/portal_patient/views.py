@@ -50,7 +50,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 
-from clinical.models import AnalysisRecord, BiologicalRecord
+from clinical.models import AnalysisRecord, BiologicalRecord, Box
+from clinical import services_intake
 from clinical.invariants import CANONICAL_39_AXES
 from patients.models import Patient, PatientHistory, Appointment
 from accounts.models import AuditLog
@@ -116,11 +117,9 @@ def patient_ai_intake_chat_api(request):
         'timestamp': timezone.now().isoformat()
     })
 
-    # Update chief_complaint
-    if not patient.chief_complaint:
-        patient.chief_complaint = user_message
-    else:
-        patient.chief_complaint += f" | {user_message}"
+    # ข้อความเข้ารอบซักประวัติ (Box ช่องทางเว็บ) ให้บุคลากรตรวจทานก่อน ไม่เขียนลงเวชระเบียนตรง
+    intake_box = services_intake.open_session(patient, Box.Source.WEB)
+    services_intake.append_message(intake_box, 'text', text=user_message)
 
     # Generate Intelligent Clinical Response based on symptom keywords
     msg_lower = user_message.lower()
@@ -146,16 +145,10 @@ def patient_ai_intake_chat_api(request):
         'timestamp': timezone.now().isoformat()
     })
     patient.extra_data['intake_messages'] = history
-    patient.save(update_fields=['chief_complaint', 'extra_data'])
+    patient.save(update_fields=['extra_data'])
 
-    # Create PatientHistory SOAP note if completed
     if is_completed:
-        PatientHistory.objects.create(
-            patient=patient,
-            subjective=f"AI Anamnesis Intake: {patient.chief_complaint}",
-            assessment="Preliminary Clinical Intake pending Physician Review",
-            plan="Physician review & 39 biological axes evaluation scheduled"
-        )
+        services_intake.close_session(intake_box)
 
     return JsonResponse({
         'success': True,
@@ -179,15 +172,9 @@ def patient_ai_intake_fallback_api(request):
     if not patient:
         return JsonResponse({'success': False, 'message': 'ไม่พบเวชระเบียน'}, status=404)
 
-    patient.chief_complaint = manual_notes
-    patient.save(update_fields=['chief_complaint'])
-
-    PatientHistory.objects.create(
-        patient=patient,
-        subjective=f"[Manual Fallback Form] {manual_notes}",
-        assessment="Direct Patient Submission via Fallback Form",
-        plan="Pending Clinical Review"
-    )
+    intake_box = services_intake.open_session(patient, Box.Source.WEB)
+    services_intake.append_message(intake_box, 'text', text=f"[แบบฟอร์มสำรอง] {manual_notes}")
+    services_intake.close_session(intake_box)
 
     return JsonResponse({
         'success': True,

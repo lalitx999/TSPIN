@@ -13,6 +13,7 @@ from patients.views_liff import (
     liff_request_otp_api,
     liff_verify_otp_api,
     liff_request_staff_assisted_api,
+    liff_register_api,
 )
 from patients.views_line_internal import line_internal_ingest_view
 import patients.views_staff as views_staff
@@ -50,6 +51,7 @@ urlpatterns = [
     path('liff/api/request-otp/', liff_request_otp_api, name='root_liff_request_otp_api'),
     path('liff/api/verify-otp/', liff_verify_otp_api, name='root_liff_verify_otp_api'),
     path('liff/api/request-staff-assisted/', liff_request_staff_assisted_api, name='root_liff_request_staff_assisted_api'),
+    path('liff/api/register/', liff_register_api, name='root_liff_register_api'),
 
     # Internal Microservice Gateway (FastAPI 8088 -> Django 8000)
     path('internal/line/webhook/', line_internal_ingest_view, name='root_internal_line_webhook'),

@@ -63,5 +63,53 @@
         </div>
     </div>
 
+    {% if ai_usage %}
+    <!-- ค่าใช้จ่าย AI เดือนนี้ (เฉพาะผู้ดูแลระบบ) -->
+    <div class="card shadow-sm border">
+        <div class="card-header bg-light py-2.5 px-3 border-bottom">
+            <h6 class="fw-bold text-dark mb-0 small"><i class="fas fa-coins me-1"></i> การใช้ AI เดือนนี้</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0 small">
+                <thead class="table-light"><tr><th class="px-3">ผู้ให้บริการ</th><th>Token เข้า / ออก</th><th>ค่าใช้จ่าย (บาท)</th><th>งบ/เดือน</th></tr></thead>
+                <tbody>
+                {% for row in ai_usage %}
+                    <tr>
+                        <td class="px-3 fw-bold">{{ row.provider }}</td>
+                        <td class="font-monospace">{{ row.tokens_in }} / {{ row.tokens_out }}</td>
+                        <td>{% if row.priced %}{{ row.cost|floatformat:2 }}{% else %}<span class="text-muted">ยังไม่ตั้งราคา</span>{% endif %}</td>
+                        <td>{% if row.budget is not None %}{{ row.budget }}{% else %}<span class="text-muted">ไม่จำกัด</span>{% endif %}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- รหัสเปิดกล่องส่วนตัว: ใช้ปลดล็อกกล่องประวัติ/รอบซักประวัติ LINE -->
+    <div class="card shadow-sm border" id="box-password">
+        <div class="card-header bg-light py-2.5 px-3 border-bottom">
+            <h6 class="fw-bold text-dark mb-0 small"><i class="fas fa-key me-1"></i> รหัสเปิดกล่องส่วนตัว (Box Password)</h6>
+        </div>
+        <div class="card-body p-4" style="max-width: 560px;">
+            <p class="small text-muted">
+                {% if request.user.has_box_password %}ตั้งรหัสไว้แล้ว กรอกด้านล่างเพื่อเปลี่ยนรหัส{% else %}ยังไม่ได้ตั้งรหัส ต้องตั้งก่อนจึงจะเปิดกล่องประวัติผู้ป่วยได้{% endif %}
+                ใช้รหัสแยกจากรหัสเข้าสู่ระบบ
+            </p>
+            <form method="POST" action="{% url 'patients:doctor_settings' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="set_box_password">
+                <label class="form-label small fw-bold">รหัสผ่านเข้าสู่ระบบปัจจุบัน (ยืนยันตัวตน)</label>
+                <input type="password" name="current_password" class="form-control mb-2" required autocomplete="current-password">
+                <label class="form-label small fw-bold">รหัสเปิดกล่องใหม่ (อย่างน้อย 8 ตัวอักษร)</label>
+                <input type="password" name="box_password" class="form-control mb-2" required minlength="8" autocomplete="new-password">
+                <label class="form-label small fw-bold">ยืนยันรหัสเปิดกล่อง</label>
+                <input type="password" name="box_password_confirm" class="form-control mb-3" required minlength="8" autocomplete="new-password">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> บันทึกรหัสเปิดกล่อง</button>
+            </form>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

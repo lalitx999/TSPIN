@@ -255,6 +255,18 @@ class Box(SoftDeleteModel):
     decision = models.CharField(max_length=20, choices=Decision.choices, blank=True)
     doctor_notes = models.TextField(blank=True)
 
+    # รอบซักประวัติ (LINE/เว็บ): กล่องสถานะ DRAFT คือรอบที่ยังคุยอยู่ ข้อความใหม่จะต่อเข้ากล่องเดิม
+    last_activity_at = models.DateTimeField(null=True, blank=True, db_index=True)
+
+    # บันทึกเวชระเบียนที่สร้างจากกล่องนี้ (กันบันทึกซ้ำ และย้อนกลับไปดูต้นฉบับได้)
+    emr_history = models.OneToOneField(
+        'patients.PatientHistory',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='source_box',
+    )
+
     # Emergency Break-Glass Flag
     is_break_glass = models.BooleanField(default=False)
     break_glass_reason = models.TextField(blank=True)

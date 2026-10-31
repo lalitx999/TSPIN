@@ -122,3 +122,23 @@ class AgenticArtifact(models.Model):
 
     def __str__(self):
         return f"Artifact [{self.get_artifact_type_display()}]: {self.patient.hn} ({self.get_status_display()})"
+
+
+class AIUsageLog(models.Model):
+    """
+    บันทึกการใช้ LLM ทุกครั้ง (token และค่าใช้จ่ายโดยประมาณ) ใช้คุมงบรายเดือนต่อผู้ให้บริการ
+    ไม่เก็บเนื้อหาคำถาม/คำตอบ
+    """
+    provider = models.CharField(max_length=30, db_index=True)
+    model_name = models.CharField(max_length=100, blank=True)
+    purpose = models.CharField(max_length=50, help_text="เช่น intake_soap")
+    prompt_tokens = models.PositiveIntegerField(default=0)
+    completion_tokens = models.PositiveIntegerField(default=0)
+    estimated_cost_thb = models.DecimalField(max_digits=10, decimal_places=4, null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        app_label = 'intelligence'
+        db_table = 'ai_usage_logs'
+        ordering = ['-created_at']

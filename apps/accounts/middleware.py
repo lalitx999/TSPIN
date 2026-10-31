@@ -60,3 +60,23 @@ class IdleSessionTimeoutMiddleware:
 
         response = self.get_response(request)
         return response
+
+
+class ForcePasswordChangeMiddleware:
+    """
+    ถ้าล็อกอินด้วยรหัสที่ผู้ดูแลตั้งให้ (must_change_password) จะเข้าได้แค่หน้าเปลี่ยนรหัส/ออกจากระบบ
+    ธงอยู่ใน session ที่ตั้งตอนล็อกอิน
+    """
+    ALLOWED_PREFIXES = ('/accounts/password/change/', '/accounts/logout/', '/static/', '/health')
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if (
+            request.user.is_authenticated
+            and request.session.get('force_password_change')
+            and not request.path.startswith(self.ALLOWED_PREFIXES)
+        ):
+            return redirect('accounts:password_change')
+        return self.get_response(request)

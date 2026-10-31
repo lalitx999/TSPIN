@@ -24,6 +24,7 @@ class BotanyConfig:
     # AI Provider Keys
     DEEPSEEK_API_KEY: str = os.getenv("DEEPSEEK_API_KEY", "").strip()
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "").strip()
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "").strip()
     GEMINI_API_KEY: str = (
         os.getenv("GEMINI_API_KEY", "") or os.getenv("GOOGLE_AI_API_KEY", "")
     ).strip()
@@ -42,6 +43,11 @@ class BotanyConfig:
     GROQ_MODEL: str = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b").strip()
     GEMINI_FLASH_MODEL: str = os.getenv("GEMINI_FLASH_MODEL", "gemini-2.5-flash").strip()
     GEMINI_PRO_MODEL: str = os.getenv("GEMINI_PRO_MODEL", "gemini-2.5-pro").strip()
+    # ไม่มีค่าเริ่มต้น: ต้องระบุชื่อโมเดล OpenAI ที่บัญชีใช้ได้เองใน .env
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "").strip()
+
+    # ผู้ให้บริการที่ใช้ร่าง SOAP จากรอบซักประวัติ: groq | openai (Django อ่านค่าเดียวกันเพื่อตรวจงบก่อนเรียก)
+    SOAP_PROVIDER: str = os.getenv("AI_SOAP_PROVIDER", "groq").strip().lower()
 
     # Zero-Retention & Privacy Compliance Headers
     ZERO_RETENTION_ENABLED: bool = os.getenv("ZERO_RETENTION_ENABLED", "True").lower() in ("true", "1", "yes")
@@ -53,6 +59,10 @@ class BotanyConfig:
     @classmethod
     def is_groq_available(cls) -> bool:
         return bool(cls.GROQ_API_KEY)
+
+    @classmethod
+    def is_openai_available(cls) -> bool:
+        return bool(cls.OPENAI_API_KEY and cls.OPENAI_MODEL)
 
     @classmethod
     def is_deepseek_available(cls) -> bool:

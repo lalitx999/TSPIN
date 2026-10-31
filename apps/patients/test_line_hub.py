@@ -9,6 +9,7 @@ Verifies:
 """
 
 import json
+from django.core.cache import cache
 from datetime import date, timedelta
 from django.test import TestCase
 from django.urls import reverse
@@ -29,6 +30,7 @@ from patients.models import (
 
 class LineOACaregiverHubTests(TestCase):
     def setUp(self):
+        cache.clear()
         # สร้างบุคลากรทางการแพทย์ (Doctor & Nurse)
         self.doctor = User.objects.create_user(
             username='dr_line_test',
@@ -254,21 +256,18 @@ class LineOACaregiverHubTests(TestCase):
         self.assertEqual(history.doctor, self.doctor)
         self.assertEqual(history.patient, self.father)
 
-    def test_liff_request_otp_success_and_audit(self):
+    def test_liff_request_otp_sends_email_and_never_returns_code(self):
         """
         6. Step 1 OTP Request:
-        กรอก HN และเบอร์โทรที่ถูกต้อง -> ได้รับ token, masked phone และบันทึก AuditLog
+        กรอก HN -> ส่ง OTP ไปอีเมลในเวชระเบียน ได้ token + masked email และห้ามมีรหัส OTP ในคำตอบ API
         """
-        payload = {
-            'hn': self.father.hn,
-            'phone': '0811112222',
-            'role': 'FATHER',
-            'line_user_id': self.line_user.line_user_id
-        }
+        from django.core import mail
+        self.father.email = 'father@example.com'
+        self.father.save()
 
         resp = self.client.post(
             reverse('root_liff_request_otp_api'),
-            data=json.dumps(payload),
+            data=json.dumps({'identifier': self.father.hn, 'role': 'FATHER', 'line_user_id': self.line_user.line_user_id}),
             content_type='application/json'
         )
 
@@ -276,39 +275,73 @@ class LineOACaregiverHubTests(TestCase):
         data = resp.json()
         self.assertEqual(data['status'], 'ok')
         self.assertIn('token', data)
-        self.assertIn('081-xxx-2222', data['masked_phone'])
+        self.assertNotIn('debug_otp', data)
+        self.assertEqual(data['masked_email'], 'fa****@example.com')
 
-        # ตรวจสอบ AuditLog
+        token_obj = PatientLinkingToken.objects.get(token=data['token'])
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['father@example.com'])
+        self.assertIn(token_obj.nonce, mail.outbox[0].body)
+        self.assertNotIn(token_obj.nonce, resp.content.decode())
+
         audit = AuditLog.objects.filter(action='LINE_OTP_REQUESTED').first()
         self.assertIsNotNone(audit)
         self.assertEqual(audit.changes['hn'], self.father.hn)
 
-    def test_liff_request_otp_phone_mismatch_fails(self):
+    def test_liff_request_otp_without_email_requires_staff(self):
         """
-        7. Step 1 Phone Mismatch:
-        กรอกเบอร์โทรผิด -> โดน Reject 400 และบันทึก LINE_BINDING_FAILED Audit
+        7. ไม่มีอีเมลในเวชระเบียน -> ไม่ส่ง OTP ใด ๆ ให้ยืนยันกับเจ้าหน้าที่
         """
-        payload = {
-            'hn': self.father.hn,
-            'phone': '0999999999',  # เบอร์ผิด
-            'role': 'FATHER',
-            'line_user_id': self.line_user.line_user_id
-        }
-
+        from django.core import mail
         resp = self.client.post(
             reverse('root_liff_request_otp_api'),
-            data=json.dumps(payload),
+            data=json.dumps({'identifier': self.father.hn, 'role': 'FATHER', 'line_user_id': self.line_user.line_user_id}),
             content_type='application/json'
         )
+        self.assertEqual(resp.json()['status'], 'staff_required')
+        self.assertEqual(len(mail.outbox), 0)
 
+    def test_liff_otp_token_locked_after_five_wrong_codes(self):
+        token_obj, real_otp = PatientLinkingToken.create_otp_token(self.father)
+        wrong = '000000' if real_otp != '000000' else '111111'
+        for _ in range(5):
+            self.client.post(reverse('root_liff_verify_otp_api'), data=json.dumps({
+                'token': token_obj.token, 'otp': wrong, 'line_user_id': self.line_user.line_user_id,
+            }), content_type='application/json')
+        token_obj.refresh_from_db()
+        self.assertTrue(token_obj.is_used)
+        cache.clear()  # ล้าง rate limit ต่อนาที เพื่อพิสูจน์ว่า token ถูกเผาทิ้ง ไม่ใช่แค่โดนจำกัดความถี่
+        resp = self.client.post(reverse('root_liff_verify_otp_api'), data=json.dumps({
+            'token': token_obj.token, 'otp': real_otp, 'line_user_id': self.line_user.line_user_id,
+        }), content_type='application/json')
         self.assertEqual(resp.status_code, 400)
-        data = resp.json()
-        self.assertEqual(data['status'], 'error')
+        self.assertFalse(LinePatientBinding.objects.filter(patient=self.father, line_user=self.line_user).exists())
 
-        # ตรวจสอบ Failed AuditLog
-        audit = AuditLog.objects.filter(action='LINE_BINDING_FAILED').first()
-        self.assertIsNotNone(audit)
-        self.assertIn('Phone mismatch', audit.changes['reason'])
+    def test_liff_register_new_patient_sends_otp(self):
+        from django.core import mail
+        resp = self.client.post(reverse('root_liff_register_api'), data=json.dumps({
+            'first_name': 'ใหม่', 'last_name': 'ลงทะเบียน', 'national_id': '1100400123450',
+            'phone': '0899999999', 'email': 'new@example.com', 'pdpa_consent': True,
+            'line_user_id': 'U_NEW_REG',
+        }), content_type='application/json')
+        self.assertEqual(resp.json()['status'], 'ok')
+        patient = Patient.objects.get(email='new@example.com')
+        self.assertEqual(patient.status, 'pending')
+        self.assertTrue(patient.extra_data['needs_staff_verification'])
+        self.assertEqual(len(mail.outbox), 1)
+
+        again = self.client.post(reverse('root_liff_register_api'), data=json.dumps({
+            'first_name': 'ซ้ำ', 'last_name': 'ซ้ำ', 'national_id': '1100400123450',
+            'phone': '0899999998', 'email': 'dup@example.com', 'pdpa_consent': True, 'line_user_id': 'U_DUP',
+        }), content_type='application/json')
+        self.assertEqual(again.json()['status'], 'exists')
+
+    def test_liff_register_rejects_invalid_national_id(self):
+        resp = self.client.post(reverse('root_liff_register_api'), data=json.dumps({
+            'first_name': 'a', 'last_name': 'b', 'national_id': '1234567890123',
+            'phone': '0899999999', 'email': 'x@example.com', 'pdpa_consent': True, 'line_user_id': 'U_X',
+        }), content_type='application/json')
+        self.assertEqual(resp.status_code, 400)
 
     def test_liff_verify_otp_wrong_code_fails(self):
         """

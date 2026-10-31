@@ -167,6 +167,10 @@
                 <i class="fas fa-calendar-alt"></i>
                 <span>ปฏิทินนัดหมายแพทย์</span>
             </a>
+            <a href="{% url 'clinical:intake_list' %}" class="doctor-nav-item {% if 'intake' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fab fa-line"></i>
+                <span>ซักถามพูดคุยผ่าน LINE</span>
+            </a>
             <a href="{% url 'patients:staff_review_queue' %}" class="doctor-nav-item {% if 'review' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-stethoscope"></i>
                 <span>ตรวจทานเคส (Review Queue)</span>
@@ -314,6 +318,9 @@
             </a>
             <a href="{% url 'patients:doctor_appointments' %}" class="doctor-nav-item {% if request.resolver_match.url_name == 'doctor_appointments' %}active{% endif %}">
                 <i class="fas fa-calendar-alt"></i> ปฏิทินนัดหมายแพทย์
+            </a>
+            <a href="{% url 'clinical:intake_list' %}" class="doctor-nav-item {% if 'intake' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fab fa-line"></i> ซักถามพูดคุยผ่าน LINE
             </a>
 
             <div class="sidebar-category-title">39 แกนชีววิทยา & 12 โดเมน</div>

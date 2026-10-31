@@ -8,7 +8,9 @@
             <span class="small fw-bold text-dark">
                 <i class="fas fa-user-md text-primary me-1"></i>
                 {% if history.doctor %}
-                    นพ./พญ. {{ history.doctor.get_full_name|default:history.doctor.username }}
+                    {% if history.doctor.role == 'doctor' %}นพ./พญ. {% endif %}{{ history.doctor.get_full_name|default:history.doctor.username }}
+                    {% if history.doctor.role != 'doctor' %}<span class="badge bg-light text-secondary border ms-1">{{ history.doctor.get_role_display }}</span>{% endif %}
+                    {% if history.source_box %}<span class="badge bg-success-subtle text-success border ms-1">จาก {{ history.source_box.get_source_display }}{% if history.source_box.contents.soap_source == 'ai' %} · AI ช่วยร่าง{% endif %}</span>{% endif %}
                 {% else %}
                     แพทย์ผู้ตรวจ
                 {% endif %}

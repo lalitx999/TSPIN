@@ -61,13 +61,16 @@ class SOAPStructurer:
             {"role": "user", "content": user_content}
         ]
 
-        # Call Groq Gateway with JSON mode
-        res = await gateway.call_groq_chat(
+        # เรียกผู้ให้บริการที่ตั้งค่าไว้ (AI_SOAP_PROVIDER) ในโหมด JSON
+        res = await gateway.call_chat(
+            config.SOAP_PROVIDER,
             messages=messages,
             temperature=0.1,
             max_tokens=1500,
-            response_format={"type": "json_object"} if config.is_groq_available() else None
+            json_mode=True,
         )
+        meta = {"provider": res.get("provider", config.SOAP_PROVIDER), "model": res.get("model", ""),
+                "usage": res.get("usage", {})}
 
         content = res.get("content", "")
 
@@ -93,7 +96,8 @@ class SOAPStructurer:
                 "success": True,
                 "is_fallback": False,
                 "soap": parsed_soap,
-                "gateway": "groq-llama-3.3-70b"
+                "gateway": f"{meta['provider']}:{meta['model']}",
+                **meta,
             }
         except Exception as e:
             logger.warning(f"Could not parse Groq SOAP JSON: {e}. Raw content: {content}")
@@ -106,7 +110,8 @@ class SOAPStructurer:
                     "assessment": content[:300],
                     "plan": "ส่งต่อข้อมูลให้แพทย์ผู้รักษาประเมินการรักษา"
                 },
-                "gateway": "groq-raw-fallback"
+                "gateway": "groq-raw-fallback",
+                **meta,
             }
 
 

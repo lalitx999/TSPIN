@@ -55,3 +55,6 @@ sentry.log
 .coverage
 htmlcov/
 .pytest_cache/
+
+# Encrypted clinical media (LINE/web uploads) — never commit
+private_media/

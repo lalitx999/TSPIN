@@ -643,6 +643,9 @@ class BotanyEnginePhase5Tests(TestCase):
         """[Phase 5 Clinical]: บันทึกคำสั่งการรักษาของแพทย์ เปลี่ยนสถานะเป็น reviewed และบันทึก AuditLog"""
         self.client.force_login(self.doctor)
         from clinical.models import Box
+        # ต้องปลดล็อกกล่องก่อนบันทึกคำสั่ง
+        self.client.post(reverse('clinical:box_unlock', kwargs={'box_id': self.box.id}),
+                         {'box_password': 'DoctorSecretBoxKey2026!'})
 
         resp = self.client.post(
             reverse('clinical:box_decision', kwargs={'box_id': self.box.id}),
@@ -915,7 +918,7 @@ class NursingAssistantRoleTests(TestCase):
     def setUp(self):
         self.na = User.objects.create_user(
             username='na_test', email='na@tspi.test', password='AssistantPass2026!x',
-            role=User.Role.NURSING_ASSISTANT,
+            role=User.Role.NURSING_ASSISTANT, must_change_password=False,
         )
 
     def test_can_login_to_staff_portal_and_open_clinical_pages(self):
@@ -942,3 +945,49 @@ class NursingAssistantRoleTests(TestCase):
         )
         with self.assertRaises(PermissionDenied):
             item.approve(self.na)
+
+
+class ForcedPasswordChangeTests(TestCase):
+    """บัญชีที่ผู้ดูแลตั้งรหัสให้ ต้องเปลี่ยนรหัสก่อนเข้าหน้าอื่น"""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='provisioned', email='prov@tspi.test', password='InitialPass2026!x', role=User.Role.NURSE,
+        )
+        self.assertTrue(self.user.must_change_password)
+
+    def _login(self):
+        return self.client.post(reverse('accounts:doctor_login'), {
+            'email_or_username': 'prov@tspi.test', 'password': 'InitialPass2026!x',
+        })
+
+    def test_login_redirects_to_change_and_blocks_other_pages(self):
+        self.assertRedirects(self._login(), reverse('accounts:password_change'), fetch_redirect_response=False)
+        self.assertRedirects(self.client.get('/doctor/dashboard/'), reverse('accounts:password_change'),
+                             fetch_redirect_response=False)
+
+    def test_changing_password_clears_flag_and_unblocks(self):
+        self._login()
+        resp = self.client.post(reverse('accounts:password_change'), {
+            'old_password': 'InitialPass2026!x', 'new_password1': 'BrandNewSecret2026!', 'new_password2': 'BrandNewSecret2026!',
+        })
+        self.assertEqual(resp.status_code, 302)
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.must_change_password)
+        self.assertEqual(self.client.get('/doctor/dashboard/').status_code, 200)
+
+    def test_weak_new_password_rejected(self):
+        self._login()
+        self.client.post(reverse('accounts:password_change'), {
+            'old_password': 'InitialPass2026!x', 'new_password1': 'short1', 'new_password2': 'short1',
+        })
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.must_change_password)
+
+    def test_login_next_rejects_protocol_relative_redirect(self):
+        self.user.must_change_password = False
+        self.user.save()
+        resp = self.client.post(reverse('accounts:doctor_login') + '?next=//evil.example/x', {
+            'email_or_username': 'prov@tspi.test', 'password': 'InitialPass2026!x',
+        })
+        self.assertNotIn('evil.example', resp['Location'])

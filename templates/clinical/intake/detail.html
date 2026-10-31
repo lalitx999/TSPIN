@@ -1,0 +1,124 @@
+{% extends 'layouts/doctor_base.html' %}
+
+{% block title %}รอบซักประวัติ — {{ box.patient.full_name }} | TSPI CLINIC{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column gap-4">
+
+    <div class="card shadow-sm border">
+        <div class="card-body p-3 p-md-4 d-flex flex-column flex-md-row justify-content-between gap-3">
+            <div>
+                <a href="{% url 'clinical:intake_list' %}" class="small text-muted text-decoration-none"><i class="fas fa-arrow-left me-1"></i> กลับรายการ</a>
+                <h1 class="h4 fw-bold mb-1 mt-1 text-dark">{{ box.patient.full_name }}</h1>
+                <div class="small text-muted">
+                    HN: <span class="font-monospace">{{ box.patient.hn }}</span> &bull;
+                    {% if box.source == 'LINE' %}LINE{% else %}เว็บ{% endif %} &bull;
+                    {{ box.get_status_display }}
+                    {% if box.contents.red_flag %}<span class="badge bg-danger ms-1">อาการฉุกเฉิน</span>{% endif %}
+                </div>
+            </div>
+            {% if box.emr_history %}
+            <a href="{% url 'patients:patient_detail' box.patient.id %}" class="btn btn-outline-success align-self-start">
+                <i class="fas fa-check me-1"></i> บันทึกเข้าเวชระเบียนแล้ว — ดูแฟ้ม
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if not is_unlocked %}
+    <div class="card shadow-sm border">
+        <div class="card-body p-4" style="max-width: 520px;">
+            <h6 class="fw-bold text-dark"><i class="fas fa-lock me-1"></i> กล่องนี้ถูกล็อก</h6>
+            {% if has_box_password %}
+            <form method="POST" action="{% url 'clinical:box_unlock' box.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <label for="box_password" class="form-label small text-muted">กรอกรหัสเปิดกล่องส่วนตัวเพื่ออ่านบทสนทนา</label>
+                <div class="input-group">
+                    <input type="password" id="box_password" name="box_password" class="form-control" required autofocus>
+                    <button type="submit" class="btn btn-primary">ปลดล็อก</button>
+                </div>
+            </form>
+            {% else %}
+            <p class="small text-muted mb-2">ท่านยังไม่ได้ตั้งรหัสเปิดกล่องส่วนตัว</p>
+            <a href="{% url 'patients:doctor_settings' %}" class="btn btn-sm btn-primary">ไปตั้งรหัสที่หน้าตั้งค่า</a>
+            {% endif %}
+            <p class="small text-muted mt-3 mb-0">กรณีฉุกเฉินใช้ Break-Glass ได้ที่ <a href="{% url 'clinical:box_detail' box.id %}">หน้ากล่อง</a></p>
+        </div>
+    </div>
+    {% else %}
+    <div class="row g-4">
+        <!-- บทสนทนาต้นฉบับ -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm border h-100">
+                <div class="card-header bg-light py-2.5 px-3"><h6 class="fw-bold mb-0 small">บทสนทนาต้นฉบับ ({{ chat_messages|length }})</h6></div>
+                <div class="card-body p-3 d-flex flex-column gap-2" style="max-height: 640px; overflow-y: auto;">
+                    {% for m in chat_messages %}
+                    <div class="p-2.5 rounded-3 border bg-white small">
+                        <div class="text-muted mb-1" style="font-size: 0.7rem;">{{ m.at_display|date:"d/m/Y H:i" }}</div>
+                        {% if m.kind == 'text' %}
+                            <div style="white-space: pre-line;">{{ m.text }}</div>
+                        {% elif not m.media %}
+                            <div class="text-danger">[ไฟล์ {{ m.kind }} ดึงจาก LINE ไม่สำเร็จ]</div>
+                        {% elif m.kind == 'image' %}
+                            <a href="{% url 'clinical:intake_media' box.id m.media.media_id %}" target="_blank">
+                                <img src="{% url 'clinical:intake_media' box.id m.media.media_id %}" alt="รูปจากผู้ป่วย" class="img-fluid rounded-2" style="max-height: 260px;">
+                            </a>
+                        {% elif m.kind == 'audio' %}
+                            <audio controls preload="none" src="{% url 'clinical:intake_media' box.id m.media.media_id %}" class="w-100"></audio>
+                        {% elif m.kind == 'video' %}
+                            <video controls preload="none" src="{% url 'clinical:intake_media' box.id m.media.media_id %}" class="w-100 rounded-2"></video>
+                        {% else %}
+                            <a href="{% url 'clinical:intake_media' box.id m.media.media_id %}" target="_blank"><i class="fas fa-file me-1"></i> เปิดไฟล์</a>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <p class="text-muted small mb-0">ยังไม่มีข้อความ</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- SOAP -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm border">
+                <div class="card-header bg-light py-2.5 px-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 small">SOAP</h6>
+                    {% if soap_source == 'ai' %}
+                    <span class="badge bg-warning-subtle text-warning-emphasis border">ร่างโดย AI ({{ ai_meta.gateway }}) — ต้องตรวจทาน</span>
+                    {% endif %}
+                </div>
+                <div class="card-body p-3">
+                    {% if not box.emr_history %}
+                    <form method="POST" action="{% url 'clinical:intake_summarize' box.id %}" class="mb-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-wand-magic-sparkles me-1"></i> {% if soap_source == 'ai' %}ให้ AI สรุปใหม่{% else %}ให้ AI สรุป SOAP{% endif %}
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'clinical:intake_commit' box.id %}">
+                        {% csrf_token %}
+                        <label class="form-label small fw-bold mb-1">S — อาการที่ผู้ป่วยเล่า</label>
+                        <textarea name="subjective" class="form-control form-control-sm mb-2" rows="3" {% if box.emr_history %}readonly{% endif %}>{{ soap.subjective }}</textarea>
+                        <label class="form-label small fw-bold mb-1">O — สิ่งที่ตรวจพบ / ผลแล็บ</label>
+                        <textarea name="objective" class="form-control form-control-sm mb-2" rows="3" {% if box.emr_history %}readonly{% endif %}>{{ soap.objective }}</textarea>
+                        <label class="form-label small fw-bold mb-1">A — การประเมิน</label>
+                        <textarea name="assessment" class="form-control form-control-sm mb-2" rows="3" {% if box.emr_history %}readonly{% endif %}>{{ soap.assessment }}</textarea>
+                        <label class="form-label small fw-bold mb-1">P — แผนการดูแล</label>
+                        <textarea name="plan" class="form-control form-control-sm mb-3" rows="3" {% if box.emr_history %}readonly{% endif %}>{{ soap.plan }}</textarea>
+                        {% if not box.emr_history %}
+                        <button type="submit" class="btn btn-primary w-100" onclick="return confirm('ยืนยันบันทึก SOAP นี้เข้าเวชระเบียนในชื่อของท่าน?');">
+                            <i class="fas fa-file-medical me-1"></i> บันทึกเข้าเวชระเบียน
+                        </button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

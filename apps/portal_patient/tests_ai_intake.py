@@ -47,16 +47,20 @@ class PatientAIIntakePersistenceTests(TestCase):
         self.assertTrue(data['success'])
         self.assertIn('ผื่นคัน', data['reply'])
 
-        # Verify DB persistence
+        # ข้อความต้องเข้ารอบซักประวัติ (Box) รอบุคลากรตรวจ ไม่เขียนทับอาการหลักในเวชระเบียน
+        from clinical.models import Box
+        box = Box.objects.get(patient=self.patient, source=Box.Source.WEB)
+        self.assertEqual(box.status, Box.Status.DRAFT)
+        self.assertIn('ผื่นคัน', box.contents['messages'][0]['text'])
         self.patient.refresh_from_db()
-        self.assertIn('ผื่นคัน', self.patient.chief_complaint)
+        self.assertNotIn('ผื่นคัน', self.patient.chief_complaint or '')
         self.assertIn('intake_messages', self.patient.extra_data)
         self.assertEqual(len(self.patient.extra_data['intake_messages']), 2)
         self.assertEqual(self.patient.extra_data['intake_messages'][0]['sender'], 'user')
         self.assertEqual(self.patient.extra_data['intake_messages'][1]['sender'], 'ai')
 
-    def test_ai_intake_chat_completion_creates_patient_history_note(self):
-        """เมื่อบทสนทนาจบลง (Complete) ต้องสร้าง PatientHistory (SOAP Note) อัตโนมัติ"""
+    def test_ai_intake_chat_completion_closes_box_without_writing_emr(self):
+        """จบบทสนทนาแล้วกล่องพร้อมให้บุคลากรตรวจ แต่ยังไม่มีอะไรเข้าเวชระเบียนจนกว่าบุคลากรจะกดบันทึก"""
         response = self.client.post(
             reverse('portal_patient:ai_intake_chat_api'),
             {'message': 'บอกอาการครบแล้วครับ ขอบคุณครับ'}
@@ -65,13 +69,12 @@ class PatientAIIntakePersistenceTests(TestCase):
         data = response.json()
         self.assertTrue(data['is_completed'])
 
-        # Check PatientHistory created
-        history_entry = PatientHistory.objects.filter(patient=self.patient).first()
-        self.assertIsNotNone(history_entry)
-        self.assertIn("AI Anamnesis Intake", history_entry.subjective)
+        from clinical.models import Box
+        self.assertEqual(Box.objects.get(patient=self.patient, source=Box.Source.WEB).status, Box.Status.DONE)
+        self.assertFalse(PatientHistory.objects.filter(patient=self.patient).exists())
 
     def test_ai_intake_fallback_api_saves_manual_symptoms(self):
-        """Gotcha 4: ฟอร์ม Fallback กรอกอาการเอง ต้องบันทึกเข้า DB และสร้าง PatientHistory ทันที"""
+        """Gotcha 4: ฟอร์ม Fallback ต้องบันทึกอาการเข้ากล่องที่พร้อมให้บุคลากรตรวจ (ไม่เขียนเวชระเบียนตรง)"""
         response = self.client.post(
             reverse('portal_patient:ai_intake_fallback_api'),
             {'manual_notes': 'ส่งอาการโดยตรง: มีอาการเวียนศีรษะและอ่อนเพลียเรื้อรัง'}
@@ -80,10 +83,11 @@ class PatientAIIntakePersistenceTests(TestCase):
         data = response.json()
         self.assertTrue(data['success'])
 
-        self.patient.refresh_from_db()
-        self.assertIn('เวียนศีรษะ', self.patient.chief_complaint)
-        history_entry = PatientHistory.objects.filter(patient=self.patient, subjective__contains='เวียนศีรษะ').first()
-        self.assertIsNotNone(history_entry)
+        from clinical.models import Box
+        box = Box.objects.get(patient=self.patient, source=Box.Source.WEB)
+        self.assertEqual(box.status, Box.Status.DONE)
+        self.assertIn('เวียนศีรษะ', box.contents['messages'][0]['text'])
+        self.assertFalse(PatientHistory.objects.filter(patient=self.patient).exists())
 
 
     def test_axes_result_view_renders_all_39_axes_from_database(self):

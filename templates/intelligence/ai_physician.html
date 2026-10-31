@@ -45,6 +45,11 @@
                     {% endif %}
                 </div>
                 <div class="card-body p-3">
+                    {% if auto_selected %}
+                        <div class="alert alert-info border-0 p-2 small mb-3">
+                            <i class="fas fa-circle-info me-1"></i> เลือกให้อัตโนมัติ: คนไข้ล่าสุดที่มีข้อมูลเข้า ตรวจชื่อก่อนถาม
+                        </div>
+                    {% endif %}
                     {% if patient %}
                         <div class="d-flex align-items-center gap-3 mb-3">
                             <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-5" style="width: 46px; height: 46px;">
@@ -93,6 +98,20 @@
                                 <i class="fas fa-users me-1"></i> เลือกคนไข้จากเวชระเบียน
                             </a>
                         </div>
+                    {% endif %}
+
+                    {% if recent_patients %}
+                    <div class="mt-3 pt-3 border-top">
+                        <span class="small fw-semibold text-dark d-block mb-1">คนไข้ที่มีข้อมูลเข้าล่าสุด</span>
+                        <div class="list-group list-group-flush small">
+                            {% for rp in recent_patients %}
+                            <a href="?patient_id={{ rp.pk }}" class="list-group-item list-group-item-action px-2 py-1.5 {% if patient and rp.pk == patient.pk %}active{% endif %}">
+                                {{ rp.full_name }} <span class="font-monospace opacity-75">({{ rp.hn }})</span>
+                            </a>
+                            {% endfor %}
+                            <a href="?general=1" class="list-group-item list-group-item-action px-2 py-1.5 text-muted">ปรึกษาแบบทั่วไป (ไม่เลือกคนไข้)</a>
+                        </div>
+                    </div>
                     {% endif %}
                 </div>
             </div>

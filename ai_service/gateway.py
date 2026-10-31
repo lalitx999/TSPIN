@@ -14,6 +14,15 @@ from .config import config
 logger = logging.getLogger("tspi.gateway")
 
 
+
+def _usage(data: Dict[str, Any]) -> Dict[str, int]:
+    """จำนวน token จาก response แบบ OpenAI-compatible (ใช้คำนวณงบต่อผู้ให้บริการ)"""
+    usage = data.get("usage") or {}
+    return {
+        "prompt_tokens": int(usage.get("prompt_tokens") or 0),
+        "completion_tokens": int(usage.get("completion_tokens") or 0),
+    }
+
 class ExternalAIGateway:
     """Enterprise Gateway for Gemini, Groq, and DeepSeek Cloud AI services."""
 
@@ -62,13 +71,68 @@ class ExternalAIGateway:
                 if resp.status_code == 200:
                     data = resp.json()
                     content = data["choices"][0]["message"]["content"]
-                    return {"success": True, "content": content, "raw": data}
+                    return {"success": True, "content": content, "raw": data,
+                            "provider": "groq", "model": config.GROQ_MODEL, "usage": _usage(data)}
                 else:
                     logger.error(f"Groq API Error [{resp.status_code}]: {resp.text}")
                     return {"success": False, "error": f"HTTP_{resp.status_code}", "detail": resp.text}
         except Exception as e:
             logger.error(f"Groq Request Exception: {e}", exc_info=True)
             return {"success": False, "error": str(e)}
+
+    # =========================================================================
+    # 1b. OPENAI (ChatGPT) CLIENT
+    # =========================================================================
+    async def call_openai_chat(
+        self,
+        messages: List[Dict[str, str]],
+        max_tokens: int = 2048,
+        response_format: Optional[Dict[str, str]] = None
+    ) -> Dict[str, Any]:
+        """Calls OpenAI Chat Completions. ไม่ส่ง temperature เพราะโมเดลตระกูล reasoning รับเฉพาะค่าเริ่มต้น"""
+        if not config.is_openai_available():
+            return {"success": False, "error": "OPENAI_NOT_CONFIGURED",
+                    "content": "ขออภัยครับ ไม่พบการตั้งค่า OPENAI_API_KEY / OPENAI_MODEL ในระบบ"}
+
+        payload: Dict[str, Any] = {
+            "model": config.OPENAI_MODEL,
+            "messages": messages,
+            "max_completion_tokens": max_tokens,
+        }
+        if response_format:
+            payload["response_format"] = response_format
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                resp = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {config.OPENAI_API_KEY}", "Content-Type": "application/json"},
+                    json=payload,
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    return {"success": True, "content": data["choices"][0]["message"]["content"], "raw": data,
+                            "provider": "openai", "model": config.OPENAI_MODEL, "usage": _usage(data)}
+                logger.error(f"OpenAI API Error [{resp.status_code}]")
+                return {"success": False, "error": f"HTTP_{resp.status_code}"}
+        except Exception as e:
+            logger.error(f"OpenAI Request Exception: {e}", exc_info=True)
+            return {"success": False, "error": type(e).__name__}
+
+    async def call_chat(
+        self,
+        provider: str,
+        messages: List[Dict[str, str]],
+        temperature: float = 0.2,
+        max_tokens: int = 2048,
+        json_mode: bool = False,
+    ) -> Dict[str, Any]:
+        """เรียกผู้ให้บริการแชทตามที่ตั้งค่าไว้ (groq | openai)"""
+        fmt = {"type": "json_object"} if json_mode else None
+        if provider == "openai":
+            return await self.call_openai_chat(messages, max_tokens=max_tokens,
+                                               response_format=fmt if config.is_openai_available() else None)
+        return await self.call_groq_chat(messages, temperature=temperature, max_tokens=max_tokens,
+                                         response_format=fmt if config.is_groq_available() else None)
 
     # =========================================================================
     # 2. DEEPSEEK CLIENT (Deep Biological Reasoning & 39 Axes Calculation)

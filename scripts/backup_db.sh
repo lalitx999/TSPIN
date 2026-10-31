@@ -26,8 +26,18 @@ fi
 BACKUP_SIZE=$(ls -lh "${BACKUP_FILE}" | awk '{print $5}')
 echo "[TSPI Backup] Backup successful: ${BACKUP_FILE} (${BACKUP_SIZE})"
 
+# Encrypted clinical media (LINE/web images, audio). Files are already Fernet-encrypted,
+# so the archive is safe at rest; it still needs the same FERNET_KEY/SECRET_KEY to restore.
+PRIVATE_MEDIA_ROOT="${PRIVATE_MEDIA_ROOT:-./private_media}"
+if [ -d "${PRIVATE_MEDIA_ROOT}" ]; then
+    MEDIA_FILE="${BACKUP_DIR}/tspi_media_backup_${TIMESTAMP}.tar.gz"
+    tar -czf "${MEDIA_FILE}" -C "$(dirname "${PRIVATE_MEDIA_ROOT}")" "$(basename "${PRIVATE_MEDIA_ROOT}")"
+    echo "[TSPI Backup] Media backup: ${MEDIA_FILE} ($(ls -lh "${MEDIA_FILE}" | awk '{print $5}'))"
+fi
+
 # Retention Rotation: Remove backups older than 7 days
 echo "[TSPI Backup] Cleaning up backups older than ${RETENTION_DAYS} days..."
 find "${BACKUP_DIR}" -name "tspi_db_backup_*.sql.gz" -type f -mtime +${RETENTION_DAYS} -delete
+find "${BACKUP_DIR}" -name "tspi_media_backup_*.tar.gz" -type f -mtime +${RETENTION_DAYS} -delete
 
 echo "[TSPI Backup] Completed successfully."

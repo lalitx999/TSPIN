@@ -55,7 +55,7 @@ RUN groupadd -g 1000 appgroup && \
 COPY . /app/
 
 # Ensure directories for static, media, and logs exist and have correct ownership
-RUN mkdir -p /app/staticfiles /app/media /app/logs && \
+RUN mkdir -p /app/staticfiles /app/media /app/private_media /app/logs && \
     chmod +x /app/entrypoint.sh && \
     chown -R appuser:appgroup /app
 

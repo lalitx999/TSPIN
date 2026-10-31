@@ -125,6 +125,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     # ⚠️ Session Timeout Enforcement (30 นาที idle / 12 ชั่วโมง absolute)
     'accounts.middleware.IdleSessionTimeoutMiddleware',
+    'accounts.middleware.ForcePasswordChangeMiddleware',
     # ⚠️ AxesMiddleware ต้องอยู่หลัง AuthenticationMiddleware เสมอ
     'axes.middleware.AxesMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -174,6 +175,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+# ไฟล์ทางคลินิก (เข้ารหัส) อยู่นอก MEDIA_ROOT เพื่อไม่ให้ nginx serve ตรง ๆ
+PRIVATE_MEDIA_ROOT = Path(os.environ.get('PRIVATE_MEDIA_ROOT', BASE_DIR / 'private_media'))
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -188,9 +191,39 @@ AUTHENTICATION_BACKENDS = [
 # ==============================================================================
 LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', '')
+# อีเมล (OTP ยืนยันตัวตนผ่าน LINE) ใช้ SMTP ของ Hostinger: ตั้งค่าใน .env
+# ถ้าไม่ตั้ง EMAIL_HOST จะพิมพ์อีเมลออก console (ใช้ตอนพัฒนา)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '465'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'True' if EMAIL_PORT == 465 else 'False').lower() in ('true', '1')
+EMAIL_USE_TLS = not EMAIL_USE_SSL and EMAIL_PORT == 587
+EMAIL_TIMEOUT = 15
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'no-reply@localhost')
+EMAIL_BACKEND = (
+    'django.core.mail.backends.smtp.EmailBackend' if EMAIL_HOST
+    else 'django.core.mail.backends.console.EmailBackend'
+)
+
+# Cache: Redis เมื่อมี REDIS_HOST (ต้องใช้ร่วมกันทุก gunicorn worker ไม่งั้น rate limit/OTP/กันเดารหัส
+# จะแยกกันคนละ process) ไม่มี Redis (ตอนพัฒนา/เทสต์) ใช้ locmem
+REDIS_HOST = os.environ.get('REDIS_HOST', '')
+if REDIS_HOST:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': f"redis://{REDIS_HOST}:{os.environ.get('REDIS_PORT', '6379')}/1",
+        }
+    }
+else:
+    CACHES = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}}
+
 # Shared secret for Django <-> FastAPI calls. No default: unset means internal calls fail closed.
 INTERNAL_API_TOKEN = os.environ.get('INTERNAL_API_TOKEN', '')
 AI_SERVICE_URL = os.environ.get('AI_SERVICE_URL', 'http://127.0.0.1:8088')
+# ผู้ให้บริการที่ใช้ร่าง SOAP (ต้องตรงกับ AI service) ใช้ตรวจงบก่อนเรียก
+AI_SOAP_PROVIDER = os.environ.get('AI_SOAP_PROVIDER', 'groq').strip().lower()
 
 # Blanks LLM provider keys during tests so the suite never calls paid APIs
 TEST_RUNNER = 'config.test_runner.OfflineAITestRunner'

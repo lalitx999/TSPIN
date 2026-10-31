@@ -22,6 +22,7 @@ from patients.views_liff import (
     liff_request_otp_api,
     liff_verify_otp_api,
     liff_request_staff_assisted_api,
+    liff_register_api,
 )
 
 app_name = 'portal_patient'
@@ -73,4 +74,5 @@ urlpatterns = [
     path('line/liff/request-otp/', liff_request_otp_api, name='liff_request_otp_api'),
     path('line/liff/verify-otp/', liff_verify_otp_api, name='liff_verify_otp_api'),
     path('line/liff/request-staff-assisted/', liff_request_staff_assisted_api, name='liff_request_staff_assisted_api'),
+    path('line/liff/register/', liff_register_api, name='liff_register_api'),
 ]

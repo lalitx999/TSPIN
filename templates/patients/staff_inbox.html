@@ -203,6 +203,19 @@
                         {% endif %}
 
                         <div>{{ msg.content }}</div>
+                        {% if msg.raw_payload.stored_media %}
+                        <div class="mt-2">
+                            {% if msg.message_type == 'image' %}
+                            <a href="{% url 'patients:staff_inbox_media' msg.pk %}" target="_blank" rel="noopener">
+                                <img src="{% url 'patients:staff_inbox_media' msg.pk %}" alt="รูปที่ลูกค้าส่งมา" loading="lazy" class="img-fluid rounded" style="max-width: 240px;">
+                            </a>
+                            {% else %}
+                            <a href="{% url 'patients:staff_inbox_media' msg.pk %}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-paperclip me-1"></i> เปิดไฟล์
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
 
                         <!-- Action Bar for Clinical Candidate -->
                         {% if msg.direction == 'INCOMING' %}

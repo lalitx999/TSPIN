@@ -195,6 +195,8 @@ LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', '')
 # LIFF app id ("{channelId}-{suffix}"): ใช้ตรวจ ID token ของผู้ใช้ LINE ในฟอร์มยืนยันตัวตน
 LINE_LIFF_ID = os.environ.get('LINE_LIFF_ID', '')
+# ตอนรันเทสทำงาน LINE ทันทีใน request เดียวกัน เพราะ thread อื่นมองไม่เห็นข้อมูลใน transaction ของเทส
+LINE_DISPATCH_INLINE = 'test' in sys.argv
 # URL webhook ของระบบเก่า ส่งต่อข้อความของคนที่ไม่ได้เปิดบอทเรา (ว่าง = ไม่ส่งต่อ)
 LINE_RELAY_URL = os.environ.get('LINE_RELAY_URL', '')
 # OA ที่ลิงก์ "เปิดบอท" บนเว็บชี้ไป

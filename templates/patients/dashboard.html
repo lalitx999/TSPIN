@@ -24,6 +24,18 @@
         </div>
     </div>
 
+    <!-- เคสจาก LINE: อยู่บนสุดและอัปเดตเองทุก 30 วินาที -->
+    <div id="lineCases" data-url="{% url 'patients:doctor_line_cases' %}">{% include 'patients/partials/line_cases.html' %}</div>
+    <script>
+        setInterval(function () {
+            var box = document.getElementById('lineCases');
+            fetch(box.dataset.url, {credentials: 'same-origin'})
+                .then(function (r) { return r.ok && !r.redirected ? r.text() : null; })
+                .then(function (html) { if (html !== null) { box.innerHTML = html; } })
+                .catch(function () {});
+        }, 30000);
+    </script>
+
     <!-- Quick Stat Cards (Row 4 Cols) -->
     <div class="row g-3">
         <!-- Card 1: Total Patients -->
@@ -264,7 +276,7 @@
                 </div>
                 <div>
                     <h6 class="fw-bold text-dark mb-0">เวชระเบียนคนไข้จริงจากฐานข้อมูลคลินิก (PostgreSQL Live)</h6>
-                    <small class="text-muted">เชื่อมโยงข้อมูลจริง {{ total_patients|default:"3,028" }} ราย พร้อมประวัติอาการและผลประเมิน 39 แกน</small>
+                    <small class="text-muted">เชื่อมโยงข้อมูลจริง {{ total_patients }} ราย พร้อมประวัติอาการและผลประเมิน 39 แกน</small>
                 </div>
             </div>
             <a href="{% url 'patients:patient_list' %}" class="btn btn-sm btn-primary">

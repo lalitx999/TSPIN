@@ -1,0 +1,39 @@
+{% extends 'layouts/doctor_base.html' %}
+
+{% block title %}ป้าย QR เปิดบอท | TSPI Clinical EMR{% endblock %}
+
+{% block extra_doctor_head %}
+<style>
+    .qr-poster { max-width: 520px; margin: 0 auto; background: #fff; border: 1px solid #dee2e6; border-radius: 20px; padding: 2.5rem; text-align: center; }
+    .qr-poster svg { width: 100%; max-width: 320px; height: auto; }
+    .qr-poster h2 { font-size: 2rem; font-weight: 700; color: #14532D; }
+    .qr-poster ol { text-align: left; font-size: 1.3rem; line-height: 1.8; margin: 1.5rem auto 0; max-width: 24rem; }
+    @media print {
+        body * { visibility: hidden; }
+        .qr-poster, .qr-poster * { visibility: visible; }
+        .qr-poster { position: absolute; inset: 0; border: 0; max-width: none; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column gap-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pb-3 border-bottom">
+        <div>
+            <h1 class="h4 fw-bold mb-1 text-dark"><i class="fas fa-qrcode text-primary me-2"></i>ป้าย QR เปิดบอท</h1>
+            <p class="text-muted small mb-0">พิมพ์ติดเคาน์เตอร์ ให้คนไข้สแกนแล้วเริ่มใช้บอทคลินิกทาง LINE</p>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="window.print()"><i class="fas fa-print me-1"></i> พิมพ์ป้าย</button>
+    </div>
+
+    <div class="qr-poster">
+        <h2>ใช้บอทคลินิกทาง LINE</h2>
+        <div class="my-3">{{ qr_svg }}</div>
+        <ol>
+            <li>สแกน QR นี้ด้วยมือถือ</li>
+            <li>กดส่งคำว่า &ldquo;เปิดใช้งานบอท&rdquo;</li>
+            <li>กรอกชื่อกับเบอร์โทร แล้วใช้งานได้เลย</li>
+        </ol>
+    </div>
+</div>
+{% endblock %}

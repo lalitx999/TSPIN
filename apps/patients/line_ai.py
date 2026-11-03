@@ -24,11 +24,13 @@ DAILY_LIMIT_PER_USER = 30
 HISTORY_MESSAGES = 8
 HISTORY_WINDOW = timedelta(minutes=30)
 MAX_ANSWER_CHARS = 3500
+SEND_TO_DOCTOR_POSTBACK = 'action=send_to_doctor&msg='
 UNAVAILABLE_TEXT = 'ขออภัยครับ ตอนนี้ผู้ช่วย AI ไม่พร้อมใช้งาน ลองใหม่อีกครั้ง หรือกดปิดบอทแล้วฝากข้อความถึงเจ้าหน้าที่ได้ครับ'
 
 
-def answer_question(line_user_id: str, patient, text: str, reply_token: str) -> None:
-    _run_in_background(_answer, line_user_id, patient, text, reply_token)
+def answer_question(line_user_id: str, patient, text: str, reply_token: str, symptom_message_id: str = '') -> None:
+    """symptom_message_id: ถ้าข้อความนี้ดูเหมือนเล่าอาการ ใต้คำตอบจะมีปุ่มส่งข้อความนี้ให้หมอ"""
+    _run_in_background(_answer, line_user_id, patient, text, reply_token, symptom_message_id)
 
 
 def _run_in_background(func, *args) -> None:
@@ -40,11 +42,11 @@ def _run_in_background(func, *args) -> None:
     threading.Thread(target=run, daemon=True).start()
 
 
-def _answer(line_user_id: str, patient, text: str, reply_token: str) -> None:
+def _answer(line_user_id: str, patient, text: str, reply_token: str, symptom_message_id: str = '') -> None:
     try:
         LineMessagingService.show_loading(line_user_id)
         line_user = LineUser.objects.get(line_user_id=line_user_id)
-        card = _limit_card() if _over_daily_limit(line_user_id) else _ask_ai(line_user, patient, text)
+        card = _limit_card() if _over_daily_limit(line_user_id) else _ask_ai(line_user, patient, text, symptom_message_id)
         if not LineMessagingService.reply_message(reply_token, [card]):
             LineMessagingService.push_message(line_user_id, [card])
     except Exception as e:
@@ -76,11 +78,11 @@ def _history(line_user: LineUser, text: str) -> list:
     return history
 
 
-def _ask_ai(line_user: LineUser, patient, text: str) -> dict:
+def _ask_ai(line_user: LineUser, patient, text: str, symptom_message_id: str = '') -> dict:
     provider = settings.AI_SOAP_PROVIDER
     allowed, budget_msg = ai_budget.check_budget(provider)
     if not allowed:
-        return _answer_card(budget_msg)
+        return _answer_card(budget_msg, symptom_message_id=symptom_message_id)
     try:
         response = httpx.post(
             f"{settings.AI_SERVICE_URL}/api/ai/assistant/chat",
@@ -97,25 +99,32 @@ def _ask_ai(line_user: LineUser, patient, text: str) -> dict:
 
     answer = data.get('answer')
     if not answer:
-        return _answer_card(UNAVAILABLE_TEXT)
+        return _answer_card(UNAVAILABLE_TEXT, symptom_message_id=symptom_message_id)
     # เก็บคำตอบไว้ให้เจ้าหน้าที่เห็นว่า AI บอกอะไรคนไข้ และใช้เป็นบริบทของคำถามถัดไป
     CommunicationRecord.objects.create(
         line_message_id=f"ai_{uuid.uuid4().hex[:24]}", line_user=line_user, patient=patient,
         direction=CommunicationRecord.DirectionChoices.OUTGOING,
         message_type=CommunicationRecord.MessageTypeChoices.TEXT, content=answer,
     )
-    return _answer_card(answer, sources=data.get('sources') or [], emergency=data.get('kind') == 'emergency')
+    return _answer_card(answer, sources=data.get('sources') or [], emergency=data.get('kind') == 'emergency',
+                        symptom_message_id=symptom_message_id)
 
 
-def _answer_card(answer: str, sources=(), emergency: bool = False) -> dict:
+def _answer_card(answer: str, sources=(), emergency: bool = False, symptom_message_id: str = '') -> dict:
     body = answer if len(answer) <= MAX_ANSWER_CHARS else f"{answer[:MAX_ANSWER_CHARS]}…"
     if sources:
         body += '\n\nอ้างอิงเอกสารคลินิก:\n' + '\n'.join(f"[{i}] {title}" for i, title in enumerate(sources, 1))
     if emergency:
         return LineFlexMessageBuilder.build_bot_card('อาจเป็นภาวะฉุกเฉิน', body, danger=True, buttons=[
             LineFlexMessageBuilder.button_uri('โทร 1669', 'tel:1669', style='secondary')])
-    return LineFlexMessageBuilder.build_bot_card('ผู้ช่วย AI ของคลินิก', body, buttons=[
-        LineFlexMessageBuilder.button_message('เล่าอาการให้คลินิก', 'เริ่ม', style='secondary')])
+    if symptom_message_id:
+        body += '\n\nคำตอบนี้มาจาก AI หมอยังไม่เห็นข้อความนี้ ถ้าอยากให้หมอดู กดปุ่มด้านล่างได้เลย'
+        button = LineFlexMessageBuilder.button_postback(
+            'ส่งอาการนี้ให้หมอ', f'{SEND_TO_DOCTOR_POSTBACK}{symptom_message_id}', style='primary')
+    else:
+        body += '\n\nพิมพ์ถามต่อได้เลยครับ'
+        button = LineFlexMessageBuilder.button_message('เล่าอาการให้คลินิก', 'เริ่ม', style='secondary')
+    return LineFlexMessageBuilder.build_bot_card('ผู้ช่วย AI ของคลินิก', body, buttons=[button])
 
 
 def _limit_card() -> dict:

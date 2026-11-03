@@ -16,7 +16,7 @@ from django.urls import reverse
 from accounts.models import AuditLog, User
 from clinical import media_store, services_intake
 from clinical.models import Box
-from patients import line_relay
+from patients import line_alerts, line_relay
 from patients.line_service import make_line_register_token
 from patients.models import Patient, PatientHistory
 from patients.models_line import ClinicalReviewItem, CommunicationRecord, LineUser
@@ -296,6 +296,58 @@ class LineAiChatTests(IntakeTestBase):
         self.assertTrue(CommunicationRecord.objects.filter(
             line_user=self.line_user, direction='OUTGOING', content='ตอบจากเอกสาร [1]').exists())
 
+    def _tap_send_to_doctor(self, message_id, user_id='U_INTAKE_1', event_id='tap1'):
+        event = {'type': 'postback', 'replyToken': 'r', 'webhookEventId': event_id, 'source': {'userId': user_id},
+                 'postback': {'data': f'action=send_to_doctor&msg={message_id}'}}
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, [event])
+        return json.dumps(reply.call_args.args[1], ensure_ascii=False)
+
+    def test_symptom_answer_offers_send_to_doctor_and_general_question_does_not(self):
+        _, reply = self._ask('ปวดหัวมา 3 วัน', event_id='sym1')
+        text = json.dumps(reply.call_args.args[1], ensure_ascii=False)
+        self.assertIn('ส่งอาการนี้ให้หมอ', text)
+        self.assertIn('action=send_to_doctor&msg=sym1', text)
+        _, reply = self._ask('คลินิกเปิดกี่โมง', event_id='gen1')
+        text = json.dumps(reply.call_args.args[1], ensure_ascii=False)
+        self.assertNotIn('ส่งอาการนี้ให้หมอ', text)
+        self.assertIn('เล่าอาการให้คลินิก', text)
+
+    def test_send_to_doctor_submits_message_once_with_next_steps(self):
+        self._ask('ปวดหัวมา 3 วัน', event_id='sym2')
+        text = self._tap_send_to_doctor('sym2')
+        box = Box.objects.get(patient=self.patient)
+        self.assertEqual(box.status, Box.Status.DONE)
+        self.assertEqual(box.contents['messages'][0]['text'], 'ปวดหัวมา 3 วัน')
+        self.assertIn('พิมพ์ถาม AI ได้เลย', text)
+        self.assertIn('ส่งให้ทีมแพทย์แล้ว', self._tap_send_to_doctor('sym2', event_id='tap2'))
+        self.assertEqual(Box.objects.filter(patient=self.patient).count(), 1)
+
+    def test_send_to_doctor_cannot_take_another_users_message(self):
+        self._ask('ปวดหัวมา 3 วัน', event_id='sym3')
+        other = Patient.objects.create(hn='HN-INT-3', first_name='คนอื่น', last_name='ทดสอบ', phone='0899999999',
+                                       line_user_id='U_OTHER')
+        LineUser.objects.create(line_user_id='U_OTHER', display_name='อื่น', bot_enabled=True, active_patient=other)
+        self.assertIn('ไม่พบข้อความนี้', self._tap_send_to_doctor('sym3', user_id='U_OTHER'))
+        self.assertFalse(Box.objects.filter(patient=other).exists())
+
+    def test_send_to_doctor_joins_open_session(self):
+        self._ask('ปวดหัวมา 3 วัน', event_id='sym4')
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True):
+            _signed_post(self.client, [_text_event('U_INTAKE_1', 's2', 'เริ่ม'), _text_event('U_INTAKE_1', 's3', 'เวียนหัวด้วย')])
+        self.assertIn('เสร็จแล้ว', self._tap_send_to_doctor('sym4'))
+        box = Box.objects.get(patient=self.patient)
+        self.assertEqual(box.status, Box.Status.DRAFT)
+        self.assertEqual(len([m for m in box.contents['messages'] if m['sender'] == 'patient']), 2)
+
+    def test_done_card_tells_patient_what_to_do_next(self):
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, [_text_event('U_INTAKE_1', 'd1', 'เริ่ม'), _text_event('U_INTAKE_1', 'd2', 'ปวดหลัง'),
+                                       _text_event('U_INTAKE_1', 'd3', 'เสร็จแล้ว')])
+        text = json.dumps(reply.call_args.args[1], ensure_ascii=False)
+        self.assertIn('พิมพ์ถาม AI ได้เลย', text)
+        self.assertIn('ดูใบนัด', text)
+
     def test_next_question_sends_earlier_answer_as_context(self):
         self._ask('เบาหวานคืออะไร')
         post, _ = self._ask('กินข้าวได้ไหม', event_id='ai2')
@@ -342,6 +394,218 @@ class LineAiChatTests(IntakeTestBase):
         post, reply = self._ask('เบาหวานคืออะไร')
         post.assert_not_called()
         reply.assert_not_called()
+
+
+class LinePhase2Tests(IntakeTestBase):
+    """Dashboard หมอ แจ้งเตือนฉุกเฉิน แจ้งคนไข้เมื่อตรวจแล้ว และหน้าตรวจเบอร์ซ้ำ"""
+
+    def setUp(self):
+        super().setUp()
+        self.ai_background.side_effect = lambda func, *args: func(*args)
+        self.doctor = User.objects.create_user(username='doc_p2', password='x-Strong-pass-1', role=User.Role.DOCTOR,
+                                               email='doc@tspi.test')
+        self.client.force_login(self.doctor)
+
+    def _message(self, event_id, text):
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True):
+            _signed_post(self.client, [_text_event('U_INTAKE_1', event_id, text)])
+
+    def _duplicate_request(self):
+        """เบอร์ซ้ำจากฟอร์มจริง: ได้เวชระเบียนใหม่และคำขอย้าย LINE"""
+        existing = Patient.objects.create(hn='HN-INT-9', first_name='เดิม', last_name='คนไข้', phone='081-234-5678')
+        LineUser.objects.create(line_user_id='Uabc999', display_name='ใหม่', bot_enabled=True)
+        url = f"{reverse('root_line_register')}?t={make_line_register_token('Uabc999')}"
+        with patch('patients.views_line_register.LineMessagingService.push_message', return_value=True):
+            self.client.post(url, {'full_name': 'สมชาย ใจดี', 'phone': '0812345678', 'consent': 'on'})
+        return existing, ClinicalReviewItem.objects.get(patient=existing)
+
+    def test_dashboard_shows_emergency_before_patient_finishes(self):
+        self._message('e1', 'แน่นหน้าอกมาก หายใจไม่ออก')
+        self.assertEqual(Box.objects.get(patient=self.patient).status, Box.Status.DRAFT)
+        response = self.client.get(reverse('patients:dashboard'))
+        self.assertContains(response, 'มีเคสฉุกเฉินจาก LINE 1 เคส')
+        self.assertContains(response, reverse('clinical:intake_detail', kwargs={'box_id': Box.objects.get().id}))
+
+    def test_dashboard_lists_finished_case_but_not_open_ordinary_session(self):
+        self._message('n1', 'เริ่ม')
+        self._message('n2', 'ปวดหลังนิดหน่อย')
+        self.assertNotContains(self.client.get(reverse('patients:doctor_line_cases')), self.patient.hn)
+        self._message('n3', 'เสร็จแล้ว')
+        response = self.client.get(reverse('patients:doctor_line_cases'))
+        self.assertContains(response, self.patient.hn)
+        self.assertNotContains(response, 'ปวดหลัง')  # เนื้อหายังต้องปลดล็อกกล่องก่อน
+
+    def test_line_cases_requires_clinical_staff(self):
+        self.client.logout()
+        self.assertEqual(self.client.get(reverse('patients:doctor_line_cases')).status_code, 302)
+
+    def test_emergency_email_once_without_patient_details(self):
+        from django.core import mail
+        self._message('e2', 'แน่นหน้าอกมาก')
+        self._message('e3', 'หายใจไม่ออก แน่นหน้าอก')
+        self.assertEqual(len(mail.outbox), 1)
+        sent = mail.outbox[0]
+        self.assertEqual(sent.to, ['doc@tspi.test'])
+        self.assertNotIn(self.patient.first_name, sent.subject + sent.body)
+        self.assertNotIn('แน่นหน้าอก', sent.subject + sent.body)
+
+    def test_patient_told_when_case_saved_only_if_bot_on(self):
+        box = Box.objects.create(patient=self.patient, source=Box.Source.LINE, status=Box.Status.DONE,
+                                 contents={'messages': []})
+        with patch('patients.line_alerts.LineMessagingService.push_message', return_value=True) as push:
+            line_alerts.notify_patient_reviewed(box)
+        self.assertEqual(push.call_args.args[0], 'U_INTAKE_1')
+        self.assertIn('ทีมแพทย์ตรวจข้อมูลแล้ว', json.dumps(push.call_args.args[1], ensure_ascii=False))
+        self.line_user.bot_enabled = False
+        self.line_user.save()
+        with patch('patients.line_alerts.LineMessagingService.push_message', return_value=True) as push:
+            line_alerts.notify_patient_reviewed(box)
+        push.assert_not_called()
+
+    def test_link_request_only_on_its_own_page_and_queue_cannot_approve_it(self):
+        existing, item = self._duplicate_request()
+        self.assertNotContains(self.client.get(reverse('patients:staff_review_queue')), existing.hn)
+        page = self.client.get(reverse('patients:staff_line_links'))
+        self.assertContains(page, 'สมชาย ใจดี')
+        self.assertContains(page, existing.hn)
+        response = self.client.post(f'/staff/api/review-item/{item.pk}/approve/', {'clinical_summary': 'x'})
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(PatientHistory.objects.filter(patient=existing).exists())
+
+    def test_approving_moves_line_to_old_record_and_tells_patient(self):
+        existing, item = self._duplicate_request()
+        line_user = LineUser.objects.get(line_user_id='Uabc999')
+        temporary = line_user.active_patient
+        with patch('patients.line_links.LineMessagingService.push_message', return_value=True) as push:
+            self.client.post(reverse('patients:staff_line_link_decide', args=[item.pk]), {'decision': 'approve'})
+        line_user.refresh_from_db()
+        temporary.refresh_from_db()
+        existing.refresh_from_db()
+        item.refresh_from_db()
+        self.assertEqual(line_user.active_patient, existing)
+        self.assertEqual(existing.line_user_id, 'Uabc999')
+        self.assertIsNone(temporary.line_user_id)
+        self.assertEqual(item.status, ClinicalReviewItem.StatusChoices.APPROVED)
+        self.assertEqual(item.reviewer, self.doctor)
+        self.assertFalse(PatientHistory.objects.filter(patient=existing).exists())
+        self.assertEqual(push.call_args.args[0], 'Uabc999')
+        self.assertTrue(AuditLog.objects.filter(action='LINE_BINDING_SUCCESS', user=self.doctor).exists())
+
+    def test_rejecting_keeps_new_record(self):
+        existing, item = self._duplicate_request()
+        line_user = LineUser.objects.get(line_user_id='Uabc999')
+        temporary = line_user.active_patient
+        self.client.post(reverse('patients:staff_line_link_decide', args=[item.pk]), {'decision': 'reject'})
+        line_user.refresh_from_db()
+        item.refresh_from_db()
+        self.assertEqual(line_user.active_patient, temporary)
+        self.assertEqual(item.status, ClinicalReviewItem.StatusChoices.REJECTED)
+        existing.refresh_from_db()
+        self.assertIsNone(existing.line_user_id)
+
+
+class LineInboxMediaTests(IntakeTestBase):
+    """บอทปิด: ไฟล์ถูกเก็บแบบเข้ารหัสให้เจ้าหน้าที่ดู โดยบอทยังเงียบและไม่เปิดกล่อง"""
+
+    PNG = b'\x89PNG\r\n\x1a\n' + b'inbox-image-bytes'
+
+    def setUp(self):
+        super().setUp()
+        self.line_user.bot_enabled = False
+        self.line_user.save()
+        self.doctor = User.objects.create_user(username='doc_media', password='x-Strong-pass-1', role=User.Role.DOCTOR)
+
+    def _send(self, content=None, msg_type='image', msg_id='im1'):
+        event = {'type': 'message', 'replyToken': 'r', 'source': {'userId': 'U_INTAKE_1'},
+                 'message': {'id': msg_id, 'type': msg_type}}
+        with patch('patients.views_line.LineMessagingService.get_message_content',
+                   return_value=content if content is not None else (self.PNG, 'image/png')) as download, \
+                patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, [event])
+        return download, reply
+
+    def test_stored_encrypted_silently_without_box(self):
+        _, reply = self._send()
+        reply.assert_not_called()
+        self.assertFalse(Box.objects.filter(patient=self.patient).exists())
+        meta = CommunicationRecord.objects.get(line_message_id='im1').raw_payload['stored_media']
+        self.assertNotIn(b'inbox-image-bytes', (media_store._root() / meta['path']).read_bytes())
+        self.assertEqual(media_store.read_decrypted(meta), self.PNG)
+
+    def test_retry_does_not_download_twice(self):
+        self._send()
+        download, _ = self._send()
+        download.assert_not_called()
+
+    def test_download_failure_keeps_message(self):
+        with patch('patients.views_line.LineMessagingService.get_message_content', return_value=None):
+            _signed_post(self.client, [{'type': 'message', 'replyToken': 'r', 'source': {'userId': 'U_INTAKE_1'},
+                                        'message': {'id': 'im2', 'type': 'image'}}])
+        record = CommunicationRecord.objects.get(line_message_id='im2')
+        self.assertNotIn('stored_media', record.raw_payload)
+
+    def test_staff_can_view_with_audit_and_others_cannot(self):
+        self._send()
+        record = CommunicationRecord.objects.get(line_message_id='im1')
+        url = reverse('patients:staff_inbox_media', args=[record.pk])
+        self.assertEqual(self.client.get(url).status_code, 302)
+        patient_user = User.objects.create_user(username='pat_media', password='x-Strong-pass-1', role=User.Role.PATIENT)
+        self.client.force_login(patient_user)
+        self.assertEqual(self.client.get(url).status_code, 403)
+        self.client.force_login(self.doctor)
+        response = self.client.get(url)
+        self.assertEqual(response.content, self.PNG)
+        self.assertEqual(response['Content-Disposition'], 'inline')
+        self.assertTrue(AuditLog.objects.filter(action='INBOX_MEDIA_VIEWED', user=self.doctor).exists())
+        page = self.client.get(reverse('patients:staff_inbox'), {'user_id': self.line_user.line_user_id})
+        self.assertContains(page, url)
+
+    def test_risky_file_type_is_downloaded_not_rendered(self):
+        self._send(content=(b'<script>alert(1)</script>', 'text/html'), msg_type='file', msg_id='im3')
+        record = CommunicationRecord.objects.get(line_message_id='im3')
+        self.client.force_login(self.doctor)
+        response = self.client.get(reverse('patients:staff_inbox_media', args=[record.pk]))
+        self.assertEqual(response['Content-Disposition'], 'attachment')
+        self.assertEqual(response['Content-Type'], 'application/octet-stream')
+
+
+class LineQrPosterTests(TestCase):
+    @override_settings(LINE_BOT_LINK_ENABLED=False, LINE_OA_ID='@testoa')
+    def test_staff_get_printable_qr_of_the_opt_in_link(self):
+        url = reverse('patients:staff_line_qr')
+        self.assertEqual(self.client.get(url).status_code, 302)
+        self.client.force_login(User.objects.create_user(username='doc_qr', password='x-Strong-pass-1', role=User.Role.DOCTOR))
+        response = self.client.get(url)
+        self.assertContains(response, '<svg')
+        self.assertContains(response, 'เปิดใช้งานบอท')
+        self.assertIn('https://line.me/R/oaMessage/@testoa/?', response.context['link'])
+
+
+class LineDispatchTests(TestCase):
+    def test_same_user_stays_in_order_and_error_does_not_stop_queue(self):
+        import threading
+        from patients import line_dispatch
+        seen = []
+        done = threading.Event()
+
+        def fail():
+            raise RuntimeError('boom')
+
+        with override_settings(LINE_DISPATCH_INLINE=False), patch('patients.line_dispatch.connections'):
+            line_dispatch.submit('U1', seen.append, 1)
+            line_dispatch.submit('U1', fail)
+            line_dispatch.submit('U1', seen.append, 2)
+            line_dispatch.submit('U1', done.set)
+            self.assertTrue(done.wait(5))
+        self.assertEqual(seen, [1, 2])
+
+    @override_settings(LINE_CHANNEL_SECRET=LINE_SECRET, LINE_CHANNEL_ACCESS_TOKEN='', LINE_DISPATCH_INLINE=False)
+    def test_webhook_saves_message_before_slow_work_runs(self):
+        with patch('patients.views_line.line_dispatch.submit') as submit:
+            response = _signed_post(self.client, [_text_event('U_QUEUE', 'q1', 'สวัสดี')])
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(CommunicationRecord.objects.filter(line_message_id='q1').exists())
+        submit.assert_called_once()
 
 
 @override_settings(LINE_RELAY_URL='https://old.example/webhook/')

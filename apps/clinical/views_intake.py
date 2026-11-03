@@ -17,6 +17,7 @@ from accounts.views import get_client_ip
 from clinical import media_store, services_intake
 from clinical.models import Box
 from clinical.views_box import is_box_unlocked
+from patients import line_alerts
 
 INTAKE_SOURCES = (Box.Source.LINE, Box.Source.WEB, Box.Source.CLINIC)
 STATUS_TABS = {
@@ -105,6 +106,8 @@ def intake_commit_action(request: HttpRequest, box_id) -> HttpResponse:
     except ValueError as exc:
         messages.error(request, str(exc))
         return redirect('clinical:intake_detail', box_id=box.id)
+    if box.source == Box.Source.LINE:
+        line_alerts.notify_patient_reviewed(box)
     messages.success(request, "บันทึกเข้าเวชระเบียนเรียบร้อยแล้ว")
     return redirect('patients:patient_detail', patient_id=history.patient_id)
 

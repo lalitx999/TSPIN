@@ -171,6 +171,14 @@
                 <i class="fab fa-line"></i>
                 <span>ซักถามพูดคุยผ่าน LINE</span>
             </a>
+            <a href="{% url 'patients:staff_line_links' %}" class="doctor-nav-item {% if 'line_link' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-link"></i>
+                <span>ตรวจเบอร์ซ้ำจาก LINE</span>
+            </a>
+            <a href="{% url 'patients:staff_line_qr' %}" class="doctor-nav-item {% if request.resolver_match.url_name == 'staff_line_qr' %}active{% endif %}">
+                <i class="fas fa-qrcode"></i>
+                <span>ป้าย QR เปิดบอท</span>
+            </a>
             <a href="{% url 'patients:staff_review_queue' %}" class="doctor-nav-item {% if 'review' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-stethoscope"></i>
                 <span>ตรวจทานเคส (Review Queue)</span>
@@ -321,6 +329,12 @@
             </a>
             <a href="{% url 'clinical:intake_list' %}" class="doctor-nav-item {% if 'intake' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fab fa-line"></i> ซักถามพูดคุยผ่าน LINE
+            </a>
+            <a href="{% url 'patients:staff_line_links' %}" class="doctor-nav-item {% if 'line_link' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-link"></i> ตรวจเบอร์ซ้ำจาก LINE
+            </a>
+            <a href="{% url 'patients:staff_line_qr' %}" class="doctor-nav-item {% if request.resolver_match.url_name == 'staff_line_qr' %}active{% endif %}">
+                <i class="fas fa-qrcode"></i> ป้าย QR เปิดบอท
             </a>
 
             <div class="sidebar-category-title">39 แกนชีววิทยา & 12 โดเมน</div>

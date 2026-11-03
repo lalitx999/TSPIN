@@ -12,17 +12,30 @@ import logging
 from datetime import timedelta
 from typing import Dict, Any
 
+import segno
+from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse, HttpRequest, HttpResponse
+from django.http import Http404, JsonResponse, HttpRequest, HttpResponse
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_protect
 from django.db import transaction
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q, Max
 
 from accounts.decorators import clinical_staff_required, doctor_only
 from accounts.models import AuditLog, User
+from accounts.views import get_client_ip
+from clinical import media_store
+from patients.line_service import line_bot_link
+from patients.line_links import (
+    approve_link_request,
+    clinical_review_items,
+    is_link_request,
+    pending_link_requests,
+    reject_link_request,
+)
 from patients.models import (
     Patient,
     LineUser,
@@ -48,28 +61,28 @@ def staff_dashboard_view(request: HttpRequest) -> HttpResponse:
     today = timezone.now().date()
 
     # สถิติคิวตรวจทาน
-    pending_level1 = ClinicalReviewItem.objects.filter(
+    pending_level1 = clinical_review_items().filter(
         status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
         review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_1_INTAKE
     ).count()
 
-    pending_level2 = ClinicalReviewItem.objects.filter(
+    pending_level2 = clinical_review_items().filter(
         status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
         review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC
     ).count()
 
-    approved_today = ClinicalReviewItem.objects.filter(
+    approved_today = clinical_review_items().filter(
         status=ClinicalReviewItem.StatusChoices.APPROVED,
         reviewed_at__date=today
     ).count()
 
-    rejected_today = ClinicalReviewItem.objects.filter(
+    rejected_today = clinical_review_items().filter(
         status=ClinicalReviewItem.StatusChoices.REJECTED,
         reviewed_at__date=today
     ).count()
 
     # รายการเคสด่วนวิกฤต (Urgent Items) ที่ยังรอการอนุมัติ (Sort ขึ้นบนสุด)
-    urgent_items = ClinicalReviewItem.objects.filter(
+    urgent_items = clinical_review_items().filter(
         status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
         review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC
     ).select_related('patient', 'source_message').order_by('-created_at')[:5]
@@ -227,7 +240,7 @@ def staff_review_queue_view(request: HttpRequest) -> HttpResponse:
     status_filter = request.GET.get('status', ClinicalReviewItem.StatusChoices.PENDING_REVIEW)
     active_tab = request.GET.get('tab', 'level1')
 
-    base_qs = ClinicalReviewItem.objects.select_related(
+    base_qs = clinical_review_items().select_related(
         'patient', 'source_message', 'source_message__line_user', 'reviewer'
     ).order_by('-created_at')
 
@@ -238,12 +251,12 @@ def staff_review_queue_view(request: HttpRequest) -> HttpResponse:
     level2_items = base_qs.filter(review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC)
 
     # นับจำนวนสำหรับ Badges
-    p_level1_count = ClinicalReviewItem.objects.filter(
+    p_level1_count = clinical_review_items().filter(
         status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
         review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_1_INTAKE
     ).count()
 
-    p_level2_count = ClinicalReviewItem.objects.filter(
+    p_level2_count = clinical_review_items().filter(
         status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
         review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC
     ).count()
@@ -267,19 +280,19 @@ def staff_review_queue_poll_api(request: HttpRequest) -> JsonResponse:
     """
     Real-time Polling API (5 วินาที) สำหรับตรวจสอบจำนวนเคสรอตรวจทานแบบ Real-time
     """
-    p_level1_count = ClinicalReviewItem.objects.filter(
+    p_level1_count = clinical_review_items().filter(
         status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
         review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_1_INTAKE
     ).count()
 
-    p_level2_count = ClinicalReviewItem.objects.filter(
+    p_level2_count = clinical_review_items().filter(
         status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
         review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC
     ).count()
 
     # ตรวจสอบว่ามีรายการใหม่เข้ามาในช่วง 10 วินาทีล่าสุดหรือไม่
     recent_threshold = timezone.now() - timedelta(seconds=10)
-    has_new_items = ClinicalReviewItem.objects.filter(
+    has_new_items = clinical_review_items().filter(
         status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
         created_at__gte=recent_threshold
     ).exists()
@@ -316,6 +329,10 @@ def staff_approve_review_item_api(request: HttpRequest, item_id: int) -> JsonRes
             item = ClinicalReviewItem.objects.select_for_update().filter(pk=item_id).first()
             if not item:
                 return JsonResponse({'status': 'error', 'message': 'ไม่พบรายการที่ระบุ'}, status=404)
+
+            if is_link_request(item):
+                # อนุมัติแบบคิวจะเขียนข้อความลงเวชระเบียน ต้องจัดการที่หน้าตรวจเบอร์ซ้ำเท่านั้น
+                return JsonResponse({'status': 'error', 'message': 'รายการนี้ต้องจัดการที่หน้าตรวจเบอร์ซ้ำจาก LINE'}, status=400)
 
             if item.status != ClinicalReviewItem.StatusChoices.PENDING_REVIEW:
                 return JsonResponse({
@@ -474,3 +491,74 @@ def staff_inbox_reply_action(request: HttpRequest) -> HttpResponse:
         client_ip=request.META.get('REMOTE_ADDR'), user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
     )
     return redirect(back)
+
+
+# ==============================================================================
+# ตรวจเบอร์ซ้ำจาก LINE (/doctor/line-links/)
+# ==============================================================================
+
+@clinical_staff_required
+@require_GET
+def staff_line_links_view(request: HttpRequest) -> HttpResponse:
+    rows = []
+    for item in pending_link_requests():
+        payload = item.source_message.raw_payload or {}
+        rows.append({'item': item, 'typed_name': payload.get('typed_name'), 'typed_phone': payload.get('typed_phone'),
+                     'new_hn': payload.get('new_hn')})
+    return render(request, 'patients/line_links.html', {'requests': rows})
+
+
+@clinical_staff_required
+@require_POST
+def staff_line_link_decide_action(request: HttpRequest, item_id: int) -> HttpResponse:
+    item = get_object_or_404(pending_link_requests(), pk=item_id)
+    if request.POST.get('decision') == 'approve':
+        approve_link_request(item, request.user, request)
+        messages.success(request, f"เชื่อม LINE กับ {item.patient.hn} แล้ว")
+    else:
+        reject_link_request(item, request.user, request)
+        messages.success(request, "บันทึกว่าไม่ใช่คนเดียวกันแล้ว")
+    return redirect('patients:staff_line_links')
+
+
+# ==============================================================================
+# ไฟล์ที่เก็บไว้กับข้อความใน Inbox
+# ==============================================================================
+
+# นอกเหนือจากนี้บังคับดาวน์โหลด ไม่ให้ไฟล์ที่ลูกค้าส่งมา (เช่น HTML) ทำงานในหน้าเว็บของเจ้าหน้าที่
+INLINE_MEDIA_TYPES = ('image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf')
+INLINE_MEDIA_PREFIXES = ('audio/', 'video/')
+
+
+@clinical_staff_required
+@require_GET
+def staff_inbox_media_view(request: HttpRequest, record_id: int) -> HttpResponse:
+    record = get_object_or_404(CommunicationRecord, pk=record_id)
+    meta = (record.raw_payload or {}).get('stored_media')
+    data = media_store.read_decrypted(meta) if meta else None
+    if data is None:
+        raise Http404
+    content_type = meta.get('content_type', 'application/octet-stream')
+    AuditLog.objects.create(
+        user=request.user, action='INBOX_MEDIA_VIEWED', model='CommunicationRecord', object_id=str(record.pk),
+        changes={'media_id': meta.get('media_id'), 'content_type': content_type},
+        client_ip=get_client_ip(request), user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+    )
+    inline = content_type in INLINE_MEDIA_TYPES or content_type.startswith(INLINE_MEDIA_PREFIXES)
+    response = HttpResponse(data, content_type=content_type if inline else 'application/octet-stream')
+    response['Cache-Control'] = 'no-store'
+    response['Content-Disposition'] = 'inline' if inline else 'attachment'
+    response['X-Content-Type-Options'] = 'nosniff'
+    return response
+
+
+# ==============================================================================
+# ป้าย QR เปิดบอท สำหรับพิมพ์ติดเคาน์เตอร์
+# ==============================================================================
+
+@clinical_staff_required
+@require_GET
+def staff_line_qr_view(request: HttpRequest) -> HttpResponse:
+    link = line_bot_link()
+    qr_svg = segno.make(link, error='m').svg_inline(scale=10, border=2, omitsize=True)
+    return render(request, 'patients/line_qr.html', {'qr_svg': mark_safe(qr_svg), 'link': link})

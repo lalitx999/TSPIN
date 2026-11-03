@@ -7,12 +7,15 @@ from datetime import date, datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
+from django.db.models import Case, IntegerField, Q, Value, When
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from accounts.decorators import clinical_staff_required
 from accounts.models import AuditLog
 from accounts.views import get_client_ip
+from clinical.models import Box
+from clinical.views_intake import INTAKE_SOURCES
+from patients.line_links import pending_link_requests
 from patients.models import Patient, PatientHistory, Appointment
 from patients.forms import PatientForm, PatientHistorySOAPForm
 
@@ -36,7 +39,32 @@ def doctor_dashboard(request):
         'urgent_cases': urgent_cases,
         'today_appointments': today_appointments,
         'recent_patients': recent_patients,
+        **_line_cases_context(),
     })
+
+
+def _line_cases_context() -> dict:
+    """เคสที่รอตรวจ รวมเคสฉุกเฉินที่คนไข้ยังไม่ได้กดเสร็จแล้ว ไม่งั้นหมอจะไม่เห็นจนกว่าคนไข้จะปิดรอบเอง"""
+    pending = Box.objects.filter(
+        Q(status=Box.Status.DONE) | Q(status=Box.Status.DRAFT, contents__red_flag=True),
+        source__in=INTAKE_SOURCES, patient__isnull=False,
+    )
+    cases = (
+        pending.select_related('patient')
+        .annotate(urgent_first=Case(When(contents__red_flag=True, then=Value(0)), default=Value(1), output_field=IntegerField()))
+        .order_by('urgent_first', '-last_activity_at')[:5]
+    )
+    return {
+        'cases': cases,
+        'waiting_count': pending.count(),
+        'urgent_count': pending.filter(contents__red_flag=True).count(),
+        'link_request_count': pending_link_requests().count(),
+    }
+
+
+@clinical_staff_required
+def doctor_line_cases(request):
+    return render(request, 'patients/partials/line_cases.html', _line_cases_context())
 
 
 @clinical_staff_required

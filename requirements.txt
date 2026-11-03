@@ -44,6 +44,7 @@ fastapi>=0.110.0
 uvicorn>=0.28.0
 sse-starlette>=2.0.0
 httpx>=0.27.0
+segno>=1.6.0
 
 # Previously missing (imported by the code; production image could not start without them)
 # Image de-identification (face blur / EXIF strip) in ai_service/sanitizer.py

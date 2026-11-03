@@ -16,14 +16,14 @@ from django.urls import reverse
 from accounts.models import AuditLog
 from patients.models import Patient, PatientLinkingToken, Appointment
 from clinical.models import AnalysisRecord, Box
-from patients import line_ai
+from patients import line_ai, line_alerts, line_dispatch
 from patients.line_relay import relay_to_old_system
 from patients.line_service import (
     BOT_OFF_WORDS, BOT_ON_WORD, LineSecurity, LineFlexMessageBuilder, LineMessagingService, is_bot_on_word,
     make_line_register_token,
 )
 from patients.views_line_internal import ingest_line_event, detect_clinical_intent
-from patients.models_line import LineUser
+from patients.models_line import CommunicationRecord, LineUser
 from clinical import media_store, services_intake
 
 START_WORDS = ('เริ่ม', 'เริ่มต้น', 'start', 'ปรึกษา')
@@ -77,6 +77,10 @@ def _menu_buttons() -> list:
         LineFlexMessageBuilder.button_postback('ดูใบนัด', 'action=check_appointment'),
         LineFlexMessageBuilder.button_postback('ดูผลตรวจ', 'action=check_report'),
     ]
+
+
+def _sent_to_doctor_card(title: str) -> dict:
+    return _card(title, 'ทีมแพทย์จะตรวจและติดต่อกลับครับ\n\nระหว่างนี้พิมพ์ถาม AI ได้เลย หรือเลือกเมนูด้านล่าง', buttons=_menu_buttons())
 
 
 def _bot_menu_card(request: HttpRequest, patient, line_user_id: str) -> dict:
@@ -180,7 +184,12 @@ def line_webhook_view(request: HttpRequest) -> HttpResponse:
     # 6. กระจายจัดการ Events ตามประเภท
     for event in events:
         try:
-            _dispatch_line_event(request, event)
+            # บันทึกข้อความก่อนตอบ LINE เสมอ ส่วนงานช้า (ดาวน์โหลดไฟล์ ตอบกลับ) ทำต่อหลังตอบแล้ว
+            if event.get('type') == 'message':
+                result, _ = ingest_line_event(event)
+                if result.get('action') == 'deduplicated':
+                    continue  # LINE ส่งซ้ำ: เคยจัดการแล้ว ห้ามตอบหรือสั่งงานซ้ำ
+            line_dispatch.submit((event.get('source') or {}).get('userId') or '', _dispatch_line_event, request, event)
         except Exception as e:
             logger.error(f"[LINE Webhook] Error processing event: {e}", exc_info=True)
 
@@ -215,11 +224,6 @@ def _dispatch_line_event(request: HttpRequest, event: dict):
         )
 
     elif event_type == 'message':
-        # บันทึกทุกข้อความเข้า Unified Inbox ไม่ว่าบอทจะเปิดหรือปิด เจ้าหน้าที่จะได้เห็นประวัติครบ
-        result, _ = ingest_line_event(event)
-        if result.get('action') == 'deduplicated':
-            return  # LINE ส่งซ้ำ: เคยจัดการแล้ว ห้ามตอบหรือสั่งงานซ้ำ
-
         message_obj = event.get('message', {})
         msg_type = message_obj.get('type')
         raw_text = (message_obj.get('text') or '').strip() if msg_type == 'text' else ''
@@ -229,7 +233,10 @@ def _dispatch_line_event(request: HttpRequest, event: dict):
             _reply(reply_token, _bot_menu_card(request, patient, line_user_id))
             return
         if not line_user.bot_enabled:
-            return  # บอทปิดอยู่: ไม่ตอบ และไม่เปิดรอบซักประวัติ
+            # บอทปิดอยู่: ไม่ตอบ และไม่เปิดรอบซักประวัติ แต่เก็บไฟล์ไว้ให้เจ้าหน้าที่ เพราะ LINE ลบทิ้งภายหลัง
+            if msg_type in MEDIA_KINDS:
+                _store_inbox_media(line_user, message_obj)
+            return
         if raw_text in BOT_OFF_WORDS:
             _turn_bot_off(request, line_user, patient, reply_token)
         elif msg_type == 'text':
@@ -244,10 +251,42 @@ def _dispatch_line_event(request: HttpRequest, event: dict):
         postback_data = event.get('postback', {}).get('data', '')
         if postback_data == LineFlexMessageBuilder.BOT_OFF_POSTBACK:
             _turn_bot_off(request, line_user, patient, reply_token)
+        elif postback_data.startswith(line_ai.SEND_TO_DOCTOR_POSTBACK):
+            _send_message_to_doctor(request, patient, line_user, postback_data, reply_token)
         elif 'action=check_appointment' in postback_data:
             _send_appointment_reply(request, patient, line_user_id, reply_token)
         elif 'action=check_report' in postback_data:
             _send_latest_report_reply(request, patient, line_user_id, reply_token)
+
+
+def _send_message_to_doctor(request: HttpRequest, patient: Patient, line_user: LineUser, postback_data: str, reply_token: str):
+    """ปุ่มใต้คำตอบ AI: ส่งข้อความที่เคยถาม AI เข้ากล่องให้ทีมแพทย์ โดยไม่ต้องพิมพ์ใหม่"""
+    if not patient:
+        _reply(reply_token, _binding_card(request, line_user.line_user_id))
+        return
+
+    message_id = postback_data[len(line_ai.SEND_TO_DOCTOR_POSTBACK):]
+    # หาจากข้อความของ LINE คนนี้เท่านั้น กันการปลอม postback มาดึงข้อความของคนอื่น
+    record = CommunicationRecord.objects.filter(
+        line_message_id=message_id, line_user=line_user,
+        direction=CommunicationRecord.DirectionChoices.INCOMING,
+    ).first()
+    if not record:
+        _reply(reply_token, _intake_card('ไม่พบข้อความนี้', 'รบกวนกด "เล่าอาการให้คลินิก" แล้วพิมพ์อาการอีกครั้งครับ'))
+        return
+    if Box.objects.filter(patient=patient, source=Box.Source.LINE,
+                          contents__messages__contains=[{'external_id': message_id}]).exists():
+        _reply(reply_token, _sent_to_doctor_card('ส่งให้ทีมแพทย์แล้ว'))
+        return
+
+    box = services_intake.open_session(patient, Box.Source.LINE)
+    still_telling = bool((box.contents or {}).get('messages'))
+    services_intake.append_message(box, 'text', text=record.content, external_id=message_id)
+    if still_telling:
+        _reply(reply_token, _intake_card('เพิ่มเข้ารอบเล่าอาการแล้ว', 'เล่าเพิ่มได้เลยครับ เมื่อครบแล้วกด "เสร็จแล้ว"'))
+    else:
+        services_intake.close_session(box, reason='sent_from_ai_chat')
+        _reply(reply_token, _sent_to_doctor_card('ส่งให้ทีมแพทย์แล้ว'))
 
 
 def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_id: str, raw_text: str, reply_token: str,
@@ -276,7 +315,7 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
         open_box = Box.objects.filter(patient=patient, source=Box.Source.LINE, status=Box.Status.DRAFT).first()
         if open_box and (open_box.contents or {}).get('messages'):
             services_intake.close_session(open_box)
-            _reply(reply_token, _card('ได้รับข้อมูลครบแล้ว', 'ขอบคุณครับ ทีมแพทย์จะตรวจและติดต่อกลับครับ'))
+            _reply(reply_token, _sent_to_doctor_card('ได้รับข้อมูลครบแล้ว'))
         else:
             _reply(reply_token, _intake_card('ยังไม่มีข้อมูลอาการ', 'พิมพ์เล่าอาการ หรือส่งรูป/ข้อความเสียงได้เลยครับ'))
         return
@@ -287,16 +326,20 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
                                          f'สวัสดีครับคุณ{patient.first_name} ส่งข้อความ รูป หรือข้อความเสียงได้\nเมื่อเล่าครบแล้วกดปุ่ม "เสร็จแล้ว"'))
         return
 
-    _, is_urgent, _ = detect_clinical_intent(raw_text)
+    is_clinical, is_urgent, _ = detect_clinical_intent(raw_text)
     in_session = Box.objects.filter(patient=patient, source=Box.Source.LINE, status=Box.Status.DRAFT).exists()
     if not in_session and not is_urgent:
         # ไม่ได้กำลังเล่าอาการ: เป็นคำถามทั่วไป ให้ AI ตอบ อาการฉุกเฉินยังเข้ากล่องเพื่อให้ทีมแพทย์เห็น
-        line_ai.answer_question(line_user_id, patient, raw_text, reply_token)
+        line_ai.answer_question(line_user_id, patient, raw_text, reply_token,
+                                symptom_message_id=message_id if is_clinical else '')
         return
 
     box = services_intake.open_session(patient, Box.Source.LINE)
     is_first = not (box.contents or {}).get('messages')
+    already_flagged = (box.contents or {}).get('red_flag')
     services_intake.append_message(box, 'text', text=raw_text, external_id=message_id, red_flag=is_urgent)
+    if is_urgent and not already_flagged:
+        line_alerts.notify_emergency(request, box)
     if not reply_token:
         return
     if is_urgent:
@@ -309,9 +352,26 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
         _reply(reply_token, _intake_card('รับทราบครับ', 'เล่าเพิ่มเติมได้เรื่อย ๆ ส่งรูปหรือข้อความเสียงได้ เมื่อครบแล้วกด "เสร็จแล้ว"'))
 
 
+def _store_inbox_media(line_user: LineUser, message_obj: dict) -> None:
+    """เข้ารหัสเก็บไฟล์ไว้กับข้อความใน Inbox สำหรับไฟล์ที่ไม่ได้เข้ารอบซักประวัติ"""
+    message_id = message_obj.get('id', '')
+    record = CommunicationRecord.objects.filter(line_message_id=message_id, line_user=line_user).first()
+    if not record:
+        return
+    content = LineMessagingService.get_message_content(message_id)
+    if not content:
+        logger.warning("[LINE Webhook] Could not download media for inbox")
+        return
+    data, content_type = content
+    meta = media_store.save_encrypted(data, content_type, kind=f"line_inbox/{MEDIA_KINDS[message_obj['type']]}")
+    record.raw_payload = {**(record.raw_payload or {}), 'stored_media': meta}
+    record.save(update_fields=['raw_payload'])
+
+
 def _handle_line_media(request: HttpRequest, patient: Patient, line_user_id: str, message_obj: dict, reply_token: str):
     """ดึงรูป/เสียง/วิดีโอจาก LINE ทันที (LINE เก็บไว้ไม่นาน) เข้ารหัสเก็บ แล้วต่อเข้ารอบซักประวัติ"""
     if not patient:
+        _store_inbox_media(LineUser.objects.get(line_user_id=line_user_id), message_obj)
         _reply(reply_token, _binding_card(request, line_user_id))
         return
 
@@ -351,7 +411,7 @@ def _send_appointment_reply(request: HttpRequest, patient: Patient, line_user_id
         )
         _reply(reply_token, LineFlexMessageBuilder.with_close_button(card))
     else:
-        _reply(reply_token, _card('ยังไม่มีนัดหมาย', f'เรียนคุณ {patient.full_name}\nขณะนี้ท่านยังไม่มีนัดหมายแพทย์ที่เปิดอยู่'))
+        _reply(reply_token, _card('ยังไม่มีนัดหมาย', f'เรียนคุณ {patient.full_name}\nขณะนี้ท่านยังไม่มีนัดหมายแพทย์ที่เปิดอยู่\n\nพิมพ์ถาม AI ได้เลย หรือเลือกเมนูด้านล่าง', buttons=_menu_buttons()))
 
 
 def _send_latest_report_reply(request: HttpRequest, patient: Patient, line_user_id: str, reply_token: str):
@@ -375,7 +435,7 @@ def _send_latest_report_reply(request: HttpRequest, patient: Patient, line_user_
         )
         _reply(reply_token, LineFlexMessageBuilder.with_close_button(card))
     else:
-        _reply(reply_token, _card('ยังไม่มีผลตรวจที่พร้อมดู', f'เรียนคุณ {patient.full_name}\nขณะนี้ยังไม่มีรายงานที่แพทย์ลงนามอนุมัติ กรุณาสอบถามแพทย์ผู้ดูแลหากต้องการข้อมูลเพิ่มเติม'))
+        _reply(reply_token, _card('ยังไม่มีผลตรวจที่พร้อมดู', f'เรียนคุณ {patient.full_name}\nขณะนี้ยังไม่มีรายงานที่แพทย์ลงนามอนุมัติ กรุณาสอบถามแพทย์ผู้ดูแลหากต้องการข้อมูลเพิ่มเติม\n\nพิมพ์ถาม AI ได้เลย หรือเลือกเมนูด้านล่าง', buttons=_menu_buttons()))
 
 
 def line_account_binding_callback_view(request: HttpRequest) -> HttpResponse:

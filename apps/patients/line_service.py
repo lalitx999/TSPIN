@@ -40,11 +40,14 @@ def read_line_register_token(token: str) -> str:
         return ''
 
 
-def line_bot_url() -> str:
-    """ลิงก์เปิดแชท OA พร้อมพิมพ์คำเปิดบอทไว้ให้ ลูกค้ากดส่งอย่างเดียว (ว่างถ้ายังไม่เปิดใช้)"""
-    if not settings.LINE_BOT_LINK_ENABLED:
-        return ''
+def line_bot_link() -> str:
+    """ลิงก์เปิดแชท OA พร้อมพิมพ์คำเปิดบอทไว้ให้ ลูกค้ากดส่งอย่างเดียว"""
     return f"https://line.me/R/oaMessage/{quote(settings.LINE_OA_ID, safe='@')}/?{quote(BOT_ON_WORD)}"
+
+
+def line_bot_url() -> str:
+    """ลิงก์สำหรับเว็บสาธารณะ (ว่างถ้ายังไม่เปิดใช้)"""
+    return line_bot_link() if settings.LINE_BOT_LINK_ENABLED else ''
 
 
 class LineSecurity:

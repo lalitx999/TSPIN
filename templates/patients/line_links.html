@@ -1,0 +1,52 @@
+{% extends 'layouts/doctor_base.html' %}
+
+{% block title %}ตรวจเบอร์ซ้ำจาก LINE | TSPI Clinical EMR{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column gap-4">
+    <div class="pb-3 border-bottom">
+        <h1 class="h4 fw-bold mb-1 text-dark"><i class="fas fa-link text-primary me-2"></i>ตรวจเบอร์ซ้ำจาก LINE</h1>
+        <p class="text-muted small mb-0">คนไข้ใช้บอทได้แล้ว แต่ยังไม่เห็นประวัติเดิม ตรวจว่าเป็นคนเดียวกันจริงก่อนกดเชื่อม</p>
+    </div>
+
+    {% for row in requests %}
+    <div class="card shadow-sm border">
+        <div class="card-body p-4">
+            <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                    <div class="text-muted small mb-1">ข้อมูลที่กรอกทาง LINE</div>
+                    {% if row.typed_name %}
+                    <div class="fw-bold text-dark">{{ row.typed_name }}</div>
+                    <div class="font-monospace small">{{ row.typed_phone }}</div>
+                    {% if row.new_hn %}<div class="text-muted small">เวชระเบียนที่เปิดให้ใหม่: {{ row.new_hn }}</div>{% endif %}
+                    {% else %}
+                    <div class="small" style="white-space: pre-line">{{ row.item.source_message.content }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="text-muted small mb-1">เวชระเบียนเดิมที่เบอร์ตรงกัน</div>
+                    <div class="fw-bold text-dark">{{ row.item.patient.full_name }}</div>
+                    <div class="font-monospace small">{{ row.item.patient.phone }}</div>
+                    <div class="text-muted small">{{ row.item.patient.hn }}</div>
+                </div>
+            </div>
+            <div class="d-flex flex-column flex-sm-row gap-2 justify-content-end">
+                <form method="post" action="{% url 'patients:staff_line_link_decide' row.item.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="decision" value="reject">
+                    <button type="submit" class="btn btn-outline-secondary w-100">ไม่ใช่คนเดียวกัน</button>
+                </form>
+                <form method="post" action="{% url 'patients:staff_line_link_decide' row.item.pk %}"
+                      onsubmit="return confirm('LINE นี้จะเห็นใบนัดและผลตรวจของ {{ row.item.patient.hn }} ยืนยันว่าเป็นคนเดียวกัน?');">
+                    {% csrf_token %}
+                    <input type="hidden" name="decision" value="approve">
+                    <button type="submit" class="btn btn-success fw-bold w-100">เป็นคนเดียวกัน เชื่อมประวัติเดิม</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card border"><div class="card-body text-center text-muted py-5">ไม่มีรายการรอตรวจ</div></div>
+    {% endfor %}
+</div>
+{% endblock %}

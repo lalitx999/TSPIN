@@ -53,6 +53,11 @@ urlpatterns = [
     # Option C: Staff UI (Unified Inbox & Clinical Review Queue)
     path('staff/', views_staff.staff_dashboard_view, name='staff_dashboard'),
     path('inbox/', views_staff.staff_inbox_view, name='staff_inbox'),
+    path('inbox/media/<int:record_id>/', views_staff.staff_inbox_media_view, name='staff_inbox_media'),
+    path('line-cases/', views.doctor_line_cases, name='doctor_line_cases'),
+    path('line-links/', views_staff.staff_line_links_view, name='staff_line_links'),
+    path('line-qr/', views_staff.staff_line_qr_view, name='staff_line_qr'),
+    path('line-links/<int:item_id>/decide/', views_staff.staff_line_link_decide_action, name='staff_line_link_decide'),
     path('review-queue/', views_staff.staff_review_queue_view, name='staff_review_queue'),
     path('api/inbox/create-review-item/', views_staff.staff_create_review_from_message_api, name='api_create_review_from_message'),
     path('api/review-queue/poll/', views_staff.staff_review_queue_poll_api, name='api_review_queue_poll'),

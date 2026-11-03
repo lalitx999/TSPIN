@@ -77,6 +77,7 @@ def _flag_possible_duplicate(request: HttpRequest, line_user: LineUser, existing
         direction=CommunicationRecord.DirectionChoices.INCOMING,
         message_type=CommunicationRecord.MessageTypeChoices.TEXT,
         content=note, is_clinical_candidate=True,
+        raw_payload={'typed_name': new.full_name, 'typed_phone': new.phone, 'new_hn': new.hn},
     )
     item = ClinicalReviewItem.objects.create(
         patient=existing, source_message=record, review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_1_INTAKE,

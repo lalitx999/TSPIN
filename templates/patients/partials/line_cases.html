@@ -1,0 +1,30 @@
+{% if urgent_count %}
+<div class="alert alert-danger d-flex align-items-center gap-3 mb-3" role="alert">
+    <i class="fas fa-exclamation-triangle fs-4"></i>
+    <div class="fw-bold">มีเคสฉุกเฉินจาก LINE {{ urgent_count }} เคส กรุณาตรวจทันที</div>
+</div>
+{% endif %}
+<div class="card shadow-sm border">
+    <div class="card-header bg-light py-3 px-4 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span class="fw-bold text-dark"><i class="fab fa-line text-success me-2"></i>เคสใหม่รอตรวจ ({{ waiting_count }})</span>
+        <span class="d-flex flex-wrap gap-3 small">
+            {% if link_request_count %}<a href="{% url 'patients:staff_line_links' %}" class="fw-medium text-warning-emphasis">ตรวจเบอร์ซ้ำ {{ link_request_count }} รายการ &rarr;</a>{% endif %}
+            <a href="{% url 'patients:staff_inbox' %}" class="fw-medium">แชททั้งหมด &rarr;</a>
+            <a href="{% url 'clinical:intake_list' %}" class="fw-medium">ดูทุกเคส &rarr;</a>
+        </span>
+    </div>
+    <div class="list-group list-group-flush">
+        {% for box in cases %}
+        <a href="{% url 'clinical:intake_detail' box.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center gap-3 px-4 py-3">
+            <span>
+                {% if box.contents.red_flag %}<span class="badge bg-danger me-2">ฉุกเฉิน</span>{% endif %}
+                <span class="fw-bold text-dark">{{ box.patient.full_name }}</span>
+                <span class="text-muted small ms-1">{{ box.patient.hn }}</span>
+            </span>
+            <span class="text-muted small text-nowrap">{{ box.last_activity_at|date:"d/m H:i" }} น.</span>
+        </a>
+        {% empty %}
+        <div class="list-group-item text-center text-muted py-4">ยังไม่มีเคสรอตรวจ</div>
+        {% endfor %}
+    </div>
+</div>

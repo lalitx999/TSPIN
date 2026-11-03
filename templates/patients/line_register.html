@@ -47,15 +47,9 @@
         {% elif state == 'bound' %}
         <div class="text-center">
             <span class="site-logo auth-logo"><i class="fas fa-check"></i></span>
-            <h1 class="h3 mt-3 mb-2">เชื่อมบัญชีเรียบร้อย</h1>
-            <p class="text-muted mb-0">ปิดหน้านี้แล้วกลับไปที่แชท LINE ได้เลย</p>
-        </div>
-
-        {% elif state == 'waiting' %}
-        <div class="text-center">
-            <span class="site-logo auth-logo"><i class="fas fa-user-check"></i></span>
-            <h1 class="h3 mt-3 mb-2">ได้รับข้อมูลแล้ว</h1>
-            <p class="text-muted mb-0">เจ้าหน้าที่จะตรวจสอบข้อมูลก่อนเชื่อมบัญชี เมื่อเรียบร้อยแล้วจึงจะใช้เมนูบอทได้</p>
+            <h1 class="h3 mt-3 mb-2">ลงทะเบียนเรียบร้อย</h1>
+            <p class="text-muted mb-4">กดปิดหน้านี้ แล้วกลับไปที่แชท LINE บอททักทายและพร้อมใช้งานแล้ว</p>
+            <a href="https://line.me/R/oaMessage/{{ LINE_OA_ID }}/" class="btn btn-primary btn-lg w-100 rounded-pill"><i class="fab fa-line"></i> กลับไปที่แชท LINE</a>
         </div>
 
         {% else %}

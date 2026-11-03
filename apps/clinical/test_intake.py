@@ -46,9 +46,16 @@ class IntakeTestBase(TestCase):
         self.patient = Patient.objects.create(hn='HN-INT-1', first_name='สมหญิง', last_name='ทดสอบ',
                                               line_user_id='U_INTAKE_1')
         self.line_user = LineUser.objects.create(line_user_id='U_INTAKE_1', display_name='สมหญิง', bot_enabled=True)
+        background = patch('patients.line_ai._run_in_background')
+        self.ai_background = background.start()
+        self.addCleanup(background.stop)
 
 
 class LineSessionTests(IntakeTestBase):
+    def setUp(self):
+        super().setUp()
+        _signed_post(self.client, [_text_event('U_INTAKE_1', 'start', 'เริ่ม')])
+
     def test_messages_from_one_conversation_go_into_one_box(self):
         for i, text in enumerate(['ปวดหัวมา 3 วัน', 'กินยาแล้วไม่ดีขึ้น', 'นอนไม่ค่อยหลับ']):
             self.assertEqual(_signed_post(self.client, [_text_event('U_INTAKE_1', f'm{i}', text)]).status_code, 200)
@@ -73,7 +80,8 @@ class LineSessionTests(IntakeTestBase):
         first = Box.objects.get(patient=self.patient)
         self.assertEqual(first.status, Box.Status.DONE)
 
-        _signed_post(self.client, [_text_event('U_INTAKE_1', 'a3', 'วันนี้ผื่นลามไปที่ขา')])
+        _signed_post(self.client, [_text_event('U_INTAKE_1', 'a3', 'เริ่ม')])
+        _signed_post(self.client, [_text_event('U_INTAKE_1', 'a4', 'วันนี้ผื่นลามไปที่ขา')])
         self.assertEqual(Box.objects.filter(patient=self.patient).count(), 2)
 
     def test_urgent_message_flags_box(self):
@@ -87,7 +95,7 @@ class LineSessionTests(IntakeTestBase):
 
     def test_unbound_user_creates_no_box(self):
         _signed_post(self.client, [_text_event('U_UNKNOWN', 'x1', 'ปวดท้องมาก')])
-        self.assertFalse(Box.objects.exists())
+        self.assertFalse(Box.objects.exclude(patient=self.patient).exists())
 
     def test_image_is_downloaded_encrypted_and_hash_verified(self):
         png = b'\x89PNG\r\n\x1a\n' + b'fake-image-bytes'
@@ -156,6 +164,7 @@ class LineBotOptInTests(IntakeTestBase):
     def test_close_button_turns_bot_off_and_sends_open_session_to_staff(self):
         self.line_user.bot_enabled = True
         self.line_user.save()
+        self._post(_text_event('U_INTAKE_1', 'c0', 'เริ่ม'))
         self._post(_text_event('U_INTAKE_1', 'c1', 'ปวดหลัง'))
         reply = self._post(self._postback('U_INTAKE_1', 'action=bot_off'))
         self.assertFalse(LineUser.objects.get(pk=self.line_user.pk).bot_enabled)
@@ -204,7 +213,9 @@ class LineRegisterFormTests(IntakeTestBase):
         self.assertIn(reverse('root_line_register'), uri)
         self.assertEqual(self.client.get(uri).status_code, 200)
 
-    def test_new_person_is_bound_and_gets_menu_in_chat(self):
+    def test_new_person_can_use_bot_right_away_and_is_greeted_by_name(self):
+        self.line_new.bot_enabled = False
+        self.line_new.save()
         response, push = self._submit()
         self.assertEqual(response.status_code, 302)
         patient = Patient.objects.get(line_user_id=self.USER_ID)
@@ -213,8 +224,12 @@ class LineRegisterFormTests(IntakeTestBase):
         self.assertIn('pdpa_consent_at', patient.extra_data)
         self.line_new.refresh_from_db()
         self.assertEqual(self.line_new.active_patient, patient)
+        self.assertTrue(self.line_new.bot_enabled)
         self.assertEqual(push.call_args.args[0], self.USER_ID)
-        self.assertContains(self.client.get(self.url), 'เชื่อมบัญชีเรียบร้อย')
+        card = push.call_args.args[1][0]
+        self.assertEqual(card['type'], 'flex')
+        self.assertIn('สวัสดีครับคุณสมชาย', json.dumps(card, ensure_ascii=False))
+        self.assertContains(self.client.get(self.url), 'ลงทะเบียนเรียบร้อย')
 
     def test_consent_and_valid_phone_are_required(self):
         response, _ = self._submit(consent=None)
@@ -223,20 +238,18 @@ class LineRegisterFormTests(IntakeTestBase):
         self.assertContains(response, 'เบอร์โทรศัพท์ไม่ถูกต้อง')
         self.assertFalse(Patient.objects.filter(line_user_id=self.USER_ID).exists())
 
-    def test_existing_phone_waits_for_staff_and_exposes_nothing(self):
+    def test_existing_phone_gets_bot_now_but_never_the_old_record(self):
         existing = Patient.objects.create(hn='HN-INT-2', first_name='เดิม', last_name='คนไข้', phone='081-234-5678')
-        response, push = self._submit()
-        push.assert_not_called()
+        _, push = self._submit()
+        self.assertIn('สวัสดีครับคุณสมชาย', json.dumps(push.call_args.args[1], ensure_ascii=False))
         self.line_new.refresh_from_db()
-        self.assertIsNone(self.line_new.active_patient)
+        self.assertNotEqual(self.line_new.active_patient, existing)
+        self.assertEqual(self.line_new.active_patient.extra_data['possible_duplicate_of_hn'], existing.hn)
         existing.refresh_from_db()
         self.assertIsNone(existing.line_user_id)
-        self.assertEqual(Patient.objects.filter(phone__contains='5678').count(), 1)
-        page = self.client.get(self.url)
-        self.assertContains(page, 'เจ้าหน้าที่จะตรวจสอบ')
-        self.assertNotContains(page, existing.first_name)
         item = ClinicalReviewItem.objects.get(patient=existing)
         self.assertIn(f'({self.USER_ID})', item.review_notes)  # รูปแบบที่ปุ่มอนุมัติใน Admin อ่านได้
+        self.assertNotContains(self.client.get(self.url), existing.first_name)
         self._submit()
         self.assertEqual(ClinicalReviewItem.objects.filter(patient=existing).count(), 1)
 
@@ -248,6 +261,87 @@ class LineRegisterFormTests(IntakeTestBase):
         self.assertFalse(Patient.objects.filter(phone='0812345678').exists())
         with patch('patients.line_service.LINE_REGISTER_MAX_AGE_SECONDS', -1):
             self.assertEqual(self.client.get(self.url).status_code, 400)
+
+
+class LineAiChatTests(IntakeTestBase):
+    """ผู้ใช้ที่เปิดบอทแล้ว พิมพ์คำถามทั่วไป AI ตอบเป็น Flex ระหว่างเล่าอาการยังเข้ากล่องเหมือนเดิม"""
+
+    def setUp(self):
+        super().setUp()
+        from django.core.cache import cache
+        cache.clear()
+        self.ai_background.side_effect = lambda func, *args: func(*args)
+
+    def _ask(self, text, event_id='ai1', status_code=200, data=None):
+        fake = MagicMock(status_code=status_code)
+        fake.json.return_value = data if data is not None else {
+            'answer': 'ตอบจากเอกสาร [1]', 'kind': 'answer', 'sources': ['แกนที่ 16'], 'provider': 'groq', 'model': 'm',
+            'usage': {'prompt_tokens': 5, 'completion_tokens': 3}}
+        with patch('patients.line_ai.httpx.post', return_value=fake) as post, \
+                patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, [_text_event('U_INTAKE_1', event_id, text)])
+        return post, reply
+
+    def test_question_answered_with_flex_sources_and_saved_for_staff(self):
+        post, reply = self._ask('เบาหวานกินอะไรได้บ้าง')
+        self.assertEqual(post.call_args.kwargs['json']['messages'][-1],
+                         {'role': 'user', 'content': 'เบาหวานกินอะไรได้บ้าง'})
+        card = reply.call_args.args[1][0]
+        self.assertEqual(card['type'], 'flex')
+        text = json.dumps(card, ensure_ascii=False)
+        self.assertIn('ตอบจากเอกสาร [1]', text)
+        self.assertIn('[1] แกนที่ 16', text)
+        self.assertIn('ปิดบอท', text)
+        self.assertFalse(Box.objects.filter(patient=self.patient).exists())
+        self.assertTrue(CommunicationRecord.objects.filter(
+            line_user=self.line_user, direction='OUTGOING', content='ตอบจากเอกสาร [1]').exists())
+
+    def test_next_question_sends_earlier_answer_as_context(self):
+        self._ask('เบาหวานคืออะไร')
+        post, _ = self._ask('กินข้าวได้ไหม', event_id='ai2')
+        roles = [m['role'] for m in post.call_args.kwargs['json']['messages']]
+        self.assertEqual(roles, ['user', 'assistant', 'user'])
+
+    def test_during_intake_text_goes_to_box_not_ai(self):
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True):
+            _signed_post(self.client, [_text_event('U_INTAKE_1', 's1', 'เริ่ม')])
+        post, _ = self._ask('ปวดหลังมา 3 วัน')
+        post.assert_not_called()
+        self.assertEqual(Box.objects.get(patient=self.patient).contents['messages'][0]['text'], 'ปวดหลังมา 3 วัน')
+
+    def test_emergency_skips_ai_and_reaches_doctors(self):
+        post, reply = self._ask('แน่นหน้าอกมาก หายใจไม่ออก')
+        post.assert_not_called()
+        self.assertIn('1669', json.dumps(reply.call_args.args[1], ensure_ascii=False))
+        self.assertTrue(Box.objects.get(patient=self.patient).contents.get('red_flag'))
+
+    def test_service_down_replies_politely(self):
+        _, reply = self._ask('เบาหวานคืออะไร', status_code=500)
+        self.assertIn('ไม่พร้อมใช้งาน', json.dumps(reply.call_args.args[1], ensure_ascii=False))
+        self.assertFalse(CommunicationRecord.objects.filter(line_user=self.line_user, direction='OUTGOING').exists())
+
+    def test_daily_limit_stops_ai_calls(self):
+        with patch('patients.line_ai.DAILY_LIMIT_PER_USER', 1):
+            self._ask('ข้อแรก')
+            post, reply = self._ask('ข้อสอง', event_id='ai2')
+        post.assert_not_called()
+        self.assertIn('ถามครบจำนวน', json.dumps(reply.call_args.args[1], ensure_ascii=False))
+
+    def test_reply_failure_falls_back_to_push(self):
+        fake = MagicMock(status_code=200)
+        fake.json.return_value = {'answer': 'ตอบ', 'kind': 'general', 'sources': []}
+        with patch('patients.line_ai.httpx.post', return_value=fake), \
+                patch('patients.views_line.LineMessagingService.reply_message', return_value=False), \
+                patch('patients.views_line.LineMessagingService.push_message', return_value=True) as push:
+            _signed_post(self.client, [_text_event('U_INTAKE_1', 'ai3', 'เบาหวานคืออะไร')])
+        self.assertEqual(push.call_args.args[0], 'U_INTAKE_1')
+
+    def test_bot_off_never_calls_ai(self):
+        self.line_user.bot_enabled = False
+        self.line_user.save()
+        post, reply = self._ask('เบาหวานคืออะไร')
+        post.assert_not_called()
+        reply.assert_not_called()
 
 
 @override_settings(LINE_RELAY_URL='https://old.example/webhook/')
@@ -532,6 +626,7 @@ class Phase3ChatAndVoiceTests(IntakeTestBase):
                                   'model': 'm', 'usage': {'prompt_tokens': 10, 'completion_tokens': 5}}
         with patch('clinical.services_intake.httpx.post', return_value=fake) as post, \
              patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, [_text_event('U_INTAKE_1', 'fstart', 'เริ่ม')])
             for i in range(7):
                 _signed_post(self.client, [_text_event('U_INTAKE_1', f'f{i}', f'ปวดหัวมาก ครั้งที่ {i}')])
         self.assertEqual(post.call_count, services_intake.MAX_AI_FOLLOWUPS_PER_SESSION)
@@ -539,7 +634,7 @@ class Phase3ChatAndVoiceTests(IntakeTestBase):
         self.assertIn('ผู้ป่วย:', sent)
         box = Box.objects.get(patient=self.patient, source=Box.Source.LINE)
         self.assertEqual(sum(1 for m in box.contents['messages'] if m['sender'] == 'bot'), 5)
-        self.assertIn('ปวดมานานเท่าไหร่แล้วคะ', json.dumps(reply.call_args_list[0].args[1][0], ensure_ascii=False))
+        self.assertIn('ปวดมานานเท่าไหร่แล้วคะ', json.dumps(reply.call_args_list[1].args[1][0], ensure_ascii=False))
 
     def test_ai_followup_off_by_default(self):
         with patch('clinical.services_intake.httpx.post') as post:

@@ -454,6 +454,24 @@ class LineMessagingService:
             return False
 
     @classmethod
+    def show_loading(cls, chat_id: str, seconds: int = 30) -> None:
+        """แสดงจุดกำลังพิมพ์ในแชทระหว่างรอ AI (ไม่สำเร็จก็ไม่กระทบคำตอบ)"""
+        token = getattr(settings, 'LINE_CHANNEL_ACCESS_TOKEN', '')
+        if not token:
+            return
+        try:
+            req = urllib.request.Request(
+                "https://api.line.me/v2/bot/chat/loading/start",
+                data=json.dumps({"chatId": chat_id, "loadingSeconds": seconds}).encode('utf-8'),
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
+                method='POST'
+            )
+            with urllib.request.urlopen(req, timeout=3):
+                pass
+        except Exception as e:
+            logger.info(f"[LINE Loading] Could not show loading: {e}")
+
+    @classmethod
     def get_message_content(cls, message_id: str, max_bytes: int = 25 * 1024 * 1024) -> Optional[Tuple[bytes, str]]:
         """
         ดาวน์โหลดไฟล์ (รูป/เสียง/วิดีโอ/ไฟล์) ที่ผู้ใช้ส่งมา

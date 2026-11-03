@@ -16,6 +16,7 @@ from django.urls import reverse
 from accounts.models import AuditLog
 from patients.models import Patient, PatientLinkingToken, Appointment
 from clinical.models import AnalysisRecord, Box
+from patients import line_ai
 from patients.line_relay import relay_to_old_system
 from patients.line_service import (
     BOT_OFF_WORDS, BOT_ON_WORD, LineSecurity, LineFlexMessageBuilder, LineMessagingService, is_bot_on_word,
@@ -70,14 +71,24 @@ def _binding_card(request: HttpRequest, line_user_id: str) -> dict:
                  buttons=[LineFlexMessageBuilder.button_uri('เชื่อมบัญชีคลินิก', binding_url)])
 
 
-def _bot_menu_card(request: HttpRequest, patient, line_user_id: str) -> dict:
-    if not patient:
-        return _binding_card(request, line_user_id)
-    return _card('เปิดใช้งานบอทแล้ว', f'สวัสดีครับคุณ{patient.first_name} เลือกสิ่งที่ต้องการได้เลย', buttons=[
+def _menu_buttons() -> list:
+    return [
         LineFlexMessageBuilder.button_message('เล่าอาการให้คลินิก', 'เริ่ม'),
         LineFlexMessageBuilder.button_postback('ดูใบนัด', 'action=check_appointment'),
         LineFlexMessageBuilder.button_postback('ดูผลตรวจ', 'action=check_report'),
-    ])
+    ]
+
+
+def _bot_menu_card(request: HttpRequest, patient, line_user_id: str) -> dict:
+    if not patient:
+        return _binding_card(request, line_user_id)
+    return _card('เปิดใช้งานบอทแล้ว', f'สวัสดีครับคุณ{patient.first_name}\nพิมพ์คำถามเรื่องโรคหรือการรักษา ถาม AI ได้เลย หรือเลือกเมนูด้านล่าง',
+                 buttons=_menu_buttons())
+
+
+def welcome_card(patient) -> dict:
+    return _card(f'สวัสดีครับคุณ{patient.first_name}', 'ลงทะเบียนเรียบร้อยแล้ว ใช้งานบอทได้เลยครับ\nพิมพ์คำถามเรื่องโรคหรือการรักษา ถาม AI ได้เลย หรือเลือกเมนูด้านล่าง',
+                 buttons=_menu_buttons())
 
 
 def _set_bot_enabled(request: HttpRequest, line_user: LineUser, enabled: bool, patient) -> None:
@@ -243,7 +254,7 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
                               message_id: str = ''):
     """
     จัดการข้อความจากผู้ป่วยบน LINE OA
-    คำสั่ง (นัดหมาย/ผลตรวจ/ติดต่อ) ตอบทันที ข้อความอื่นของผู้ป่วยที่ผูกบัญชีแล้วต่อเข้ารอบซักประวัติ (Box เดียวต่อรอบ)
+    คำสั่ง (นัดหมาย/ผลตรวจ/ติดต่อ) ตอบทันที ระหว่างเล่าอาการข้อความเข้ารอบซักประวัติ (Box เดียวต่อรอบ) นอกนั้น AI ตอบ
     """
     text = raw_text.lower()
 
@@ -276,9 +287,15 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
                                          f'สวัสดีครับคุณ{patient.first_name} ส่งข้อความ รูป หรือข้อความเสียงได้\nเมื่อเล่าครบแล้วกดปุ่ม "เสร็จแล้ว"'))
         return
 
+    _, is_urgent, _ = detect_clinical_intent(raw_text)
+    in_session = Box.objects.filter(patient=patient, source=Box.Source.LINE, status=Box.Status.DRAFT).exists()
+    if not in_session and not is_urgent:
+        # ไม่ได้กำลังเล่าอาการ: เป็นคำถามทั่วไป ให้ AI ตอบ อาการฉุกเฉินยังเข้ากล่องเพื่อให้ทีมแพทย์เห็น
+        line_ai.answer_question(line_user_id, patient, raw_text, reply_token)
+        return
+
     box = services_intake.open_session(patient, Box.Source.LINE)
     is_first = not (box.contents or {}).get('messages')
-    _, is_urgent, _ = detect_clinical_intent(raw_text)
     services_intake.append_message(box, 'text', text=raw_text, external_id=message_id, red_flag=is_urgent)
     if not reply_token:
         return

@@ -1,7 +1,7 @@
 """
-เชื่อมบัญชี LINE แบบง่าย: ชื่อ เบอร์โทร ยินยอม ไม่ต้องใช้ LIFF
-รู้ว่าเป็น LINE คนไหนจากลิงก์ที่ลงนามซึ่งบอทส่งให้ในแชท เบอร์ที่กรอกพิสูจน์ตัวตนไม่ได้
-จึงเปิดเวชระเบียนใหม่ได้ทันที แต่ถ้าเบอร์ตรงกับคนไข้เดิม ต้องให้เจ้าหน้าที่ยืนยันก่อน ไม่งั้นใครรู้เบอร์ก็เห็นผลตรวจได้
+เชื่อมบัญชี LINE แบบง่าย: ชื่อ เบอร์โทร ยินยอม ส่งแล้วใช้บอทได้ทันที ไม่ต้องรออนุมัติ ไม่ต้องใช้ LIFF
+รู้ว่าเป็น LINE คนไหนจากลิงก์ที่ลงนามซึ่งบอทส่งให้ในแชท ส่วนเบอร์ที่กรอกพิสูจน์ตัวตนไม่ได้
+จึงเปิดเวชระเบียนใหม่เสมอ ถ้าเบอร์ตรงกับคนไข้เดิมให้เจ้าหน้าที่ตรวจทีหลัง ไม่งั้นใครรู้เบอร์ก็เห็นผลตรวจของคนอื่นได้
 """
 
 import uuid
@@ -20,7 +20,7 @@ from accounts.models import AuditLog
 from accounts.views import get_client_ip
 from patients.line_service import LineMessagingService, read_line_register_token
 from patients.models import ClinicalReviewItem, CommunicationRecord, LinePatientBinding, LineUser, Patient
-from patients.views_line import _bot_menu_card, _resolve_patient
+from patients.views_line import _resolve_patient, _set_bot_enabled, welcome_card
 from patients.views_liff import _next_hn
 
 
@@ -45,20 +45,15 @@ def _find_by_phone(phone: str):
     )
 
 
-def _has_pending_request(line_user: LineUser) -> bool:
-    return ClinicalReviewItem.objects.filter(
-        source_message__line_user=line_user,
-        source_message__line_message_id__startswith='staff_req_',
-        status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
-    ).exists()
-
-
-def _create_and_bind(request: HttpRequest, line_user: LineUser, first_name: str, last_name: str, phone: str) -> Patient:
+def _create_and_bind(request: HttpRequest, line_user: LineUser, full_name: str, phone: str, duplicate_of) -> Patient:
+    first_name, _, last_name = full_name.partition(' ')
+    extra_data = {'registered_via': 'line_form', 'needs_staff_verification': True,
+                  'pdpa_consent_at': timezone.now().isoformat()}
+    if duplicate_of:
+        extra_data['possible_duplicate_of_hn'] = duplicate_of.hn
     patient = Patient.objects.create(
-        hn=_next_hn(), first_name=first_name, last_name=last_name, phone=phone, status='pending',
-        line_user_id=line_user.line_user_id,
-        extra_data={'registered_via': 'line_form', 'needs_staff_verification': True,
-                    'pdpa_consent_at': timezone.now().isoformat()},
+        hn=_next_hn(), first_name=first_name[:100], last_name=last_name[:100], phone=phone, status='pending',
+        line_user_id=line_user.line_user_id, extra_data=extra_data,
     )
     LinePatientBinding.objects.create(
         line_user=line_user, patient=patient, role=LinePatientBinding.RoleChoices.SELF,
@@ -72,23 +67,25 @@ def _create_and_bind(request: HttpRequest, line_user: LineUser, first_name: str,
     return patient
 
 
-def _request_staff_check(request: HttpRequest, line_user: LineUser, patient: Patient, full_name: str, phone: str) -> None:
-    """รูปแบบข้อความเดียวกับคำขอ Staff-Assisted เพื่อให้ปุ่มอนุมัติใน Django Admin ผูกบัญชีให้ได้"""
-    note = (f"คำขอเชื่อมต่อ LINE OA (ฟอร์มชื่อ-เบอร์โทร):\nLINE User: {full_name} ({line_user.line_user_id})\n"
-            f"Role: {LinePatientBinding.RoleChoices.SELF}\nเบอร์ที่กรอก: {phone}\nกรุณาตรวจว่าเป็นคนไข้รายนี้จริงก่อนอนุมัติ")
+def _flag_possible_duplicate(request: HttpRequest, line_user: LineUser, existing: Patient, new: Patient) -> None:
+    """รูปแบบข้อความเดียวกับคำขอ Staff-Assisted: ปุ่มอนุมัติใน Django Admin จะย้าย LINE นี้ไปเวชระเบียนเดิม"""
+    note = (f"เบอร์จากฟอร์มลงทะเบียน LINE ตรงกับเวชระเบียนเดิม:\nLINE User: {new.full_name} ({line_user.line_user_id})\n"
+            f"Role: {LinePatientBinding.RoleChoices.SELF}\nเบอร์ที่กรอก: {new.phone}\nเปิดเวชระเบียนใหม่ {new.hn} ให้แล้ว\n"
+            f"ถ้าตรวจแล้วเป็นคนเดียวกับ {existing.hn} ให้กดอนุมัติ LINE นี้จะเห็นข้อมูลของ {existing.hn}")
     record = CommunicationRecord.objects.create(
-        line_message_id=f"staff_req_{uuid.uuid4().hex[:16]}", line_user=line_user, patient=patient,
+        line_message_id=f"staff_req_{uuid.uuid4().hex[:16]}", line_user=line_user, patient=existing,
         direction=CommunicationRecord.DirectionChoices.INCOMING,
         message_type=CommunicationRecord.MessageTypeChoices.TEXT,
         content=note, is_clinical_candidate=True,
     )
     item = ClinicalReviewItem.objects.create(
-        patient=patient, source_message=record, review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_1_INTAKE,
+        patient=existing, source_message=record, review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_1_INTAKE,
         status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW, review_notes=note,
     )
     AuditLog.objects.create(user=None, action='LINE_STAFF_ASSISTED_REQUESTED', model='ClinicalReviewItem',
                             object_id=str(item.pk),
-                            changes={'hn': patient.hn, 'line_user_id': line_user.line_user_id, 'via': 'line_form'},
+                            changes={'hn': existing.hn, 'new_hn': new.hn, 'line_user_id': line_user.line_user_id,
+                                     'via': 'line_form'},
                             client_ip=get_client_ip(request), user_agent=request.META.get('HTTP_USER_AGENT', '')[:500])
 
 
@@ -103,8 +100,6 @@ def line_register_view(request: HttpRequest) -> HttpResponse:
     line_user, _ = LineUser.objects.get_or_create(line_user_id=line_user_id, defaults={'display_name': 'LINE User'})
     if _resolve_patient(line_user_id):
         return render(request, template, {'state': 'bound'})
-    if _has_pending_request(line_user):
-        return render(request, template, {'state': 'waiting'})
 
     form = LineRegisterForm(request.POST or None)
     if request.method != 'POST':
@@ -116,20 +111,17 @@ def line_register_view(request: HttpRequest) -> HttpResponse:
         return render(request, template, {'state': 'form', 'form': form})
 
     full_name = ' '.join(form.cleaned_data['full_name'].split())
-    first_name, _, last_name = full_name.partition(' ')
     phone = form.cleaned_data['phone']
     with transaction.atomic():
         # ล็อกแถวนี้ไว้ กดส่งซ้ำพร้อมกันจะได้ไม่เปิดเวชระเบียนสองใบ
         line_user = LineUser.objects.select_for_update().get(pk=line_user.pk)
-        if _resolve_patient(line_user_id) or _has_pending_request(line_user):
+        if _resolve_patient(line_user_id):
             return redirect(request.get_full_path())
         existing = _find_by_phone(phone)
+        patient = _create_and_bind(request, line_user, full_name, phone, existing)
         if existing:
-            _request_staff_check(request, line_user, existing, full_name, phone)
-            patient = None
-        else:
-            patient = _create_and_bind(request, line_user, first_name[:100], last_name[:100], phone)
+            _flag_possible_duplicate(request, line_user, existing, patient)
+        _set_bot_enabled(request, line_user, True, patient)
 
-    if patient and line_user.bot_enabled:
-        LineMessagingService.push_message(line_user_id, [_bot_menu_card(request, patient, line_user_id)])
+    LineMessagingService.push_message(line_user_id, [welcome_card(patient)])
     return redirect(request.get_full_path())

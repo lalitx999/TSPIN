@@ -121,7 +121,8 @@
                     <h2>ติดต่อคลินิก</h2>
                     <ul class="list-unstyled mb-0">
                         <li><i class="fas fa-map-marker-alt me-2"></i> ศูนย์การแพทย์และการฟื้นฟูสุขภาพ TSPI</li>
-                        <li><i class="fab fa-line me-2"></i> LINE: @505bfkpi</li>
+                        <li><i class="fab fa-line me-2"></i> LINE: {{ LINE_OA_ID }}</li>
+                        {% if LINE_BOT_URL %}<li><i class="fas fa-robot me-2"></i> <a href="{{ LINE_BOT_URL }}">เปิดบอทคลินิกใน LINE</a></li>{% endif %}
                         <li><i class="fas fa-clock me-2"></i> จันทร์ – เสาร์ 09:00 – 18:00 น.</li>
                         <li><i class="fas fa-ambulance me-2"></i> ฉุกเฉิน โทร <strong class="text-white">1669</strong></li>
                     </ul>

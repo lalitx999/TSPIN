@@ -87,6 +87,21 @@
             </div>
             {% endfor %}
         </div>
+        {% if LINE_BOT_URL %}
+        <div class="line-bot-band mt-5">
+            <div class="d-flex flex-column flex-sm-row gap-3">
+                <span class="icon-tile flex-shrink-0"><i class="fab fa-line"></i></span>
+                <div>
+                    <h3 class="h4 mb-2">เป็นคนไข้ของคลินิก ใช้บอทผ่าน LINE ได้</h3>
+                    <p class="text-muted mb-0">เล่าอาการให้ทีมแพทย์ ดูใบนัด และดูผลตรวจได้ในแชท กดปุ่มแล้ว LINE จะพิมพ์คำว่า &ldquo;เปิดใช้งานบอท&rdquo; ไว้ให้ แค่กดส่ง และกดปิดบอทได้ทุกเมื่อ</p>
+                </div>
+            </div>
+            <div class="text-center flex-shrink-0">
+                <a href="{{ LINE_BOT_URL }}" class="btn btn-primary btn-xl w-100"><i class="fab fa-line"></i> เปิดบอทใน LINE</a>
+                <small class="d-none d-lg-block text-muted mt-2">กดจากมือถือที่มีแอป LINE</small>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </section>
 

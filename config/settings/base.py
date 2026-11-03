@@ -149,6 +149,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.asset_version',
+                'core.context_processors.line_oa',
             ],
             # ⚠️ ห้ามปิด autoescape เด็ดขาด ป้องกัน Stored/Reflected XSS
             'autoescape': True,
@@ -194,6 +195,12 @@ LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', '')
 # LIFF app id ("{channelId}-{suffix}"): ใช้ตรวจ ID token ของผู้ใช้ LINE ในฟอร์มยืนยันตัวตน
 LINE_LIFF_ID = os.environ.get('LINE_LIFF_ID', '')
+# URL webhook ของระบบเก่า ส่งต่อข้อความของคนที่ไม่ได้เปิดบอทเรา (ว่าง = ไม่ส่งต่อ)
+LINE_RELAY_URL = os.environ.get('LINE_RELAY_URL', '')
+# OA ที่ลิงก์ "เปิดบอท" บนเว็บชี้ไป
+LINE_OA_ID = os.environ.get('LINE_OA_ID', '@505bfkpi')
+# เปิดเมื่อ webhook ของ OA นั้นชี้มาที่ระบบนี้แล้วเท่านั้น ไม่งั้นข้อความเปิดบอทจะไปโผล่ในแชทขายของโดยไม่มีบอทตอบ
+LINE_BOT_LINK_ENABLED = os.environ.get('LINE_BOT_LINK_ENABLED', 'false').lower() == 'true'
 # อีเมล (OTP ยืนยันตัวตนผ่าน LINE) ใช้ SMTP ของ Hostinger: ตั้งค่าใน .env
 # ถ้าไม่ตั้ง EMAIL_HOST จะพิมพ์อีเมลออก console (ใช้ตอนพัฒนา)
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')

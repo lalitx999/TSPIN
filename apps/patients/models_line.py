@@ -40,6 +40,9 @@ class LineUser(models.Model):
         help_text="บัญชีผู้ใช้ระบบ (ถ้ามี เช่น บุคลากรทางการแพทย์ หรือคนไข้ Portal)"
     )
 
+    # บอทปิดเป็นค่าเริ่มต้น: ตอบอัตโนมัติเฉพาะคนที่พิมพ์ "เปิดใช้งานบอท" เอง
+    bot_enabled = models.BooleanField(default=False, help_text="ผู้ใช้เปิดใช้งานบอทตอบอัตโนมัติอยู่หรือไม่")
+
     created_at = models.DateTimeField(auto_now_add=True)
     last_seen_at = models.DateTimeField(auto_now=True)
 

@@ -16,7 +16,10 @@ from django.urls import reverse
 from accounts.models import AuditLog
 from patients.models import Patient, PatientLinkingToken, Appointment
 from clinical.models import AnalysisRecord, Box
-from patients.line_service import LineSecurity, LineFlexMessageBuilder, LineMessagingService
+from patients.line_relay import relay_to_old_system
+from patients.line_service import (
+    BOT_OFF_WORDS, BOT_ON_WORD, LineSecurity, LineFlexMessageBuilder, LineMessagingService, is_bot_on_word,
+)
 from patients.views_line_internal import ingest_line_event, detect_clinical_intent
 from patients.models_line import LineUser
 from clinical import media_store, services_intake
@@ -25,19 +28,30 @@ START_WORDS = ('เริ่ม', 'เริ่มต้น', 'start', 'ปร�
 DONE_WORDS = ('เสร็จแล้ว', 'จบ', 'done', 'ครบแล้ว')
 MEDIA_KINDS = {'image': 'image', 'audio': 'audio', 'video': 'video', 'file': 'file'}
 EMERGENCY_TEXT = (
-    "⚠️ อาการที่แจ้งมาอาจเป็นภาวะฉุกเฉิน\n"
     "หากมีอาการแน่นหน้าอก หายใจลำบาก หมดสติ หรือแขนขาอ่อนแรง กรุณาโทร 1669 หรือไปโรงพยาบาลที่ใกล้ที่สุดทันที\n"
     "ทีมแพทย์ได้รับแจ้งแล้วเช่นกัน"
 )
 
 
-def _done_quick_reply(text: str) -> dict:
-    """ข้อความพร้อมปุ่ม "เสร็จแล้ว" ให้ผู้ป่วยกดปิดรอบซักประวัติ"""
-    return {
-        "type": "text",
-        "text": text,
-        "quickReply": {"items": [{"type": "action", "action": {"type": "message", "label": "เสร็จแล้ว", "text": "เสร็จแล้ว"}}]},
-    }
+def _card(title: str, body: str, buttons=None, **kwargs) -> dict:
+    return LineFlexMessageBuilder.build_bot_card(title, body, buttons=buttons, **kwargs)
+
+
+def _intake_card(title: str, body: str) -> dict:
+    """การ์ดระหว่างเล่าอาการ พร้อมปุ่ม "เสร็จแล้ว" ให้ผู้ป่วยกดปิดรอบซักประวัติ"""
+    return _card(title, body, buttons=[LineFlexMessageBuilder.button_message('เสร็จแล้ว', 'เสร็จแล้ว')])
+
+
+def _emergency_card() -> dict:
+    return _card('อาจเป็นภาวะฉุกเฉิน', EMERGENCY_TEXT, danger=True, buttons=[
+        LineFlexMessageBuilder.button_uri('โทร 1669', 'tel:1669', style='secondary'),
+        LineFlexMessageBuilder.button_message('เสร็จแล้ว', 'เสร็จแล้ว', style='secondary'),
+    ])
+
+
+def _reply(reply_token: str, card: dict) -> None:
+    if reply_token:
+        LineMessagingService.reply_message(reply_token, [card])
 
 
 def _resolve_patient(line_user_id: str):
@@ -50,7 +64,44 @@ def _resolve_patient(line_user_id: str):
 
 def _binding_card(request: HttpRequest) -> dict:
     binding_url = request.build_absolute_uri(reverse('root_liff_binding_page'))
-    return LineFlexMessageBuilder.build_welcome_card(binding_url=binding_url)
+    return _card('เชื่อมบัญชีคลินิกก่อนนะครับ', 'เชื่อมบัญชี LINE กับเวชระเบียนของคลินิก เพื่อเล่าอาการ ดูใบนัด และดูผลตรวจผ่านบอทได้',
+                 buttons=[LineFlexMessageBuilder.button_uri('เชื่อมบัญชีคลินิก', binding_url)])
+
+
+def _bot_menu_card(request: HttpRequest, patient) -> dict:
+    if not patient:
+        return _binding_card(request)
+    return _card('เปิดใช้งานบอทแล้ว', f'สวัสดีครับคุณ{patient.first_name} เลือกสิ่งที่ต้องการได้เลย', buttons=[
+        LineFlexMessageBuilder.button_message('เล่าอาการให้คลินิก', 'เริ่ม'),
+        LineFlexMessageBuilder.button_postback('ดูใบนัด', 'action=check_appointment'),
+        LineFlexMessageBuilder.button_postback('ดูผลตรวจ', 'action=check_report'),
+    ])
+
+
+def _set_bot_enabled(request: HttpRequest, line_user: LineUser, enabled: bool, patient) -> None:
+    line_user.bot_enabled = enabled
+    line_user.save(update_fields=['bot_enabled', 'last_seen_at'])
+    AuditLog.objects.create(
+        action='LINE_BOT_ENABLED' if enabled else 'LINE_BOT_DISABLED',
+        user=None,
+        model='Patient',
+        object_id=str(patient.pk) if patient else '',
+        client_ip=request.META.get('REMOTE_ADDR'),
+        user_agent=request.META.get('HTTP_USER_AGENT', ''),
+        changes={'line_user_id': line_user.line_user_id},
+    )
+
+
+def _turn_bot_off(request: HttpRequest, line_user: LineUser, patient, reply_token: str) -> None:
+    """ปิดบอท: ถ้ากำลังเล่าอาการค้างอยู่ ส่งรอบนั้นให้ทีมแพทย์เลย ไม่ให้ข้อมูลค้างในร่าง"""
+    if patient:
+        open_box = Box.objects.filter(patient=patient, source=Box.Source.LINE, status=Box.Status.DRAFT).first()
+        if open_box and (open_box.contents or {}).get('messages'):
+            services_intake.close_session(open_box, reason='bot_disabled')
+    _set_bot_enabled(request, line_user, False, patient)
+    _reply(reply_token, _card('ปิดบอทแล้ว', f'บอทจะไม่ตอบอัตโนมัติอีก พิมพ์ข้อความทิ้งไว้ได้ เจ้าหน้าที่จะตอบกลับทางแชทนี้\n\nอยากใช้บอทอีกครั้ง พิมพ์ว่า "{BOT_ON_WORD}"',
+                               closable=False))
+
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +158,13 @@ def line_webhook_view(request: HttpRequest) -> HttpResponse:
     if len(events) == 0:
         return JsonResponse({"status": "ok", "message": "Probe signature verified successfully"})
 
-    # 5. กระจายจัดการ Events ตามประเภท
+    # 5. ส่งต่อให้ระบบเก่าก่อน เพราะต้องดูสถานะบอทก่อนที่ event ชุดนี้จะเปลี่ยนมัน
+    try:
+        relay_to_old_system(raw_body, signature, data)
+    except Exception as e:
+        logger.error(f"[LINE Relay] Failed before delivery: {e}", exc_info=True)
+
+    # 6. กระจายจัดการ Events ตามประเภท
     for event in events:
         try:
             _dispatch_line_event(request, event)
@@ -130,8 +187,10 @@ def _dispatch_line_event(request: HttpRequest, event: dict):
     # ค้นหาผู้ป่วยที่ผูกกับ LINE ID นี้ไว้แล้วในระบบ
     patient = _resolve_patient(line_user_id)
 
+    line_user, _ = LineUser.objects.get_or_create(line_user_id=line_user_id, defaults={'display_name': 'LINE User'})
+
     if event_type == 'follow':
-        # ผู้ใช้กดเพิ่มเพื่อนหรือปลดบล็อก LINE OA
+        # ผู้ใช้กดเพิ่มเพื่อนหรือปลดบล็อก LINE OA (บันทึกอย่างเดียว บอทไม่ทักเอง)
         AuditLog.objects.create(
             action='LINE_USER_FOLLOW',
             user=None,
@@ -141,27 +200,39 @@ def _dispatch_line_event(request: HttpRequest, event: dict):
             user_agent=request.META.get('HTTP_USER_AGENT', ''),
             changes={'details': f"LINE User {line_user_id} followed TSPI Clinic OA"}
         )
-        msg = LineFlexMessageBuilder.build_welcome_card() if patient else _binding_card(request)
-
-        if reply_token:
-            LineMessagingService.reply_message(reply_token, [msg])
 
     elif event_type == 'message':
-        # บันทึกทุกข้อความเข้า Unified Inbox / Clinical Review Queue (Caregiver Hub)
-        ingest_line_event(event)
+        # บันทึกทุกข้อความเข้า Unified Inbox ไม่ว่าบอทจะเปิดหรือปิด เจ้าหน้าที่จะได้เห็นประวัติครบ
+        result, _ = ingest_line_event(event)
+        if result.get('action') == 'deduplicated':
+            return  # LINE ส่งซ้ำ: เคยจัดการแล้ว ห้ามตอบหรือสั่งงานซ้ำ
 
         message_obj = event.get('message', {})
         msg_type = message_obj.get('type')
-        if msg_type == 'text':
-            _handle_line_text_command(request, patient, line_user_id, (message_obj.get('text') or '').strip(), reply_token,
+        raw_text = (message_obj.get('text') or '').strip() if msg_type == 'text' else ''
+
+        if is_bot_on_word(raw_text):
+            _set_bot_enabled(request, line_user, True, patient)
+            _reply(reply_token, _bot_menu_card(request, patient))
+            return
+        if not line_user.bot_enabled:
+            return  # บอทปิดอยู่: ไม่ตอบ และไม่เปิดรอบซักประวัติ
+        if raw_text in BOT_OFF_WORDS:
+            _turn_bot_off(request, line_user, patient, reply_token)
+        elif msg_type == 'text':
+            _handle_line_text_command(request, patient, line_user_id, raw_text, reply_token,
                                       message_id=message_obj.get('id', ''))
         elif msg_type in MEDIA_KINDS:
             _handle_line_media(request, patient, message_obj, reply_token)
 
     elif event_type == 'postback':
+        if not line_user.bot_enabled:
+            return  # ปุ่มจากการ์ดเก่าหรือ Rich Menu ไม่ปลุกบอท ต้องพิมพ์เปิดเองเท่านั้น
         postback_data = event.get('postback', {}).get('data', '')
-        if 'action=check_appointment' in postback_data:
-            _send_appointment_reply(patient, reply_token)
+        if postback_data == LineFlexMessageBuilder.BOT_OFF_POSTBACK:
+            _turn_bot_off(request, line_user, patient, reply_token)
+        elif 'action=check_appointment' in postback_data:
+            _send_appointment_reply(request, patient, reply_token)
         elif 'action=check_report' in postback_data:
             _send_latest_report_reply(request, patient, reply_token)
 
@@ -175,41 +246,32 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
     text = raw_text.lower()
 
     if any(k in text for k in ['นัดหมาย', 'ใบนัด', 'ตารางนัด', 'appointment']):
-        _send_appointment_reply(patient, reply_token)
+        _send_appointment_reply(request, patient, reply_token)
         return
     if any(k in text for k in ['ผลตรวจ', 'รายงาน', 'ผลแล็บ', 'report']):
         _send_latest_report_reply(request, patient, reply_token)
         return
     if any(k in text for k in ['ติดต่อ', 'เบอร์โทร']):
-        LineMessagingService.reply_message(reply_token, [{
-            "type": "text",
-            "text": "TSPI Precision Medicine Clinic\nโทร: 02-123-4567\nเวลาทำการ: จันทร์ - ศุกร์ 09:00 - 18:00 น."
-        }])
+        _reply(reply_token, _card('ติดต่อเจ้าหน้าที่', 'กดปิดบอท แล้วพิมพ์ข้อความทิ้งไว้ได้เลย เจ้าหน้าที่จะตอบกลับทางแชทนี้ในเวลาทำการ'))
         return
 
     if not patient:
-        if reply_token:
-            LineMessagingService.reply_message(reply_token, [_binding_card(request)])
+        _reply(reply_token, _binding_card(request))
         return
 
     if text in DONE_WORDS:
         open_box = Box.objects.filter(patient=patient, source=Box.Source.LINE, status=Box.Status.DRAFT).first()
         if open_box and (open_box.contents or {}).get('messages'):
             services_intake.close_session(open_box)
-            reply = "ขอบคุณครับ คลินิกได้รับข้อมูลของคุณครบแล้ว ทีมแพทย์จะตรวจและติดต่อกลับครับ"
+            _reply(reply_token, _card('ได้รับข้อมูลครบแล้ว', 'ขอบคุณครับ ทีมแพทย์จะตรวจและติดต่อกลับครับ'))
         else:
-            reply = "ยังไม่มีข้อมูลอาการในรอบนี้ครับ พิมพ์เล่าอาการ หรือส่งรูป/ข้อความเสียงได้เลย"
-        if reply_token:
-            LineMessagingService.reply_message(reply_token, [{"type": "text", "text": reply}])
+            _reply(reply_token, _intake_card('ยังไม่มีข้อมูลอาการ', 'พิมพ์เล่าอาการ หรือส่งรูป/ข้อความเสียงได้เลยครับ'))
         return
 
     if text in START_WORDS:
         services_intake.open_session(patient, Box.Source.LINE)
-        if reply_token:
-            LineMessagingService.reply_message(reply_token, [_done_quick_reply(
-                f"สวัสดีครับคุณ{patient.first_name} เล่าอาการได้เลยครับ ส่งข้อความ รูป หรือข้อความเสียงได้\n"
-                "เมื่อเล่าครบแล้วกดปุ่ม \"เสร็จแล้ว\" ด้านล่าง"
-            )])
+        _reply(reply_token, _intake_card('เล่าอาการได้เลยครับ',
+                                         f'สวัสดีครับคุณ{patient.first_name} ส่งข้อความ รูป หรือข้อความเสียงได้\nเมื่อเล่าครบแล้วกดปุ่ม "เสร็จแล้ว"'))
         return
 
     box = services_intake.open_session(patient, Box.Source.LINE)
@@ -219,22 +281,19 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
     if not reply_token:
         return
     if is_urgent:
-        LineMessagingService.reply_message(reply_token, [_done_quick_reply(EMERGENCY_TEXT)])
+        _reply(reply_token, _emergency_card())
         return
     question = services_intake.ai_followup_question(box)
     if question:
-        LineMessagingService.reply_message(reply_token, [_done_quick_reply(question)])
+        _reply(reply_token, _intake_card('ขอถามเพิ่มอีกนิดครับ', question))
     elif is_first:
-        LineMessagingService.reply_message(reply_token, [_done_quick_reply(
-            "รับทราบครับ เล่าเพิ่มเติมได้เรื่อย ๆ ส่งรูปหรือข้อความเสียงได้ เมื่อครบแล้วกด \"เสร็จแล้ว\""
-        )])
+        _reply(reply_token, _intake_card('รับทราบครับ', 'เล่าเพิ่มเติมได้เรื่อย ๆ ส่งรูปหรือข้อความเสียงได้ เมื่อครบแล้วกด "เสร็จแล้ว"'))
 
 
 def _handle_line_media(request: HttpRequest, patient: Patient, message_obj: dict, reply_token: str):
     """ดึงรูป/เสียง/วิดีโอจาก LINE ทันที (LINE เก็บไว้ไม่นาน) เข้ารหัสเก็บ แล้วต่อเข้ารอบซักประวัติ"""
     if not patient:
-        if reply_token:
-            LineMessagingService.reply_message(reply_token, [_binding_card(request)])
+        _reply(reply_token, _binding_card(request))
         return
 
     kind = MEDIA_KINDS[message_obj.get('type')]
@@ -249,19 +308,17 @@ def _handle_line_media(request: HttpRequest, patient: Patient, message_obj: dict
         media = media_store.save_encrypted(data, content_type, kind=f"line/{kind}")
     services_intake.append_message(box, kind, media=media, external_id=message_id)
 
-    if reply_token and (is_first or media is None):
-        text = "ได้รับไฟล์แล้วครับ" if media else "ขออภัย ระบบดึงไฟล์นี้ไม่สำเร็จ รบกวนส่งใหม่อีกครั้งครับ"
-        LineMessagingService.reply_message(reply_token, [_done_quick_reply(text)])
+    if is_first or media is None:
+        if media:
+            _reply(reply_token, _intake_card('ได้รับไฟล์แล้วครับ', 'ส่งเพิ่มหรือเล่าอาการต่อได้เลย เมื่อครบแล้วกด "เสร็จแล้ว"'))
+        else:
+            _reply(reply_token, _intake_card('ดึงไฟล์ไม่สำเร็จ', 'ขออภัยครับ รบกวนส่งไฟล์นี้ใหม่อีกครั้ง'))
 
 
-def _send_appointment_reply(patient: Patient, reply_token: str):
+def _send_appointment_reply(request: HttpRequest, patient: Patient, reply_token: str):
     """ตอบกลับด้วยใบนัดหมายแพทย์ล่าสุด"""
     if not patient:
-        msg = {
-            "type": "text",
-            "text": "กรุณาเชื่อมต่อบัญชีผู้ป่วย (HN) กับระบบก่อนเพื่อดูใบนัดหมาย"
-        }
-        LineMessagingService.reply_message(reply_token, [msg])
+        _reply(reply_token, _binding_card(request))
         return
 
     appt = patient.appointments.filter(status__in=['scheduled', 'confirmed']).order_by('appointment_date', 'appointment_time').first()
@@ -273,23 +330,15 @@ def _send_appointment_reply(patient: Patient, reply_token: str):
             appt_time=str(appt.appointment_time),
             doctor_name=doc_name
         )
-        LineMessagingService.reply_message(reply_token, [card])
+        _reply(reply_token, LineFlexMessageBuilder.with_close_button(card))
     else:
-        msg = {
-            "type": "text",
-            "text": f"เรียนคุณ {patient.full_name}\nท่านยังไม่มีนัดหมายแพทย์ที่เปิดอยู่ในขณะนี้"
-        }
-        LineMessagingService.reply_message(reply_token, [msg])
+        _reply(reply_token, _card('ยังไม่มีนัดหมาย', f'เรียนคุณ {patient.full_name}\nขณะนี้ท่านยังไม่มีนัดหมายแพทย์ที่เปิดอยู่'))
 
 
 def _send_latest_report_reply(request: HttpRequest, patient: Patient, reply_token: str):
     """ตอบกลับด้วยรายงานการแพทย์แม่นยำที่ได้รับการอนุมัติล่าสุด (Approved Report Only)"""
     if not patient:
-        msg = {
-            "type": "text",
-            "text": "กรุณาเข้าสู่ระบบ Patient Portal เพื่อเชื่อมโยงบัญชีก่อนตรวจสอบรายงาน"
-        }
-        LineMessagingService.reply_message(reply_token, [msg])
+        _reply(reply_token, _binding_card(request))
         return
 
     # ดึงเฉพาะรายงานที่ได้รับการอนุมัติแล้วเท่านั้น (Pillar 15)
@@ -305,13 +354,9 @@ def _send_latest_report_reply(request: HttpRequest, patient: Patient, reply_toke
             report_title=f"รายงานการแพทย์แม่นยำ 39 แกน #{report.pk}",
             portal_url=portal_url
         )
-        LineMessagingService.reply_message(reply_token, [card])
+        _reply(reply_token, LineFlexMessageBuilder.with_close_button(card))
     else:
-        msg = {
-            "type": "text",
-            "text": f"เรียนคุณ {patient.full_name}\nขณะนี้ยังไม่มีรายงานที่แพทย์ลงนามอนุมัติเผยแพร่\nกรุณาติดต่อแพทย์ผู้ดูแลหากต้องการข้อมูลเพิ่มเติม"
-        }
-        LineMessagingService.reply_message(reply_token, [msg])
+        _reply(reply_token, _card('ยังไม่มีผลตรวจที่พร้อมดู', f'เรียนคุณ {patient.full_name}\nขณะนี้ยังไม่มีรายงานที่แพทย์ลงนามอนุมัติ กรุณาสอบถามแพทย์ผู้ดูแลหากต้องการข้อมูลเพิ่มเติม'))
 
 
 def line_account_binding_callback_view(request: HttpRequest) -> HttpResponse:

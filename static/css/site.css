@@ -102,6 +102,11 @@ main { flex: 1 0 auto; }
 .site-cta h2 { color: #fff; }
 .site-cta .btn-light { color: var(--tspi-green-900); font-weight: 700; }
 
+/* แถบเปิดบอท LINE */
+.line-bot-band { display: flex; flex-direction: column; gap: 1.5rem; padding: 1.75rem; background: var(--tspi-green-50); border: 1px solid var(--tspi-green-100); border-radius: 22px; }
+.line-bot-band .icon-tile { background: #fff; }
+@media (min-width: 992px) { .line-bot-band { flex-direction: row; align-items: center; justify-content: space-between; gap: 3rem; padding: 2rem 2.5rem; } }
+
 /* ---------- ส่วนท้าย ---------- */
 .site-footer { background: #0F2A1A; color: #CFE3D2; padding: 4rem 0 2rem; margin-top: 0; }
 .site-footer h2 { color: #fff; font-size: 1.1rem; margin-bottom: 1rem; }

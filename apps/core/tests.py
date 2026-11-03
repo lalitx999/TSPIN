@@ -2,7 +2,7 @@
 Unit Tests for Public Core Pages & Base Layout Rendering (Pillars 2, 4, 15).
 """
 
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
@@ -163,6 +163,25 @@ class EncryptionKeyRotationTests(TestCase):
             rotated = Patient.objects.get(pk=p.pk).id_card_encrypted
             self.assertNotEqual(rotated, old_token)
             self.assertEqual(ClinicalEncryption.decrypt(rotated), '1100400123450')
+
+
+class LineBotLinkTests(TestCase):
+    """ลิงก์เปิดบอทบนเว็บ: ซ่อนจนกว่า webhook จะชี้มาที่ระบบนี้"""
+
+    @override_settings(LINE_BOT_LINK_ENABLED=False, LINE_OA_ID='@testoa')
+    def test_hidden_until_enabled(self):
+        resp = self.client.get('/')
+        self.assertNotContains(resp, 'oaMessage')
+        self.assertContains(resp, 'LINE: @testoa')
+
+    @override_settings(LINE_BOT_LINK_ENABLED=True, LINE_OA_ID='@testoa')
+    def test_link_prefills_the_exact_word_the_webhook_expects(self):
+        from urllib.parse import unquote, urlsplit
+        from patients.line_service import BOT_ON_WORD, line_bot_url
+        url = line_bot_url()
+        self.assertTrue(url.startswith('https://line.me/R/oaMessage/@testoa/?'))
+        self.assertEqual(unquote(urlsplit(url).query), BOT_ON_WORD)
+        self.assertContains(self.client.get('/'), url)
 
 
 class GuestAssistantApiTests(TestCase):

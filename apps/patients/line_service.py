@@ -12,9 +12,24 @@ import logging
 import urllib.request
 import urllib.error
 from typing import Dict, Any, List, Optional, Tuple
+from urllib.parse import quote
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
+
+BOT_ON_WORD = 'เปิดใช้งานบอท'
+BOT_OFF_WORDS = ('ปิดบอท', 'ปิดใช้งานบอท')
+
+
+def is_bot_on_word(text: str) -> bool:
+    return text.replace(' ', '') == BOT_ON_WORD
+
+
+def line_bot_url() -> str:
+    """ลิงก์เปิดแชท OA พร้อมพิมพ์คำเปิดบอทไว้ให้ ลูกค้ากดส่งอย่างเดียว (ว่างถ้ายังไม่เปิดใช้)"""
+    if not settings.LINE_BOT_LINK_ENABLED:
+        return ''
+    return f"https://line.me/R/oaMessage/{quote(settings.LINE_OA_ID, safe='@')}/?{quote(BOT_ON_WORD)}"
 
 
 class LineSecurity:
@@ -55,8 +70,76 @@ class LineSecurity:
 class LineFlexMessageBuilder:
     """
     ตัวสร้างโครงสร้างข้อความ Rich Flex Message สำหรับส่งให้ผู้ป่วยบน LINE OA
-    รองรับภาษาไทย Sarabun-styled, Modern Medical Theme (Cyan / Slate / White)
+    โทนเขียวเดียวกับหน้าเว็บ TSPI Clinic
     """
+
+    GREEN = "#2E7D32"
+    RED = "#B91C1C"
+    BOT_OFF_POSTBACK = "action=bot_off"
+
+    @staticmethod
+    def button_message(label: str, text: str, style: str = "primary") -> Dict[str, Any]:
+        return LineFlexMessageBuilder._button(label, {"type": "message", "label": label, "text": text}, style)
+
+    @staticmethod
+    def button_postback(label: str, data: str, style: str = "secondary") -> Dict[str, Any]:
+        return LineFlexMessageBuilder._button(label, {"type": "postback", "label": label, "data": data, "displayText": label}, style)
+
+    @staticmethod
+    def button_uri(label: str, uri: str, style: str = "primary") -> Dict[str, Any]:
+        return LineFlexMessageBuilder._button(label, {"type": "uri", "label": label, "uri": uri}, style)
+
+    @staticmethod
+    def _button(label: str, action: Dict[str, Any], style: str) -> Dict[str, Any]:
+        button = {"type": "button", "style": style, "height": "sm", "action": action}
+        if style == "primary":
+            button["color"] = LineFlexMessageBuilder.GREEN
+        return button
+
+    @classmethod
+    def close_button(cls) -> Dict[str, Any]:
+        return {"type": "button", "style": "link", "height": "sm", "color": "#64748B",
+                "action": {"type": "postback", "label": "ปิดบอท", "data": cls.BOT_OFF_POSTBACK, "displayText": "ปิดบอท"}}
+
+    @classmethod
+    def with_close_button(cls, message: Dict[str, Any]) -> Dict[str, Any]:
+        """เติมปุ่มปิดบอทลงการ์ดที่มีอยู่แล้ว (ใบนัด, รายงาน) โดยไม่แก้การ์ดต้นฉบับ"""
+        bubble = dict(message["contents"])
+        footer = dict(bubble.get("footer") or {"type": "box", "layout": "vertical", "spacing": "sm", "contents": []})
+        footer["contents"] = [*footer["contents"], cls.close_button()]
+        bubble["footer"] = footer
+        return {**message, "contents": bubble}
+
+    @classmethod
+    def build_bot_card(cls, title: str, body: str, buttons: Optional[List[Dict[str, Any]]] = None,
+                       danger: bool = False, closable: bool = True) -> Dict[str, Any]:
+        """การ์ดข้อความของบอท ทุกข้อความใช้แบบเดียวกัน และมีปุ่มปิดบอทเสมอ (ยกเว้นการ์ดยืนยันว่าปิดแล้ว)"""
+        footer = list(buttons or [])
+        if closable:
+            footer.append(cls.close_button())
+        bubble: Dict[str, Any] = {
+            "type": "bubble",
+            "size": "mega",
+            "header": {
+                "type": "box",
+                "layout": "vertical",
+                "paddingAll": "lg",
+                "backgroundColor": cls.RED if danger else cls.GREEN,
+                "contents": [
+                    {"type": "text", "text": "TSPI Clinic", "color": "#FFFFFFCC", "size": "xs"},
+                    {"type": "text", "text": title, "color": "#FFFFFF", "size": "lg", "weight": "bold", "wrap": True, "margin": "xs"},
+                ],
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "paddingAll": "lg",
+                "contents": [{"type": "text", "text": body, "size": "md", "color": "#0F172A", "wrap": True, "lineSpacing": "6px"}],
+            },
+        }
+        if footer:
+            bubble["footer"] = {"type": "box", "layout": "vertical", "spacing": "sm", "contents": footer}
+        return {"type": "flex", "altText": f"{title}: {body}"[:400], "contents": bubble}
 
     @staticmethod
     def build_welcome_card(binding_url: Optional[str] = None) -> Dict[str, Any]:
@@ -66,7 +149,7 @@ class LineFlexMessageBuilder:
                 "type": "text",
                 "text": "TSPI CLINIC PRECISION MEDICINE",
                 "weight": "bold",
-                "color": "#0ea5e9",
+                "color": "#2E7D32",
                 "size": "xs"
             },
             {
@@ -92,7 +175,7 @@ class LineFlexMessageBuilder:
             footer_contents.append({
                 "type": "button",
                 "style": "primary",
-                "color": "#0284c7",
+                "color": "#2E7D32",
                 "height": "sm",
                 "action": {
                     "type": "uri",
@@ -143,7 +226,7 @@ class LineFlexMessageBuilder:
                 "header": {
                     "type": "box",
                     "layout": "vertical",
-                    "backgroundColor": "#0284c7",
+                    "backgroundColor": "#2E7D32",
                     "contents": [
                         {
                             "type": "text",

@@ -16,7 +16,9 @@ from django.urls import reverse
 from accounts.models import AuditLog, User
 from clinical import media_store, services_intake
 from clinical.models import Box
+from patients import line_relay
 from patients.models import Patient, PatientHistory
+from patients.models_line import CommunicationRecord, LineUser
 
 LINE_SECRET = 'intake-test-line-secret'
 
@@ -42,6 +44,7 @@ class IntakeTestBase(TestCase):
         self.addCleanup(override.disable)
         self.patient = Patient.objects.create(hn='HN-INT-1', first_name='สมหญิง', last_name='ทดสอบ',
                                               line_user_id='U_INTAKE_1')
+        self.line_user = LineUser.objects.create(line_user_id='U_INTAKE_1', display_name='สมหญิง', bot_enabled=True)
 
 
 class LineSessionTests(IntakeTestBase):
@@ -91,6 +94,151 @@ class LineSessionTests(IntakeTestBase):
         stored = (media_store._root() / meta['path']).read_bytes()
         self.assertNotIn(b'fake-image-bytes', stored)  # เก็บแบบเข้ารหัส
         self.assertEqual(media_store.read_decrypted(meta), png)
+
+
+class LineBotOptInTests(IntakeTestBase):
+    """บอทปิดเป็นค่าเริ่มต้น เปิดได้ด้วยการพิมพ์ "เปิดใช้งานบอท" เท่านั้น และทุกคำตอบเป็น Flex ที่มีปุ่มปิดบอท"""
+
+    def setUp(self):
+        super().setUp()
+        self.line_user.bot_enabled = False
+        self.line_user.save()
+
+    def _post(self, *events):
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, list(events))
+        return reply
+
+    def _postback(self, user_id, data, event_id='pb1'):
+        return {'type': 'postback', 'replyToken': 'r', 'webhookEventId': event_id, 'source': {'userId': user_id},
+                'postback': {'data': data}}
+
+    def _close_labels(self, reply):
+        card = reply.call_args.args[1][0]
+        self.assertEqual(card['type'], 'flex')
+        return [b['action']['label'] for b in card['contents'].get('footer', {}).get('contents', [])]
+
+    def test_bot_off_stays_silent_but_message_is_stored(self):
+        reply = self._post(_text_event('U_INTAKE_1', 'q1', 'มีครีมขายไหมครับ'))
+        reply.assert_not_called()
+        self.assertFalse(Box.objects.filter(patient=self.patient).exists())
+        self.assertTrue(CommunicationRecord.objects.filter(line_message_id='q1').exists())
+
+    def test_unknown_customer_gets_no_reply_on_follow_or_message(self):
+        follow = {'type': 'follow', 'replyToken': 'r', 'source': {'userId': 'U_NEW'}}
+        self._post(follow).assert_not_called()
+        self._post(_text_event('U_NEW', 'q2', 'สวัสดีครับ')).assert_not_called()
+
+    def test_only_exact_phrase_turns_bot_on(self):
+        self._post(_text_event('U_INTAKE_1', 'q3', 'อยากเปิดใช้งานบอทต้องทำไง')).assert_not_called()
+        self._post(_text_event('U_INTAKE_1', 'q4', 'เริ่ม')).assert_not_called()
+        self.assertFalse(LineUser.objects.get(pk=self.line_user.pk).bot_enabled)
+
+        reply = self._post(_text_event('U_INTAKE_1', 'q5', 'เปิดใช้งานบอท'))
+        self.assertTrue(LineUser.objects.get(pk=self.line_user.pk).bot_enabled)
+        self.assertIn('ปิดบอท', self._close_labels(reply))
+        self.assertTrue(AuditLog.objects.filter(action='LINE_BOT_ENABLED').exists())
+
+    def test_every_bot_reply_is_flex_with_close_button(self):
+        self.line_user.bot_enabled = True
+        self.line_user.save()
+        for i, text in enumerate(['เริ่ม', 'ปวดหลัง', 'แน่นหน้าอกมาก', 'ใบนัด', 'ผลตรวจ', 'ติดต่อ', 'เสร็จแล้ว']):
+            reply = self._post(_text_event('U_INTAKE_1', f'all{i}', text))
+            if reply.called:
+                self.assertIn('ปิดบอท', self._close_labels(reply), text)
+
+    def test_close_button_turns_bot_off_and_sends_open_session_to_staff(self):
+        self.line_user.bot_enabled = True
+        self.line_user.save()
+        self._post(_text_event('U_INTAKE_1', 'c1', 'ปวดหลัง'))
+        reply = self._post(self._postback('U_INTAKE_1', 'action=bot_off'))
+        self.assertFalse(LineUser.objects.get(pk=self.line_user.pk).bot_enabled)
+        self.assertEqual(Box.objects.get(patient=self.patient).status, Box.Status.DONE)
+        self.assertEqual(reply.call_args.args[1][0]['type'], 'flex')
+        self._post(_text_event('U_INTAKE_1', 'c2', 'ปวดอีกแล้ว')).assert_not_called()
+
+    def test_old_card_buttons_do_not_wake_bot(self):
+        self._post(self._postback('U_INTAKE_1', 'action=check_appointment')).assert_not_called()
+
+    def test_line_retry_of_enable_command_replies_once(self):
+        event = _text_event('U_INTAKE_1', 'r1', 'เปิดใช้งานบอท')
+        self.assertTrue(self._post(event).called)
+        self._post(event).assert_not_called()
+
+
+@override_settings(LINE_RELAY_URL='https://old.example/webhook/')
+class LineRelayTests(IntakeTestBase):
+    """ระบบเก่าได้ข้อความของคนที่ไม่ได้เปิดบอทเท่านั้น สองบอทต้องไม่ตอบซ้อนกัน"""
+
+    def setUp(self):
+        super().setUp()
+        self.line_user.bot_enabled = False
+        self.line_user.save()
+
+    def _post(self, *events):
+        with patch('patients.line_relay._deliver_in_background') as deliver, \
+                patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            response = _signed_post(self.client, list(events))
+        self.assertEqual(response.status_code, 200)
+        return deliver, reply
+
+    def _forwarded_ids(self, deliver):
+        _, body, signature = deliver.call_args.args
+        expected = base64.b64encode(hmac.new(LINE_SECRET.encode(), body, hashlib.sha256).digest()).decode()
+        self.assertEqual(signature, expected)  # ระบบเก่าใช้ secret เดียวกัน ต้องตรวจผ่าน
+        return [e['message']['id'] for e in json.loads(body)['events']]
+
+    def test_nothing_forwarded_when_url_not_set(self):
+        with override_settings(LINE_RELAY_URL=''):
+            deliver, _ = self._post(_text_event('U_INTAKE_1', 'n1', 'มีครีมขายไหม'))
+        deliver.assert_not_called()
+
+    def test_bot_off_message_goes_to_old_system_only(self):
+        deliver, reply = self._post(_text_event('U_INTAKE_1', 'o1', 'มีครีมขายไหม'))
+        self.assertEqual(self._forwarded_ids(deliver), ['o1'])
+        reply.assert_not_called()
+
+    def test_turn_on_word_and_later_messages_stay_with_our_bot(self):
+        deliver, reply = self._post(_text_event('U_INTAKE_1', 'o2', 'เปิดใช้งานบอท'),
+                                    _text_event('U_INTAKE_1', 'o3', 'ปวดหัว'))
+        deliver.assert_not_called()
+        self.assertTrue(reply.called)
+
+    def test_mixed_batch_forwards_only_other_customer(self):
+        self.line_user.bot_enabled = True
+        self.line_user.save()
+        deliver, _ = self._post(_text_event('U_INTAKE_1', 'o4', 'ปวดหัว'),
+                                _text_event('U_SALES', 'o5', 'สั่งของครับ'))
+        self.assertEqual(self._forwarded_ids(deliver), ['o5'])
+
+    def test_after_turning_off_next_message_goes_to_old_system(self):
+        self.line_user.bot_enabled = True
+        self.line_user.save()
+        off = {'type': 'postback', 'replyToken': 'r', 'webhookEventId': 'p1', 'source': {'userId': 'U_INTAKE_1'},
+               'postback': {'data': 'action=bot_off'}}
+        deliver, _ = self._post(off, _text_event('U_INTAKE_1', 'o6', 'สั่งของครับ'))
+        self.assertEqual(self._forwarded_ids(deliver), ['o6'])
+
+    def test_follow_event_is_forwarded_even_when_bot_is_on(self):
+        self.line_user.bot_enabled = True
+        self.line_user.save()
+        deliver, _ = self._post({'type': 'follow', 'replyToken': 'r', 'source': {'userId': 'U_INTAKE_1'}})
+        self.assertEqual(json.loads(deliver.call_args.args[1])['events'][0]['type'], 'follow')
+
+    def test_relay_error_does_not_stop_our_bot(self):
+        with patch('patients.line_relay._deliver_in_background', side_effect=RuntimeError('boom')), \
+                patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            self.assertEqual(_signed_post(self.client, [_text_event('U_INTAKE_1', 'o7', 'เปิดใช้งานบอท'),
+                                                        _text_event('U_SALES', 'o8', 'สั่งของ')]).status_code, 200)
+        self.assertTrue(reply.called)
+
+    def test_delivery_retries_server_errors_but_not_rejections(self):
+        with patch('patients.line_relay.httpx.post', side_effect=[MagicMock(status_code=502), MagicMock(status_code=200)]) as post:
+            self.assertTrue(line_relay._deliver('https://old.example/', b'{}', 'sig'))
+        self.assertEqual(post.call_count, 2)
+        with patch('patients.line_relay.httpx.post', return_value=MagicMock(status_code=401)) as post:
+            self.assertFalse(line_relay._deliver('https://old.example/', b'{}', 'sig'))
+        self.assertEqual(post.call_count, 1)
 
 
 class IntakeStaffFlowTests(IntakeTestBase):
@@ -237,8 +385,8 @@ class AIBudgetTests(IntakeTestBase):
 class Phase3ChatAndVoiceTests(IntakeTestBase):
     def setUp(self):
         super().setUp()
-        from patients.models import LineUser
-        self.line_user = LineUser.objects.create(line_user_id='U_INTAKE_1', display_name='สมหญิง', active_patient=self.patient)
+        self.line_user.active_patient = self.patient
+        self.line_user.save()
         self.nurse = User.objects.create_user(username='nurse_p3', password='NursePass2026!x', role=User.Role.NURSE)
         self.doctor = User.objects.create_user(username='dr_p3', password='DoctorPass2026!x', role=User.Role.DOCTOR)
 
@@ -307,7 +455,7 @@ class Phase3ChatAndVoiceTests(IntakeTestBase):
         self.assertIn('ผู้ป่วย:', sent)
         box = Box.objects.get(patient=self.patient, source=Box.Source.LINE)
         self.assertEqual(sum(1 for m in box.contents['messages'] if m['sender'] == 'bot'), 5)
-        self.assertIn('ปวดมานานเท่าไหร่แล้วคะ', reply.call_args_list[0].args[1][0]['text'])
+        self.assertIn('ปวดมานานเท่าไหร่แล้วคะ', json.dumps(reply.call_args_list[0].args[1][0], ensure_ascii=False))
 
     def test_ai_followup_off_by_default(self):
         with patch('clinical.services_intake.httpx.post') as post:

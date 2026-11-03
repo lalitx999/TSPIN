@@ -4,7 +4,9 @@
 """
 
 import logging
+from urllib.parse import urlencode
 
+from django.core.cache import cache
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.urls import reverse
@@ -20,15 +22,31 @@ EMERGENCY_ALERT_ROLES = (User.Role.DOCTOR, User.Role.NURSE, User.Role.NURSING_AS
 
 
 def notify_emergency(request, box) -> None:
-    recipients = list(
-        User.objects.filter(is_active=True, role__in=EMERGENCY_ALERT_ROLES).exclude(email='')
-        .values_list('email', flat=True)
-    )
+    recipients = _emergency_recipients()
     if not recipients:
         logger.warning("[LINE Alert] No staff email to notify about an emergency case")
         return
     url = request.build_absolute_uri(reverse('clinical:intake_detail', kwargs={'box_id': box.id}))
     line_ai._run_in_background(_send_emergency_email, recipients, url)
+
+
+def notify_unbound_emergency(request, line_user) -> None:
+    """คนที่ยังไม่ลงทะเบียนไม่มีกล่องให้ติดธง จึงกันอีเมลซ้ำด้วยเวลา 1 ชั่วโมงต่อคนแทน"""
+    if not cache.add(f"line_emergency_{line_user.line_user_id}", 1, timeout=60 * 60):
+        return
+    recipients = _emergency_recipients()
+    if not recipients:
+        logger.warning("[LINE Alert] No staff email to notify about an emergency case")
+        return
+    url = request.build_absolute_uri(f"{reverse('patients:staff_inbox')}?{urlencode({'user_id': line_user.line_user_id})}")
+    line_ai._run_in_background(_send_emergency_email, recipients, url)
+
+
+def _emergency_recipients() -> list:
+    return list(
+        User.objects.filter(is_active=True, role__in=EMERGENCY_ALERT_ROLES).exclude(email='')
+        .values_list('email', flat=True)
+    )
 
 
 def _send_emergency_email(recipients: list, url: str) -> None:

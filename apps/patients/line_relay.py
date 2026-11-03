@@ -15,6 +15,7 @@ from django.conf import settings
 
 from patients.line_service import BOT_OFF_WORDS, LineFlexMessageBuilder, is_bot_on_word
 from patients.models_line import LineUser
+from patients.views_line_internal import detect_clinical_intent
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +41,9 @@ def events_for_old_system(events: list) -> list:
         if is_bot_on_word(text):
             enabled.add(user_id)
         elif user_id not in enabled:
-            forwarded.append(event)
+            # บอทเราตอบเตือนฉุกเฉินแม้บอทปิด reply token ใช้ได้ครั้งเดียว จึงไม่ส่งข้อความนี้ต่อ
+            if not detect_clinical_intent(text)[1]:
+                forwarded.append(event)
         elif (text in BOT_OFF_WORDS
               or (event.get('postback') or {}).get('data') == LineFlexMessageBuilder.BOT_OFF_POSTBACK):
             enabled.discard(user_id)

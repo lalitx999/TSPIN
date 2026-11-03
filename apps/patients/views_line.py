@@ -236,6 +236,8 @@ def _dispatch_line_event(request: HttpRequest, event: dict):
             # บอทปิดอยู่: ไม่ตอบ และไม่เปิดรอบซักประวัติ แต่เก็บไฟล์ไว้ให้เจ้าหน้าที่ เพราะ LINE ลบทิ้งภายหลัง
             if msg_type in MEDIA_KINDS:
                 _store_inbox_media(line_user, message_obj)
+            elif detect_clinical_intent(raw_text)[1]:
+                _handle_emergency_while_bot_off(request, line_user, patient, raw_text, message_obj.get('id', ''), reply_token)
             return
         if raw_text in BOT_OFF_WORDS:
             _turn_bot_off(request, line_user, patient, reply_token)
@@ -350,6 +352,26 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
         _reply(reply_token, _intake_card('ขอถามเพิ่มอีกนิดครับ', question))
     elif is_first:
         _reply(reply_token, _intake_card('รับทราบครับ', 'เล่าเพิ่มเติมได้เรื่อย ๆ ส่งรูปหรือข้อความเสียงได้ เมื่อครบแล้วกด "เสร็จแล้ว"'))
+
+
+def _handle_emergency_while_bot_off(request: HttpRequest, line_user: LineUser, patient, raw_text: str, message_id: str,
+                                    reply_token: str) -> None:
+    """ข้อยกเว้นข้อเดียวของบอทปิด: อาจเป็นเรื่องชีวิต จึงเตือนโทร 1669 และแจ้งทีมแพทย์"""
+    if patient:
+        box = services_intake.open_session(patient, Box.Source.LINE)
+        already_flagged = (box.contents or {}).get('red_flag')
+        services_intake.append_message(box, 'text', text=raw_text, external_id=message_id, red_flag=True)
+        if not already_flagged:
+            line_alerts.notify_emergency(request, box)
+    else:
+        record = CommunicationRecord.objects.filter(line_message_id=message_id, line_user=line_user).first()
+        if record:
+            record.raw_payload = {**(record.raw_payload or {}), 'emergency_alert': True}
+            record.save(update_fields=['raw_payload'])
+        line_alerts.notify_unbound_emergency(request, line_user)
+    _reply(reply_token, _card('อาจเป็นภาวะฉุกเฉิน', EMERGENCY_TEXT, danger=True, closable=False, buttons=[
+        LineFlexMessageBuilder.button_uri('โทร 1669', 'tel:1669', style='secondary'),
+    ]))
 
 
 def _store_inbox_media(line_user: LineUser, message_obj: dict) -> None:

@@ -504,6 +504,65 @@ class LinePhase2Tests(IntakeTestBase):
         self.assertIsNone(existing.line_user_id)
 
 
+class LineEmergencyWhileBotOffTests(IntakeTestBase):
+    """บอทปิดยังเงียบทุกอย่าง ยกเว้นเคสฉุกเฉินที่ต้องเตือน 1669 และแจ้งทีมแพทย์"""
+    TEXT = 'แน่นหน้าอกมาก หายใจไม่ออก'
+
+    def setUp(self):
+        super().setUp()
+        from django.core.cache import cache
+        cache.clear()
+        self.ai_background.side_effect = lambda func, *args: func(*args)
+        self.line_user.bot_enabled = False
+        self.line_user.save()
+        self.doctor = User.objects.create_user(username='doc_off', password='x-Strong-pass-1', role=User.Role.DOCTOR,
+                                               email='doc@tspi.test')
+
+    def _send(self, user_id, event_id, text):
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, [_text_event(user_id, event_id, text)])
+        return reply
+
+    def test_registered_patient_warned_and_case_reaches_doctors_but_bot_stays_off(self):
+        from django.core import mail
+        reply = self._send('U_INTAKE_1', 'e1', self.TEXT)
+        text = json.dumps(reply.call_args.args[1], ensure_ascii=False)
+        self.assertIn('tel:1669', text)
+        self.assertNotIn('ปิดบอท', text)
+        self.assertTrue(Box.objects.get(patient=self.patient).contents['red_flag'])
+        self.assertEqual(len(mail.outbox), 1)
+        self.line_user.refresh_from_db()
+        self.assertFalse(self.line_user.bot_enabled)
+        self._send('U_INTAKE_1', 'e2', self.TEXT)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_unregistered_customer_warned_and_shown_on_dashboard_with_one_email(self):
+        from django.core import mail
+        reply = self._send('U_SALES', 'u1', self.TEXT)
+        self.assertIn('tel:1669', json.dumps(reply.call_args.args[1], ensure_ascii=False))
+        self._send('U_SALES', 'u2', self.TEXT)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertNotIn('แน่นหน้าอก', mail.outbox[0].body)
+        self.assertFalse(Box.objects.exists())
+        self.client.force_login(self.doctor)
+        response = self.client.get(reverse('patients:doctor_line_cases'))
+        self.assertContains(response, 'ลูกค้า LINE ที่ยังไม่ลงทะเบียน')
+        self.assertContains(response, 'มีเคสฉุกเฉินจาก LINE 2 เคส')
+        self.assertContains(response, 'user_id=U_SALES')
+
+    def test_ordinary_message_still_silent(self):
+        from django.core import mail
+        self._send('U_INTAKE_1', 'n1', 'ปวดหลังนิดหน่อย มีครีมไหม').assert_not_called()
+        self.assertFalse(Box.objects.exists())
+        self.assertEqual(mail.outbox, [])
+
+    @override_settings(LINE_RELAY_URL='https://old.example/webhook/')
+    def test_emergency_not_forwarded_to_old_system(self):
+        with patch('patients.line_relay._deliver_in_background') as deliver:
+            self._send('U_SALES', 'r1', self.TEXT)
+        deliver.assert_not_called()
+
+
 class LineInboxMediaTests(IntakeTestBase):
     """บอทปิด: ไฟล์ถูกเก็บแบบเข้ารหัสให้เจ้าหน้าที่ดู โดยบอทยังเงียบและไม่เปิดกล่อง"""
 

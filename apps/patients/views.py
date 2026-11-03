@@ -3,19 +3,21 @@ Views for Doctor Portal & EMR Management (Pillars 2, 5, 8).
 Enforces HTMX Live Search, SOAP Note Logging, and Full AuditLog.
 """
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db.models import Case, IntegerField, Q, Value, When
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
+from django.utils import timezone
 from accounts.decorators import clinical_staff_required
 from accounts.models import AuditLog
 from accounts.views import get_client_ip
 from clinical.models import Box
 from clinical.views_intake import INTAKE_SOURCES
 from patients.line_links import pending_link_requests
+from patients.models_line import CommunicationRecord
 from patients.models import Patient, PatientHistory, Appointment
 from patients.forms import PatientForm, PatientHistorySOAPForm
 
@@ -54,10 +56,16 @@ def _line_cases_context() -> dict:
         .annotate(urgent_first=Case(When(contents__red_flag=True, then=Value(0)), default=Value(1), output_field=IntegerField()))
         .order_by('urgent_first', '-last_activity_at')[:5]
     )
+    unregistered_emergencies = list(
+        CommunicationRecord.objects.filter(raw_payload__emergency_alert=True, patient__isnull=True,
+                                           created_at__gte=timezone.now() - timedelta(hours=24))
+        .select_related('line_user').order_by('-created_at')[:5]
+    )
     return {
         'cases': cases,
+        'unregistered_emergencies': unregistered_emergencies,
         'waiting_count': pending.count(),
-        'urgent_count': pending.filter(contents__red_flag=True).count(),
+        'urgent_count': pending.filter(contents__red_flag=True).count() + len(unregistered_emergencies),
         'link_request_count': pending_link_requests().count(),
     }
 

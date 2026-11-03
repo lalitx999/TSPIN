@@ -14,6 +14,12 @@
         </span>
     </div>
     <div class="list-group list-group-flush">
+        {% for msg in unregistered_emergencies %}
+        <a href="{% url 'patients:staff_inbox' %}?user_id={{ msg.line_user.line_user_id|urlencode }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center gap-3 px-4 py-3">
+            <span><span class="badge bg-danger me-2">ฉุกเฉิน</span><span class="fw-bold text-dark">ลูกค้า LINE ที่ยังไม่ลงทะเบียน</span></span>
+            <span class="text-muted small text-nowrap">{{ msg.created_at|date:"d/m H:i" }} น.</span>
+        </a>
+        {% endfor %}
         {% for box in cases %}
         <a href="{% url 'clinical:intake_detail' box.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center gap-3 px-4 py-3">
             <span>
@@ -24,7 +30,7 @@
             <span class="text-muted small text-nowrap">{{ box.last_activity_at|date:"d/m H:i" }} น.</span>
         </a>
         {% empty %}
-        <div class="list-group-item text-center text-muted py-4">ยังไม่มีเคสรอตรวจ</div>
+        {% if not unregistered_emergencies %}<div class="list-group-item text-center text-muted py-4">ยังไม่มีเคสรอตรวจ</div>{% endif %}
         {% endfor %}
     </div>
 </div>

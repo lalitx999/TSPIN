@@ -1,0 +1,72 @@
+{% extends 'layouts/public_base.html' %}
+
+{% block title %}เชื่อมบัญชี LINE | TSPI Clinic{% endblock %}
+
+{% block extra_head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+    <div class="auth-card">
+        {% if state == 'form' %}
+        <div class="text-center mb-4">
+            <span class="site-logo auth-logo"><i class="fab fa-line"></i></span>
+            <h1 class="h3 mt-3 mb-1">เชื่อมบัญชี LINE</h1>
+            <p class="text-muted mb-0">กรอกชื่อกับเบอร์โทร แล้วกดส่งได้เลย</p>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-floating mb-3">
+                <input type="text" name="full_name" id="id_full_name" required maxlength="150" autocomplete="name"
+                       value="{{ form.full_name.value|default:'' }}" class="form-control {% if form.full_name.errors %}is-invalid{% endif %}" placeholder="ชื่อ-นามสกุล">
+                <label for="id_full_name">ชื่อ-นามสกุล</label>
+                {% if form.full_name.errors %}<div class="invalid-feedback">{{ form.full_name.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="form-floating mb-3">
+                <input type="tel" name="phone" id="id_phone" required maxlength="20" inputmode="tel" autocomplete="tel"
+                       value="{{ form.phone.value|default:'' }}" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" placeholder="เบอร์โทรศัพท์">
+                <label for="id_phone">เบอร์โทรศัพท์</label>
+                {% if form.phone.errors %}<div class="invalid-feedback">{{ form.phone.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="auth-consent mb-4">
+                <div class="form-check">
+                    <input class="form-check-input {% if form.consent.errors %}is-invalid{% endif %}" type="checkbox" name="consent" id="id_consent" required>
+                    <label class="form-check-label" for="id_consent">
+                        ยอมรับให้ TSPI Clinic เก็บและใช้ข้อมูลสุขภาพเพื่อการดูแลรักษา ตาม<a href="{% url 'core:privacy' %}" target="_blank" rel="noopener">นโยบายความเป็นส่วนตัว</a>
+                    </label>
+                    {% if form.consent.errors %}<div class="invalid-feedback d-block">{{ form.consent.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill">ส่งข้อมูล</button>
+        </form>
+
+        {% elif state == 'bound' %}
+        <div class="text-center">
+            <span class="site-logo auth-logo"><i class="fas fa-check"></i></span>
+            <h1 class="h3 mt-3 mb-2">เชื่อมบัญชีเรียบร้อย</h1>
+            <p class="text-muted mb-0">ปิดหน้านี้แล้วกลับไปที่แชท LINE ได้เลย</p>
+        </div>
+
+        {% elif state == 'waiting' %}
+        <div class="text-center">
+            <span class="site-logo auth-logo"><i class="fas fa-user-check"></i></span>
+            <h1 class="h3 mt-3 mb-2">ได้รับข้อมูลแล้ว</h1>
+            <p class="text-muted mb-0">เจ้าหน้าที่จะตรวจสอบข้อมูลก่อนเชื่อมบัญชี เมื่อเรียบร้อยแล้วจึงจะใช้เมนูบอทได้</p>
+        </div>
+
+        {% else %}
+        <div class="text-center">
+            <span class="site-logo auth-logo"><i class="fas fa-clock"></i></span>
+            <h1 class="h3 mt-3 mb-2">ลิงก์นี้ใช้ไม่ได้แล้ว</h1>
+            <p class="text-muted mb-0">กลับไปที่แชท LINE แล้วพิมพ์ว่า &ldquo;เปิดใช้งานบอท&rdquo; เพื่อรับลิงก์ใหม่</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block footer %}{% endblock %}

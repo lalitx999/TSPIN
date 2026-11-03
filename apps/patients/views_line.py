@@ -19,6 +19,7 @@ from clinical.models import AnalysisRecord, Box
 from patients.line_relay import relay_to_old_system
 from patients.line_service import (
     BOT_OFF_WORDS, BOT_ON_WORD, LineSecurity, LineFlexMessageBuilder, LineMessagingService, is_bot_on_word,
+    make_line_register_token,
 )
 from patients.views_line_internal import ingest_line_event, detect_clinical_intent
 from patients.models_line import LineUser
@@ -62,15 +63,16 @@ def _resolve_patient(line_user_id: str):
     return Patient.objects.filter(line_user_id=line_user_id).first()
 
 
-def _binding_card(request: HttpRequest) -> dict:
-    binding_url = request.build_absolute_uri(reverse('root_liff_binding_page'))
+def _binding_card(request: HttpRequest, line_user_id: str) -> dict:
+    binding_url = request.build_absolute_uri(
+        f"{reverse('root_line_register')}?t={make_line_register_token(line_user_id)}")
     return _card('เชื่อมบัญชีคลินิกก่อนนะครับ', 'เชื่อมบัญชี LINE กับเวชระเบียนของคลินิก เพื่อเล่าอาการ ดูใบนัด และดูผลตรวจผ่านบอทได้',
                  buttons=[LineFlexMessageBuilder.button_uri('เชื่อมบัญชีคลินิก', binding_url)])
 
 
-def _bot_menu_card(request: HttpRequest, patient) -> dict:
+def _bot_menu_card(request: HttpRequest, patient, line_user_id: str) -> dict:
     if not patient:
-        return _binding_card(request)
+        return _binding_card(request, line_user_id)
     return _card('เปิดใช้งานบอทแล้ว', f'สวัสดีครับคุณ{patient.first_name} เลือกสิ่งที่ต้องการได้เลย', buttons=[
         LineFlexMessageBuilder.button_message('เล่าอาการให้คลินิก', 'เริ่ม'),
         LineFlexMessageBuilder.button_postback('ดูใบนัด', 'action=check_appointment'),
@@ -213,7 +215,7 @@ def _dispatch_line_event(request: HttpRequest, event: dict):
 
         if is_bot_on_word(raw_text):
             _set_bot_enabled(request, line_user, True, patient)
-            _reply(reply_token, _bot_menu_card(request, patient))
+            _reply(reply_token, _bot_menu_card(request, patient, line_user_id))
             return
         if not line_user.bot_enabled:
             return  # บอทปิดอยู่: ไม่ตอบ และไม่เปิดรอบซักประวัติ
@@ -223,7 +225,7 @@ def _dispatch_line_event(request: HttpRequest, event: dict):
             _handle_line_text_command(request, patient, line_user_id, raw_text, reply_token,
                                       message_id=message_obj.get('id', ''))
         elif msg_type in MEDIA_KINDS:
-            _handle_line_media(request, patient, message_obj, reply_token)
+            _handle_line_media(request, patient, line_user_id, message_obj, reply_token)
 
     elif event_type == 'postback':
         if not line_user.bot_enabled:
@@ -232,9 +234,9 @@ def _dispatch_line_event(request: HttpRequest, event: dict):
         if postback_data == LineFlexMessageBuilder.BOT_OFF_POSTBACK:
             _turn_bot_off(request, line_user, patient, reply_token)
         elif 'action=check_appointment' in postback_data:
-            _send_appointment_reply(request, patient, reply_token)
+            _send_appointment_reply(request, patient, line_user_id, reply_token)
         elif 'action=check_report' in postback_data:
-            _send_latest_report_reply(request, patient, reply_token)
+            _send_latest_report_reply(request, patient, line_user_id, reply_token)
 
 
 def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_id: str, raw_text: str, reply_token: str,
@@ -246,17 +248,17 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
     text = raw_text.lower()
 
     if any(k in text for k in ['นัดหมาย', 'ใบนัด', 'ตารางนัด', 'appointment']):
-        _send_appointment_reply(request, patient, reply_token)
+        _send_appointment_reply(request, patient, line_user_id, reply_token)
         return
     if any(k in text for k in ['ผลตรวจ', 'รายงาน', 'ผลแล็บ', 'report']):
-        _send_latest_report_reply(request, patient, reply_token)
+        _send_latest_report_reply(request, patient, line_user_id, reply_token)
         return
     if any(k in text for k in ['ติดต่อ', 'เบอร์โทร']):
         _reply(reply_token, _card('ติดต่อเจ้าหน้าที่', 'กดปิดบอท แล้วพิมพ์ข้อความทิ้งไว้ได้เลย เจ้าหน้าที่จะตอบกลับทางแชทนี้ในเวลาทำการ'))
         return
 
     if not patient:
-        _reply(reply_token, _binding_card(request))
+        _reply(reply_token, _binding_card(request, line_user_id))
         return
 
     if text in DONE_WORDS:
@@ -290,10 +292,10 @@ def _handle_line_text_command(request: HttpRequest, patient: Patient, line_user_
         _reply(reply_token, _intake_card('รับทราบครับ', 'เล่าเพิ่มเติมได้เรื่อย ๆ ส่งรูปหรือข้อความเสียงได้ เมื่อครบแล้วกด "เสร็จแล้ว"'))
 
 
-def _handle_line_media(request: HttpRequest, patient: Patient, message_obj: dict, reply_token: str):
+def _handle_line_media(request: HttpRequest, patient: Patient, line_user_id: str, message_obj: dict, reply_token: str):
     """ดึงรูป/เสียง/วิดีโอจาก LINE ทันที (LINE เก็บไว้ไม่นาน) เข้ารหัสเก็บ แล้วต่อเข้ารอบซักประวัติ"""
     if not patient:
-        _reply(reply_token, _binding_card(request))
+        _reply(reply_token, _binding_card(request, line_user_id))
         return
 
     kind = MEDIA_KINDS[message_obj.get('type')]
@@ -315,10 +317,10 @@ def _handle_line_media(request: HttpRequest, patient: Patient, message_obj: dict
             _reply(reply_token, _intake_card('ดึงไฟล์ไม่สำเร็จ', 'ขออภัยครับ รบกวนส่งไฟล์นี้ใหม่อีกครั้ง'))
 
 
-def _send_appointment_reply(request: HttpRequest, patient: Patient, reply_token: str):
+def _send_appointment_reply(request: HttpRequest, patient: Patient, line_user_id: str, reply_token: str):
     """ตอบกลับด้วยใบนัดหมายแพทย์ล่าสุด"""
     if not patient:
-        _reply(reply_token, _binding_card(request))
+        _reply(reply_token, _binding_card(request, line_user_id))
         return
 
     appt = patient.appointments.filter(status__in=['scheduled', 'confirmed']).order_by('appointment_date', 'appointment_time').first()
@@ -335,17 +337,17 @@ def _send_appointment_reply(request: HttpRequest, patient: Patient, reply_token:
         _reply(reply_token, _card('ยังไม่มีนัดหมาย', f'เรียนคุณ {patient.full_name}\nขณะนี้ท่านยังไม่มีนัดหมายแพทย์ที่เปิดอยู่'))
 
 
-def _send_latest_report_reply(request: HttpRequest, patient: Patient, reply_token: str):
+def _send_latest_report_reply(request: HttpRequest, patient: Patient, line_user_id: str, reply_token: str):
     """ตอบกลับด้วยรายงานการแพทย์แม่นยำที่ได้รับการอนุมัติล่าสุด (Approved Report Only)"""
     if not patient:
-        _reply(reply_token, _binding_card(request))
+        _reply(reply_token, _binding_card(request, line_user_id))
         return
 
     # ดึงเฉพาะรายงานที่ได้รับการอนุมัติแล้วเท่านั้น (Pillar 15)
     report = AnalysisRecord.objects.filter(
         patient=patient,
         status__in=['approved', 'released']
-    ).order_by('-created_at').first()
+    ).order_by('-analysis_date').first()
 
     if report:
         portal_url = request.build_absolute_uri(reverse('portal_patient:portal_report_detail', kwargs={'pk': report.pk}))

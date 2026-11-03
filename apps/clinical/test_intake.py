@@ -17,8 +17,9 @@ from accounts.models import AuditLog, User
 from clinical import media_store, services_intake
 from clinical.models import Box
 from patients import line_relay
+from patients.line_service import make_line_register_token
 from patients.models import Patient, PatientHistory
-from patients.models_line import CommunicationRecord, LineUser
+from patients.models_line import ClinicalReviewItem, CommunicationRecord, LineUser
 
 LINE_SECRET = 'intake-test-line-secret'
 
@@ -78,6 +79,11 @@ class LineSessionTests(IntakeTestBase):
     def test_urgent_message_flags_box(self):
         _signed_post(self.client, [_text_event('U_INTAKE_1', 'u1', 'แน่นหน้าอกมาก หายใจไม่ออก')])
         self.assertTrue(Box.objects.get(patient=self.patient).contents.get('red_flag'))
+
+    def test_report_command_replies_when_no_report_yet(self):
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, [_text_event('U_INTAKE_1', 'rep1', 'ดูผลตรวจ')])
+        self.assertIn('ยังไม่มีผลตรวจ', json.dumps(reply.call_args.args[1], ensure_ascii=False))
 
     def test_unbound_user_creates_no_box(self):
         _signed_post(self.client, [_text_event('U_UNKNOWN', 'x1', 'ปวดท้องมาก')])
@@ -164,6 +170,84 @@ class LineBotOptInTests(IntakeTestBase):
         event = _text_event('U_INTAKE_1', 'r1', 'เปิดใช้งานบอท')
         self.assertTrue(self._post(event).called)
         self._post(event).assert_not_called()
+
+
+class LineRegisterFormTests(IntakeTestBase):
+    """เชื่อมบัญชีด้วยชื่อ เบอร์ ยินยอม: ระบุตัว LINE จากลิงก์ลงนาม และเบอร์ซ้ำต้องผ่านเจ้าหน้าที่"""
+    USER_ID = 'Uabc123'
+
+    def setUp(self):
+        super().setUp()
+        from django.core.cache import cache
+        cache.clear()
+        self.line_new = LineUser.objects.create(line_user_id=self.USER_ID, display_name='ใหม่', bot_enabled=True)
+        self.url = f"{reverse('root_line_register')}?t={make_line_register_token(self.USER_ID)}"
+
+    def _submit(self, **overrides):
+        data = {'full_name': 'สมชาย ใจดี', 'phone': '081-234-5678', 'consent': 'on', **overrides}
+        with patch('patients.views_line_register.LineMessagingService.push_message', return_value=True) as push:
+            return self.client.post(self.url, {k: v for k, v in data.items() if v is not None}), push
+
+    def test_form_only_asks_name_phone_consent(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(list(response.context['form'].fields), ['full_name', 'phone', 'consent'])
+        self.assertNotContains(response, 'liff')
+
+    def test_bot_binding_button_opens_signed_form(self):
+        self.line_new.bot_enabled = False
+        self.line_new.save()
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, [_text_event(self.USER_ID, 'r1', 'เปิดใช้งานบอท')])
+        card = reply.call_args.args[1][0]
+        uri = card['contents']['footer']['contents'][0]['action']['uri']
+        self.assertIn(reverse('root_line_register'), uri)
+        self.assertEqual(self.client.get(uri).status_code, 200)
+
+    def test_new_person_is_bound_and_gets_menu_in_chat(self):
+        response, push = self._submit()
+        self.assertEqual(response.status_code, 302)
+        patient = Patient.objects.get(line_user_id=self.USER_ID)
+        self.assertEqual((patient.first_name, patient.last_name, patient.phone), ('สมชาย', 'ใจดี', '0812345678'))
+        self.assertTrue(patient.extra_data['needs_staff_verification'])
+        self.assertIn('pdpa_consent_at', patient.extra_data)
+        self.line_new.refresh_from_db()
+        self.assertEqual(self.line_new.active_patient, patient)
+        self.assertEqual(push.call_args.args[0], self.USER_ID)
+        self.assertContains(self.client.get(self.url), 'เชื่อมบัญชีเรียบร้อย')
+
+    def test_consent_and_valid_phone_are_required(self):
+        response, _ = self._submit(consent=None)
+        self.assertContains(response, 'กรุณากดยอมรับ')
+        response, _ = self._submit(phone='12345')
+        self.assertContains(response, 'เบอร์โทรศัพท์ไม่ถูกต้อง')
+        self.assertFalse(Patient.objects.filter(line_user_id=self.USER_ID).exists())
+
+    def test_existing_phone_waits_for_staff_and_exposes_nothing(self):
+        existing = Patient.objects.create(hn='HN-INT-2', first_name='เดิม', last_name='คนไข้', phone='081-234-5678')
+        response, push = self._submit()
+        push.assert_not_called()
+        self.line_new.refresh_from_db()
+        self.assertIsNone(self.line_new.active_patient)
+        existing.refresh_from_db()
+        self.assertIsNone(existing.line_user_id)
+        self.assertEqual(Patient.objects.filter(phone__contains='5678').count(), 1)
+        page = self.client.get(self.url)
+        self.assertContains(page, 'เจ้าหน้าที่จะตรวจสอบ')
+        self.assertNotContains(page, existing.first_name)
+        item = ClinicalReviewItem.objects.get(patient=existing)
+        self.assertIn(f'({self.USER_ID})', item.review_notes)  # รูปแบบที่ปุ่มอนุมัติใน Admin อ่านได้
+        self._submit()
+        self.assertEqual(ClinicalReviewItem.objects.filter(patient=existing).count(), 1)
+
+    def test_forged_or_expired_link_is_rejected(self):
+        self.assertEqual(self.client.get(reverse('root_line_register') + '?t=forged').status_code, 400)
+        response = self.client.post(reverse('root_line_register') + '?t=forged',
+                                    {'full_name': 'ก ข', 'phone': '0812345678', 'consent': 'on'})
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Patient.objects.filter(phone='0812345678').exists())
+        with patch('patients.line_service.LINE_REGISTER_MAX_AGE_SECONDS', -1):
+            self.assertEqual(self.client.get(self.url).status_code, 400)
 
 
 @override_settings(LINE_RELAY_URL='https://old.example/webhook/')

@@ -14,15 +14,30 @@ import urllib.error
 from typing import Dict, Any, List, Optional, Tuple
 from urllib.parse import quote
 from django.conf import settings
+from django.core import signing
 
 logger = logging.getLogger(__name__)
 
 BOT_ON_WORD = 'เปิดใช้งานบอท'
 BOT_OFF_WORDS = ('ปิดบอท', 'ปิดใช้งานบอท')
+LINE_REGISTER_SALT = 'patients.line_register'
+LINE_REGISTER_MAX_AGE_SECONDS = 24 * 60 * 60
 
 
 def is_bot_on_word(text: str) -> bool:
     return text.replace(' ', '') == BOT_ON_WORD
+
+
+def make_line_register_token(line_user_id: str) -> str:
+    return signing.dumps(line_user_id, salt=LINE_REGISTER_SALT)
+
+
+def read_line_register_token(token: str) -> str:
+    """คืน LINE user id จากลิงก์เชื่อมบัญชี (ว่างถ้าลิงก์ปลอมหรือหมดอายุ)"""
+    try:
+        return signing.loads(token, salt=LINE_REGISTER_SALT, max_age=LINE_REGISTER_MAX_AGE_SECONDS)
+    except signing.BadSignature:
+        return ''
 
 
 def line_bot_url() -> str:

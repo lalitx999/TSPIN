@@ -89,7 +89,7 @@ class DevTunnelGuardMiddleware:
     หน้าอื่น (เวชระเบียน, admin, ฯลฯ) ตอบ 404 เพื่อไม่ให้ข้อมูลผู้ป่วยในเครื่อง dev หลุดออกอินเทอร์เน็ต
     ทำงานเฉพาะเมื่อตั้ง DEV_TUNNEL_HOSTS
     """
-    PUBLIC_PREFIXES = ('/line/webhook/', '/liff/', '/patient/line/liff/', '/static/', '/health/')
+    PUBLIC_PREFIXES = ('/line/webhook/', '/line/register/', '/liff/', '/patient/line/liff/', '/static/', '/health/')
 
     def __init__(self, get_response):
         from django.conf import settings

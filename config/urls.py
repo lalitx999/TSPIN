@@ -16,6 +16,7 @@ from patients.views_liff import (
     liff_register_api,
 )
 from patients.views_line_internal import line_internal_ingest_view
+from patients.views_line_register import line_register_view
 import patients.views_staff as views_staff
 
 urlpatterns = [
@@ -42,6 +43,7 @@ urlpatterns = [
 
     # Direct LINE Webhook Routes (Pillar 14)
     path('line/webhook/', line_webhook_view, name='root_line_webhook'),
+    path('line/register/', line_register_view, name='root_line_register'),
     path('line/confirm/', line_account_binding_callback_view, name='root_line_confirm'),
     path('link/', line_account_binding_callback_view, name='root_line_link_alias'),
     path('liff/identity/', line_account_binding_callback_view, name='root_liff_identity_alias'),

@@ -8,10 +8,12 @@ import hmac
 import json
 import shutil
 import tempfile
+from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from accounts.models import AuditLog, User
 from clinical import media_store, services_intake
@@ -19,6 +21,7 @@ from clinical.models import Box
 from patients import line_alerts, line_relay
 from patients.line_service import make_line_register_token
 from patients.models import Patient, PatientHistory
+from intelligence.models import AIUsageLog
 from patients.models_line import ClinicalReviewItem, CommunicationRecord, LineUser
 
 LINE_SECRET = 'intake-test-line-secret'
@@ -45,73 +48,188 @@ class IntakeTestBase(TestCase):
         self.addCleanup(override.disable)
         self.patient = Patient.objects.create(hn='HN-INT-1', first_name='สมหญิง', last_name='ทดสอบ',
                                               line_user_id='U_INTAKE_1')
-        self.line_user = LineUser.objects.create(line_user_id='U_INTAKE_1', display_name='สมหญิง', bot_enabled=True)
+        self.line_user = LineUser.objects.create(line_user_id='U_INTAKE_1', display_name='สมหญิง', bot_enabled=True,
+                                                 bot_last_active_at=timezone.now())
         background = patch('patients.line_ai._run_in_background')
         self.ai_background = background.start()
         self.addCleanup(background.stop)
 
+    def _reply_text(self, reply):
+        return json.dumps(reply.call_args.args[1], ensure_ascii=False)
 
-class LineSessionTests(IntakeTestBase):
+
+def _ai_response(answer='ดื่มน้ำมาก ๆ พักผ่อนให้พอครับ เริ่มปวดตั้งแต่เมื่อไรครับ', kind='answer', status_code=200):
+    fake = MagicMock(status_code=status_code)
+    fake.json.return_value = {'answer': answer, 'kind': kind, 'sources': ['ข้อมูลคลินิก: นัดหมาย'],
+                              'provider': 'groq', 'model': 'm', 'usage': {'prompt_tokens': 5, 'completion_tokens': 3}}
+    return fake
+
+
+class LineChatSessionTests(IntakeTestBase):
+    """เปิดบอทแล้วคุยได้เลย ทุกข้อความและคำตอบของ AI อยู่ในรอบแชท (Box) เดียวให้หมออ่าน"""
+
     def setUp(self):
         super().setUp()
-        _signed_post(self.client, [_text_event('U_INTAKE_1', 'start', 'เริ่ม')])
+        from django.core.cache import cache
+        cache.clear()
+        self.ai_background.side_effect = lambda func, *args: func(*args)
 
-    def test_messages_from_one_conversation_go_into_one_box(self):
-        for i, text in enumerate(['ปวดหัวมา 3 วัน', 'กินยาแล้วไม่ดีขึ้น', 'นอนไม่ค่อยหลับ']):
-            self.assertEqual(_signed_post(self.client, [_text_event('U_INTAKE_1', f'm{i}', text)]).status_code, 200)
+    def _send(self, *events, ai=None):
+        with patch('patients.line_ai.httpx.post', return_value=ai or _ai_response()) as post, \
+                patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, list(events))
+        return post, reply
 
-        boxes = Box.objects.filter(patient=self.patient, source=Box.Source.LINE)
-        self.assertEqual(boxes.count(), 1)
-        box = boxes.get()
+    def test_messages_and_ai_answers_go_into_one_session_box(self):
+        self._send(_text_event('U_INTAKE_1', 'm1', 'ปวดหัวมา 3 วัน'))
+        self._send(_text_event('U_INTAKE_1', 'm2', 'ประมาณ 6 เต็ม 10'))
+        box = Box.objects.get(patient=self.patient, source=Box.Source.LINE)
         self.assertEqual(box.status, Box.Status.DRAFT)
-        self.assertEqual([m['text'] for m in box.contents['messages']],
-                         ['ปวดหัวมา 3 วัน', 'กินยาแล้วไม่ดีขึ้น', 'นอนไม่ค่อยหลับ'])
+        self.assertEqual([(m['sender'], m['text'][:10]) for m in box.contents['messages']],
+                         [('patient', 'ปวดหัวมา 3'), ('bot', 'ดื่มน้ำมาก'), ('patient', 'ประมาณ 6 เ'), ('bot', 'ดื่มน้ำมาก')])
+        self.assertTrue(box.contents['has_symptoms'])
         self.assertTrue(box.verify_integrity())
 
     def test_line_retry_does_not_duplicate_message(self):
         event = _text_event('U_INTAKE_1', 'dup1', 'ปวดหลัง')
-        _signed_post(self.client, [event])
-        _signed_post(self.client, [event])
-        self.assertEqual(len(Box.objects.get(patient=self.patient).contents['messages']), 1)
+        post, _ = self._send(event)
+        self._send(event)
+        patient_msgs = [m for m in Box.objects.get(patient=self.patient).contents['messages'] if m['sender'] == 'patient']
+        self.assertEqual(len(patient_msgs), 1)
 
-    def test_done_closes_session_and_next_message_opens_new_box(self):
-        _signed_post(self.client, [_text_event('U_INTAKE_1', 'a1', 'มีผื่นที่แขน')])
-        _signed_post(self.client, [_text_event('U_INTAKE_1', 'a2', 'เสร็จแล้ว')])
-        first = Box.objects.get(patient=self.patient)
-        self.assertEqual(first.status, Box.Status.DONE)
+    def test_old_start_and_done_words_are_just_chat(self):
+        for i, text in enumerate(['เริ่ม', 'เสร็จแล้ว']):
+            post, reply = self._send(_text_event('U_INTAKE_1', f'w{i}', text))
+            post.assert_called_once()
+            self.assertEqual(reply.call_args.args[1][0]['type'], 'text')
+        self.assertEqual(Box.objects.get(patient=self.patient).status, Box.Status.DRAFT)
 
-        _signed_post(self.client, [_text_event('U_INTAKE_1', 'a3', 'เริ่ม')])
-        _signed_post(self.client, [_text_event('U_INTAKE_1', 'a4', 'วันนี้ผื่นลามไปที่ขา')])
-        self.assertEqual(Box.objects.filter(patient=self.patient).count(), 2)
+    def test_general_chat_is_not_marked_as_symptoms(self):
+        self._send(_text_event('U_INTAKE_1', 'g1', 'สวัสดีครับ คลินิกเปิดกี่โมง'))
+        self.assertFalse(Box.objects.get(patient=self.patient).contents.get('has_symptoms'))
 
-    def test_urgent_message_flags_box(self):
-        _signed_post(self.client, [_text_event('U_INTAKE_1', 'u1', 'แน่นหน้าอกมาก หายใจไม่ออก')])
+    def test_urgent_message_flags_box_and_skips_ai(self):
+        post, reply = self._send(_text_event('U_INTAKE_1', 'u1', 'แน่นหน้าอกมาก หายใจไม่ออก'))
+        post.assert_not_called()
+        self.assertIn('tel:1669', self._reply_text(reply))
         self.assertTrue(Box.objects.get(patient=self.patient).contents.get('red_flag'))
 
-    def test_report_command_replies_when_no_report_yet(self):
-        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
-            _signed_post(self.client, [_text_event('U_INTAKE_1', 'rep1', 'ดูผลตรวจ')])
-        self.assertIn('ยังไม่มีผลตรวจ', json.dumps(reply.call_args.args[1], ensure_ascii=False))
+    def test_report_question_answered_in_plain_text(self):
+        post, reply = self._send(_text_event('U_INTAKE_1', 'rep1', 'ขอดูผลตรวจหน่อย'))
+        post.assert_not_called()
+        message = reply.call_args.args[1][0]
+        self.assertEqual(message['type'], 'text')
+        self.assertIn('ยังไม่มีผลตรวจ', message['text'])
 
-    def test_unbound_user_creates_no_box(self):
-        _signed_post(self.client, [_text_event('U_UNKNOWN', 'x1', 'ปวดท้องมาก')])
+    def test_unregistered_user_gets_registration_card_and_no_box(self):
+        LineUser.objects.create(line_user_id='U_UNKNOWN', bot_enabled=True, bot_last_active_at=timezone.now())
+        post, reply = self._send(_text_event('U_UNKNOWN', 'x1', 'ปวดท้องมาก'))
+        post.assert_not_called()
+        self.assertIn(reverse('root_line_register'), self._reply_text(reply))
         self.assertFalse(Box.objects.exclude(patient=self.patient).exists())
 
-    def test_image_is_downloaded_encrypted_and_hash_verified(self):
-        png = b'\x89PNG\r\n\x1a\n' + b'fake-image-bytes'
-        event = {'type': 'message', 'replyToken': 'rt-img', 'source': {'userId': 'U_INTAKE_1'},
-                 'message': {'id': 'img1', 'type': 'image'}}
-        with patch('patients.views_line.LineMessagingService.get_message_content', return_value=(png, 'image/png')):
-            _signed_post(self.client, [event])
+    def _image(self, msg_id):
+        return {'type': 'message', 'replyToken': f'rt-{msg_id}', 'source': {'userId': 'U_INTAKE_1'},
+                'message': {'id': msg_id, 'type': 'image'}}
 
+    def test_images_stored_encrypted_with_one_reply_for_a_burst(self):
+        png = b'\x89PNG\r\n\x1a\n' + b'fake-image-bytes'
+        with patch('patients.views_line.LineMessagingService.get_message_content', return_value=(png, 'image/png')):
+            _, first = self._send(self._image('img1'))
+            _, second = self._send(self._image('img2'))
+        self.assertIn('ได้รับรูปแล้ว', first.call_args.args[1][0]['text'])
+        second.assert_not_called()
         meta = Box.objects.get(patient=self.patient).contents['messages'][0]['media']
-        stored = (media_store._root() / meta['path']).read_bytes()
-        self.assertNotIn(b'fake-image-bytes', stored)  # เก็บแบบเข้ารหัส
+        self.assertNotIn(b'fake-image-bytes', (media_store._root() / meta['path']).read_bytes())
         self.assertEqual(media_store.read_decrypted(meta), png)
+
+    def _voice(self):
+        return {'type': 'message', 'replyToken': 'rt-v1', 'source': {'userId': 'U_INTAKE_1'},
+                'message': {'id': 'v1', 'type': 'audio'}}
+
+    def test_voice_asks_to_type_when_transcription_is_off(self):
+        with patch('patients.views_line.LineMessagingService.get_message_content', return_value=(b'aud', 'audio/m4a')):
+            post, reply = self._send(self._voice())
+        post.assert_not_called()
+        self.assertIn('พิมพ์เล่า', reply.call_args.args[1][0]['text'])
+
+    @override_settings(LINE_VOICE_TRANSCRIBE_ENABLED=True)
+    def test_voice_is_transcribed_and_answered_when_enabled(self):
+        transcript = MagicMock(status_code=200)
+        transcript.json.return_value = {'sanitized_transcript': 'ปวดท้องตั้งแต่เมื่อวาน'}
+        with patch('patients.views_line.LineMessagingService.get_message_content', return_value=(b'aud', 'audio/m4a')), \
+                patch('patients.line_ai.httpx.post', side_effect=[transcript, _ai_response()]) as post, \
+                patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, [self._voice()])
+        self.assertTrue(post.call_args_list[0].args[0].endswith('/api/intake/voice'))
+        self.assertEqual(post.call_args_list[1].kwargs['json']['messages'][-1],
+                         {'role': 'user', 'content': 'ปวดท้องตั้งแต่เมื่อวาน'})
+        self.assertEqual(reply.call_args.args[1][0]['type'], 'text')
+        first = Box.objects.get(patient=self.patient).contents['messages'][0]
+        self.assertEqual((first['kind'], first['text']), ('audio', 'ปวดท้องตั้งแต่เมื่อวาน'))
+
+
+@override_settings(LINE_BOT_IDLE_MINUTES=60)
+class LineIdleTests(IntakeTestBase):
+    """เงียบเกินเวลา บอทปิดเองโดยไม่แจ้ง รอบแชทจบและไปรอหมอ ข้อความถัดไปไปถึงทีมขาย"""
+
+    def setUp(self):
+        super().setUp()
+        self.ai_background.side_effect = lambda func, *args: func(*args)
+        with patch('patients.line_ai.httpx.post', return_value=_ai_response()):
+            _signed_post(self.client, [_text_event('U_INTAKE_1', 'i1', 'ปวดหลังมา 2 วัน')])
+        self._age(minutes=61)
+
+    def _age(self, minutes):
+        past = timezone.now() - timedelta(minutes=minutes)
+        LineUser.objects.filter(pk=self.line_user.pk).update(bot_last_active_at=past)
+        for box in Box.objects.filter(patient=self.patient):
+            box.last_activity_at = past
+            box.save(update_fields=['last_activity_at', 'signature'])
+
+    def test_next_message_after_idle_gets_no_reply_and_session_closes(self):
+        with patch('patients.line_ai.httpx.post') as post, \
+                patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
+            _signed_post(self.client, [_text_event('U_INTAKE_1', 'i2', 'มีครีมขายไหมครับ')])
+        post.assert_not_called()
+        reply.assert_not_called()
+        self.line_user.refresh_from_db()
+        self.assertFalse(self.line_user.bot_enabled)
+        box = Box.objects.get(patient=self.patient)
+        self.assertEqual(box.status, Box.Status.DONE)
+        self.assertEqual(box.contents['closed_reason'], 'idle')
+        self.assertTrue(AuditLog.objects.filter(action='LINE_BOT_DISABLED', changes__reason='idle').exists())
+
+    def test_still_on_just_before_the_limit(self):
+        self._age(minutes=59)
+        self.line_user.refresh_from_db()
+        self.assertTrue(self.line_user.is_bot_on())
+
+    @override_settings(LINE_RELAY_URL='https://old.example/webhook/')
+    def test_message_after_idle_goes_to_old_system(self):
+        with patch('patients.line_relay._deliver_in_background') as deliver:
+            _signed_post(self.client, [_text_event('U_INTAKE_1', 'i3', 'สั่งของครับ')])
+        self.assertEqual([e['message']['id'] for e in json.loads(deliver.call_args.args[1])['events']], ['i3'])
+
+    def test_doctor_list_closes_sessions_nobody_came_back_to(self):
+        nurse = User.objects.create_user(username='nurse_idle', password='NursePass2026!x', role=User.Role.NURSE)
+        self.client.force_login(nurse)
+        response = self.client.get(reverse('clinical:intake_list'))
+        self.assertEqual(Box.objects.get(patient=self.patient).status, Box.Status.DONE)
+        self.assertContains(response, self.patient.hn)
+        self.assertContains(response, 'มีอาการ')
+
+    def test_typing_open_again_starts_a_new_session(self):
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True), \
+                patch('patients.line_ai.httpx.post', return_value=_ai_response()):
+            _signed_post(self.client, [_text_event('U_INTAKE_1', 'i4', 'เปิดบอท'),
+                                       _text_event('U_INTAKE_1', 'i5', 'วันนี้ปวดน้อยลงแล้ว')])
+        self.assertEqual(Box.objects.filter(patient=self.patient).count(), 2)
+        self.assertEqual(Box.objects.filter(patient=self.patient, status=Box.Status.DRAFT).count(), 1)
 
 
 class LineBotOptInTests(IntakeTestBase):
-    """บอทปิดเป็นค่าเริ่มต้น เปิดได้ด้วยการพิมพ์ "เปิดใช้งานบอท" เท่านั้น และทุกคำตอบเป็น Flex ที่มีปุ่มปิดบอท"""
+    """บอทปิดเป็นค่าเริ่มต้น เปิดด้วย "เปิดบอท" (รับคำใกล้เคียง) ทักด้วยข้อความธรรมดา และปิดด้วย "ปิดบอท" """
 
     def setUp(self):
         super().setUp()
@@ -127,11 +245,6 @@ class LineBotOptInTests(IntakeTestBase):
         return {'type': 'postback', 'replyToken': 'r', 'webhookEventId': event_id, 'source': {'userId': user_id},
                 'postback': {'data': data}}
 
-    def _close_labels(self, reply):
-        card = reply.call_args.args[1][0]
-        self.assertEqual(card['type'], 'flex')
-        return [b['action']['label'] for b in card['contents'].get('footer', {}).get('contents', [])]
-
     def test_bot_off_stays_silent_but_message_is_stored(self):
         reply = self._post(_text_event('U_INTAKE_1', 'q1', 'มีครีมขายไหมครับ'))
         reply.assert_not_called()
@@ -143,40 +256,43 @@ class LineBotOptInTests(IntakeTestBase):
         self._post(follow).assert_not_called()
         self._post(_text_event('U_NEW', 'q2', 'สวัสดีครับ')).assert_not_called()
 
-    def test_only_exact_phrase_turns_bot_on(self):
-        self._post(_text_event('U_INTAKE_1', 'q3', 'อยากเปิดใช้งานบอทต้องทำไง')).assert_not_called()
-        self._post(_text_event('U_INTAKE_1', 'q4', 'เริ่ม')).assert_not_called()
+    def test_on_words_accept_variants_but_not_sentences(self):
+        for i, text in enumerate(['อยากเปิดบอทต้องทำไง', 'เริ่ม', 'เปิด']):
+            self._post(_text_event('U_INTAKE_1', f'no{i}', text)).assert_not_called()
         self.assertFalse(LineUser.objects.get(pk=self.line_user.pk).bot_enabled)
+        for i, text in enumerate(['เปิดบอท', 'เปิดบอท ครับ', 'เปิดใช้งานบอท', 'คุยกับ AI', 'เปิดใช้บอทค่ะ']):
+            LineUser.objects.filter(pk=self.line_user.pk).update(bot_enabled=False)
+            self.assertTrue(self._post(_text_event('U_INTAKE_1', f'yes{i}', text)).called, text)
+            self.assertTrue(LineUser.objects.get(pk=self.line_user.pk).is_bot_on(), text)
 
-        reply = self._post(_text_event('U_INTAKE_1', 'q5', 'เปิดใช้งานบอท'))
-        self.assertTrue(LineUser.objects.get(pk=self.line_user.pk).bot_enabled)
-        self.assertIn('ปิดบอท', self._close_labels(reply))
+    def test_turning_on_greets_by_name_in_plain_text(self):
+        reply = self._post(_text_event('U_INTAKE_1', 'q5', 'เปิดบอท'))
+        message = reply.call_args.args[1][0]
+        self.assertEqual(message['type'], 'text')
+        self.assertIn('สวัสดีครับคุณสมหญิง', message['text'])
+        self.assertIn('ปิดบอท', message['text'])
+        self.assertIn('1 ชั่วโมง', message['text'])
         self.assertTrue(AuditLog.objects.filter(action='LINE_BOT_ENABLED').exists())
 
-    def test_every_bot_reply_is_flex_with_close_button(self):
-        self.line_user.bot_enabled = True
-        self.line_user.save()
-        for i, text in enumerate(['เริ่ม', 'ปวดหลัง', 'แน่นหน้าอกมาก', 'ใบนัด', 'ผลตรวจ', 'ติดต่อ', 'เสร็จแล้ว']):
-            reply = self._post(_text_event('U_INTAKE_1', f'all{i}', text))
-            if reply.called:
-                self.assertIn('ปิดบอท', self._close_labels(reply), text)
-
-    def test_close_button_turns_bot_off_and_sends_open_session_to_staff(self):
-        self.line_user.bot_enabled = True
-        self.line_user.save()
-        self._post(_text_event('U_INTAKE_1', 'c0', 'เริ่ม'))
+    def test_off_word_turns_bot_off_and_ends_session(self):
+        self._post(_text_event('U_INTAKE_1', 'c0', 'เปิดบอท'))
         self._post(_text_event('U_INTAKE_1', 'c1', 'ปวดหลัง'))
-        reply = self._post(self._postback('U_INTAKE_1', 'action=bot_off'))
+        reply = self._post(_text_event('U_INTAKE_1', 'c2', 'ปิดบอท ครับ'))
         self.assertFalse(LineUser.objects.get(pk=self.line_user.pk).bot_enabled)
         self.assertEqual(Box.objects.get(patient=self.patient).status, Box.Status.DONE)
-        self.assertEqual(reply.call_args.args[1][0]['type'], 'flex')
-        self._post(_text_event('U_INTAKE_1', 'c2', 'ปวดอีกแล้ว')).assert_not_called()
+        self.assertEqual(reply.call_args.args[1][0]['type'], 'text')
+        self._post(_text_event('U_INTAKE_1', 'c3', 'ปวดอีกแล้ว')).assert_not_called()
+
+    def test_close_button_on_old_cards_still_turns_bot_off(self):
+        self._post(_text_event('U_INTAKE_1', 'b0', 'เปิดบอท'))
+        self._post(self._postback('U_INTAKE_1', 'action=bot_off'))
+        self.assertFalse(LineUser.objects.get(pk=self.line_user.pk).bot_enabled)
 
     def test_old_card_buttons_do_not_wake_bot(self):
         self._post(self._postback('U_INTAKE_1', 'action=check_appointment')).assert_not_called()
 
     def test_line_retry_of_enable_command_replies_once(self):
-        event = _text_event('U_INTAKE_1', 'r1', 'เปิดใช้งานบอท')
+        event = _text_event('U_INTAKE_1', 'r1', 'เปิดบอท')
         self.assertTrue(self._post(event).called)
         self._post(event).assert_not_called()
 
@@ -189,7 +305,8 @@ class LineRegisterFormTests(IntakeTestBase):
         super().setUp()
         from django.core.cache import cache
         cache.clear()
-        self.line_new = LineUser.objects.create(line_user_id=self.USER_ID, display_name='ใหม่', bot_enabled=True)
+        self.line_new = LineUser.objects.create(line_user_id=self.USER_ID, display_name='ใหม่', bot_enabled=True,
+                                                bot_last_active_at=timezone.now())
         self.url = f"{reverse('root_line_register')}?t={make_line_register_token(self.USER_ID)}"
 
     def _submit(self, **overrides):
@@ -207,7 +324,7 @@ class LineRegisterFormTests(IntakeTestBase):
         self.line_new.bot_enabled = False
         self.line_new.save()
         with patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
-            _signed_post(self.client, [_text_event(self.USER_ID, 'r1', 'เปิดใช้งานบอท')])
+            _signed_post(self.client, [_text_event(self.USER_ID, 'r1', 'เปิดบอท')])
         card = reply.call_args.args[1][0]
         uri = card['contents']['footer']['contents'][0]['action']['uri']
         self.assertIn(reverse('root_line_register'), uri)
@@ -224,11 +341,11 @@ class LineRegisterFormTests(IntakeTestBase):
         self.assertIn('pdpa_consent_at', patient.extra_data)
         self.line_new.refresh_from_db()
         self.assertEqual(self.line_new.active_patient, patient)
-        self.assertTrue(self.line_new.bot_enabled)
+        self.assertTrue(self.line_new.is_bot_on())
         self.assertEqual(push.call_args.args[0], self.USER_ID)
-        card = push.call_args.args[1][0]
-        self.assertEqual(card['type'], 'flex')
-        self.assertIn('สวัสดีครับคุณสมชาย', json.dumps(card, ensure_ascii=False))
+        message = push.call_args.args[1][0]
+        self.assertEqual(message['type'], 'text')
+        self.assertIn('สวัสดีครับคุณสมชาย', message['text'])
         self.assertContains(self.client.get(self.url), 'ลงทะเบียนเรียบร้อย')
 
     def test_consent_and_valid_phone_are_required(self):
@@ -264,7 +381,7 @@ class LineRegisterFormTests(IntakeTestBase):
 
 
 class LineAiChatTests(IntakeTestBase):
-    """ผู้ใช้ที่เปิดบอทแล้ว พิมพ์คำถามทั่วไป AI ตอบเป็น Flex ระหว่างเล่าอาการยังเข้ากล่องเหมือนเดิม"""
+    """AI ตอบเป็นข้อความแชทธรรมดา เก็บคำตอบให้เจ้าหน้าที่ และใช้เป็นบริบทของข้อความถัดไป"""
 
     def setUp(self):
         super().setUp()
@@ -272,81 +389,21 @@ class LineAiChatTests(IntakeTestBase):
         cache.clear()
         self.ai_background.side_effect = lambda func, *args: func(*args)
 
-    def _ask(self, text, event_id='ai1', status_code=200, data=None):
-        fake = MagicMock(status_code=status_code)
-        fake.json.return_value = data if data is not None else {
-            'answer': 'ตอบจากเอกสาร [1]', 'kind': 'answer', 'sources': ['แกนที่ 16'], 'provider': 'groq', 'model': 'm',
-            'usage': {'prompt_tokens': 5, 'completion_tokens': 3}}
-        with patch('patients.line_ai.httpx.post', return_value=fake) as post, \
+    def _ask(self, text, event_id='ai1', response=None):
+        with patch('patients.line_ai.httpx.post', return_value=response or _ai_response('ตอบจากผู้ช่วย')) as post, \
                 patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
             _signed_post(self.client, [_text_event('U_INTAKE_1', event_id, text)])
         return post, reply
 
-    def test_question_answered_with_flex_sources_and_saved_for_staff(self):
+    def test_answer_is_plain_text_without_citations_and_saved_for_staff(self):
         post, reply = self._ask('เบาหวานกินอะไรได้บ้าง')
+        self.assertTrue(post.call_args.args[0].endswith('/api/ai/line/chat'))
         self.assertEqual(post.call_args.kwargs['json']['messages'][-1],
                          {'role': 'user', 'content': 'เบาหวานกินอะไรได้บ้าง'})
-        card = reply.call_args.args[1][0]
-        self.assertEqual(card['type'], 'flex')
-        text = json.dumps(card, ensure_ascii=False)
-        self.assertIn('ตอบจากเอกสาร [1]', text)
-        self.assertIn('[1] แกนที่ 16', text)
-        self.assertIn('ปิดบอท', text)
-        self.assertFalse(Box.objects.filter(patient=self.patient).exists())
+        self.assertEqual(reply.call_args.args[1], [{'type': 'text', 'text': 'ตอบจากผู้ช่วย'}])
         self.assertTrue(CommunicationRecord.objects.filter(
-            line_user=self.line_user, direction='OUTGOING', content='ตอบจากเอกสาร [1]').exists())
-
-    def _tap_send_to_doctor(self, message_id, user_id='U_INTAKE_1', event_id='tap1'):
-        event = {'type': 'postback', 'replyToken': 'r', 'webhookEventId': event_id, 'source': {'userId': user_id},
-                 'postback': {'data': f'action=send_to_doctor&msg={message_id}'}}
-        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
-            _signed_post(self.client, [event])
-        return json.dumps(reply.call_args.args[1], ensure_ascii=False)
-
-    def test_symptom_answer_offers_send_to_doctor_and_general_question_does_not(self):
-        _, reply = self._ask('ปวดหัวมา 3 วัน', event_id='sym1')
-        text = json.dumps(reply.call_args.args[1], ensure_ascii=False)
-        self.assertIn('ส่งอาการนี้ให้หมอ', text)
-        self.assertIn('action=send_to_doctor&msg=sym1', text)
-        _, reply = self._ask('คลินิกเปิดกี่โมง', event_id='gen1')
-        text = json.dumps(reply.call_args.args[1], ensure_ascii=False)
-        self.assertNotIn('ส่งอาการนี้ให้หมอ', text)
-        self.assertIn('เล่าอาการให้คลินิก', text)
-
-    def test_send_to_doctor_submits_message_once_with_next_steps(self):
-        self._ask('ปวดหัวมา 3 วัน', event_id='sym2')
-        text = self._tap_send_to_doctor('sym2')
-        box = Box.objects.get(patient=self.patient)
-        self.assertEqual(box.status, Box.Status.DONE)
-        self.assertEqual(box.contents['messages'][0]['text'], 'ปวดหัวมา 3 วัน')
-        self.assertIn('พิมพ์ถาม AI ได้เลย', text)
-        self.assertIn('ส่งให้ทีมแพทย์แล้ว', self._tap_send_to_doctor('sym2', event_id='tap2'))
-        self.assertEqual(Box.objects.filter(patient=self.patient).count(), 1)
-
-    def test_send_to_doctor_cannot_take_another_users_message(self):
-        self._ask('ปวดหัวมา 3 วัน', event_id='sym3')
-        other = Patient.objects.create(hn='HN-INT-3', first_name='คนอื่น', last_name='ทดสอบ', phone='0899999999',
-                                       line_user_id='U_OTHER')
-        LineUser.objects.create(line_user_id='U_OTHER', display_name='อื่น', bot_enabled=True, active_patient=other)
-        self.assertIn('ไม่พบข้อความนี้', self._tap_send_to_doctor('sym3', user_id='U_OTHER'))
-        self.assertFalse(Box.objects.filter(patient=other).exists())
-
-    def test_send_to_doctor_joins_open_session(self):
-        self._ask('ปวดหัวมา 3 วัน', event_id='sym4')
-        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True):
-            _signed_post(self.client, [_text_event('U_INTAKE_1', 's2', 'เริ่ม'), _text_event('U_INTAKE_1', 's3', 'เวียนหัวด้วย')])
-        self.assertIn('เสร็จแล้ว', self._tap_send_to_doctor('sym4'))
-        box = Box.objects.get(patient=self.patient)
-        self.assertEqual(box.status, Box.Status.DRAFT)
-        self.assertEqual(len([m for m in box.contents['messages'] if m['sender'] == 'patient']), 2)
-
-    def test_done_card_tells_patient_what_to_do_next(self):
-        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
-            _signed_post(self.client, [_text_event('U_INTAKE_1', 'd1', 'เริ่ม'), _text_event('U_INTAKE_1', 'd2', 'ปวดหลัง'),
-                                       _text_event('U_INTAKE_1', 'd3', 'เสร็จแล้ว')])
-        text = json.dumps(reply.call_args.args[1], ensure_ascii=False)
-        self.assertIn('พิมพ์ถาม AI ได้เลย', text)
-        self.assertIn('ดูใบนัด', text)
+            line_user=self.line_user, direction='OUTGOING', content='ตอบจากผู้ช่วย').exists())
+        self.assertTrue(AIUsageLog.objects.filter(purpose='line_chat').exists())
 
     def test_next_question_sends_earlier_answer_as_context(self):
         self._ask('เบาหวานคืออะไร')
@@ -354,22 +411,14 @@ class LineAiChatTests(IntakeTestBase):
         roles = [m['role'] for m in post.call_args.kwargs['json']['messages']]
         self.assertEqual(roles, ['user', 'assistant', 'user'])
 
-    def test_during_intake_text_goes_to_box_not_ai(self):
-        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True):
-            _signed_post(self.client, [_text_event('U_INTAKE_1', 's1', 'เริ่ม')])
-        post, _ = self._ask('ปวดหลังมา 3 วัน')
-        post.assert_not_called()
-        self.assertEqual(Box.objects.get(patient=self.patient).contents['messages'][0]['text'], 'ปวดหลังมา 3 วัน')
-
-    def test_emergency_skips_ai_and_reaches_doctors(self):
-        post, reply = self._ask('แน่นหน้าอกมาก หายใจไม่ออก')
-        post.assert_not_called()
-        self.assertIn('1669', json.dumps(reply.call_args.args[1], ensure_ascii=False))
+    def test_ai_side_emergency_shows_call_card_and_flags_session(self):
+        _, reply = self._ask('ชักเกร็งไปเมื่อกี้', response=_ai_response('โทร 1669', kind='emergency'))
+        self.assertIn('tel:1669', self._reply_text(reply))
         self.assertTrue(Box.objects.get(patient=self.patient).contents.get('red_flag'))
 
     def test_service_down_replies_politely(self):
-        _, reply = self._ask('เบาหวานคืออะไร', status_code=500)
-        self.assertIn('ไม่พร้อมใช้งาน', json.dumps(reply.call_args.args[1], ensure_ascii=False))
+        _, reply = self._ask('เบาหวานคืออะไร', response=_ai_response(status_code=500))
+        self.assertIn('ไม่พร้อมใช้งาน', reply.call_args.args[1][0]['text'])
         self.assertFalse(CommunicationRecord.objects.filter(line_user=self.line_user, direction='OUTGOING').exists())
 
     def test_daily_limit_stops_ai_calls(self):
@@ -377,12 +426,10 @@ class LineAiChatTests(IntakeTestBase):
             self._ask('ข้อแรก')
             post, reply = self._ask('ข้อสอง', event_id='ai2')
         post.assert_not_called()
-        self.assertIn('ถามครบจำนวน', json.dumps(reply.call_args.args[1], ensure_ascii=False))
+        self.assertIn('ครบจำนวน', reply.call_args.args[1][0]['text'])
 
     def test_reply_failure_falls_back_to_push(self):
-        fake = MagicMock(status_code=200)
-        fake.json.return_value = {'answer': 'ตอบ', 'kind': 'general', 'sources': []}
-        with patch('patients.line_ai.httpx.post', return_value=fake), \
+        with patch('patients.line_ai.httpx.post', return_value=_ai_response('ตอบ')), \
                 patch('patients.views_line.LineMessagingService.reply_message', return_value=False), \
                 patch('patients.views_line.LineMessagingService.push_message', return_value=True) as push:
             _signed_post(self.client, [_text_event('U_INTAKE_1', 'ai3', 'เบาหวานคืออะไร')])
@@ -407,7 +454,8 @@ class LinePhase2Tests(IntakeTestBase):
         self.client.force_login(self.doctor)
 
     def _message(self, event_id, text):
-        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True):
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True), \
+                patch('patients.line_ai.httpx.post', return_value=_ai_response()):
             _signed_post(self.client, [_text_event('U_INTAKE_1', event_id, text)])
 
     def _duplicate_request(self):
@@ -426,14 +474,20 @@ class LinePhase2Tests(IntakeTestBase):
         self.assertContains(response, 'มีเคสฉุกเฉินจาก LINE 1 เคส')
         self.assertContains(response, reverse('clinical:intake_detail', kwargs={'box_id': Box.objects.get().id}))
 
-    def test_dashboard_lists_finished_case_but_not_open_ordinary_session(self):
-        self._message('n1', 'เริ่ม')
+    def test_dashboard_lists_finished_symptom_session_but_not_open_one(self):
         self._message('n2', 'ปวดหลังนิดหน่อย')
         self.assertNotContains(self.client.get(reverse('patients:doctor_line_cases')), self.patient.hn)
-        self._message('n3', 'เสร็จแล้ว')
+        self._message('n3', 'ปิดบอท')
         response = self.client.get(reverse('patients:doctor_line_cases'))
         self.assertContains(response, self.patient.hn)
         self.assertNotContains(response, 'ปวดหลัง')  # เนื้อหายังต้องปลดล็อกกล่องก่อน
+
+    def test_general_chat_session_goes_to_its_own_tab_not_the_dashboard(self):
+        self._message('g1', 'สวัสดีครับ คลินิกเปิดกี่โมง')
+        self._message('g2', 'ปิดบอท')
+        self.assertNotContains(self.client.get(reverse('patients:doctor_line_cases')), self.patient.hn)
+        self.assertNotContains(self.client.get(reverse('clinical:intake_list')), self.patient.hn)
+        self.assertContains(self.client.get(reverse('clinical:intake_list'), {'tab': 'general'}), self.patient.hn)
 
     def test_line_cases_requires_clinical_staff(self):
         self.client.logout()
@@ -455,7 +509,7 @@ class LinePhase2Tests(IntakeTestBase):
         with patch('patients.line_alerts.LineMessagingService.push_message', return_value=True) as push:
             line_alerts.notify_patient_reviewed(box)
         self.assertEqual(push.call_args.args[0], 'U_INTAKE_1')
-        self.assertIn('ทีมแพทย์ตรวจข้อมูลแล้ว', json.dumps(push.call_args.args[1], ensure_ascii=False))
+        self.assertIn('ทีมแพทย์ได้อ่านข้อมูล', json.dumps(push.call_args.args[1], ensure_ascii=False))
         self.line_user.bot_enabled = False
         self.line_user.save()
         with patch('patients.line_alerts.LineMessagingService.push_message', return_value=True) as push:
@@ -636,7 +690,7 @@ class LineQrPosterTests(TestCase):
         self.client.force_login(User.objects.create_user(username='doc_qr', password='x-Strong-pass-1', role=User.Role.DOCTOR))
         response = self.client.get(url)
         self.assertContains(response, '<svg')
-        self.assertContains(response, 'เปิดใช้งานบอท')
+        self.assertContains(response, 'เปิดบอท')
         self.assertIn('https://line.me/R/oaMessage/@testoa/?', response.context['link'])
 
 
@@ -941,25 +995,3 @@ class Phase3ChatAndVoiceTests(IntakeTestBase):
         self.assertEqual(box.contents['soap']['plan'], 'ติดตาม')
         detail = self.client.get(reverse('clinical:intake_detail', args=[box.id]))
         self.assertContains(detail, 'คนไข้ปวดหลังสามวัน')  # ผู้บันทึกเปิดได้ทันที
-
-    @override_settings(AI_INTAKE_BOT_ENABLED=True)
-    def test_ai_followup_question_replied_and_capped(self):
-        fake = MagicMock(status_code=200)
-        fake.json.return_value = {'success': True, 'question': 'ปวดมานานเท่าไหร่แล้วคะ', 'provider': 'groq',
-                                  'model': 'm', 'usage': {'prompt_tokens': 10, 'completion_tokens': 5}}
-        with patch('clinical.services_intake.httpx.post', return_value=fake) as post, \
-             patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as reply:
-            _signed_post(self.client, [_text_event('U_INTAKE_1', 'fstart', 'เริ่ม')])
-            for i in range(7):
-                _signed_post(self.client, [_text_event('U_INTAKE_1', f'f{i}', f'ปวดหัวมาก ครั้งที่ {i}')])
-        self.assertEqual(post.call_count, services_intake.MAX_AI_FOLLOWUPS_PER_SESSION)
-        sent = post.call_args.kwargs['json']['transcript']
-        self.assertIn('ผู้ป่วย:', sent)
-        box = Box.objects.get(patient=self.patient, source=Box.Source.LINE)
-        self.assertEqual(sum(1 for m in box.contents['messages'] if m['sender'] == 'bot'), 5)
-        self.assertIn('ปวดมานานเท่าไหร่แล้วคะ', json.dumps(reply.call_args_list[1].args[1][0], ensure_ascii=False))
-
-    def test_ai_followup_off_by_default(self):
-        with patch('clinical.services_intake.httpx.post') as post:
-            _signed_post(self.client, [_text_event('U_INTAKE_1', 'off1', 'ปวดท้อง')])
-        post.assert_not_called()

@@ -13,8 +13,8 @@ from django.urls import reverse
 
 from accounts.models import User
 from patients import line_ai
-from patients.line_service import LineFlexMessageBuilder, LineMessagingService
-from patients.models_line import LinePatientBinding, LineUser
+from patients.line_service import LineMessagingService, text_message
+from patients.models_line import LinePatientBinding, LineUser, bot_idle_cutoff
 
 logger = logging.getLogger(__name__)
 
@@ -62,17 +62,14 @@ def _send_emergency_email(recipients: list, url: str) -> None:
 
 
 def notify_patient_reviewed(box) -> None:
-    """บอกคนไข้ว่าทีมแพทย์ตรวจแล้ว ไม่ใส่ผลการตรวจในแชท และไม่รบกวนคนที่ปิดบอทไว้"""
+    """บอกคนไข้ว่าทีมแพทย์ตรวจแล้ว ไม่ใส่ผลการตรวจในแชท และไม่รบกวนคนที่บอทปิดไปแล้ว (แชทเป็นของทีมขาย)"""
     patient = box.patient
     bound_line_users = LineUser.objects.filter(
         Q(active_patient=patient)
         | Q(line_user_id=patient.line_user_id or '')
         | Q(patient_bindings__patient=patient, patient_bindings__status=LinePatientBinding.StatusChoices.ACTIVE),
-        bot_enabled=True,
+        bot_enabled=True, bot_last_active_at__gte=bot_idle_cutoff(),
     ).distinct()
-    card = LineFlexMessageBuilder.build_bot_card(
-        'ทีมแพทย์ตรวจข้อมูลแล้ว',
-        'ทีมแพทย์ได้ตรวจข้อมูลที่คุณส่งมาเรียบร้อยแล้ว หากต้องทำอะไรเพิ่มเติม เจ้าหน้าที่จะติดต่อกลับครับ',
-    )
+    card = text_message('ทีมแพทย์ได้อ่านข้อมูลที่คุณเล่าไว้เรียบร้อยแล้วครับ หากต้องทำอะไรเพิ่มเติม เจ้าหน้าที่จะติดต่อกลับ')
     for line_user in bound_line_users:
         LineMessagingService.push_message(line_user.line_user_id, [card])

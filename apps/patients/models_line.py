@@ -4,10 +4,17 @@ Enforces Caregiver 1:N Relationship, Unified Communication Record,
 and Clinical Review Queue Gate before EMR Entry (Human-in-the-loop).
 """
 
+from datetime import timedelta
+
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from core.models import SoftDeleteModel
+
+
+def bot_idle_cutoff():
+    """ข้อความหลังเวลานี้ยังนับว่าคุยกับบอทอยู่"""
+    return timezone.now() - timedelta(minutes=settings.LINE_BOT_IDLE_MINUTES)
 
 
 class LineUser(models.Model):
@@ -40,8 +47,10 @@ class LineUser(models.Model):
         help_text="บัญชีผู้ใช้ระบบ (ถ้ามี เช่น บุคลากรทางการแพทย์ หรือคนไข้ Portal)"
     )
 
-    # บอทปิดเป็นค่าเริ่มต้น: ตอบอัตโนมัติเฉพาะคนที่พิมพ์ "เปิดใช้งานบอท" เอง
+    # บอทปิดเป็นค่าเริ่มต้น: ตอบอัตโนมัติเฉพาะคนที่พิมพ์ "เปิดบอท" เอง และปิดเองเมื่อเงียบเกิน LINE_BOT_IDLE_MINUTES
     bot_enabled = models.BooleanField(default=False, help_text="ผู้ใช้เปิดใช้งานบอทตอบอัตโนมัติอยู่หรือไม่")
+    bot_last_active_at = models.DateTimeField(null=True, blank=True,
+                                              help_text="ข้อความล่าสุดที่บอทรับไว้ ใช้ตัดสินว่าเงียบจนบอทปิดเองหรือยัง")
 
     created_at = models.DateTimeField(auto_now_add=True)
     last_seen_at = models.DateTimeField(auto_now=True)
@@ -53,6 +62,10 @@ class LineUser(models.Model):
 
     def __str__(self):
         return f"LineUser({self.display_name or self.line_user_id[:8]})"
+
+    def is_bot_on(self) -> bool:
+        """บอทตอบคนนี้อยู่จริงไหม: เปิดไว้และยังไม่เงียบเกินเวลาที่ตั้ง (ใช้ทั้งตอนตอบและตอนส่งต่อให้ระบบเก่า)"""
+        return bool(self.bot_enabled and self.bot_last_active_at and self.bot_last_active_at >= bot_idle_cutoff())
 
     @property
     def is_clinician_or_staff(self) -> bool:

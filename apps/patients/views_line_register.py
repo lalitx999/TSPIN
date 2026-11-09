@@ -20,7 +20,7 @@ from accounts.models import AuditLog
 from accounts.views import get_client_ip
 from patients.line_service import LineMessagingService, read_line_register_token
 from patients.models import ClinicalReviewItem, CommunicationRecord, LinePatientBinding, LineUser, Patient
-from patients.views_line import _resolve_patient, _set_bot_enabled, welcome_card
+from patients.views_line import _resolve_patient, _set_bot_enabled, welcome_message
 from patients.views_liff import _next_hn
 
 
@@ -124,5 +124,5 @@ def line_register_view(request: HttpRequest) -> HttpResponse:
             _flag_possible_duplicate(request, line_user, existing, patient)
         _set_bot_enabled(request, line_user, True, patient)
 
-    LineMessagingService.push_message(line_user_id, [welcome_card(patient)])
+    LineMessagingService.push_message(line_user_id, [welcome_message(patient)])
     return redirect(request.get_full_path())

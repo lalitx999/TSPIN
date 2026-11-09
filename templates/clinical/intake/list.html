@@ -12,7 +12,7 @@
             </span>
             <h1 class="h4 fw-bold mb-1 text-dark">ซักถามพูดคุยผ่าน LINE</h1>
             <p class="text-muted small mb-0">
-                รอบซักประวัติจาก LINE และหน้าเว็บผู้ป่วย เปิดกล่องเพื่ออ่านบทสนทนา ให้ AI ร่าง SOAP ตรวจทาน แล้วบันทึกเข้าเวชระเบียน
+                บทสนทนาที่ผู้ป่วยคุยกับผู้ช่วย AI ทาง LINE (หนึ่งรอบ = ตั้งแต่เปิดบอทจนบอทปิด) และจากหน้าเว็บ เปิดกล่องเพื่ออ่าน ให้ AI ร่าง SOAP ตรวจทาน แล้วบันทึกเข้าเวชระเบียน
             </p>
         </div>
     </div>
@@ -47,6 +47,8 @@
                             <small class="text-muted font-monospace">HN: {{ box.patient.hn }}</small>
                             {% if box.contents.red_flag %}
                             <span class="badge bg-danger ms-1"><i class="fas fa-triangle-exclamation me-1"></i>อาการฉุกเฉิน</span>
+                            {% elif box.contents.has_symptoms %}
+                            <span class="badge bg-warning-subtle text-warning-emphasis border ms-1">มีอาการ</span>
                             {% endif %}
                         </td>
                         <td class="px-3 py-2.5">

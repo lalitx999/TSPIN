@@ -1,8 +1,8 @@
 """
 รอบซักประวัติ (Intake Session) แบบเบา: ใช้ Box หนึ่งกล่องต่อหนึ่งรอบการคุย
 
-- DRAFT  = กำลังคุย ข้อความ/รูป/เสียงใหม่ต่อเข้ากล่องเดิม
-- DONE   = ผู้ป่วยกด "เสร็จแล้ว" รอบุคลากรเปิดดู
+- DRAFT  = กำลังคุย ข้อความ/รูป/เสียงใหม่ (และคำตอบของ AI ใน LINE) ต่อเข้ากล่องเดิม
+- DONE   = จบรอบแล้ว (LINE: บอทปิดหรือเงียบเกินเวลา) รอบุคลากรเปิดดู
 - REVIEWED = บันทึกเข้าเวชระเบียน (PatientHistory) แล้ว ล็อกไม่ให้บันทึกซ้ำ
 
 AI สรุป SOAP ทำเมื่อบุคลากรกดปุ่มเท่านั้น (ประหยัดค่า AI และไม่สรุปกล่องที่ไม่มีใครเปิด)
@@ -15,6 +15,7 @@ from typing import Any, Dict, Optional, Tuple
 import httpx
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from accounts.models import AuditLog
@@ -29,13 +30,18 @@ logger = logging.getLogger('tspi.clinical.intake')
 SESSION_IDLE_LIMIT = timedelta(hours=24)
 SOAP_FIELDS = ('subjective', 'objective', 'assessment', 'plan')
 MEDIA_LABELS = {'image': 'รูปภาพ', 'audio': 'ข้อความเสียง', 'video': 'วิดีโอ', 'file': 'ไฟล์'}
-SENDER_LABELS = {'patient': 'ผู้ป่วย', 'bot': 'ผู้ช่วยซักประวัติ', 'staff': 'บุคลากร'}
+SENDER_LABELS = {'patient': 'ผู้ป่วย', 'bot': 'ผู้ช่วย AI', 'staff': 'บุคลากร'}
+
+
+def line_idle_limit() -> timedelta:
+    return timedelta(minutes=settings.LINE_BOT_IDLE_MINUTES)
 
 
 def open_session(patient, source: str) -> Box:
-    """คืนกล่องที่ยังคุยอยู่ของผู้ป่วยในช่องทางนี้ หรือเปิดกล่องใหม่"""
+    """คืนกล่องที่ยังคุยอยู่ของผู้ป่วยในช่องทางนี้ หรือเปิดกล่องใหม่ (LINE ใช้เวลาเงียบเดียวกับที่บอทปิดเอง)"""
+    idle_limit = line_idle_limit() if source == Box.Source.LINE else SESSION_IDLE_LIMIT
     box = Box.objects.filter(patient=patient, source=source, status=Box.Status.DRAFT).order_by('-created_at').first()
-    if box and box.last_activity_at and timezone.now() - box.last_activity_at > SESSION_IDLE_LIMIT:
+    if box and box.last_activity_at and timezone.now() - box.last_activity_at > idle_limit:
         close_session(box, reason='idle')
         box = None
     if box is None:
@@ -50,7 +56,8 @@ def open_session(patient, source: str) -> Box:
 
 
 def append_message(box: Box, kind: str, text: str = '', media: Optional[Dict[str, Any]] = None,
-                   sender: str = 'patient', external_id: str = '', red_flag: bool = False) -> Box:
+                   sender: str = 'patient', external_id: str = '', red_flag: bool = False,
+                   has_symptoms: bool = False) -> Box:
     """ต่อข้อความ/ไฟล์เข้ากล่อง (เก็บต้นฉบับ ไม่ sanitize เพราะเป็นข้อมูลให้บุคลากรอ่าน)"""
     contents = dict(box.contents or {})
     messages = list(contents.get('messages', []))
@@ -67,6 +74,8 @@ def append_message(box: Box, kind: str, text: str = '', media: Optional[Dict[str
     contents['messages'] = messages
     if red_flag:
         contents['red_flag'] = True
+    if red_flag or has_symptoms:
+        contents['has_symptoms'] = True  # ให้หมอเห็นรอบที่มีเรื่องอาการก่อนรอบที่คุยทั่วไป
     box.contents = contents
     box.last_activity_at = timezone.now()
     box.save(update_fields=['contents', 'last_activity_at', 'signature'])
@@ -82,6 +91,29 @@ def close_session(box: Box, reason: str = 'patient_done') -> Box:
         box.processed_at = timezone.now()
         box.save(update_fields=['contents', 'status', 'processed_at', 'signature'])
     return box
+
+
+def end_line_session(patient, reason: str) -> None:
+    """จบรอบแชท LINE ที่ค้างอยู่ รอบที่ยังไม่มีข้อความทิ้งไป ไม่ให้รกรายการของหมอ"""
+    if not patient:
+        return
+    for box in Box.objects.filter(patient=patient, source=Box.Source.LINE, status=Box.Status.DRAFT):
+        if (box.contents or {}).get('messages'):
+            close_session(box, reason=reason)
+        else:
+            box.delete()
+
+
+def needs_doctor_q() -> Q:
+    """รอบที่หมอควรอ่าน: มีเรื่องอาการหรือฉุกเฉิน (รอบ LINE ที่คุยทั่วไปแยกไว้อีกแท็บ) ช่องทางอื่นนับทุกรอบ"""
+    return Q(contents__has_symptoms=True) | Q(contents__red_flag=True) | ~Q(source=Box.Source.LINE)
+
+
+def close_idle_line_sessions() -> None:
+    """ปิดรอบ LINE ที่เงียบเกินเวลา ก่อนแสดงรายการให้หมอ (ไม่ต้องมี cron: คนที่ไม่กลับมาคุยก็ถูกปิดตอนหมอเปิดดู)"""
+    cutoff = timezone.now() - line_idle_limit()
+    for box in Box.objects.filter(source=Box.Source.LINE, status=Box.Status.DRAFT, last_activity_at__lt=cutoff)[:200]:
+        close_session(box, reason='idle')
 
 
 def transcript_text(box: Box) -> str:
@@ -146,46 +178,6 @@ def summarize_with_ai(box: Box, user) -> Tuple[bool, str]:
     AuditLog.objects.create(user=user, action='INTAKE_AI_SUMMARY_CREATED', model='Box', object_id=str(box.id),
                             changes={'gateway': data.get('gateway', '')})
     return True, ''
-
-
-MAX_AI_FOLLOWUPS_PER_SESSION = 5
-
-
-def ai_followup_question(box: Box) -> Optional[str]:
-    """
-    ให้ AI ถามต่อ 1 ข้อ (เปิดด้วย AI_INTAKE_BOT_ENABLED) จำกัดจำนวนต่อรอบและตรวจงบก่อนเรียก
-    ล้มเหลวเมื่อไหร่คืน None ให้บอทใช้ข้อความตอบรับแบบเดิม
-    """
-    if not settings.AI_INTAKE_BOT_ENABLED:
-        return None
-    contents = box.contents or {}
-    if contents.get('ai_followups', 0) >= MAX_AI_FOLLOWUPS_PER_SESSION:
-        return None
-    provider = settings.AI_SOAP_PROVIDER
-    if not ai_budget.check_budget(provider)[0]:
-        return None
-    try:
-        resp = httpx.post(
-            f"{settings.AI_SERVICE_URL}/api/ai/intake/followup",
-            json={'transcript': TextDeidentifier.sanitize(transcript_text(box))['sanitized_text']},
-            headers={'X-Internal-Token': settings.INTERNAL_API_TOKEN},
-            timeout=20.0,
-        )
-        data = resp.json() if resp.status_code == 200 else {}
-    except (httpx.HTTPError, ValueError) as exc:
-        logger.warning(f"[Intake AI] follow-up failed for box {box.id}: {exc}")
-        return None
-    if any((data.get('usage') or {}).values()):
-        ai_budget.record_usage(data.get('provider') or provider, data.get('model', ''), data['usage'], 'intake_followup')
-    question = (data.get('question') or '').strip() if data.get('success') else ''
-    if not question:
-        return None
-    contents = dict(box.contents or {})
-    contents['ai_followups'] = contents.get('ai_followups', 0) + 1
-    box.contents = contents
-    box.save(update_fields=['contents', 'signature'])
-    append_message(box, 'text', text=question, sender='bot')
-    return question
 
 
 def commit_to_emr(box: Box, user, soap: Dict[str, str]) -> PatientHistory:

@@ -203,6 +203,10 @@ LINE_RELAY_URL = os.environ.get('LINE_RELAY_URL', '')
 LINE_OA_ID = os.environ.get('LINE_OA_ID', '@505bfkpi')
 # เปิดเมื่อ webhook ของ OA นั้นชี้มาที่ระบบนี้แล้วเท่านั้น ไม่งั้นข้อความเปิดบอทจะไปโผล่ในแชทขายของโดยไม่มีบอทตอบ
 LINE_BOT_LINK_ENABLED = os.environ.get('LINE_BOT_LINK_ENABLED', 'false').lower() == 'true'
+# เงียบนานเท่านี้ (นาที) บอทปิดเองโดยไม่แจ้ง ข้อความถัดไปไปถึงทีมขายตามปกติ
+LINE_BOT_IDLE_MINUTES = int(os.environ.get('LINE_BOT_IDLE_MINUTES', '60'))
+# ถอดข้อความเสียงใน LINE ด้วย AI ภายนอก (ส่งเสียงจริงออกไปโดยไม่ลบข้อมูลระบุตัวตน จึงปิดไว้จนกว่าคลินิกอนุมัติ)
+LINE_VOICE_TRANSCRIBE_ENABLED = os.environ.get('LINE_VOICE_TRANSCRIBE_ENABLED', 'false').lower() == 'true'
 # อีเมล (OTP ยืนยันตัวตนผ่าน LINE) ใช้ SMTP ของ Hostinger: ตั้งค่าใน .env
 # ถ้าไม่ตั้ง EMAIL_HOST จะพิมพ์อีเมลออก console (ใช้ตอนพัฒนา)
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
@@ -242,7 +246,6 @@ AI_SERVICE_URL = os.environ.get('AI_SERVICE_URL', 'http://127.0.0.1:8088')
 # ผู้ให้บริการที่ใช้ร่าง SOAP (ต้องตรงกับ AI service) ใช้ตรวจงบก่อนเรียก
 AI_SOAP_PROVIDER = os.environ.get('AI_SOAP_PROVIDER', 'groq').strip().lower()
 # ให้บอท LINE ถามต่อด้วย AI (ใช้งบ) ปิดไว้เป็นค่าเริ่มต้น
-AI_INTAKE_BOT_ENABLED = os.environ.get('AI_INTAKE_BOT_ENABLED', 'False').lower() in ('true', '1')
 
 # Blanks LLM provider keys during tests so the suite never calls paid APIs
 TEST_RUNNER = 'config.test_runner.OfflineAITestRunner'

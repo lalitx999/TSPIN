@@ -4,7 +4,7 @@
 """
 
 from django.contrib import messages
-from django.db.models import Case, IntegerField, Value, When
+from django.db.models import Case, IntegerField, Q, Value, When
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -21,9 +21,12 @@ from patients import line_alerts
 
 INTAKE_SOURCES = (Box.Source.LINE, Box.Source.WEB, Box.Source.CLINIC)
 STATUS_TABS = {
-    'waiting': ('รอตรวจ', [Box.Status.DONE]),
-    'open': ('กำลังคุย', [Box.Status.DRAFT]),
-    'saved': ('บันทึกแล้ว', [Box.Status.REVIEWED]),
+    'waiting': ('มีอาการ รอตรวจ', lambda: Q(status=Box.Status.DONE) & services_intake.needs_doctor_q()),
+    # กล่องที่ไม่มีคีย์ has_symptoms เลยทำให้ NOT ตรง ๆ หลุด จึงตัดด้วยรายการที่ต้องให้หมอดูแทน
+    'general': ('คุยทั่วไป', lambda: Q(status=Box.Status.DONE)
+                & ~Q(pk__in=Box.objects.filter(services_intake.needs_doctor_q()).values('pk'))),
+    'open': ('กำลังคุย', lambda: Q(status=Box.Status.DRAFT)),
+    'saved': ('บันทึกแล้ว', lambda: Q(status=Box.Status.REVIEWED)),
 }
 
 
@@ -32,14 +35,15 @@ def intake_list_view(request: HttpRequest) -> HttpResponse:
     tab = request.GET.get('tab', 'waiting')
     if tab not in STATUS_TABS:
         tab = 'waiting'
+    services_intake.close_idle_line_sessions()
+    base = Box.objects.filter(source__in=INTAKE_SOURCES, patient__isnull=False)
     boxes = (
-        Box.objects.filter(source__in=INTAKE_SOURCES, status__in=STATUS_TABS[tab][1], patient__isnull=False)
+        base.filter(STATUS_TABS[tab][1]())
         .select_related('patient')
         .annotate(urgent_first=Case(When(contents__red_flag=True, then=Value(0)), default=Value(1), output_field=IntegerField()))
         .order_by('urgent_first', '-last_activity_at', '-created_at')[:100]
     )
-    counts = {key: Box.objects.filter(source__in=INTAKE_SOURCES, status__in=st, patient__isnull=False).count()
-              for key, (_, st) in STATUS_TABS.items()}
+    counts = {key: base.filter(q()).count() for key, (_, q) in STATUS_TABS.items()}
     return render(request, 'clinical/intake/list.html', {
         'boxes': boxes,
         'tab': tab,

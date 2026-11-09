@@ -442,42 +442,6 @@ async def generate_soap_endpoint(
     }
 
 
-class IntakeFollowupRequest(BaseModel):
-    transcript: str = Field(..., description="บทสนทนาที่ลบข้อมูลระบุตัวตนแล้ว")
-
-
-INTAKE_FOLLOWUP_PROMPT = (
-    "คุณคือผู้ช่วยพยาบาลของคลินิก ทำหน้าที่ซักประวัติผ่านแชท LINE เป็นภาษาไทยสุภาพ "
-    "อ่านข้อความของผู้ป่วยแล้วถามคำถามต่อเพียง 1 ข้อ สั้นไม่เกิน 2 ประโยค เพื่อให้ได้ข้อมูลที่แพทย์ต้องใช้ "
-    "เช่น ระยะเวลา ความรุนแรง ตำแหน่ง ปัจจัยกระตุ้น อาการร่วม ยาที่ใช้อยู่ "
-    "ห้ามวินิจฉัยโรค ห้ามแนะนำยาหรือการรักษา ห้ามสัญญาผลการรักษา "
-    "ถ้าข้อมูลครบพอแล้ว ให้ขอบคุณและบอกให้กดปุ่ม \"เสร็จแล้ว\" "
-    "ถ้ามีอาการที่อาจเป็นภาวะฉุกเฉิน ให้แนะนำโทร 1669 ทันที"
-)
-
-
-@app.post("/api/ai/intake/followup")
-async def intake_followup_endpoint(req: IntakeFollowupRequest):
-    """คำถามซักประวัติต่อ 1 ข้อสำหรับบอท LINE (ข้อความเข้ามาต้องลบข้อมูลระบุตัวตนแล้ว)"""
-    res = await gateway.call_chat(
-        config.SOAP_PROVIDER,
-        messages=[
-            {"role": "system", "content": INTAKE_FOLLOWUP_PROMPT},
-            {"role": "user", "content": TextDeidentifier.sanitize(req.transcript)["sanitized_text"][-4000:]},
-        ],
-        temperature=0.3,
-        max_tokens=200,
-    )
-    question = (res.get("content") or "").strip() if res.get("success") else ""
-    return {
-        "success": bool(question),
-        "question": question[:500],
-        "provider": res.get("provider", config.SOAP_PROVIDER),
-        "model": res.get("model", ""),
-        "usage": res.get("usage", {}),
-    }
-
-
 class LibrarySearchRequest(BaseModel):
     query: str = Field(..., description="คำค้นหาอาการหรือแกนชีวภาพ")
     lab_markers: Optional[List[Dict[str, Any]]] = Field(default=[], description="ผลแล็บเพื่อแมปกับแกน")
@@ -964,6 +928,93 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
     guarded = ClinicalGuardrail.sanitize_and_guard(answer)
     # answer = มีเอกสารคลินิกรองรับ, general = ความรู้ทั่วไปจาก AI ล้วน
     return {"answer": guarded["safe_text"], "kind": "answer" if sources else "general", "sources": sources, **meta}
+
+
+# ==============================================================================
+# แชทกับผู้ป่วยใน LINE: ซักประวัติทีละคำถามและให้คำแนะนำทั่วไป ไม่วินิจฉัย ไม่แนะนำยา ไม่เลือกผลิตภัณฑ์ให้
+# ทีมแพทย์อ่านบทสนทนานี้ใน EMR แล้วดึงเข้าเวชระเบียนเอง
+# ==============================================================================
+LINE_CHAT_HISTORY_LIMIT = 20
+LINE_CHAT_SYSTEM_PROMPT = (
+    "คุณคือผู้ช่วย AI ของคลินิก TSPI ที่คุยกับผู้ป่วยทางแชท LINE ตอบเป็นภาษาไทย สุภาพ เป็นกันเอง "
+    "เข้าใจง่ายสำหรับผู้สูงอายุ ใช้คำลงท้ายว่า \"ครับ\"\n"
+    "หน้าที่ของคุณ:\n"
+    "1. ซักประวัติเมื่อผู้ป่วยเล่าอาการ ถามทีละ 1 คำถามเท่านั้น เลือกเรื่องที่ยังไม่รู้ตามลำดับนี้: "
+    "เริ่มเป็นเมื่อไรหรือเป็นมานานแค่ไหน, รุนแรงแค่ไหน (ให้คะแนน 0-10 ได้), มีอาการอื่นร่วมไหม, "
+    "ใช้ยาหรืออาหารเสริมอะไรอยู่, มีโรคประจำตัวไหม, แพ้ยาอะไรไหม ห้ามถามซ้ำเรื่องที่ผู้ป่วยตอบแล้ว "
+    "เมื่อถามครบแล้วให้สรุปสั้น ๆ ว่าได้ข้อมูลอะไรบ้าง และบอกว่าทีมแพทย์ของคลินิกจะอ่านข้อมูลนี้\n"
+    "2. ให้คำแนะนำทั่วไปในการดูแลตัวเอง เช่น การพักผ่อน อาหาร การดื่มน้ำ การออกกำลังกาย "
+    "และบอกอาการที่ควรรีบไปพบแพทย์\n"
+    "3. ตอบเรื่องคลินิก (นัดหมาย บริการ การประเมิน 39 แกน) จาก <ความรู้> เท่านั้น ถ้าไม่มีข้อมูล "
+    "ให้บอกว่าให้สอบถามเจ้าหน้าที่ โดยพิมพ์ \"ปิดบอท\" แล้วฝากข้อความไว้\n"
+    "ห้ามเด็ดขาด:\n"
+    "- บอกหรือเดาว่าผู้ป่วยเป็นโรคอะไร ถ้าถูกถาม ให้ตอบว่าผู้ช่วยบอกไม่ได้ แพทย์จะเป็นผู้ประเมิน\n"
+    "- แนะนำยา ชื่อยา ขนาดยา หรือให้หยุดหรือปรับยาที่แพทย์สั่ง\n"
+    "- เลือกหรือแนะนำผลิตภัณฑ์ชิ้นใดให้ บอกได้แค่ว่าคลินิกมีผลิตภัณฑ์ การเลือกต้องผ่านแพทย์ "
+    "หรือพิมพ์ \"ปิดบอท\" เพื่อคุยกับเจ้าหน้าที่\n"
+    "- แปลผลแล็บออกมาเป็นการวินิจฉัย\n"
+    "คุยเรื่องอื่น: ทักทายหรือคุยเล่นสั้น ๆ ได้ แล้วชวนกลับมาเรื่องสุขภาพ ถ้าขอให้ทำงานที่ไม่เกี่ยวกับสุขภาพหรือคลินิก "
+    "เช่น การบ้าน เขียนโค้ด แปลเอกสาร ให้ปฏิเสธอย่างสุภาพใน 1 ประโยค\n"
+    "รูปแบบ: ข้อความแชทสั้น ไม่เกิน 5 บรรทัด ไม่ใช้ markdown (ห้ามใช้ ** # หรือตาราง) ไม่ใส่หมายเลขอ้างอิง"
+)
+LINE_CHAT_EMERGENCY = (
+    "อาการที่เล่ามาอาจเป็นภาวะฉุกเฉิน กรุณาโทร 1669 หรือไปโรงพยาบาลที่ใกล้ที่สุดทันทีครับ "
+    "ทีมแพทย์ของคลินิกจะเห็นข้อความนี้ด้วย"
+)
+LINE_CHAT_MEDICATION_REPLY = (
+    "เรื่องยาและขนาดยา ผู้ช่วยแนะนำไม่ได้ครับ ต้องให้แพทย์หรือเภสัชกรเป็นผู้แนะนำ "
+    "ทีมแพทย์ของคลินิกจะเห็นข้อความนี้ เล่าอาการเพิ่มเติมได้เลยครับ"
+)
+# ตัวเลขตามด้วยหน่วยยา = ขนาดยา ถือว่าหลุดกฎ ใช้ข้อความปลอดภัยแทนทั้งคำตอบ
+_DOSAGE_PATTERN = re.compile(r"\d+(?:[.,]\d+)?\s*(?:มก\.?|มิลลิกรัม|mg|ม\.ก\.|มล\.?|มิลลิลิตร|ml|ไมโครกรัม|mcg|เม็ด|แคปซูล)",
+                             re.IGNORECASE)
+_MARKDOWN_NOISE = re.compile(r"\*\*|__|^#+\s*", re.MULTILINE)
+
+
+LINE_CHAT_DIAGNOSIS_REPLY = (
+    "ผู้ช่วยบอกไม่ได้ว่าเป็นโรคอะไรครับ แพทย์จะเป็นผู้ประเมิน ทีมแพทย์ของคลินิกจะอ่านข้อความนี้ "
+    "เล่าอาการเพิ่มเติมได้เลยครับ"
+)
+
+
+def line_chat_safety(answer: str) -> Dict[str, Any]:
+    """ตรวจคำตอบก่อนส่งถึงผู้ป่วย: หลุดขนาดยาหรือวินิจฉัยใช้ข้อความปลอดภัยแทนทั้งคำตอบ และตัด markdown ที่ LINE แสดงไม่ได้"""
+    if _DOSAGE_PATTERN.search(answer):
+        return {"text": LINE_CHAT_MEDICATION_REPLY, "blocked": "dosage"}
+    if ClinicalGuardrail.check_forbidden_assertions(answer)[0]:
+        return {"text": LINE_CHAT_DIAGNOSIS_REPLY, "blocked": "diagnosis"}
+    return {"text": _MARKDOWN_NOISE.sub("", answer).strip(), "blocked": ""}
+
+
+class LineChatRequest(BaseModel):
+    messages: List[AssistantMessage] = Field(..., description="บทสนทนาใน LINE (ข้อความสุดท้ายคือของผู้ป่วย)")
+
+
+@app.post("/api/ai/line/chat")
+async def line_chat_endpoint(req: LineChatRequest):
+    history = [m for m in req.messages if m.role in ('user', 'assistant') and m.content.strip()][-LINE_CHAT_HISTORY_LIMIT:]
+    if not history or history[-1].role != 'user':
+        raise HTTPException(status_code=400, detail="ข้อความสุดท้ายต้องเป็นของผู้ป่วย")
+    question = TextDeidentifier.sanitize(history[-1].content)["sanitized_text"][:2000]
+
+    if any(k in question for k in ASSISTANT_EMERGENCY_KEYWORDS):
+        return {"answer": LINE_CHAT_EMERGENCY, "kind": "emergency", "sources": [], "usage": {}}
+
+    context = retrieve_tspi_knowledge(question)
+    knowledge = "\n\n".join(f"{c['title']}\n{c['text']}" for c in context) or "(ไม่มีข้อมูลคลินิกที่เกี่ยวกับข้อความนี้)"
+    messages = [{"role": "system", "content": LINE_CHAT_SYSTEM_PROMPT}]
+    for m in history[:-1]:
+        messages.append({"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]})
+    messages.append({"role": "user", "content": f"<ความรู้>\n{knowledge}\n</ความรู้>\n\nผู้ป่วย: {question}"})
+
+    res = await gateway.call_chat(config.SOAP_PROVIDER, messages=messages, temperature=0.3, max_tokens=600)
+    meta = {"provider": res.get("provider", config.SOAP_PROVIDER), "model": res.get("model", ""), "usage": res.get("usage", {})}
+    answer = (res.get("content") or "").strip() if res.get("success") else ""
+    if not answer:
+        return {"answer": "", "kind": "unavailable", "sources": [], **meta}
+    checked = line_chat_safety(answer)
+    return {"answer": checked["text"], "kind": "answer", "blocked": checked["blocked"],
+            "sources": [c['title'] for c in context], **meta}
 
 
 if __name__ == "__main__":

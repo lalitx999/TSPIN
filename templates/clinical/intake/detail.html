@@ -56,7 +56,7 @@
                     {% for m in chat_messages %}
                     <div class="p-2.5 rounded-3 border bg-white small">
                         <div class="text-muted mb-1" style="font-size: 0.7rem;">
-                            {% if m.sender == 'bot' %}<span class="badge bg-secondary-subtle text-secondary border me-1">ผู้ช่วยซักประวัติ (AI)</span>{% elif m.sender == 'staff' %}<span class="badge bg-primary-subtle text-primary border me-1">บุคลากร</span>{% endif %}
+                            {% if m.sender == 'bot' %}<span class="badge bg-secondary-subtle text-secondary border me-1">ผู้ช่วย AI</span>{% elif m.sender == 'staff' %}<span class="badge bg-primary-subtle text-primary border me-1">บุคลากร</span>{% endif %}
                             {{ m.at_display|date:"d/m/Y H:i" }}
                         </div>
                         {% if m.kind == 'text' %}

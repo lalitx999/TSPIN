@@ -14,6 +14,7 @@ from django.utils import timezone
 from accounts.decorators import clinical_staff_required
 from accounts.models import AuditLog
 from accounts.views import get_client_ip
+from clinical import services_intake
 from clinical.models import Box
 from clinical.views_intake import INTAKE_SOURCES
 from patients.line_links import pending_link_requests
@@ -46,9 +47,10 @@ def doctor_dashboard(request):
 
 
 def _line_cases_context() -> dict:
-    """เคสที่รอตรวจ รวมเคสฉุกเฉินที่คนไข้ยังไม่ได้กดเสร็จแล้ว ไม่งั้นหมอจะไม่เห็นจนกว่าคนไข้จะปิดรอบเอง"""
+    """รอบแชทที่มีเรื่องอาการและจบแล้ว รวมเคสฉุกเฉินที่ยังคุยอยู่ ไม่งั้นหมอจะไม่เห็นจนกว่าบอทจะปิด"""
+    services_intake.close_idle_line_sessions()
     pending = Box.objects.filter(
-        Q(status=Box.Status.DONE) | Q(status=Box.Status.DRAFT, contents__red_flag=True),
+        (Q(status=Box.Status.DONE) & services_intake.needs_doctor_q()) | Q(status=Box.Status.DRAFT, contents__red_flag=True),
         source__in=INTAKE_SOURCES, patient__isnull=False,
     )
     cases = (

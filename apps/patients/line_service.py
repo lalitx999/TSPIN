@@ -5,6 +5,7 @@ and Secure Message Delivery Pipeline.
 """
 
 import hmac
+import re
 import hashlib
 import base64
 import json
@@ -18,14 +19,33 @@ from django.core import signing
 
 logger = logging.getLogger(__name__)
 
-BOT_ON_WORD = 'เปิดใช้งานบอท'
-BOT_OFF_WORDS = ('ปิดบอท', 'ปิดใช้งานบอท')
+BOT_ON_WORD = 'เปิดบอท'
+BOT_OFF_WORD = 'ปิดบอท'
+# พิมพ์แบบไหนก็เปิดหรือปิดได้ แต่ต้องเป็นคำสั่งทั้งข้อความ ประโยคที่แค่มีคำนี้อยู่ (เช่น "เปิดบอทยังไง") ไม่นับ
+BOT_ON_WORDS = frozenset({'เปิดบอท', 'เปิดใช้งานบอท', 'เปิดใช้บอท', 'เปิดการใช้งานบอท', 'คุยกับai', 'คุยกับเอไอ',
+                          'คุยกับบอท', 'เปิดai'})
+BOT_OFF_WORDS = frozenset({'ปิดบอท', 'ปิดใช้งานบอท', 'ปิดใช้บอท', 'ปิดการใช้งานบอท', 'ปิดai', 'หยุดบอท'})
+_POLITE_ENDING = re.compile(r'(?:นะ)?(?:ครับผม|ครับ|คับ|ค่ะ|คะ|ค่า|จ้า|จ้ะ)$')
 LINE_REGISTER_SALT = 'patients.line_register'
 LINE_REGISTER_MAX_AGE_SECONDS = 24 * 60 * 60
 
 
+def _command_form(text: str) -> str:
+    """ตัดช่องว่าง ตัวพิมพ์ และคำลงท้ายสุภาพ เพื่อเทียบกับคำสั่ง"""
+    return _POLITE_ENDING.sub('', ''.join((text or '').split()).lower().rstrip('!.'))
+
+
 def is_bot_on_word(text: str) -> bool:
-    return text.replace(' ', '') == BOT_ON_WORD
+    return _command_form(text) in BOT_ON_WORDS
+
+
+def is_bot_off_word(text: str) -> bool:
+    return _command_form(text) in BOT_OFF_WORDS
+
+
+def text_message(text: str) -> Dict[str, Any]:
+    """ข้อความแชทธรรมดา (LINE จำกัด 5,000 ตัวอักษร)"""
+    return {"type": "text", "text": text[:5000]}
 
 
 def make_line_register_token(line_user_id: str) -> str:

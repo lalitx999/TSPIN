@@ -868,13 +868,44 @@ class AIServiceAuthTests(TestCase):
                                     headers={'X-Internal-Token': ai_config.INTERNAL_API_TOKEN})
         self.assertEqual(resp.status_code, 404)
 
-    def test_intake_followup_offline_returns_no_question(self):
+    def test_line_chat_needs_token_and_offline_returns_no_answer(self):
         from ai_service.config import config as ai_config
         headers = {'X-Internal-Token': ai_config.INTERNAL_API_TOKEN}
-        self.assertEqual(self.api_client.post('/api/ai/intake/followup', json={'transcript': 'x'}).status_code, 401)
-        resp = self.api_client.post('/api/ai/intake/followup', json={'transcript': 'ผู้ป่วย: ปวดหัว'}, headers=headers)
+        body = {'messages': [{'role': 'user', 'content': 'ปวดหัว'}]}
+        self.assertEqual(self.api_client.post('/api/ai/line/chat', json=body).status_code, 401)
+        resp = self.api_client.post('/api/ai/line/chat', json=body, headers=headers)
         self.assertEqual(resp.status_code, 200)
-        self.assertFalse(resp.json()['success'])  # ไม่มีคีย์ในเทสต์ -> ไม่มีคำถาม ไม่ใช้แม่แบบแทน
+        self.assertEqual(resp.json()['answer'], '')  # ไม่มีคีย์ในเทสต์ -> ไม่มีคำตอบ ไม่ใช้แม่แบบแทน
+
+    def _line_chat(self, llm_answer, text='ปวดหัวมา 2 วัน'):
+        from unittest.mock import AsyncMock, patch
+        from ai_service import main as ai_main
+        from ai_service.config import config as ai_config
+        result = {'success': True, 'content': llm_answer, 'provider': 'groq', 'model': 'm', 'usage': {}}
+        with patch.object(ai_main.gateway, 'call_chat', new=AsyncMock(return_value=result)) as llm:
+            resp = self.api_client.post('/api/ai/line/chat', json={'messages': [{'role': 'user', 'content': text}]},
+                                        headers={'X-Internal-Token': ai_config.INTERNAL_API_TOKEN})
+        return resp.json(), llm
+
+    def test_line_chat_prompt_forbids_diagnosis_drugs_and_product_picks(self):
+        data, llm = self._line_chat('**เป็นมา** นานแค่ไหนแล้วครับ')
+        self.assertEqual(data['answer'], 'เป็นมา นานแค่ไหนแล้วครับ')  # ตัด markdown ที่ LINE แสดงไม่ได้
+        system = llm.call_args.kwargs['messages'][0]['content']
+        for rule in ('ถามทีละ 1 คำถาม', 'ห้ามเด็ดขาด', 'บอกหรือเดาว่าผู้ป่วยเป็นโรคอะไร', 'ขนาดยา', 'ผลิตภัณฑ์', 'การบ้าน'):
+            self.assertIn(rule, system)
+
+    def test_line_chat_replaces_dosage_or_diagnosis_with_safe_reply(self):
+        data, _ = self._line_chat('กินพาราเซตามอล 500 มก. ทุก 6 ชั่วโมงครับ')
+        self.assertEqual(data['blocked'], 'dosage')
+        self.assertNotIn('500', data['answer'])
+        data, _ = self._line_chat('จากอาการ คุณเป็นโรคไมเกรนครับ')
+        self.assertEqual(data['blocked'], 'diagnosis')
+        self.assertNotIn('ไมเกรน', data['answer'])
+
+    def test_line_chat_emergency_skips_llm(self):
+        data, llm = self._line_chat('ตอบ', text='แน่นหน้าอก หายใจลำบาก')
+        self.assertEqual(data['kind'], 'emergency')
+        llm.assert_not_called()
 
     def test_copilot_never_falls_back_to_default_products(self):
         from unittest.mock import patch

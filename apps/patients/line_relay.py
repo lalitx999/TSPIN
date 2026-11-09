@@ -13,8 +13,8 @@ import threading
 import httpx
 from django.conf import settings
 
-from patients.line_service import BOT_OFF_WORDS, LineFlexMessageBuilder, is_bot_on_word
-from patients.models_line import LineUser
+from patients.line_service import LineFlexMessageBuilder, is_bot_off_word, is_bot_on_word
+from patients.models_line import LineUser, bot_idle_cutoff
 from patients.views_line_internal import detect_clinical_intent
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,9 @@ RELAY_ATTEMPTS = 2
 def events_for_old_system(events: list) -> list:
     """เลือก event ที่ระบบเก่าควรได้ ไล่ตามลำดับ เพราะคนเดียวอาจเปิดหรือปิดบอทกลาง batch"""
     user_ids = {(e.get('source') or {}).get('userId') for e in events}
-    enabled = set(LineUser.objects.filter(line_user_id__in=user_ids, bot_enabled=True)
+    # กฎเดียวกับ LineUser.is_bot_on: เงียบเกินเวลาแล้วนับว่าปิด ข้อความนี้จึงไปถึงระบบเก่า
+    enabled = set(LineUser.objects.filter(line_user_id__in=user_ids, bot_enabled=True,
+                                          bot_last_active_at__gte=bot_idle_cutoff())
                   .values_list('line_user_id', flat=True))
 
     forwarded = []
@@ -44,7 +46,7 @@ def events_for_old_system(events: list) -> list:
             # บอทเราตอบเตือนฉุกเฉินแม้บอทปิด reply token ใช้ได้ครั้งเดียว จึงไม่ส่งข้อความนี้ต่อ
             if not detect_clinical_intent(text)[1]:
                 forwarded.append(event)
-        elif (text in BOT_OFF_WORDS
+        elif (is_bot_off_word(text)
               or (event.get('postback') or {}).get('data') == LineFlexMessageBuilder.BOT_OFF_POSTBACK):
             enabled.discard(user_id)
     return forwarded

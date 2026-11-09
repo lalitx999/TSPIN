@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from accounts.models import AuditLog
 from accounts.views import get_client_ip
-from patients.line_service import LineFlexMessageBuilder, LineMessagingService
+from patients.line_service import LineMessagingService, text_message
 from patients.models_line import ClinicalReviewItem, LinePatientBinding
 
 LINK_REQUEST_PREFIX = 'staff_req_'
@@ -72,13 +72,10 @@ def approve_link_request(item: ClinicalReviewItem, reviewer, request) -> None:
             existing.save(update_fields=['line_user_id', 'updated_at'])
         _finish(item, ClinicalReviewItem.StatusChoices.APPROVED, reviewer, request, 'LINE_BINDING_SUCCESS', changes)
 
-    if line_user.bot_enabled:
-        LineMessagingService.push_message(line_user.line_user_id, [LineFlexMessageBuilder.build_bot_card(
-            'เชื่อมประวัติเดิมเรียบร้อย',
-            f'เจ้าหน้าที่เชื่อม LINE นี้กับประวัติของคุณ{existing.first_name}แล้ว ดูใบนัดและผลตรวจเดิมได้เลยครับ',
-            buttons=[LineFlexMessageBuilder.button_postback('ดูใบนัด', 'action=check_appointment'),
-                     LineFlexMessageBuilder.button_postback('ดูผลตรวจ', 'action=check_report')],
-        )])
+    if line_user.is_bot_on():
+        LineMessagingService.push_message(line_user.line_user_id, [text_message(
+            f'เจ้าหน้าที่เชื่อม LINE นี้กับประวัติเดิมของคุณ{existing.first_name}แล้วครับ '
+            f'พิมพ์ถามเรื่องใบนัดหรือผลตรวจได้เลย')])
 
 
 def reject_link_request(item: ClinicalReviewItem, reviewer, request) -> None:

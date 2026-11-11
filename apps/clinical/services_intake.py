@@ -37,6 +37,40 @@ def line_idle_limit() -> timedelta:
     return timedelta(minutes=settings.LINE_BOT_IDLE_MINUTES)
 
 
+def build_anonymous_patient_context(patient) -> Dict[str, Any]:
+    """
+    สรุปบริบททางคลินิกแบบไม่ระบุตัวตน (Zero-PII) สำหรับให้ AI ช่วยสนทนาได้ตรงจุด
+    ไม่ใส่ชื่อ นามสกุล HN เบอร์โทร หรือเลขบัตร
+    """
+    if not patient:
+        return {}
+    from patients.models import Appointment
+    ctx: Dict[str, Any] = {}
+    gender_map = {'M': 'ชาย', 'F': 'หญิง'}
+    if getattr(patient, 'gender', None) in gender_map:
+        ctx['gender'] = gender_map[patient.gender]
+    if getattr(patient, 'age', None) is not None:
+        ctx['age'] = patient.age
+    for field, key in (('allergies', 'allergies'), ('medical_history', 'medical_history'),
+                       ('current_medications', 'current_medications')):
+        val = str(getattr(patient, field, '') or '').strip()
+        if val:
+            ctx[key] = TextDeidentifier.sanitize(val)['sanitized_text'][:400]
+    appt = (
+        Appointment.objects.filter(
+            patient=patient,
+            status__in=['scheduled', 'confirmed'],
+            appointment_date__gte=timezone.localdate(),
+        )
+        .order_by('appointment_date', 'appointment_time')
+        .first()
+    )
+    if appt:
+        t_str = appt.appointment_time.strftime('%H:%M') if appt.appointment_time else ''
+        ctx['upcoming_appointment'] = f"{appt.appointment_date:%d/%m/%Y} {t_str}".strip()
+    return ctx
+
+
 def open_session(patient, source: str) -> Box:
     """คืนกล่องที่ยังคุยอยู่ของผู้ป่วยในช่องทางนี้ หรือเปิดกล่องใหม่ (LINE ใช้เวลาเงียบเดียวกับที่บอทปิดเอง)"""
     idle_limit = line_idle_limit() if source == Box.Source.LINE else SESSION_IDLE_LIMIT

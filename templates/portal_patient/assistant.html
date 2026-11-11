@@ -28,7 +28,7 @@
 
         <div class="ai-nav-group">
             <button type="button" class="ai-nav-btn" :class="{ 'active': !current }" @click="startFresh()">
-                <i class="fas fa-pen-to-square"></i>
+                <i class="fas fa-edit"></i>
                 <span>แชทใหม่</span>
             </button>
             <a href="{% url 'portal_patient:dashboard' %}" class="ai-nav-btn">
@@ -127,7 +127,7 @@
                     </div>
                 </template>
                 <button type="button" class="ai-circle-btn" @click="startFresh()" title="แชทใหม่" aria-label="แชทใหม่">
-                    <i class="fas fa-pen-to-square"></i>
+                    <i class="fas fa-edit"></i>
                 </button>
                 <a href="{% url 'portal_patient:dashboard' %}" class="ai-user-avatar" title="กลับแดชบอร์ดคนไข้">
                     {{ patient_display_name|slice:":1"|upper }}

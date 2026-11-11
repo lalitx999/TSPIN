@@ -1118,15 +1118,53 @@ ASSISTANT_EMERGENCY = (
 ASSISTANT_EMERGENCY_KEYWORDS = ('แน่นหน้าอก', 'เจ็บหน้าอก', 'หายใจไม่ออก', 'หายใจลำบาก', 'หมดสติ', 'ปากเบี้ยว',
                                 'แขนขาอ่อนแรง', 'ชัก', 'ไอเป็นเลือด', 'อาเจียนเป็นเลือด', 'ฆ่าตัวตาย', 'แพ้ยารุนแรง')
 ASSISTANT_SYSTEM_PROMPT = (
-    "คุณคือผู้ช่วยให้ข้อมูลสุขภาพของคลินิก TSPI ตอบเป็นภาษาไทย สุภาพ เข้าใจง่ายสำหรับผู้สูงอายุ ไม่เกิน 8 ประโยค\n"
+    "คุณคือผู้ช่วยให้ข้อมูลสุขภาพของคลินิก TSPI ตอบเป็นภาษาไทย สุภาพ อบอุ่น เข้าใจง่าย ไม่เกิน 8 ประโยค\n"
     "กฎที่ห้ามละเมิด:\n"
-    "1. ถ้าคำถามไม่เกี่ยวกับ " + ASSISTANT_SCOPE_TEXT + " ให้ตอบคำเดียวว่า " + ASSISTANT_OUT_OF_SCOPE_TOKEN + "\n"
+    "1. ถ้าคำถามเป็นงานที่ไม่เกี่ยวกับ " + ASSISTANT_SCOPE_TEXT + " เช่น เขียนโค้ด ทำการบ้าน แปลเอกสาร คณิตศาสตร์ "
+    "ให้ตอบคำเดียวว่า " + ASSISTANT_OUT_OF_SCOPE_TOKEN + "\n"
+    "   (ข้อยกเว้น: คำทักทาย คำขอบคุณ เช่น \"ขอบคุณ\", \"โอเค\", \"เข้าใจแล้ว\" หรือคำบอกว่าเล่าอาการครบแล้ว "
+    "ให้ตอบรับอย่างสุภาพใน 1-2 ประโยคและแนะนำให้กดปุ่มส่งให้แพทย์ถ้าต้องการ ห้ามตอบ OUT_OF_SCOPE)\n"
     "2. ตอบจาก <ความรู้> ของคลินิกก่อนเสมอ และอ้างอิงด้วยหมายเลข เช่น [1] ทุกประโยคที่มาจากความรู้นั้น\n"
     "3. ถ้าความรู้ของคลินิกไม่พอหรือไม่มี ให้เสริมด้วยความรู้ทางการแพทย์ทั่วไปที่เป็นที่ยอมรับ โดยขึ้นบรรทัดใหม่ว่า \""
     + ASSISTANT_GENERAL_HEADING + "\" แล้วจึงเขียน ห้ามใส่หมายเลขอ้างอิงในส่วนนี้ และห้ามอ้างว่าเป็นข้อมูลของคลินิก\n"
     "4. ห้ามวินิจฉัยโรค ห้ามแนะนำยา ขนาดยา หรือบอกว่าผู้ใช้ควรใช้ผลิตภัณฑ์ใด การรักษาและการเลือกผลิตภัณฑ์ต้องผ่านแพทย์\n"
-    "5. ถ้าผู้ใช้เล่าอาการ ให้ถามข้อมูลเพิ่มที่แพทย์ต้องใช้ 1 คำถาม (ระยะเวลา ความรุนแรง อาการร่วม) และแนะนำให้ปรึกษาแพทย์ของคลินิก"
+    "5. ถ้าผู้ใช้ถามความรู้ทั่วไป ให้ตอบให้ครบถ้วนโดยไม่ต้องซักประวัติ แต่ถ้าผู้ใช้เล่าอาการ ให้ดู <ข้อมูลแฟ้มผู้ป่วย> "
+    "เพื่อไม่ถามซ้ำสิ่งที่บันทึกไว้แล้ว ถามข้อมูลเพิ่มที่ยังขาด 1 คำถาม และแนะนำให้ส่งข้อมูลให้แพทย์ของคลินิกตรวจ"
 )
+
+
+def _format_patient_context_block(ctx: Optional[Dict[str, Any]]) -> str:
+    """แปลงบริบทผู้ป่วยไร้ตัวตนเป็นข้อความสั้น ๆ ใน prompt (ลบ PII ซ้ำอีกครั้ง)"""
+    if not isinstance(ctx, dict) or not ctx:
+        return ""
+    lines = []
+    if ctx.get("gender") or ctx.get("age") is not None:
+        lines.append(f"- เพศ/อายุ: {ctx.get('gender', 'ไม่ระบุ')} อายุ {ctx.get('age', 'ไม่ระบุ')} ปี")
+    if ctx.get("allergies"):
+        lines.append(f"- ประวัติแพ้ยา/อาหารที่บันทึกไว้: {TextDeidentifier.sanitize(str(ctx['allergies']))['sanitized_text'][:300]}")
+    if ctx.get("medical_history"):
+        lines.append(f"- โรคประจำตัวที่บันทึกไว้: {TextDeidentifier.sanitize(str(ctx['medical_history']))['sanitized_text'][:300]}")
+    if ctx.get("current_medications"):
+        lines.append(f"- ยา/อาหารเสริมที่บันทึกไว้: {TextDeidentifier.sanitize(str(ctx['current_medications']))['sanitized_text'][:300]}")
+    if ctx.get("upcoming_appointment"):
+        lines.append(f"- นัดหมายครั้งถัดไป: {str(ctx['upcoming_appointment'])[:60]}")
+    if not lines:
+        return ""
+    return "<ข้อมูลแฟ้มผู้ป่วย>\n" + "\n".join(lines) + "\n</ข้อมูลแฟ้มผู้ป่วย>\n\n"
+
+
+def _patient_friendly_sources(context: List[Dict[str, str]]) -> List[str]:
+    """ซ่อนชื่อ chunk เทคนิค (เช่น 'คลังความรู้ TSPI ส่วนที่ 92') ไม่ให้คนไข้สับสน"""
+    out: List[str] = []
+    for c in context:
+        title = str(c.get("title") or "").strip()
+        if not title:
+            continue
+        if title.startswith("คลังความรู้ TSPI ส่วนที่"):
+            title = "คลังความรู้สุขภาพ TSPI Clinic"
+        if title not in out:
+            out.append(title)
+    return out
 
 
 def _assistant_keywords(text: str) -> List[str]:
@@ -1182,6 +1220,7 @@ class AssistantMessage(BaseModel):
 class AssistantChatRequest(BaseModel):
     messages: List[AssistantMessage] = Field(..., description="บทสนทนาล่าสุด (ข้อความสุดท้ายคือคำถามของผู้ใช้)")
     images_base64: Optional[List[AssistantImageItem]] = Field(default=None, description="ภาพประกอบที่ผู้ป่วยแนบมา (สูงสุด 3 ภาพ)")
+    patient_context: Optional[Dict[str, Any]] = Field(default=None, description="บริบทผู้ป่วยแบบไม่ระบุตัวตน")
 
 
 @app.post("/api/ai/assistant/chat")
@@ -1215,6 +1254,7 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
     context = retrieve_tspi_knowledge(question)
     knowledge = "\n\n".join(f"[{i + 1}] {c['title']}\n{c['text']}" for i, c in enumerate(context)) \
         or "(ไม่พบเอกสารของคลินิกที่ตรงกับคำถามนี้)"
+    patient_block = _format_patient_context_block(req.patient_context)
     system_prompt = ASSISTANT_SYSTEM_PROMPT
     if sent_images:
         system_prompt += (
@@ -1225,7 +1265,7 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
         {"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]}
         for m in history[:-1]
     ]
-    conv_messages.append({"role": "user", "content": f"<ความรู้>\n{knowledge}\n</ความรู้>\n\nคำถาม: {question}"})
+    conv_messages.append({"role": "user", "content": f"{patient_block}<ความรู้>\n{knowledge}\n</ความรู้>\n\nคำถาม: {question}"})
 
     if sent_images:
         res = await gateway.call_gemini_chat(system_prompt, conv_messages, images=sent_images, temperature=0.2, max_tokens=1500)
@@ -1233,7 +1273,7 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
         res = await gateway.call_chat(config.SOAP_PROVIDER, messages=[{"role": "system", "content": system_prompt}, *conv_messages], temperature=0.2, max_tokens=1500)
     meta = {"provider": res.get("provider", config.SOAP_PROVIDER), "model": res.get("model", ""), "usage": res.get("usage", {})}
     answer = (res.get("content") or "").strip() if res.get("success") else ""
-    sources = [c['title'] for c in context]
+    sources = _patient_friendly_sources(context)
     if not answer:
         return {"answer": "ขออภัยค่ะ ระบบผู้ช่วยไม่พร้อมใช้งานชั่วคราว กรุณาลองใหม่ภายหลัง หรือทักเจ้าหน้าที่ทาง LINE",
                 "kind": "unavailable", "sources": sources, **meta}
@@ -1249,25 +1289,32 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
 # ทีมแพทย์อ่านบทสนทนานี้ใน EMR แล้วดึงเข้าเวชระเบียนเอง
 # ==============================================================================
 LINE_CHAT_HISTORY_LIMIT = 20
+LINE_INTAKE_COMPLETE_TOKEN = "[INTAKE_COMPLETE]"
 LINE_CHAT_SYSTEM_PROMPT = (
     "คุณคือผู้ช่วย AI ของคลินิก TSPI ที่คุยกับผู้ป่วยทางแชท LINE ตอบเป็นภาษาไทย สุภาพ อบอุ่น เป็นกันเอง "
-    "เข้าใจง่าย อธิบายละเอียดพอดีและเป็นธรรมชาติเหมือนคุยในหน้าเว็บ (ประมาณ 4-9 ประโยค) ใช้คำลงท้ายว่า \"ครับ\"\n"
-    "หน้าที่ของคุณ:\n"
-    "1. ซักประวัติเมื่อผู้ป่วยเล่าอาการ ถามทีละ 1 คำถามเท่านั้น เลือกเรื่องที่ยังไม่รู้ตามลำดับนี้: "
-    "เริ่มเป็นเมื่อไรหรือเป็นมานานแค่ไหน, รุนแรงแค่ไหน (ให้คะแนน 0-10 ได้), มีอาการอื่นร่วมไหม, "
-    "ใช้ยาหรืออาหารเสริมอะไรอยู่, มีโรคประจำตัวไหม, แพ้ยาอะไรไหม ห้ามถามซ้ำเรื่องที่ผู้ป่วยตอบแล้ว "
-    "เมื่อถามครบแล้วให้สรุปสั้น ๆ ว่าได้ข้อมูลอะไรบ้าง และบอกว่าทีมแพทย์ของคลินิกจะอ่านข้อมูลนี้\n"
-    "2. ตอบจาก <ความรู้> ของคลินิกก่อนเสมอ (เรื่องนัดหมาย บริการ การประเมิน 39 แกน) ถ้าไม่มีใน <ความรู้> "
-    "แต่เป็นคำถามสุขภาพทั่วไป ให้ขึ้นบรรทัดใหม่ว่า \"" + ASSISTANT_GENERAL_HEADING + "\" แล้วให้คำแนะนำทั่วไปในการดูแลตัวเอง "
-    "เช่น การพักผ่อน อาหาร การดื่มน้ำ การออกกำลังกาย และบอกอาการที่ควรรีบไปพบแพทย์ ห้ามอ้างว่าเป็นข้อมูลของคลินิก\n"
-    "3. หากมีรูปภาพแนบมา ให้อธิบายสิ่งที่สังเกตเห็นเบื้องต้นอย่างระมัดระวังและซักถามอาการประกอบ ห้ามวินิจฉัยโรคจากภาพ\n"
+    "เข้าใจง่าย ปรับระดับภาษาให้เหมาะกับ <ข้อมูลแฟ้มผู้ป่วย> และใช้คำลงท้ายว่า \"ครับ\"\n"
+    "แยกจังหวะการคุยให้ฉลาด (ดูประวัติแชท + <ข้อมูลแฟ้มผู้ป่วย> ก่อนตอบทุกครั้ง):\n"
+    "1. ถ้าผู้ป่วยถามความรู้สุขภาพหรือบริการคลินิก (ไม่ได้เล่าอาการ): ตอบจาก <ความรู้> ของคลินิกก่อนเสมอ "
+    "ถ้าไม่มีใน <ความรู้> ให้ขึ้นบรรทัดใหม่ว่า \"" + ASSISTANT_GENERAL_HEADING + "\" แล้วให้คำแนะนำทั่วไปที่ปลอดภัย "
+    "ไม่ต้องซักประวัติ 6 ข้อ\n"
+    "2. ถ้าผู้ป่วยเล่าอาการ: ตรวจสอบกับประวัติแชทและ <ข้อมูลแฟ้มผู้ป่วย> ก่อนเพื่อไม่ถามซ้ำสิ่งที่รู้แล้ว "
+    "ถามทีละ 1 คำถามเท่านั้น เฉพาะเรื่องที่ยังขาดจากรายการนี้: "
+    "เริ่มเป็นเมื่อไรหรือเป็นมานานแค่ไหน, รุนแรงแค่ไหน (0-10), มีอาการอื่นร่วมไหม, "
+    "ใช้ยาหรืออาหารเสริมอะไรอยู่, มีโรคประจำตัวไหม, แพ้ยาอะไรไหม "
+    "(ถ้าในแฟ้มมีประวัติแพ้ยา/โรคประจำตัว/ยาเดิมอยู่แล้ว ให้ทวนสั้น ๆ หรือถามเฉพาะว่ามีเพิ่มเติมไหม)\n"
+    "3. จบการสนทนาให้เป็น: เมื่อได้ข้อมูลครบแล้ว หรือผู้ป่วยส่งสัญญาณว่าครบแล้ว/ขอบคุณ (เช่น \"ประมาณนี้\", \"ครบแล้ว\", \"ขอบคุณ\"): "
+    "ให้ขึ้นบรรทัดแรกด้วยคำว่า " + LINE_INTAKE_COMPLETE_TOKEN + " แล้วเขียน:\n"
+    "   - สรุปอาการและประวัติที่ได้รับเป็นข้อย่อย (ระบุเฉพาะชื่อยาที่ผู้ป่วยแจ้ง ห้ามใส่ตัวเลขขนาดยา)\n"
+    "   - คำแนะนำดูแลตัวเองเบื้องต้น (พักผ่อน ดื่มน้ำ อาหาร) และอาการเตือนที่ควรรีบพบแพทย์\n"
+    "   - บอกว่าทีมแพทย์พร้อมเปิดอ่านสรุปนี้แล้ว และห้ามถามคำถามซักประวัติต่อ\n"
+    "4. ถ้ามีรูปภาพแนบมา ให้อธิบายสิ่งที่สังเกตเห็นเบื้องต้นอย่างระมัดระวังและซักถามอาการประกอบ ห้ามวินิจฉัยโรคจากภาพ\n"
     "ห้ามเด็ดขาด:\n"
     "- บอกหรือเดาว่าผู้ป่วยเป็นโรคอะไร ถ้าถูกถาม ให้ตอบว่าผู้ช่วยบอกไม่ได้ แพทย์จะเป็นผู้ประเมิน\n"
-    "- แนะนำยา ชื่อยา ขนาดยา หรือให้หยุดหรือปรับยาที่แพทย์สั่ง\n"
+    "- แนะนำยา ชื่อยา ขนาดยา หรือให้หยุดหรือปรับยาที่แพทย์สั่ง (เวลาทวนยาที่ผู้ป่วยกินอยู่ ห้ามใส่ขนาดยาเช่น 10 mg หรือ 500 มก.)\n"
     "- เลือกหรือแนะนำผลิตภัณฑ์ชิ้นใดให้ บอกได้แค่ว่าคลินิกมีผลิตภัณฑ์ การเลือกต้องผ่านแพทย์ "
     "หรือพิมพ์ \"ปิดบอท\" เพื่อคุยกับเจ้าหน้าที่\n"
     "- แปลผลแล็บออกมาเป็นการวินิจฉัย\n"
-    "คุยเรื่องอื่น: ทักทายหรือคุยเล่นสั้น ๆ ได้ แล้วชวนกลับมาเรื่องสุขภาพ ถ้าขอให้ทำงานที่ไม่เกี่ยวกับสุขภาพหรือคลินิก "
+    "คุยเรื่องอื่น: ทักทายหรือขอบคุณตอบรับสั้น ๆ อย่างสุภาพ แล้วถามว่ามีเรื่องสุขภาพให้ช่วยไหม ถ้าขอให้ทำงานที่ไม่เกี่ยวกับสุขภาพหรือคลินิก "
     "เช่น การบ้าน เขียนโค้ด แปลเอกสาร ให้ปฏิเสธอย่างสุภาพใน 1 ประโยค\n"
     "รูปแบบ: จัดย่อหน้าหรือข้อย่อยด้วย \"-\" ให้อ่านง่ายบนมือถือ ไม่ใช้ markdown (ห้ามใช้ ** # หรือตาราง) ไม่ใส่หมายเลขอ้างอิง [1]"
 )
@@ -1291,10 +1338,18 @@ LINE_CHAT_DIAGNOSIS_REPLY = (
 )
 
 
-def line_chat_safety(answer: str) -> Dict[str, Any]:
-    """ตรวจคำตอบก่อนส่งถึงผู้ป่วย: หลุดขนาดยาหรือวินิจฉัยใช้ข้อความปลอดภัยแทนทั้งคำตอบ และตัด markdown ที่ LINE แสดงไม่ได้"""
-    if _DOSAGE_PATTERN.search(answer):
-        return {"text": LINE_CHAT_MEDICATION_REPLY, "blocked": "dosage"}
+def line_chat_safety(answer: str, patient_texts: Optional[List[str]] = None) -> Dict[str, Any]:
+    """
+    ตรวจคำตอบก่อนส่งถึงผู้ป่วย:
+    - หลุดขนาดยาที่ AI เสนอเอง -> ใช้ข้อความปลอดภัยแทนทั้งคำตอบ
+    - ยกเว้นขนาดยาที่ผู้ป่วยเป็นคนพิมพ์เล่ามาเองในแชท (เพื่อไม่ให้บล็อกตัวเองตอน AI สรุปยาเดิม)
+    - หลุดคำวินิจฉัย -> ใช้ข้อความปลอดภัยแทนทั้งคำตอบ และตัด markdown ที่ LINE แสดงไม่ได้
+    """
+    patient_blob = " ".join(patient_texts or []).lower()
+    patient_dosages = {m.group(0).strip().lower() for m in _DOSAGE_PATTERN.finditer(patient_blob)}
+    for m in _DOSAGE_PATTERN.finditer(answer):
+        if m.group(0).strip().lower() not in patient_dosages:
+            return {"text": LINE_CHAT_MEDICATION_REPLY, "blocked": "dosage"}
     if ClinicalGuardrail.check_forbidden_assertions(answer)[0]:
         return {"text": LINE_CHAT_DIAGNOSIS_REPLY, "blocked": "diagnosis"}
     return {"text": _MARKDOWN_NOISE.sub("", answer).strip(), "blocked": ""}
@@ -1303,6 +1358,7 @@ def line_chat_safety(answer: str) -> Dict[str, Any]:
 class LineChatRequest(BaseModel):
     messages: List[AssistantMessage] = Field(..., description="บทสนทนาใน LINE (ข้อความสุดท้ายคือของผู้ป่วย)")
     images_base64: Optional[List[AssistantImageItem]] = Field(default=None, description="ภาพที่ผู้ป่วยส่งใน LINE")
+    patient_context: Optional[Dict[str, Any]] = Field(default=None, description="บริบทผู้ป่วยแบบไม่ระบุตัวตน")
 
 
 @app.post("/api/ai/line/chat")
@@ -1315,7 +1371,7 @@ async def line_chat_endpoint(req: LineChatRequest):
     question = TextDeidentifier.sanitize(raw_q)["sanitized_text"][:2000]
 
     if any(k in question for k in ASSISTANT_EMERGENCY_KEYWORDS):
-        return {"answer": LINE_CHAT_EMERGENCY, "kind": "emergency", "sources": [], "usage": {}}
+        return {"answer": LINE_CHAT_EMERGENCY, "kind": "emergency", "is_summary": False, "sources": [], "usage": {}}
 
     sent_images: List[Dict[str, Any]] = []
     for item in (req.images_base64 or [])[:3]:
@@ -1330,11 +1386,12 @@ async def line_chat_endpoint(req: LineChatRequest):
 
     context = retrieve_tspi_knowledge(question)
     knowledge = "\n\n".join(f"{c['title']}\n{c['text']}" for c in context) or "(ไม่มีข้อมูลคลินิกที่เกี่ยวกับข้อความนี้)"
+    patient_block = _format_patient_context_block(req.patient_context)
     conv_messages = [
         {"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]}
         for m in history[:-1]
     ]
-    conv_messages.append({"role": "user", "content": f"<ความรู้>\n{knowledge}\n</ความรู้>\n\nผู้ป่วย: {question}"})
+    conv_messages.append({"role": "user", "content": f"{patient_block}<ความรู้>\n{knowledge}\n</ความรู้>\n\nผู้ป่วย: {question}"})
 
     if sent_images:
         res = await gateway.call_gemini_chat(LINE_CHAT_SYSTEM_PROMPT, conv_messages, images=sent_images, temperature=0.3, max_tokens=1200)
@@ -1343,11 +1400,23 @@ async def line_chat_endpoint(req: LineChatRequest):
     meta = {"provider": res.get("provider", config.SOAP_PROVIDER), "model": res.get("model", ""), "usage": res.get("usage", {})}
     answer = (res.get("content") or "").strip() if res.get("success") else ""
     if not answer:
-        return {"answer": "", "kind": "unavailable", "sources": [], **meta}
-    checked = line_chat_safety(answer)
-    sources = [c['title'] for c in context]
-    return {"answer": checked["text"], "kind": "answer" if sources else "general", "blocked": checked["blocked"],
-            "sources": sources, **meta}
+        return {"answer": "", "kind": "unavailable", "is_summary": False, "sources": [], **meta}
+
+    is_summary = LINE_INTAKE_COMPLETE_TOKEN in answer
+    clean_answer = answer.replace(LINE_INTAKE_COMPLETE_TOKEN, "").strip()
+    patient_texts = [m.content for m in history if m.role == 'user']
+    checked = line_chat_safety(clean_answer, patient_texts=patient_texts)
+    if checked["blocked"]:
+        is_summary = False
+    sources = _patient_friendly_sources(context)
+    return {
+        "answer": checked["text"],
+        "kind": "summary" if is_summary else ("answer" if sources else "general"),
+        "is_summary": is_summary,
+        "blocked": checked["blocked"],
+        "sources": sources,
+        **meta,
+    }
 
 
 class ComposeThreeReportsRequest(BaseModel):

@@ -267,7 +267,10 @@ def assistant_send_api(request: HttpRequest, thread_id: int) -> JsonResponse:
     data = {}
     if allowed:
         history = [{'role': m.role, 'content': m.content} for m in thread.messages.all()][-8:]
+        patient_ctx = services_intake.build_anonymous_patient_context(get_current_patient(request.user))
         payload = {'messages': history}
+        if patient_ctx:
+            payload['patient_context'] = patient_ctx
         if images_b64:
             payload['images_base64'] = images_b64
         try:

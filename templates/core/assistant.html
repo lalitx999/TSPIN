@@ -30,7 +30,7 @@
 
         <div class="ai-nav-group">
             <button type="button" class="ai-nav-btn" :class="{ 'active': !currentId }" @click="newThread()">
-                <i class="fas fa-pen-to-square"></i>
+                <i class="fas fa-edit"></i>
                 <span>แชทใหม่</span>
             </button>
             <a href="{% url 'core:home' %}" class="ai-nav-btn">
@@ -106,7 +106,7 @@
 
             <div class="d-flex align-items-center gap-2">
                 <button type="button" class="ai-circle-btn" @click="newThread()" title="แชทใหม่" aria-label="แชทใหม่">
-                    <i class="fas fa-pen-to-square"></i>
+                    <i class="fas fa-edit"></i>
                 </button>
                 {% if is_patient_logged_in %}
                     <a href="{% url 'portal_patient:assistant' %}" class="ai-user-avatar" title="ไปยังแชทคนไข้เต็มรูปแบบ">

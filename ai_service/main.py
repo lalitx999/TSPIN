@@ -1270,7 +1270,7 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
     if sent_images:
         res = await gateway.call_gemini_chat(system_prompt, conv_messages, images=sent_images, temperature=0.2, max_tokens=1500)
     else:
-        res = await gateway.call_chat(config.SOAP_PROVIDER, messages=[{"role": "system", "content": system_prompt}, *conv_messages], temperature=0.2, max_tokens=1500)
+        res = await gateway.call_chat(config.CHAT_PROVIDER, messages=[{"role": "system", "content": system_prompt}, *conv_messages], temperature=0.2, max_tokens=1500)
     meta = {"provider": res.get("provider", config.SOAP_PROVIDER), "model": res.get("model", ""), "usage": res.get("usage", {})}
     answer = (res.get("content") or "").strip() if res.get("success") else ""
     sources = _patient_friendly_sources(context)
@@ -1396,7 +1396,7 @@ async def line_chat_endpoint(req: LineChatRequest):
     if sent_images:
         res = await gateway.call_gemini_chat(LINE_CHAT_SYSTEM_PROMPT, conv_messages, images=sent_images, temperature=0.3, max_tokens=1200)
     else:
-        res = await gateway.call_chat(config.SOAP_PROVIDER, messages=[{"role": "system", "content": LINE_CHAT_SYSTEM_PROMPT}, *conv_messages], temperature=0.3, max_tokens=1200)
+        res = await gateway.call_chat(config.CHAT_PROVIDER, messages=[{"role": "system", "content": LINE_CHAT_SYSTEM_PROMPT}, *conv_messages], temperature=0.3, max_tokens=1200)
     meta = {"provider": res.get("provider", config.SOAP_PROVIDER), "model": res.get("model", ""), "usage": res.get("usage", {})}
     answer = (res.get("content") or "").strip() if res.get("success") else ""
     if not answer:

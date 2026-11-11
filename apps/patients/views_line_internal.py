@@ -41,7 +41,7 @@ URGENT_KEYWORDS = [
     'หมดสติ',
     'ชักเกร็ง',
     'ปากเบี้ยว',
-    'แพ้ยา',
+    'แพ้ยารุนแรง',
     'ฉุกเฉิน',
     'ผลแล็บ',
 ]
@@ -51,6 +51,7 @@ CLINICAL_KEYWORDS = [
     'ท้องเสีย',
     'น้ำตาล',
     'พยาบาล',
+    'แพ้ยา',
     'เลือด',
     'เจ็บ',
     'ปวด',
@@ -65,7 +66,7 @@ CLINICAL_KEYWORDS = [
     'คัน',
 ]
 
-NEGATION_PREFIXES = ['ไม่', 'ไม่มี', 'ไม่เคย', 'หาย', 'ไร้', 'มิได้', 'มิ']
+NEGATION_PREFIXES = ['ไม่มีประวัติ', 'ไม่มีอาการ', 'ไม่มีการ', 'ไม่เคย', 'ปฏิเสธ', 'ไม่มี', 'ไม่', 'หาย', 'ไร้', 'มิได้', 'มิ']
 
 
 def detect_clinical_intent(text: str) -> Tuple[bool, bool, List[str]]:
@@ -102,8 +103,8 @@ def detect_clinical_intent(text: str) -> Tuple[bool, bool, List[str]]:
 
 def _is_negated(text: str, keyword: str) -> bool:
     """
-    ตรวจสอบว่าคำสำคัญถูกนำหน้าด้วยคำปฏิเสธ (Negation) ในระยะใกล้หรือไม่
-    เช่น "ไม่แน่นหน้าอก", "ไม่มีไข้", "หายปวดแล้ว"
+    ตรวจสอบว่าคำสำคัญถูกนำหน้าด้วยคำปฏิเสธ (Negation) ในประโยคเดียวกันหรือไม่
+    เช่น "ไม่แน่นหน้าอก", "ไม่มีการแพ้ยา", "ไม่มีประวัติแพ้ยา", "หายปวดแล้ว"
     """
     start_pos = 0
     while True:
@@ -111,10 +112,11 @@ def _is_negated(text: str, keyword: str) -> bool:
         if idx == -1:
             break
 
-        # ตรวจสอบบริบทข้างหน้า 1 - 6 ตัวอักษร
-        prefix_window = text[max(0, idx - 6):idx].strip()
+        # ตรวจสอบบริบทข้างหน้าในประโยคย่อยเดียวกัน (สูงสุด 18 ตัวอักษร ตัดที่เว้นวรรคหรือเครื่องหมายคั่น)
+        raw_window = text[max(0, idx - 18):idx]
+        clause = re.split(r'[\n,.;!?()]|\s+', raw_window)[-1].strip()
         for neg in NEGATION_PREFIXES:
-            if prefix_window.endswith(neg):
+            if clause.endswith(neg) or neg in clause:
                 return True
 
         start_pos = idx + len(keyword)

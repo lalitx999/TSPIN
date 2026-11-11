@@ -126,8 +126,18 @@ class ExternalAIGateway:
         max_tokens: int = 2048,
         json_mode: bool = False,
     ) -> Dict[str, Any]:
-        """เรียกผู้ให้บริการแชทตามที่ตั้งค่าไว้ (groq | openai)"""
+        """เรียกผู้ให้บริการแชทตามที่ตั้งค่าไว้ (gemini | groq | openai)"""
         fmt = {"type": "json_object"} if json_mode else None
+        if provider == "gemini":
+            sys_parts = [m.get("content", "") for m in messages if m.get("role") == "system"]
+            conv = [m for m in messages if m.get("role") != "system"]
+            res = await self.call_gemini_chat(
+                "\n\n".join(sys_parts), conv,
+                temperature=temperature, max_tokens=max_tokens,
+            )
+            if res.get("success") or not (config.is_groq_available() or config.is_openai_available()):
+                return res
+            # fallback ไป groq ถ้า gemini ขัดข้องชั่วคราว
         if provider == "openai":
             return await self.call_openai_chat(messages, max_tokens=max_tokens,
                                                response_format=fmt if config.is_openai_available() else None)

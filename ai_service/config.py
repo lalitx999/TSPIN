@@ -48,6 +48,8 @@ class BotanyConfig:
 
     # ผู้ให้บริการที่ใช้ร่าง SOAP จากรอบซักประวัติ: groq | openai (Django อ่านค่าเดียวกันเพื่อตรวจงบก่อนเรียก)
     SOAP_PROVIDER: str = os.getenv("AI_SOAP_PROVIDER", "groq").strip().lower()
+    # ผู้ให้บริการแชทผู้ป่วย (เว็บ/LINE): ค่าเริ่มต้นใช้ gemini ถ้ามีคีย์ เพราะเข้าใจบริบทภาษาไทยหลายรอบแม่นยำกว่า
+    CHAT_PROVIDER: str = (os.getenv("AI_CHAT_PROVIDER", "").strip().lower() or ("gemini" if GEMINI_API_KEY else SOAP_PROVIDER))
 
     # Zero-Retention & Privacy Compliance Headers
     ZERO_RETENTION_ENABLED: bool = os.getenv("ZERO_RETENTION_ENABLED", "True").lower() in ("true", "1", "yes")

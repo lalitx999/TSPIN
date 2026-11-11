@@ -132,17 +132,28 @@ def _over_daily_limit(line_user_id: str) -> bool:
     return False
 
 
-def _history(line_user: LineUser, text: str) -> list:
-    """บทสนทนาล่าสุดจากประวัติแชท (ข้อความนี้ถูกบันทึกแล้วตอนรับ webhook)"""
-    recent = CommunicationRecord.objects.filter(
-        line_user=line_user, message_type=CommunicationRecord.MessageTypeChoices.TEXT,
-        created_at__gte=timezone.now() - HISTORY_WINDOW,
-    ).exclude(content='').order_by('-created_at')[:HISTORY_MESSAGES]
-    history = [
-        {'role': 'user' if m.direction == CommunicationRecord.DirectionChoices.INCOMING else 'assistant',
-         'content': m.content[:1500]}
-        for m in reversed(recent)
-    ]
+def _history(line_user: LineUser, text: str, box: Optional[Box] = None) -> list:
+    """
+    บทสนทนาของรอบแชทปัจจุบัน (Box) เท่านั้น เพื่อไม่ให้ดึงแชทเก่าที่ปิดไปแล้วมาปนจน AI สับสน
+    """
+    history = []
+    if box is not None:
+        for m in ((box.contents or {}).get('messages') or [])[-HISTORY_MESSAGES:]:
+            msg_text = str(m.get('text') or '').strip()
+            if not msg_text:
+                continue
+            role = 'user' if m.get('sender') == 'patient' else 'assistant'
+            history.append({'role': role, 'content': msg_text[:1500]})
+    else:
+        recent = CommunicationRecord.objects.filter(
+            line_user=line_user, message_type=CommunicationRecord.MessageTypeChoices.TEXT,
+            created_at__gte=timezone.now() - HISTORY_WINDOW,
+        ).exclude(content='').order_by('-created_at')[:HISTORY_MESSAGES]
+        history = [
+            {'role': 'user' if m.direction == CommunicationRecord.DirectionChoices.INCOMING else 'assistant',
+             'content': m.content[:1500]}
+            for m in reversed(recent)
+        ]
     if not history or history[-1] != {'role': 'user', 'content': text[:1500]}:
         history.append({'role': 'user', 'content': text[:1500]})
     return history
@@ -171,7 +182,8 @@ def _ask_ai(line_user: LineUser, patient, text: str, box_id=None, images_b64=Non
     allowed, budget_msg = ai_budget.check_budget(provider)
     if not allowed:
         return text_message(budget_msg)
-    payload = {'messages': _history(line_user, text)}
+    box = Box.objects.filter(pk=box_id).first() if box_id else None
+    payload = {'messages': _history(line_user, text, box=box)}
     patient_ctx = services_intake.build_anonymous_patient_context(patient)
     if patient_ctx:
         payload['patient_context'] = patient_ctx
@@ -204,7 +216,6 @@ def _ask_ai(line_user: LineUser, patient, text: str, box_id=None, images_b64=Non
     )
     is_emergency = data.get('kind') == 'emergency'
     is_summary = bool(data.get('is_summary') or data.get('kind') == 'summary')
-    box = Box.objects.filter(pk=box_id).first() if box_id else None
     if box:
         # AI เจอคำฉุกเฉินที่ตัวกรองฝั่งเราไม่จับ: ติดธงไว้ให้รอบนี้ขึ้นบนสุดในรายการของหมอ
         services_intake.append_message(

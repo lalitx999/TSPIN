@@ -463,6 +463,19 @@ class LineAiChatTests(IntakeTestBase):
         self.assertEqual(Box.objects.get(patient=self.patient).status, Box.Status.DONE)
         self.assertIn('ส่งสรุปอาการให้ทีมแพทย์เรียบร้อยแล้ว', complete_reply.call_args.args[1][0]['text'])
 
+    def test_negated_drug_allergy_does_not_trigger_emergency_card(self):
+        post, reply = self._ask('ไม่มีครับไม่มีการแพ้ยาแล้วก็ไม่มีโรคประจำตัวด้วย', event_id='neg1')
+        post.assert_called_once()
+        self.assertNotIn('tel:1669', self._reply_text(reply))
+
+    def test_new_session_does_not_leak_previous_closed_session_history(self):
+        self._ask('ปวดท้องมาก กินยาเก่าอยู่', event_id='old1')
+        self._ask('ปิดบอท', event_id='old2')
+        _signed_post(self.client, [_text_event('U_INTAKE_1', 'new_on', 'เปิดบอท')])
+        post, _ = self._ask('เจ็บคอมา 2 วันครับ', event_id='new1')
+        sent_contents = [m['content'] for m in post.call_args.kwargs['json']['messages']]
+        self.assertEqual(sent_contents, ['เจ็บคอมา 2 วันครับ'])
+
     def test_next_question_sends_earlier_answer_as_context(self):
         self._ask('เบาหวานคืออะไร')
         post, _ = self._ask('กินข้าวได้ไหม', event_id='ai2')

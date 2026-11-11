@@ -172,6 +172,9 @@ def _ask_ai(line_user: LineUser, patient, text: str, box_id=None, images_b64=Non
     if not allowed:
         return text_message(budget_msg)
     payload = {'messages': _history(line_user, text)}
+    patient_ctx = services_intake.build_anonymous_patient_context(patient)
+    if patient_ctx:
+        payload['patient_context'] = patient_ctx
     if images_b64:
         payload['images_base64'] = images_b64
     try:
@@ -200,14 +203,19 @@ def _ask_ai(line_user: LineUser, patient, text: str, box_id=None, images_b64=Non
         message_type=CommunicationRecord.MessageTypeChoices.TEXT, content=answer,
     )
     is_emergency = data.get('kind') == 'emergency'
+    is_summary = bool(data.get('is_summary') or data.get('kind') == 'summary')
     box = Box.objects.filter(pk=box_id).first() if box_id else None
     if box:
         # AI เจอคำฉุกเฉินที่ตัวกรองฝั่งเราไม่จับ: ติดธงไว้ให้รอบนี้ขึ้นบนสุดในรายการของหมอ
-        services_intake.append_message(box, 'text', text=answer, sender='bot', red_flag=is_emergency)
+        services_intake.append_message(
+            box, 'text', text=answer, sender='bot',
+            red_flag=is_emergency, has_symptoms=is_summary,
+        )
     if is_emergency:
         return emergency_card()
     return LineFlexMessageBuilder.build_assistant_reply(
         answer,
         kind=data.get('kind', 'answer'),
         sources=data.get('sources', []),
+        is_summary=is_summary,
     )

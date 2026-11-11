@@ -126,7 +126,24 @@ class AssistantThreadApiTests(TestCase):
             return self._post('assistant_send_api', thread_id, {'text': text})
 
     def test_page_renders(self):
-        self.assertEqual(self.client.get(reverse('portal_patient:assistant')).status_code, 200)
+        resp = self.client.get(reverse('portal_patient:assistant'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'fa-edit')
+        self.assertNotContains(resp, 'fa-pen-to-square')
+
+    def test_patient_assistant_sends_anonymous_patient_context_without_pii(self):
+        self.patient.allergies = 'แพ้กุ้ง'
+        self.patient.save(update_fields=['allergies'])
+        tid = self._post('assistant_new_thread_api').json()['thread']['id']
+        fake = MagicMock(status_code=200)
+        fake.json.return_value = {'answer': 'รับทราบค่ะ', 'kind': 'answer', 'sources': [],
+                                  'provider': 'groq', 'model': 'm', 'usage': {}}
+        with patch('portal_patient.views_assistant.httpx.post', return_value=fake) as post:
+            self._post('assistant_send_api', tid, {'text': 'ขอบคุณสำหรับข้อมูล'})
+        sent = post.call_args.kwargs['json']
+        self.assertEqual(sent['patient_context']['allergies'], 'แพ้กุ้ง')
+        self.assertNotIn('ผู้ป่วย', json.dumps(sent['patient_context'], ensure_ascii=False))
+        self.assertNotIn('HN-ASST-1', json.dumps(sent['patient_context'], ensure_ascii=False))
 
     def test_chat_flow_saves_history_and_titles_thread(self):
         tid = self._post('assistant_new_thread_api').json()['thread']['id']

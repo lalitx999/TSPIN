@@ -113,6 +113,16 @@ def _turn_bot_off(request: HttpRequest, line_user: LineUser, patient, reply_toke
                                      f'อยากคุยกับผู้ช่วย AI อีกครั้ง พิมพ์ "{BOT_ON_WORD}"'))
 
 
+def _turn_bot_complete(request: HttpRequest, line_user: LineUser, patient, reply_token: str) -> None:
+    """ผู้ป่วยกดยืนยันส่งสรุปให้ทีมแพทย์ -> ปิดรอบเข้าคิวตรวจและปิดบอทอย่างนุ่มนวล"""
+    services_intake.end_line_session(patient, reason='patient_completed')
+    _set_bot_enabled(request, line_user, False, patient, reason='completed')
+    _reply(reply_token, text_message(
+        'ส่งสรุปอาการให้ทีมแพทย์เรียบร้อยแล้วครับ ทีมแพทย์สามารถเปิดดูข้อมูลจากเวชระเบียนได้ทันที\n\n'
+        f'หากต้องการสอบถามเพิ่มเติมหรือเล่าอาการใหม่ พิมพ์ "{BOT_ON_WORD}" ได้ทุกเมื่อครับ'
+    ))
+
+
 def _expire_idle_bot(request: HttpRequest, line_user: LineUser, patient) -> None:
     """เงียบเกินเวลา: ปิดบอทแบบเงียบ ๆ ตอนมีข้อความใหม่เข้ามา (ระบบเก่าได้ข้อความนี้ไปแล้วตามกฎเดียวกัน)"""
     services_intake.end_line_session(patient, reason='idle')
@@ -249,6 +259,8 @@ def _dispatch_line_event(request: HttpRequest, event: dict):
         postback_data = event.get('postback', {}).get('data', '')
         if postback_data == LineFlexMessageBuilder.BOT_OFF_POSTBACK:
             _turn_bot_off(request, line_user, patient, reply_token)
+        elif postback_data == LineFlexMessageBuilder.BOT_COMPLETE_POSTBACK:
+            _turn_bot_complete(request, line_user, patient, reply_token)
         elif 'action=check_appointment' in postback_data:
             _send_appointment_reply(request, patient, line_user_id, reply_token)
         elif 'action=check_report' in postback_data:

@@ -418,6 +418,51 @@ class LineAiChatTests(IntakeTestBase):
             line_user=self.line_user, direction='OUTGOING', content=answer).exists())
         self.assertTrue(AIUsageLog.objects.filter(purpose='line_chat').exists())
 
+    def test_short_intake_question_card_has_no_general_box_or_chunk_sources(self):
+        fake = MagicMock(status_code=200)
+        fake.json.return_value = {
+            'answer': '- ความรุนแรงของอาการเจ็บคอเป็นคะแนนเท่าไหร่ (0-10) ครับ?',
+            'kind': 'general',
+            'is_summary': False,
+            'sources': ['คลังความรู้ TSPI ส่วนที่ 92'],
+            'provider': 'groq', 'model': 'm', 'usage': {},
+        }
+        _, reply = self._ask('เจ็บคอมา 2 วัน', response=fake)
+        msg = reply.call_args.args[1][0]
+        serialized = json.dumps(msg, ensure_ascii=False)
+        self.assertEqual(msg['type'], 'flex')
+        self.assertIn('ซักประวัติเบื้องต้น', serialized)
+        self.assertNotIn('ความรู้ทั่วไปเพิ่มเติม', serialized)
+        self.assertNotIn('คลังความรู้ TSPI ส่วนที่', serialized)
+
+    def test_summary_card_and_bot_complete_postback_ends_session(self):
+        self.patient.allergies = 'แพ้ยา Penicillin'
+        self.patient.save(update_fields=['allergies'])
+        fake = MagicMock(status_code=200)
+        fake.json.return_value = {
+            'answer': '- เจ็บคอ 2 วัน\n- พักผ่อนให้เพียงพอครับ',
+            'kind': 'summary',
+            'is_summary': True,
+            'sources': [],
+            'provider': 'groq', 'model': 'm', 'usage': {},
+        }
+        post, reply = self._ask('โดยรวมอาการประมาณนี้ครับ', response=fake)
+        ctx = post.call_args.kwargs['json'].get('patient_context') or {}
+        self.assertEqual(ctx.get('allergies'), 'แพ้ยา Penicillin')
+        self.assertNotIn('สมหญิง', json.dumps(ctx, ensure_ascii=False))
+        card = reply.call_args.args[1][0]
+        self.assertIn('action=bot_complete', json.dumps(card, ensure_ascii=False))
+
+        with patch('patients.views_line.LineMessagingService.reply_message', return_value=True) as complete_reply:
+            _signed_post(self.client, [{
+                'type': 'postback', 'replyToken': 'rt-done', 'webhookEventId': 'ev-done',
+                'source': {'userId': 'U_INTAKE_1'}, 'postback': {'data': 'action=bot_complete'},
+            }])
+        self.line_user.refresh_from_db()
+        self.assertFalse(self.line_user.bot_enabled)
+        self.assertEqual(Box.objects.get(patient=self.patient).status, Box.Status.DONE)
+        self.assertIn('ส่งสรุปอาการให้ทีมแพทย์เรียบร้อยแล้ว', complete_reply.call_args.args[1][0]['text'])
+
     def test_next_question_sends_earlier_answer_as_context(self):
         self._ask('เบาหวานคืออะไร')
         post, _ = self._ask('กินข้าวได้ไหม', event_id='ai2')

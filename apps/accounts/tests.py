@@ -930,6 +930,32 @@ class AIServiceAuthTests(TestCase):
         self.assertTrue(vis.call_args.kwargs['images'])
         self.assertIn('ห้ามวินิจฉัยโรคจากภาพ', vis.call_args.args[0])
 
+    def test_line_chat_does_not_self_block_patient_reported_dosage_and_emits_summary(self):
+        from unittest.mock import AsyncMock, patch
+        from ai_service import main as ai_main
+        from ai_service.config import config as ai_config
+
+        summary = '[INTAKE_COMPLETE]\n- ยาที่ใช้: Cetirizine 10 mg\n- ดูแลตัวเอง: พักผ่อนให้เพียงพอครับ'
+        with patch.object(ai_main.gateway, 'call_chat', new=AsyncMock(return_value={
+            'success': True, 'content': summary, 'provider': 'groq', 'model': 'm', 'usage': {},
+        })) as llm:
+            resp = self.api_client.post('/api/ai/line/chat', json={
+                'messages': [
+                    {'role': 'user', 'content': 'ผมกิน Cetirizine 10 mg อยู่ครับ'},
+                    {'role': 'assistant', 'content': 'แพ้ยาไหมครับ?'},
+                    {'role': 'user', 'content': 'ไม่มีแพ้ยา ประมาณนี้ครับ'},
+                ],
+                'patient_context': {'gender': 'ชาย', 'age': 35, 'allergies': 'Penicillin'},
+            }, headers={'X-Internal-Token': ai_config.INTERNAL_API_TOKEN})
+        data = resp.json()
+        self.assertTrue(data['is_summary'])
+        self.assertEqual(data['blocked'], '')
+        self.assertNotIn('[INTAKE_COMPLETE]', data['answer'])
+        self.assertIn('Cetirizine 10 mg', data['answer'])
+        prompt_sent = llm.call_args.kwargs['messages'][-1]['content']
+        self.assertIn('<ข้อมูลแฟ้มผู้ป่วย>', prompt_sent)
+        self.assertIn('Penicillin', prompt_sent)
+
     def test_copilot_never_falls_back_to_default_products(self):
         from unittest.mock import patch
         from ai_service import main as ai_main

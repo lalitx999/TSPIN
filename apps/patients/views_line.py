@@ -72,7 +72,9 @@ def welcome_text(patient) -> str:
 
 
 def welcome_message(patient) -> dict:
-    return text_message(welcome_text(patient))
+    minutes = settings.LINE_BOT_IDLE_MINUTES
+    idle = f'{minutes // 60} ชั่วโมง' if minutes % 60 == 0 else f'{minutes} นาที'
+    return LineFlexMessageBuilder.build_bot_welcome_card(patient.first_name, idle, BOT_OFF_WORD)
 
 
 def _set_bot_enabled(request: HttpRequest, line_user: LineUser, enabled: bool, patient, reason: str = '') -> None:
@@ -331,7 +333,10 @@ def _handle_line_media(request: HttpRequest, patient: Patient, line_user_id: str
     kind = MEDIA_KINDS[message_obj.get('type')]
     message_id = message_obj.get('id', '')
     box = services_intake.open_session(patient, Box.Source.LINE)
-    previous = ((box.contents or {}).get('messages') or [{}])[-1]
+    last_patient_msg = next(
+        (m for m in reversed((box.contents or {}).get('messages') or []) if m.get('sender') == 'patient'),
+        {},
+    )
 
     content = LineMessagingService.get_message_content(message_id) if message_id else None
     media = media_store.save_encrypted(content[0], content[1], kind=f"line/{kind}") if content else None
@@ -341,8 +346,11 @@ def _handle_line_media(request: HttpRequest, patient: Patient, line_user_id: str
         _reply(reply_token, text_message('ขออภัยครับ ดึงไฟล์นี้ไม่สำเร็จ รบกวนส่งใหม่อีกครั้ง'))
     elif kind == 'audio' and settings.LINE_VOICE_TRANSCRIBE_ENABLED:
         line_ai.answer_voice(line_user_id, patient, content[0], content[1], reply_token, box.id, message_id)
-    elif previous.get('kind') != kind:
-        # ส่งรูปหลายรูปติดกันตอบครั้งเดียว ไม่ให้แชทรก
+    elif kind == 'image' and last_patient_msg.get('kind') != kind:
+        # ส่งรูปหลายรูปติดกันตอบครั้งเดียว และให้ AI ช่วยสังเกตเบื้องต้น + ซักประวัติเพิ่มเหมือนหน้าเว็บ
+        line_ai.answer_image(line_user_id, patient, content[0], content[1], reply_token, box.id)
+    elif last_patient_msg.get('kind') != kind:
+        # เสียง (กรณีปิดถอดเสียง) / วิดีโอ / ไฟล์: เก็บเข้ารหัสแล้วขอให้พิมพ์เล่าสั้น ๆ
         _reply(reply_token, text_message(MEDIA_REPLIES[kind]))
 
 

@@ -248,13 +248,18 @@ async def intake_voice_endpoint(
 
     # 2. Transcribe via Multimodal Audio Gateway
     prompt = (
-        "คุณเป็นบรรณารักษ์การแพทย์ จงถอดความเสียงพูดภาษาไทยของคนไข้และคำศัพท์อาการอย่างครบถ้วน "
-        "ห้ามสรุปความ ห้ามเดา และห้ามทำการวินิจฉัยโรคเด็ดขาด"
+        "ถอดเสียงพูดภาษาไทยนี้เป็นข้อความตามคำพูดจริงของผู้พูดอย่างถูกต้อง "
+        "ตอบกลับมาเฉพาะคำพูดที่ถอดได้เท่านั้น ห้ามใส่คำนำหน้า คำอธิบาย หัวข้อ รายการสรุป หรือเครื่องหมายคำพูดล้อมรอบ"
     )
     mime_type = file.content_type or "audio/mp3"
     gemini_res = await gateway.call_gemini_audio(prompt=prompt, audio_bytes=raw_audio_bytes, mime_type=mime_type)
     is_simulated = not bool(gemini_res.get("success"))
-    raw_transcript = gemini_res.get("content", "")
+    raw_transcript = (gemini_res.get("content") or "").strip()
+    if not is_simulated and raw_transcript:
+        # ตัดหัวข้อหรือเครื่องหมายคำพูดส่วนเกินที่โมเดลบางรุ่นอาจใส่มา
+        raw_transcript = re.sub(r'^ถอดความ[^:：\n]*[:：]\s*', '', raw_transcript).strip()
+        raw_transcript = re.split(r'\n\s*คำศัพท์อาการที่ครบถ้วน\s*[:：]', raw_transcript, maxsplit=1)[0].strip()
+        raw_transcript = raw_transcript.strip('"\'“” ')
 
     # 3. Post-Process Transcript with M5 Text Sanitizer
     sanitized_res = TextDeidentifier.sanitize(raw_transcript)
@@ -1245,17 +1250,17 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
 # ==============================================================================
 LINE_CHAT_HISTORY_LIMIT = 20
 LINE_CHAT_SYSTEM_PROMPT = (
-    "คุณคือผู้ช่วย AI ของคลินิก TSPI ที่คุยกับผู้ป่วยทางแชท LINE ตอบเป็นภาษาไทย สุภาพ เป็นกันเอง "
-    "เข้าใจง่ายสำหรับผู้สูงอายุ ใช้คำลงท้ายว่า \"ครับ\"\n"
+    "คุณคือผู้ช่วย AI ของคลินิก TSPI ที่คุยกับผู้ป่วยทางแชท LINE ตอบเป็นภาษาไทย สุภาพ อบอุ่น เป็นกันเอง "
+    "เข้าใจง่าย อธิบายละเอียดพอดีและเป็นธรรมชาติเหมือนคุยในหน้าเว็บ (ประมาณ 4-9 ประโยค) ใช้คำลงท้ายว่า \"ครับ\"\n"
     "หน้าที่ของคุณ:\n"
     "1. ซักประวัติเมื่อผู้ป่วยเล่าอาการ ถามทีละ 1 คำถามเท่านั้น เลือกเรื่องที่ยังไม่รู้ตามลำดับนี้: "
     "เริ่มเป็นเมื่อไรหรือเป็นมานานแค่ไหน, รุนแรงแค่ไหน (ให้คะแนน 0-10 ได้), มีอาการอื่นร่วมไหม, "
     "ใช้ยาหรืออาหารเสริมอะไรอยู่, มีโรคประจำตัวไหม, แพ้ยาอะไรไหม ห้ามถามซ้ำเรื่องที่ผู้ป่วยตอบแล้ว "
     "เมื่อถามครบแล้วให้สรุปสั้น ๆ ว่าได้ข้อมูลอะไรบ้าง และบอกว่าทีมแพทย์ของคลินิกจะอ่านข้อมูลนี้\n"
-    "2. ให้คำแนะนำทั่วไปในการดูแลตัวเอง เช่น การพักผ่อน อาหาร การดื่มน้ำ การออกกำลังกาย "
-    "และบอกอาการที่ควรรีบไปพบแพทย์\n"
-    "3. ตอบเรื่องคลินิก (นัดหมาย บริการ การประเมิน 39 แกน) จาก <ความรู้> เท่านั้น ถ้าไม่มีข้อมูล "
-    "ให้บอกว่าให้สอบถามเจ้าหน้าที่ โดยพิมพ์ \"ปิดบอท\" แล้วฝากข้อความไว้\n"
+    "2. ตอบจาก <ความรู้> ของคลินิกก่อนเสมอ (เรื่องนัดหมาย บริการ การประเมิน 39 แกน) ถ้าไม่มีใน <ความรู้> "
+    "แต่เป็นคำถามสุขภาพทั่วไป ให้ขึ้นบรรทัดใหม่ว่า \"" + ASSISTANT_GENERAL_HEADING + "\" แล้วให้คำแนะนำทั่วไปในการดูแลตัวเอง "
+    "เช่น การพักผ่อน อาหาร การดื่มน้ำ การออกกำลังกาย และบอกอาการที่ควรรีบไปพบแพทย์ ห้ามอ้างว่าเป็นข้อมูลของคลินิก\n"
+    "3. หากมีรูปภาพแนบมา ให้อธิบายสิ่งที่สังเกตเห็นเบื้องต้นอย่างระมัดระวังและซักถามอาการประกอบ ห้ามวินิจฉัยโรคจากภาพ\n"
     "ห้ามเด็ดขาด:\n"
     "- บอกหรือเดาว่าผู้ป่วยเป็นโรคอะไร ถ้าถูกถาม ให้ตอบว่าผู้ช่วยบอกไม่ได้ แพทย์จะเป็นผู้ประเมิน\n"
     "- แนะนำยา ชื่อยา ขนาดยา หรือให้หยุดหรือปรับยาที่แพทย์สั่ง\n"
@@ -1264,7 +1269,7 @@ LINE_CHAT_SYSTEM_PROMPT = (
     "- แปลผลแล็บออกมาเป็นการวินิจฉัย\n"
     "คุยเรื่องอื่น: ทักทายหรือคุยเล่นสั้น ๆ ได้ แล้วชวนกลับมาเรื่องสุขภาพ ถ้าขอให้ทำงานที่ไม่เกี่ยวกับสุขภาพหรือคลินิก "
     "เช่น การบ้าน เขียนโค้ด แปลเอกสาร ให้ปฏิเสธอย่างสุภาพใน 1 ประโยค\n"
-    "รูปแบบ: ข้อความแชทสั้น ไม่เกิน 5 บรรทัด ไม่ใช้ markdown (ห้ามใช้ ** # หรือตาราง) ไม่ใส่หมายเลขอ้างอิง"
+    "รูปแบบ: จัดย่อหน้าหรือข้อย่อยด้วย \"-\" ให้อ่านง่ายบนมือถือ ไม่ใช้ markdown (ห้ามใช้ ** # หรือตาราง) ไม่ใส่หมายเลขอ้างอิง [1]"
 )
 LINE_CHAT_EMERGENCY = (
     "อาการที่เล่ามาอาจเป็นภาวะฉุกเฉิน กรุณาโทร 1669 หรือไปโรงพยาบาลที่ใกล้ที่สุดทันทีครับ "
@@ -1297,33 +1302,52 @@ def line_chat_safety(answer: str) -> Dict[str, Any]:
 
 class LineChatRequest(BaseModel):
     messages: List[AssistantMessage] = Field(..., description="บทสนทนาใน LINE (ข้อความสุดท้ายคือของผู้ป่วย)")
+    images_base64: Optional[List[AssistantImageItem]] = Field(default=None, description="ภาพที่ผู้ป่วยส่งใน LINE")
 
 
 @app.post("/api/ai/line/chat")
 async def line_chat_endpoint(req: LineChatRequest):
-    history = [m for m in req.messages if m.role in ('user', 'assistant') and m.content.strip()][-LINE_CHAT_HISTORY_LIMIT:]
+    import base64
+    history = [m for m in req.messages if m.role in ('user', 'assistant') and (m.content.strip() or req.images_base64)][-LINE_CHAT_HISTORY_LIMIT:]
     if not history or history[-1].role != 'user':
         raise HTTPException(status_code=400, detail="ข้อความสุดท้ายต้องเป็นของผู้ป่วย")
-    question = TextDeidentifier.sanitize(history[-1].content)["sanitized_text"][:2000]
+    raw_q = history[-1].content.strip() or "ผู้ป่วยส่งรูปภาพนี้มาสอบถาม โปรดสังเกตเบื้องต้นอย่างระมัดระวังและซักถามอาการเพิ่มโดยห้ามวินิจฉัยโรค"
+    question = TextDeidentifier.sanitize(raw_q)["sanitized_text"][:2000]
 
     if any(k in question for k in ASSISTANT_EMERGENCY_KEYWORDS):
         return {"answer": LINE_CHAT_EMERGENCY, "kind": "emergency", "sources": [], "usage": {}}
 
+    sent_images: List[Dict[str, Any]] = []
+    for item in (req.images_base64 or [])[:3]:
+        try:
+            raw_bytes = base64.b64decode(item.data, validate=True)
+        except Exception:
+            continue
+        if not raw_bytes:
+            continue
+        clean, _faces = MediaSanitizer.blur_faces(raw_bytes, safety_margin=0.25)
+        sent_images.append({"data": _shrink_image(clean), "mime_type": "image/jpeg"})
+
     context = retrieve_tspi_knowledge(question)
     knowledge = "\n\n".join(f"{c['title']}\n{c['text']}" for c in context) or "(ไม่มีข้อมูลคลินิกที่เกี่ยวกับข้อความนี้)"
-    messages = [{"role": "system", "content": LINE_CHAT_SYSTEM_PROMPT}]
-    for m in history[:-1]:
-        messages.append({"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]})
-    messages.append({"role": "user", "content": f"<ความรู้>\n{knowledge}\n</ความรู้>\n\nผู้ป่วย: {question}"})
+    conv_messages = [
+        {"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]}
+        for m in history[:-1]
+    ]
+    conv_messages.append({"role": "user", "content": f"<ความรู้>\n{knowledge}\n</ความรู้>\n\nผู้ป่วย: {question}"})
 
-    res = await gateway.call_chat(config.SOAP_PROVIDER, messages=messages, temperature=0.3, max_tokens=600)
+    if sent_images:
+        res = await gateway.call_gemini_chat(LINE_CHAT_SYSTEM_PROMPT, conv_messages, images=sent_images, temperature=0.3, max_tokens=1200)
+    else:
+        res = await gateway.call_chat(config.SOAP_PROVIDER, messages=[{"role": "system", "content": LINE_CHAT_SYSTEM_PROMPT}, *conv_messages], temperature=0.3, max_tokens=1200)
     meta = {"provider": res.get("provider", config.SOAP_PROVIDER), "model": res.get("model", ""), "usage": res.get("usage", {})}
     answer = (res.get("content") or "").strip() if res.get("success") else ""
     if not answer:
         return {"answer": "", "kind": "unavailable", "sources": [], **meta}
     checked = line_chat_safety(answer)
-    return {"answer": checked["text"], "kind": "answer", "blocked": checked["blocked"],
-            "sources": [c['title'] for c in context], **meta}
+    sources = [c['title'] for c in context]
+    return {"answer": checked["text"], "kind": "answer" if sources else "general", "blocked": checked["blocked"],
+            "sources": sources, **meta}
 
 
 class ComposeThreeReportsRequest(BaseModel):

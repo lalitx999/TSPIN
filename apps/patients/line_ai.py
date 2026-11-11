@@ -4,6 +4,7 @@
 AI ใช้เวลาหลายวินาที จึงทำนอก request เพื่อให้ตอบ webhook ของ LINE ได้ทันที
 """
 
+import base64
 import logging
 import threading
 import uuid
@@ -49,6 +50,11 @@ def answer_voice(line_user_id: str, patient, audio: bytes, content_type: str, re
                  message_id: str) -> None:
     """ข้อความเสียง: ถอดเป็นตัวอักษรก่อน แล้วตอบเหมือนข้อความที่พิมพ์มา"""
     _run_in_background(_answer_voice, line_user_id, patient, audio, content_type, reply_token, box_id, message_id)
+
+
+def answer_image(line_user_id: str, patient, image_bytes: bytes, content_type: str, reply_token: str, box_id) -> None:
+    """รูปภาพจาก LINE: ส่งให้ AI ช่วยสังเกตเบื้องต้นและซักประวัติเพิ่ม (ไม่วินิจฉัย) พร้อมตอบเป็น Flex Card"""
+    _run_in_background(_answer_image, line_user_id, patient, image_bytes, content_type, reply_token, box_id)
 
 
 def _run_in_background(func, *args) -> None:
@@ -142,17 +148,38 @@ def _history(line_user: LineUser, text: str) -> list:
     return history
 
 
-def _ask_ai(line_user: LineUser, patient, text: str, box_id=None) -> dict:
+def _answer_image(line_user_id: str, patient, image_bytes: bytes, content_type: str, reply_token: str, box_id) -> None:
+    try:
+        LineMessagingService.show_loading(line_user_id)
+        line_user = LineUser.objects.get(line_user_id=line_user_id)
+        if _over_daily_limit(line_user_id):
+            _send(line_user_id, reply_token, text_message(LIMIT_TEXT))
+            return
+        images_b64 = [{
+            'data': base64.b64encode(image_bytes).decode('ascii'),
+            'mime_type': content_type or 'image/jpeg',
+        }]
+        prompt_text = 'ผู้ป่วยส่งรูปภาพนี้มาสอบถาม โปรดสังเกตเบื้องต้นและซักถามอาการประกอบโดยห้ามวินิจฉัยโรค'
+        message = _ask_ai(line_user, patient, prompt_text, box_id, images_b64=images_b64)
+        _send(line_user_id, reply_token, message)
+    except Exception as e:
+        logger.error(f"[LINE AI] Failed to answer image: {e}", exc_info=True)
+
+
+def _ask_ai(line_user: LineUser, patient, text: str, box_id=None, images_b64=None) -> dict:
     provider = settings.AI_SOAP_PROVIDER
     allowed, budget_msg = ai_budget.check_budget(provider)
     if not allowed:
         return text_message(budget_msg)
+    payload = {'messages': _history(line_user, text)}
+    if images_b64:
+        payload['images_base64'] = images_b64
     try:
         response = httpx.post(
             f"{settings.AI_SERVICE_URL}/api/ai/line/chat",
-            json={'messages': _history(line_user, text)},
+            json=payload,
             headers={'X-Internal-Token': settings.INTERNAL_API_TOKEN},
-            timeout=45.0,
+            timeout=60.0 if images_b64 else 45.0,
         )
         data = response.json() if response.status_code == 200 else {}
     except (httpx.HTTPError, ValueError) as e:
@@ -177,4 +204,10 @@ def _ask_ai(line_user: LineUser, patient, text: str, box_id=None) -> dict:
     if box:
         # AI เจอคำฉุกเฉินที่ตัวกรองฝั่งเราไม่จับ: ติดธงไว้ให้รอบนี้ขึ้นบนสุดในรายการของหมอ
         services_intake.append_message(box, 'text', text=answer, sender='bot', red_flag=is_emergency)
-    return emergency_card() if is_emergency else text_message(answer)
+    if is_emergency:
+        return emergency_card()
+    return LineFlexMessageBuilder.build_assistant_reply(
+        answer,
+        kind=data.get('kind', 'answer'),
+        sources=data.get('sources', []),
+    )

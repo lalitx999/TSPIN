@@ -907,6 +907,29 @@ class AIServiceAuthTests(TestCase):
         self.assertEqual(data['kind'], 'emergency')
         llm.assert_not_called()
 
+    def test_line_chat_with_image_uses_gemini_vision_and_guards(self):
+        import base64
+        import io
+        from PIL import Image
+        from unittest.mock import AsyncMock, patch
+        from ai_service import main as ai_main
+        from ai_service.config import config as ai_config
+
+        buf = io.BytesIO()
+        Image.new('RGB', (40, 40), color=(210, 120, 120)).save(buf, format='JPEG')
+        b64 = base64.b64encode(buf.getvalue()).decode('ascii')
+        fake = AsyncMock(return_value={'success': True, 'content': 'สังเกตเห็นรอยแดงครับ เป็นมานานแค่ไหนแล้วครับ',
+                                       'provider': 'gemini', 'model': 'm', 'usage': {}})
+        with patch.object(ai_main.gateway, 'call_gemini_chat', new=fake) as vis:
+            resp = self.api_client.post('/api/ai/line/chat',
+                                        json={'messages': [{'role': 'user', 'content': 'ดูผื่นหน่อย'}],
+                                              'images_base64': [{'data': b64, 'mime_type': 'image/jpeg'}]},
+                                        headers={'X-Internal-Token': ai_config.INTERNAL_API_TOKEN})
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('รอยแดง', resp.json()['answer'])
+        self.assertTrue(vis.call_args.kwargs['images'])
+        self.assertIn('ห้ามวินิจฉัยโรคจากภาพ', vis.call_args.args[0])
+
     def test_copilot_never_falls_back_to_default_products(self):
         from unittest.mock import patch
         from ai_service import main as ai_main

@@ -95,6 +95,17 @@ class AssistantServiceTests(TestCase):
         data = resp.json()
         self.assertTrue(data['simulated'])
 
+    def test_voice_endpoint_strips_verbose_headers_on_real_transcript(self):
+        verbose = 'ถอดความเสียงพูดภาษาไทยของคนไข้: "สวัสดีครับ เจ็บคอ"\n\nคำศัพท์อาการที่ครบถ้วน:\n1. เจ็บคอ'
+        fake_ok = AsyncMock(return_value={'success': True, 'content': verbose})
+        with patch('ai_service.main.gateway.call_gemini_audio', new=fake_ok):
+            resp = self.client_ai.post('/api/intake/voice', headers=self.headers,
+                                       data={'consent_granted': 'true'},
+                                       files={'file': ('v.webm', b'1234', 'audio/webm')})
+        data = resp.json()
+        self.assertFalse(data['simulated'])
+        self.assertEqual(data['sanitized_transcript'], 'สวัสดีครับ เจ็บคอ')
+
 
 class AssistantThreadApiTests(TestCase):
     def setUp(self):

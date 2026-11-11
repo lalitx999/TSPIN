@@ -179,6 +179,211 @@ class LineFlexMessageBuilder:
             bubble["footer"] = {"type": "box", "layout": "vertical", "spacing": "sm", "contents": footer}
         return {"type": "flex", "altText": f"{title}: {body}"[:400], "contents": bubble}
 
+    @classmethod
+    def default_quick_replies(cls) -> List[Dict[str, Any]]:
+        """ปุ่มลัดสไตล์ Gemini ด้านล่างห้องแชท LINE"""
+        return [
+            {"type": "action", "action": {"type": "message", "label": "อธิบายง่ายขึ้น", "text": "อธิบายให้เข้าใจง่ายกว่านี้หน่อยครับ"}},
+            {"type": "action", "action": {"type": "message", "label": "ซักประวัติเพิ่ม", "text": "ช่วยซักประวัติอาการต่อเลยครับ"}},
+            {"type": "action", "action": {"type": "message", "label": "ดูใบนัดหมาย", "text": "นัดหมาย"}},
+            {"type": "action", "action": {"type": "postback", "label": "ปิดบอท (คุยเจ้าหน้าที่)", "data": cls.BOT_OFF_POSTBACK, "displayText": "ปิดบอท"}},
+        ]
+
+    @classmethod
+    def build_bot_welcome_card(cls, patient_name: str, idle_text: str, off_word: str = "ปิดบอท") -> Dict[str, Any]:
+        """การ์ดต้อนรับเมื่อเปิดบอทใน LINE โทน Gemini Clean พร้อม Quick Reply"""
+        greeting = f"สวัสดีครับคุณ{patient_name}"
+        desc = (
+            f"ผมเป็นผู้ช่วย AI ของคลินิก TSPI เล่าอาการ ส่งรูปภาพ หรือสอบถามข้อมูลสุขภาพได้เลยครับ "
+            f"ทีมแพทย์สามารถเปิดอ่านบทสนทนานี้ได้\n\n"
+            f"หากเงียบเกิน {idle_text} ระบบจะปิดบอทให้อัตโนมัติ หรือพิมพ์ \"{off_word}\" เพื่อคุยกับเจ้าหน้าที่ได้ตลอดครับ"
+        )
+        bubble = {
+            "type": "bubble",
+            "size": "mega",
+            "header": {
+                "type": "box",
+                "layout": "horizontal",
+                "backgroundColor": "#F0F6FF",
+                "paddingAll": "lg",
+                "alignItems": "center",
+                "contents": [
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "width": "10px",
+                        "height": "10px",
+                        "cornerRadius": "5px",
+                        "backgroundColor": "#1A73E8",
+                        "contents": [],
+                    },
+                    {
+                        "type": "text",
+                        "text": "TSPI AI · พร้อมดูแลคุณ",
+                        "weight": "bold",
+                        "size": "sm",
+                        "color": "#174EA6",
+                        "margin": "sm",
+                        "flex": 1,
+                    },
+                ],
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "paddingAll": "lg",
+                "spacing": "sm",
+                "contents": [
+                    {"type": "text", "text": greeting, "weight": "bold", "size": "lg", "color": "#111827", "wrap": True},
+                    {"type": "text", "text": desc, "size": "sm", "color": "#374151", "wrap": True, "lineSpacing": "6px"},
+                ],
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "paddingTop": "none",
+                "contents": [cls.close_button()],
+            },
+        }
+        return {
+            "type": "flex",
+            "altText": f"{greeting} พร้อมคุยกับผู้ช่วย AI ของคลินิกแล้วครับ"[:400],
+            "contents": bubble,
+            "quickReply": {"items": cls.default_quick_replies()},
+        }
+
+    @classmethod
+    def build_assistant_reply(
+        cls,
+        answer: str,
+        kind: str = "answer",
+        sources: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """
+        การ์ดคำตอบ AI บน LINE โทน Gemini Clean:
+        - แยกส่วนข้อมูลคลินิก vs กล่องความรู้ทั่วไปเพิ่มเติม
+        - แสดงแหล่งอ้างอิงแบบกะทัดรัด (ถ้ามี)
+        - แนบ Quick Reply ลัดด้านล่างสำหรับกดถามต่อทันที
+        """
+        raw = (answer or "").strip()
+        heading = "ข้อมูลทั่วไปเพิ่มเติม"
+        idx = raw.find(heading)
+        if kind == "general" and idx < 0:
+            clinic_part, general_part = "", raw
+        elif idx >= 0:
+            clinic_part = raw[:idx].strip()
+            general_part = raw[idx:].split(":", 1)[-1].strip() if ":" in raw[idx:].splitlines()[0] else raw[idx + len(heading):].strip()
+        else:
+            clinic_part, general_part = raw, ""
+
+        body_contents: List[Dict[str, Any]] = []
+        if clinic_part:
+            body_contents.append({
+                "type": "text",
+                "text": clinic_part[:1800],
+                "size": "sm",
+                "color": "#1F2937",
+                "wrap": True,
+                "lineSpacing": "6px",
+            })
+
+        if general_part:
+            body_contents.append({
+                "type": "box",
+                "layout": "vertical",
+                "backgroundColor": "#F8FAFC",
+                "borderColor": "#CBD5E1",
+                "borderWidth": "1px",
+                "cornerRadius": "12px",
+                "paddingAll": "md",
+                "margin": "md" if clinic_part else "none",
+                "spacing": "xs",
+                "contents": [
+                    {
+                        "type": "text",
+                        "text": "ความรู้ทั่วไปเพิ่มเติม · ไม่ใช่เอกสารคลินิก",
+                        "size": "xxs",
+                        "weight": "bold",
+                        "color": "#475569",
+                        "wrap": True,
+                    },
+                    {
+                        "type": "text",
+                        "text": general_part[:1400],
+                        "size": "sm",
+                        "color": "#334155",
+                        "wrap": True,
+                        "lineSpacing": "5px",
+                    },
+                ],
+            })
+
+        if not body_contents:
+            body_contents.append({"type": "text", "text": raw[:1800] or "-", "size": "sm", "color": "#1F2937", "wrap": True})
+
+        clean_sources = [str(s).strip() for s in (sources or []) if str(s).strip()][:3]
+        if clean_sources:
+            body_contents.append({"type": "separator", "margin": "md", "color": "#EEF2F7"})
+            body_contents.append({
+                "type": "text",
+                "text": "อ้างอิง TSPI: " + " · ".join(clean_sources),
+                "size": "xxs",
+                "color": "#64748B",
+                "wrap": True,
+                "margin": "sm",
+            })
+
+        badge_text = "ข้อมูลคลินิก TSPI" if clean_sources else "คำแนะนำสุขภาพเบื้องต้น"
+        bubble: Dict[str, Any] = {
+            "type": "bubble",
+            "size": "mega",
+            "header": {
+                "type": "box",
+                "layout": "horizontal",
+                "backgroundColor": "#F0F6FF",
+                "paddingAll": "md",
+                "alignItems": "center",
+                "contents": [
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "width": "8px",
+                        "height": "8px",
+                        "cornerRadius": "4px",
+                        "backgroundColor": "#1A73E8",
+                        "contents": [],
+                    },
+                    {
+                        "type": "text",
+                        "text": f"TSPI AI · {badge_text}",
+                        "size": "xs",
+                        "weight": "bold",
+                        "color": "#174EA6",
+                        "margin": "sm",
+                        "flex": 1,
+                    },
+                ],
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "paddingAll": "lg",
+                "contents": body_contents,
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "paddingTop": "none",
+                "contents": [cls.close_button()],
+            },
+        }
+        return {
+            "type": "flex",
+            "altText": (raw or "คำตอบจาก TSPI AI")[:400],
+            "contents": bubble,
+            "quickReply": {"items": cls.default_quick_replies()},
+        }
+
     @staticmethod
     def build_welcome_card(binding_url: Optional[str] = None) -> Dict[str, Any]:
         """การ์ดต้อนรับและปุ่มเชื่อมต่อเวชระเบียนคลินิก TSPI"""

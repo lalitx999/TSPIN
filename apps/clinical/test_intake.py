@@ -101,7 +101,7 @@ class LineChatSessionTests(IntakeTestBase):
         for i, text in enumerate(['เริ่ม', 'เสร็จแล้ว']):
             post, reply = self._send(_text_event('U_INTAKE_1', f'w{i}', text))
             post.assert_called_once()
-            self.assertEqual(reply.call_args.args[1][0]['type'], 'text')
+            self.assertEqual(reply.call_args.args[1][0]['type'], 'flex')
         self.assertEqual(Box.objects.get(patient=self.patient).status, Box.Status.DRAFT)
 
     def test_general_chat_is_not_marked_as_symptoms(self):
@@ -135,9 +135,13 @@ class LineChatSessionTests(IntakeTestBase):
     def test_images_stored_encrypted_with_one_reply_for_a_burst(self):
         png = b'\x89PNG\r\n\x1a\n' + b'fake-image-bytes'
         with patch('patients.views_line.LineMessagingService.get_message_content', return_value=(png, 'image/png')):
-            _, first = self._send(self._image('img1'))
-            _, second = self._send(self._image('img2'))
-        self.assertIn('ได้รับรูปแล้ว', first.call_args.args[1][0]['text'])
+            p1, first = self._send(self._image('img1'), ai=_ai_response('สังเกตเห็นรอยแดงเบื้องต้น เริ่มเป็นเมื่อไรครับ'))
+            p2, second = self._send(self._image('img2'))
+        p1.assert_called_once()
+        self.assertTrue(p1.call_args.kwargs['json'].get('images_base64'))
+        self.assertEqual(first.call_args.args[1][0]['type'], 'flex')
+        self.assertIn('รอยแดง', self._reply_text(first))
+        p2.assert_not_called()
         second.assert_not_called()
         meta = Box.objects.get(patient=self.patient).contents['messages'][0]['media']
         self.assertNotIn(b'fake-image-bytes', (media_store._root() / meta['path']).read_bytes())
@@ -164,7 +168,8 @@ class LineChatSessionTests(IntakeTestBase):
         self.assertTrue(post.call_args_list[0].args[0].endswith('/api/intake/voice'))
         self.assertEqual(post.call_args_list[1].kwargs['json']['messages'][-1],
                          {'role': 'user', 'content': 'ปวดท้องตั้งแต่เมื่อวาน'})
-        self.assertEqual(reply.call_args.args[1][0]['type'], 'text')
+        self.assertEqual(reply.call_args.args[1][0]['type'], 'flex')
+        self.assertIn('quickReply', reply.call_args.args[1][0])
         first = Box.objects.get(patient=self.patient).contents['messages'][0]
         self.assertEqual((first['kind'], first['text']), ('audio', 'ปวดท้องตั้งแต่เมื่อวาน'))
 
@@ -265,13 +270,15 @@ class LineBotOptInTests(IntakeTestBase):
             self.assertTrue(self._post(_text_event('U_INTAKE_1', f'yes{i}', text)).called, text)
             self.assertTrue(LineUser.objects.get(pk=self.line_user.pk).is_bot_on(), text)
 
-    def test_turning_on_greets_by_name_in_plain_text(self):
+    def test_turning_on_greets_by_name_with_flex_welcome(self):
         reply = self._post(_text_event('U_INTAKE_1', 'q5', 'เปิดบอท'))
         message = reply.call_args.args[1][0]
-        self.assertEqual(message['type'], 'text')
-        self.assertIn('สวัสดีครับคุณสมหญิง', message['text'])
-        self.assertIn('ปิดบอท', message['text'])
-        self.assertIn('1 ชั่วโมง', message['text'])
+        self.assertEqual(message['type'], 'flex')
+        payload = json.dumps(message, ensure_ascii=False)
+        self.assertIn('สวัสดีครับคุณสมหญิง', payload)
+        self.assertIn('ปิดบอท', payload)
+        self.assertIn('1 ชั่วโมง', payload)
+        self.assertTrue(message.get('quickReply', {}).get('items'))
         self.assertTrue(AuditLog.objects.filter(action='LINE_BOT_ENABLED').exists())
 
     def test_off_word_turns_bot_off_and_ends_session(self):
@@ -344,8 +351,8 @@ class LineRegisterFormTests(IntakeTestBase):
         self.assertTrue(self.line_new.is_bot_on())
         self.assertEqual(push.call_args.args[0], self.USER_ID)
         message = push.call_args.args[1][0]
-        self.assertEqual(message['type'], 'text')
-        self.assertIn('สวัสดีครับคุณสมชาย', message['text'])
+        self.assertEqual(message['type'], 'flex')
+        self.assertIn('สวัสดีครับคุณสมชาย', json.dumps(message, ensure_ascii=False))
         self.assertContains(self.client.get(self.url), 'ลงทะเบียนเรียบร้อย')
 
     def test_consent_and_valid_phone_are_required(self):
@@ -395,14 +402,20 @@ class LineAiChatTests(IntakeTestBase):
             _signed_post(self.client, [_text_event('U_INTAKE_1', event_id, text)])
         return post, reply
 
-    def test_answer_is_plain_text_without_citations_and_saved_for_staff(self):
-        post, reply = self._ask('เบาหวานกินอะไรได้บ้าง')
+    def test_answer_uses_flex_card_with_quick_reply_and_saves_plain_history(self):
+        answer = 'คำแนะนำจากคลินิกครับ\n\nข้อมูลทั่วไปเพิ่มเติม (จาก AI ไม่ใช่เอกสารของคลินิก):\nดื่มน้ำอุ่นพักผ่อน'
+        post, reply = self._ask('เบาหวานกินอะไรได้บ้าง', response=_ai_response(answer))
         self.assertTrue(post.call_args.args[0].endswith('/api/ai/line/chat'))
         self.assertEqual(post.call_args.kwargs['json']['messages'][-1],
                          {'role': 'user', 'content': 'เบาหวานกินอะไรได้บ้าง'})
-        self.assertEqual(reply.call_args.args[1], [{'type': 'text', 'text': 'ตอบจากผู้ช่วย'}])
+        msg = reply.call_args.args[1][0]
+        self.assertEqual(msg['type'], 'flex')
+        self.assertTrue(msg.get('quickReply', {}).get('items'))
+        serialized = json.dumps(msg, ensure_ascii=False)
+        self.assertIn('คำแนะนำจากคลินิกครับ', serialized)
+        self.assertIn('ความรู้ทั่วไปเพิ่มเติม', serialized)
         self.assertTrue(CommunicationRecord.objects.filter(
-            line_user=self.line_user, direction='OUTGOING', content='ตอบจากผู้ช่วย').exists())
+            line_user=self.line_user, direction='OUTGOING', content=answer).exists())
         self.assertTrue(AIUsageLog.objects.filter(purpose='line_chat').exists())
 
     def test_next_question_sends_earlier_answer_as_context(self):

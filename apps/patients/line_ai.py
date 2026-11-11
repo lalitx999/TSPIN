@@ -9,6 +9,7 @@ import logging
 import threading
 import uuid
 from datetime import timedelta
+from typing import Optional
 
 import httpx
 from django.conf import settings

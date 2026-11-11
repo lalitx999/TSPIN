@@ -1,0 +1,82 @@
+{% comment %}
+เมนูของระบบภายใน ใช้ทั้งเมนูข้างจอใหญ่และแผงเลื่อนบนมือถือ (เดิมมือถือมีเมนูไม่ครบ)
+nav_id ทำให้ id ของกลุ่มพับได้ไม่ซ้ำกันระหว่างสองที่ กลุ่มที่มีหน้าปัจจุบันจะเปิดเองด้วยสคริปต์ใน doctor_base.html
+{% endcomment %}
+{% with u=request.resolver_match.url_name %}
+<nav class="adm-nav" aria-label="เมนูระบบ">
+    <div class="adm-nav-label">งานประจำวัน</div>
+    <a href="{% url 'patients:dashboard' %}" class="adm-nav-link {% if u == 'dashboard' %}active{% endif %}">
+        <i class="fas fa-th-large"></i><span>Dashboard ภาพรวม</span>
+    </a>
+    <a href="{% url 'patients:patient_list' %}" class="adm-nav-link {% if 'patient' in u and u != 'dashboard' %}active{% endif %}">
+        <i class="fas fa-user-friends"></i><span>แฟ้มคนไข้</span>
+    </a>
+    <a href="{% url 'patients:doctor_appointments' %}" class="adm-nav-link {% if u == 'doctor_appointments' %}active{% endif %}">
+        <i class="far fa-calendar"></i><span>ปฏิทินนัดหมาย</span>
+    </a>
+    <a href="{% url 'patients:doctor_pre_visit' %}" class="adm-nav-link {% if u == 'doctor_pre_visit' %}active{% endif %}">
+        <i class="far fa-clipboard"></i><span>คิวคนไข้วันนี้</span>
+    </a>
+    <a href="{% url 'patients:staff_review_queue' %}" class="adm-nav-link {% if 'review' in u and u != 'doctor_lab_review' and u != 'artifact_review' %}active{% endif %}">
+        <i class="fas fa-stethoscope"></i><span>งานรอตรวจทาน</span>
+    </a>
+
+    <div class="adm-nav-label">LINE</div>
+    <a href="{% url 'clinical:intake_list' %}" class="adm-nav-link {% if 'intake' in u %}active{% endif %}">
+        <i class="far fa-comments"></i><span>แชทผู้ป่วยผ่าน LINE</span>
+    </a>
+    <button class="adm-nav-link" type="button" data-bs-toggle="collapse" data-bs-target="#{{ nav_id }}-line" aria-expanded="false" aria-controls="{{ nav_id }}-line">
+        <i class="fab fa-line"></i><span>เครื่องมือ LINE</span><i class="fas fa-chevron-down adm-chevron"></i>
+    </button>
+    <div class="collapse adm-subnav" id="{{ nav_id }}-line">
+        <a href="{% url 'patients:staff_inbox' %}" class="adm-nav-link {% if 'inbox' in u or 'chats' in u %}active{% endif %}">กล่องข้อความรวม</a>
+        <a href="{% url 'patients:staff_line_links' %}" class="adm-nav-link {% if 'line_link' in u %}active{% endif %}">ตรวจเบอร์ซ้ำ</a>
+        <a href="{% url 'patients:staff_line_qr' %}" class="adm-nav-link {% if u == 'staff_line_qr' %}active{% endif %}">ป้าย QR เปิดบอท</a>
+    </div>
+
+    <div class="adm-nav-label">การรักษา</div>
+    <button class="adm-nav-link" type="button" data-bs-toggle="collapse" data-bs-target="#{{ nav_id }}-axes" aria-expanded="false" aria-controls="{{ nav_id }}-axes">
+        <i class="fas fa-dna"></i><span>39 แกนชีววิทยา</span><i class="fas fa-chevron-down adm-chevron"></i>
+    </button>
+    <div class="collapse adm-subnav" id="{{ nav_id }}-axes">
+        <a href="{% url 'clinical:axes_explorer' %}" class="adm-nav-link {% if u == 'axes_explorer' %}active{% endif %}">39 Biological Axes</a>
+        <a href="{% url 'patients:doctor_axes_mapping' %}" class="adm-nav-link {% if u == 'doctor_axes_mapping' %}active{% endif %}">แมปแล็บและอาการ</a>
+        <a href="{% url 'clinical:axis_graph' %}" class="adm-nav-link {% if u == 'axis_graph' %}active{% endif %}">เครือข่ายชีวภาพ</a>
+        <a href="{% url 'clinical:axis_timeline' %}" class="adm-nav-link {% if u == 'axis_timeline' %}active{% endif %}">เส้นเวลาสุขภาพ</a>
+        <a href="{% url 'patients:doctor_digital_twin' %}" class="adm-nav-link {% if u == 'doctor_digital_twin' %}active{% endif %}">Digital Twin</a>
+    </div>
+    <button class="adm-nav-link" type="button" data-bs-toggle="collapse" data-bs-target="#{{ nav_id }}-care" aria-expanded="false" aria-controls="{{ nav_id }}-care">
+        <i class="fas fa-seedling"></i><span>แผนการรักษา</span><i class="fas fa-chevron-down adm-chevron"></i>
+    </button>
+    <div class="collapse adm-subnav" id="{{ nav_id }}-care">
+        <a href="{% url 'patients:doctor_modules' %}" class="adm-nav-link {% if u == 'doctor_modules' %}active{% endif %}">200 โมดูลสมุนไพร</a>
+        <a href="{% url 'clinical:therapeutic_matrix' %}" class="adm-nav-link {% if u == 'therapeutic_matrix' %}active{% endif %}">เมทริกซ์รักษา</a>
+        <a href="{% url 'patients:doctor_outcomes' %}" class="adm-nav-link {% if u == 'doctor_outcomes' %}active{% endif %}">ติดตามผล</a>
+    </div>
+    <button class="adm-nav-link" type="button" data-bs-toggle="collapse" data-bs-target="#{{ nav_id }}-ai" aria-expanded="false" aria-controls="{{ nav_id }}-ai">
+        <i class="fas fa-magic"></i><span>AI การแพทย์</span><i class="fas fa-chevron-down adm-chevron"></i>
+    </button>
+    <div class="collapse adm-subnav" id="{{ nav_id }}-ai">
+        <a href="{% url 'intelligence:ai_physician' %}" class="adm-nav-link {% if u == 'ai_physician' %}active{% endif %}">AI Physician Copilot</a>
+        <a href="{% url 'patients:doctor_lab_review' %}" class="adm-nav-link {% if u == 'doctor_lab_review' or u == 'lab_ocr' %}active{% endif %}">นำเข้าและตรวจทานผลแล็บ</a>
+        <a href="{% url 'patients:doctor_knowledge_rag' %}" class="adm-nav-link {% if u == 'doctor_knowledge_rag' %}active{% endif %}">สืบค้นงานวิจัย</a>
+        <a href="{% url 'patients:doctor_tspi_brain' %}" class="adm-nav-link {% if u == 'doctor_tspi_brain' %}active{% endif %}">TSPI Brain Engine</a>
+        <a href="{% url 'intelligence:artifact_review' %}" class="adm-nav-link {% if u == 'artifact_review' %}active{% endif %}">ตรวจทานผล AI</a>
+    </div>
+
+    <div class="adm-nav-label">ระบบ</div>
+    <a href="{% url 'clinical:report_dashboard' %}" class="adm-nav-link {% if 'report' in u and u != 'doctor_lab_review' %}active{% endif %}">
+        <i class="far fa-file-alt"></i><span>Precision Report</span>
+    </a>
+    <a href="{% url 'patients:doctor_audit' %}" class="adm-nav-link {% if u == 'doctor_audit' %}active{% endif %}">
+        <i class="fas fa-shield-alt"></i><span>ประวัติการเข้าถึง</span>
+    </a>
+    <a href="{% url 'patients:doctor_settings' %}" class="adm-nav-link {% if u == 'doctor_settings' %}active{% endif %}">
+        <i class="fas fa-cog"></i><span>ตั้งค่าคลินิก</span>
+    </a>
+    <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+        {% csrf_token %}
+        <button type="submit" class="adm-nav-link text-danger"><i class="fas fa-sign-out-alt"></i><span>ออกจากระบบ</span></button>
+    </form>
+</nav>
+{% endwith %}

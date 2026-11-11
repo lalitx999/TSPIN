@@ -194,6 +194,7 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
+    {% block messages %}
     {% if messages %}
         <div class="container-fluid px-4 pt-3">
             {% for message in messages %}
@@ -205,6 +206,7 @@
             {% endfor %}
         </div>
     {% endif %}
+    {% endblock messages %}
     {% block layout %}{% block content %}{% endblock %}{% endblock %}
 
     <!-- Bootstrap 5.3.8 JS Bundle (Local Static) -->

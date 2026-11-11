@@ -134,8 +134,14 @@
                         </div>
 
                         <div>
-                            <label class="form-label small fw-medium text-dark mb-1">โรคประจำตัว / ประวัติการรักษา / ยาเดิม (Medical History):</label>
+                            <label class="form-label small fw-medium text-dark mb-1">โรคประจำตัว / ประวัติการรักษา / ผ่าตัด (Medical History):</label>
                             {{ form.medical_history }}
+                        </div>
+
+                        <div>
+                            <label class="form-label small fw-medium text-dark mb-1">ยาประจำตัว / อาหารเสริม / สมุนไพรเดิม (Current Medications):</label>
+                            {{ form.current_medications }}
+                            <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">ระบุชื่อยา ขนาด และวิธีใช้ เพื่อให้แพทย์และ AI ตรวจสอบปฏิกิริยาระหว่างยาและสารอาหาร (Drug-Nutrient Interactions)</small>
                         </div>
                     </div>
                 </div>

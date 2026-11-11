@@ -4,33 +4,34 @@
     <div class="fw-bold">มีเคสฉุกเฉินจาก LINE {{ urgent_count }} เคส กรุณาตรวจทันที</div>
 </div>
 {% endif %}
-<div class="card shadow-sm border">
-    <div class="card-header bg-light py-3 px-4 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <span class="fw-bold text-dark"><i class="fab fa-line text-success me-2"></i>เคสใหม่รอตรวจ ({{ waiting_count }})</span>
+<div class="adm-card h-100">
+    <div class="adm-card-head flex-wrap">
+        <h2 class="adm-card-title"><i class="fab fa-line text-success me-2"></i>เคสใหม่รอตรวจ ({{ waiting_count }})</h2>
         <span class="d-flex flex-wrap gap-3 small">
             {% if link_request_count %}<a href="{% url 'patients:staff_line_links' %}" class="fw-medium text-warning-emphasis">ตรวจเบอร์ซ้ำ {{ link_request_count }} รายการ &rarr;</a>{% endif %}
             <a href="{% url 'patients:staff_inbox' %}" class="fw-medium">แชททั้งหมด &rarr;</a>
             <a href="{% url 'clinical:intake_list' %}" class="fw-medium">ดูทุกเคส &rarr;</a>
         </span>
     </div>
-    <div class="list-group list-group-flush">
+    <div>
         {% for msg in unregistered_emergencies %}
-        <a href="{% url 'patients:staff_inbox' %}?user_id={{ msg.line_user.line_user_id|urlencode }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center gap-3 px-4 py-3">
-            <span><span class="badge bg-danger me-2">ฉุกเฉิน</span><span class="fw-bold text-dark">ลูกค้า LINE ที่ยังไม่ลงทะเบียน</span></span>
+        <a href="{% url 'patients:staff_inbox' %}?user_id={{ msg.line_user.line_user_id|urlencode }}" class="adm-person text-decoration-none">
+            <span class="adm-avatar" style="background:#FDE2E2;color:#B42318;"><i class="fas fa-exclamation"></i></span>
+            <div class="flex-grow-1"><div class="adm-person-name">ลูกค้า LINE ที่ยังไม่ลงทะเบียน</div><div class="adm-person-sub">ฉุกเฉิน</div></div>
             <span class="text-muted small text-nowrap">{{ msg.created_at|date:"d/m H:i" }} น.</span>
         </a>
         {% endfor %}
         {% for box in cases %}
-        <a href="{% url 'clinical:intake_detail' box.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center gap-3 px-4 py-3">
-            <span>
-                {% if box.contents.red_flag %}<span class="badge bg-danger me-2">ฉุกเฉิน</span>{% endif %}
-                <span class="fw-bold text-dark">{{ box.patient.full_name }}</span>
-                <span class="text-muted small ms-1">{{ box.patient.hn }}</span>
-            </span>
+        <a href="{% url 'clinical:intake_detail' box.id %}" class="adm-person text-decoration-none">
+            <span class="adm-avatar"{% if box.contents.red_flag %} style="background:#FDE2E2;color:#B42318;"{% endif %}>{{ box.patient.full_name|slice:":1" }}</span>
+            <div class="flex-grow-1">
+                <div class="adm-person-name">{{ box.patient.full_name }}{% if box.contents.red_flag %} <span class="badge bg-danger ms-1">ฉุกเฉิน</span>{% endif %}</div>
+                <div class="adm-person-sub">{{ box.patient.hn }}</div>
+            </div>
             <span class="text-muted small text-nowrap">{{ box.last_activity_at|date:"d/m H:i" }} น.</span>
         </a>
         {% empty %}
-        {% if not unregistered_emergencies %}<div class="list-group-item text-center text-muted py-4">ยังไม่มีเคสรอตรวจ</div>{% endif %}
+        {% if not unregistered_emergencies %}<div class="text-center text-muted py-4">ยังไม่มีเคสรอตรวจ</div>{% endif %}
         {% endfor %}
     </div>
 </div>

@@ -1,60 +1,38 @@
 {% for patient in patients %}
 <tr>
-    <td class="px-3 py-2.5 font-monospace">
-        <a href="{% url 'patients:patient_detail' patient.pk %}" class="badge bg-primary-subtle text-primary text-decoration-none border border-primary-subtle py-1.5 px-2">
-            <i class="fas fa-id-card-alt me-1"></i> {{ patient.hn }}
-        </a>
-    </td>
-    <td class="px-3 py-2.5">
-        <a href="{% url 'patients:patient_detail' patient.pk %}" class="fw-bold text-dark text-decoration-none">
-            {{ patient.full_name }}
-        </a>
-        {% if patient.nickname %}
-            <small class="text-muted ms-1">(ชื่อเล่น: {{ patient.nickname }})</small>
-        {% endif %}
-    </td>
-    <td class="px-3 py-2.5 text-secondary">
-        <span>{{ patient.get_gender_display|slice:":3" }}</span>
-        <span class="text-muted mx-1">/</span>
-        {% if patient.age %}
-            <span>{{ patient.age }} ปี</span>
-        {% else %}
-            <span class="text-muted">-</span>
-        {% endif %}
-    </td>
-    <td class="px-3 py-2.5 font-monospace text-muted">
-        {{ patient.phone|default:"-" }}
-    </td>
-    <td class="px-3 py-2.5">
-        <span class="badge bg-light text-dark border font-monospace">{{ patient.blood_type }}</span>
-        {% if patient.allergies %}
-            <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-1" title="ประวัติการแพ้: {{ patient.allergies }}">
-                แพ้ยา
+    <td>
+        <a href="{% url 'patients:patient_detail' patient.pk %}" class="d-flex align-items-center gap-2 text-decoration-none">
+            <span class="adm-avatar adm-avatar-sm">{{ patient.first_name|slice:":1" }}</span>
+            <span>
+                <span class="fw-semibold text-body d-block lh-sm">{{ patient.full_name }}</span>
+                {% if patient.nickname %}<small class="text-muted">ชื่อเล่น {{ patient.nickname }}</small>{% endif %}
             </span>
-        {% endif %}
+        </a>
     </td>
-    <td class="px-3 py-2.5 text-center">
-        <span class="{{ patient.status_badge_class }}">
-            {{ patient.status_label }}
-        </span>
+    <td class="font-monospace text-nowrap">{{ patient.hn }}</td>
+    <td class="text-nowrap">{{ patient.get_gender_display|slice:":3" }} / {% if patient.age %}{{ patient.age }} ปี{% else %}-{% endif %}</td>
+    <td class="font-monospace">{{ patient.phone|default:"-" }}</td>
+    <td class="text-nowrap">
+        {{ patient.blood_type|default:"-" }}
+        {% if patient.allergies %}<span class="badge bg-danger-subtle text-danger ms-1" title="ประวัติการแพ้: {{ patient.allergies }}">แพ้ยา</span>{% endif %}
     </td>
-    <td class="px-3 py-2.5 text-end">
-        <div class="btn-group btn-group-sm">
-            <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-outline-primary" title="เปิดแฟ้มเวชระเบียน EMR">
-                <i class="fas fa-folder-open me-1"></i> EMR
-            </a>
-            <a href="{% url 'patients:patient_edit' patient.pk %}" class="btn btn-outline-secondary" title="แก้ไขเวชระเบียน">
-                <i class="fas fa-edit"></i>
-            </a>
-        </div>
+    <td class="text-nowrap">
+        {% if patient.status == 'urgent' %}<span class="adm-status is-danger">เคสด่วน</span>
+        {% elif patient.status == 'medicine' %}<span class="adm-status">รับการบำบัด</span>
+        {% elif patient.status == 'completed' %}<span class="adm-status is-off">เสร็จสิ้น</span>
+        {% else %}<span class="adm-status is-warn">รอดำเนินการ</span>{% endif %}
+    </td>
+    <td class="text-end text-nowrap">
+        <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-primary">เปิดแฟ้ม</a>
+        <a href="{% url 'patients:patient_edit' patient.pk %}" class="btn btn-sm btn-light" title="แก้ไขข้อมูล" aria-label="แก้ไขข้อมูล {{ patient.full_name }}"><i class="fas fa-pen"></i></a>
     </td>
 </tr>
 {% empty %}
 <tr>
     <td colspan="7" class="text-center py-5 text-muted">
-        <i class="fas fa-user-slash fs-2 mb-2 text-secondary d-block"></i>
-        <h6 class="fw-bold text-dark mb-1">ไม่พบรายชื่อผู้ป่วยที่ตรงกับเงื่อนไข</h6>
-        <p class="small text-muted mb-0">ลองเปลี่ยนคำค้นหา หรือรีเซ็ตตัวกรองสถานะ</p>
+        <i class="fas fa-user-slash fs-2 mb-2 d-block"></i>
+        <div class="fw-semibold text-body mb-1">ไม่พบคนไข้ที่ตรงกับเงื่อนไข</div>
+        <small>ลองเปลี่ยนคำค้นหา หรือเลือก "ทุกสถานะ"</small>
     </td>
 </tr>
 {% endfor %}

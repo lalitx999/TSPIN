@@ -24,41 +24,35 @@
     <!-- Doctor Profile & Signature Card -->
     <div class="card shadow-sm border">
         <div class="card-header bg-light py-2.5 px-3 border-bottom">
-            <h6 class="fw-bold text-dark mb-0 small">ข้อมูลแพทย์ผู้รักษา</h6>
+            <h6 class="fw-bold text-dark mb-0 small"><i class="fas fa-user-md me-1"></i> ข้อมูลผู้ใช้งานและลายเซ็นเวชระเบียน</h6>
         </div>
         <div class="card-body p-4 d-flex flex-column gap-3">
             <div class="row g-3">
                 <div class="col-12 col-md-6">
                     <label class="form-label small fw-medium text-dark mb-1">ชื่อ-นามสกุล</label>
-                    <input type="text" value="{{ request.user.get_full_name|default:request.user.username }}" class="form-control">
+                    <input type="text" value="{{ request.user.get_full_name|default:request.user.username }}" class="form-control" readonly>
                 </div>
                 <div class="col-12 col-md-6">
                     <label class="form-label small fw-medium text-dark mb-1">เลขที่ใบประกอบวิชาชีพเวชกรรม (Medical License No.)</label>
-                    <input type="text" value="ว. 48291" class="form-control font-monospace">
+                    <input type="text" value="" placeholder="ยังไม่ได้ระบุ" class="form-control font-monospace" readonly>
                 </div>
                 <div class="col-12 col-md-6">
-                    <label class="form-label small fw-medium text-dark mb-1">สาขาความเชี่ยวชาญ</label>
-                    <input type="text" value="เวชศาสตร์แม่นยำและชีววิทยาระบบ (Systems Biology &amp; Functional Medicine)" class="form-control">
+                    <label class="form-label small fw-medium text-dark mb-1">บทบาท / ตำแหน่งในระบบ</label>
+                    <input type="text" value="{{ request.user.get_role_display }}" class="form-control" readonly>
                 </div>
                 <div class="col-12 col-md-6">
                     <label class="form-label small fw-medium text-dark mb-1">อีเมลติดต่อ</label>
-                    <input type="email" value="{{ request.user.email|default:'doctor@tspiclinic.com' }}" class="form-control">
+                    <input type="email" value="{{ request.user.email|default:'ยังไม่ได้ระบุ' }}" class="form-control" readonly>
                 </div>
             </div>
 
             <div class="pt-3 border-top">
                 <label class="form-label small fw-bold text-dark text-uppercase mb-2">ลายเซ็นดิจิทัลสำหรับลงนามรายงาน (Digital Signature)</label>
                 <div class="border-2 border-dashed border-secondary-subtle rounded-3 p-4 text-center bg-light">
-                    <i class="fas fa-signature fs-2 text-primary mb-2 d-block"></i>
-                    <strong class="text-dark small d-block">Digital Signature Verified (Pillar 15)</strong>
-                    <small class="text-muted mt-1 d-block">ลายเซ็นจะถูกแนบอัตโนมัติใน Precision Report ฉบับสมบูรณ์เมื่อกดอนุมัติผล</small>
+                    <i class="fas fa-file-signature fs-2 text-muted mb-2 d-block"></i>
+                    <strong class="text-dark small d-block">ระบบตรวจสอบลายเซ็นดิจิทัลตามมาตรฐานเวชระเบียน</strong>
+                    <small class="text-muted mt-1 d-block">การลงนามในเวชระเบียนและใบสรุปผลประเมินจะผูกกับบัญชีผู้ใช้และการยืนยันตัวตนใน Audit Log</small>
                 </div>
-            </div>
-
-            <div class="d-flex justify-content-end pt-2">
-                <button type="button" class="btn btn-primary px-4">
-                    <i class="fas fa-save me-1"></i> บันทึกการตั้งค่า
-                </button>
             </div>
         </div>
     </div>

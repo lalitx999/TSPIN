@@ -1,97 +1,159 @@
 {% extends 'layouts/doctor_base.html' %}
+{% load static %}
 
-{% block title %}ทะเบียนสูตรตำรับ 200 โมดูล (Phytochemical Modules) | TSPI CLINIC{% endblock %}
+{% block title %}ทะเบียนสูตรตำรับโมดูลสมุนไพร 200 โมดูล (Phytochemical Modules) | TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column gap-4" x-data="{
-    search: '',
-    selectedCategory: 'all',
-    modules: [
-        { code: 'KERRA', name: 'Kerra Capsule', active: 'สารสกัดไฟโตเคมีคอลต้านการอักเสบระดับเซลล์', axes: 'A01, A02, A03', indications: 'ลด NF-κB, ยับยั้ง IL-6 และ TNF-α ในโรคเรื้อรังและสะเก็ดเงิน' },
-        { code: 'MINOZA', name: 'Minoza Complex', active: 'กลุ่มสารสกัดปรับสมดุลระบบภูมิคุ้มกัน Th1/Th2', axes: 'A01, A02, A04', indications: 'ควบคุม Inflammasome NLRP3 และลดการแพ้ภูมิตัวเอง' },
-        { code: 'KS', name: 'KS Capsule', active: 'สารสกัดต้านไวรัสและเสริมเกราะป้องกัน Host Defense', axes: 'A01, A03, A04', indications: 'กระตุ้น Interferon Response และกำจัดเชื้อแฝงเรื้อรัง' },
-        { code: 'MERDANA', name: 'Merdana Formula', active: 'สารต้านการอักเสบและการแพ้ระบบทางเดินอาหาร', axes: 'A01, A02, A19', indications: 'รักษาอาการผื่นคัน ลำไส้อักเสบ และ Mast cell activation' },
-        { code: 'BETA_G', name: 'Beta G Immunomodulator', active: 'Beta-Glucan 1,3/1,6 บริสุทธิ์สูง', axes: 'A01, A02, A03', indications: 'กระตุ้น Macrophage และเสริมสร้างความแข็งแกร่งของภูมิคุ้มกัน' },
-        { code: 'IM-6', name: 'IM-6 Immune Support', active: 'พฤกษเคมีควบคุมไซโตไคน์', axes: 'A01, A03', indications: 'ลดภาระการอักเสบหลังการติดเชื้อเรื้อรัง' },
-        { code: 'DB1', name: 'DB-1 Metabolic Reset', active: 'Momordica charantia & Gymnema sylvestre', axes: 'A05, A06, A07', indications: 'เพิ่มความไวต่ออินซูลินและฟื้นฟู AMPK Energy Sensing' },
-        { code: 'BOVA', name: 'Bova Capsule', active: 'สารสกัดควบคุมน้ำตาลและไขมันพอกตับ', axes: 'A05, A06, A08', indications: 'ลด Hepatic Glucose Output และลด Lipotoxicity' },
-        { code: 'CINNARA', name: 'Cinnara Capsule', active: 'สารสกัด Cynara scolymus & เอนไซม์ธรรมชาติ', axes: 'A07, A16, A19', indications: 'ซ่อมแซมเยื่อบุทางเดินอาหาร กระตุ้นน้ำดี ขับสารพิษ' },
-        { code: 'HEPA-1', name: 'TSPI Master Liver Detox', active: 'Silymarin, Curcuminoids & Choline', axes: 'A16, A09', indications: 'ฟื้นฟูเส้นทาง Phase 1 & 2 ของตับ และกระตุ้นกลูตาไธโอน' },
-        { code: 'HEPA-3', name: 'Advanced Liver Protocol', active: 'สูตรขจัดสารพิษและฟื้นฟูเซลล์ตับระดับลึก', axes: 'A16, A08', indications: 'ฟื้นฟูภาวะตับคั่งไขมัน (NASH) และสารพิษตกค้าง' },
-        { code: 'KD', name: 'Kidney Defense Regeneration', active: 'สารสกัดบำรุงไตและระบบกรองของเสีย', axes: 'A20, A21', indications: 'ชะลอการเสื่อมของไต ลดโปรตีนรั่ว ฟื้นฟู Endothelium' },
-        { code: 'BONAX', name: 'Bonax Bone & Vascular', active: 'สูตรเสริมความหนาแน่นกระดูกและหลอดเลือด', axes: 'A26, A21', indications: 'ป้องกันแคลเซียมเกาะผนังหลอดเลือดและบำรุงกระดูก' },
-        { code: 'LIVOXY', name: 'Livoxy Mitochondrial Renewal', active: 'CoQ10, PQQ & Resveratrol Complex', axes: 'A08, A09, A10', indications: 'กระตุ้น Mitochondrial Biogenesis และเพิ่มระดับ ATP' },
-        { code: 'RIZZO', name: 'Rizzo Vascular Repair', active: 'สารสกัดฟลาโวนอยด์เสริมความยืดหยุ่นหลอดเลือด', axes: 'A21, A22, A24', indications: 'ลดการอักเสบของหลอดเลือดและควบคุมความดัน' }
-    ],
-    filteredModules() {
-        return this.modules.filter(m => {
-            return m.code.toLowerCase().includes(this.search.toLowerCase()) ||
-                   m.name.toLowerCase().includes(this.search.toLowerCase()) ||
-                   m.axes.toLowerCase().includes(this.search.toLowerCase()) ||
-                   m.indications.toLowerCase().includes(this.search.toLowerCase());
-        });
-    }
-}">
+<div class="d-flex flex-column gap-4">
 
     <!-- Header Card -->
     <div class="card shadow-sm border">
         <div class="card-body p-3 p-md-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
-                            <i class="fas fa-seedling me-1"></i> Pharmacopeia &amp; Formulations
+                    <div class="d-flex align-items-center gap-2 mb-1.5 flex-wrap">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5 font-monospace">
+                            <i class="fas fa-seedling me-1"></i> TSPI Pharmacopeia &amp; Formulations
                         </span>
-                        <span class="text-muted small">ทะเบียนสารสกัดและโมดูลตำรับสมุนไพร TSPI</span>
+                        <span class="text-muted small">ทะเบียนสารสกัดและโมดูลตำรับสมุนไพรความแม่นยำระดับเซลล์</span>
                     </div>
-                    <h1 class="h4 fw-bold mb-1 text-dark">ทะเบียนสูตรตำรับ 200 โมดูล (Phytochemical Modules)</h1>
+                    <h1 class="h4 fw-bold mb-1 text-dark">ทะเบียนสูตรตำรับโมดูลสมุนไพร 200 โมดูล (Phytochemical Modules)</h1>
                     <p class="text-muted small mb-0">
                         สารสกัดมาตรฐานที่มีหลักฐานเชิงประจักษ์ (Evidence-Based) ออกฤทธิ์ตรงตามกลไกชีววิทยา 39 แกน ใน 12 โดเมน
                     </p>
                 </div>
 
-                <div style="min-width: 260px;">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0 text-muted">
-                            <i class="fas fa-search small"></i>
-                        </span>
-                        <input type="text" x-model="search" placeholder="ค้นหาชื่อโมดูล แกน หรือสรรพคุณ..." class="form-control border-start-0 ps-0">
-                    </div>
+                <!-- Navigation link to Therapeutic Matrix -->
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{% url 'clinical:therapeutic_matrix' %}" class="btn btn-sm btn-outline-primary shadow-sm">
+                        <i class="fas fa-table-cells me-1"></i> เมทริกซ์การรักษา (Matrix)
+                    </a>
+                    <a href="{% url 'clinical:axes_explorer' %}" class="btn btn-sm btn-outline-secondary shadow-sm">
+                        <i class="fas fa-project-diagram me-1"></i> 39 แกนชีววิทยา
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modules Grid (Row 3 Cols) -->
+    <!-- Search & Filter Card -->
+    <div class="card shadow-sm border">
+        <div class="card-body p-3">
+            <form method="get" action="{% url 'patients:doctor_modules' %}" class="row g-2 align-items-center">
+                <div class="col-12 col-md-8 col-lg-9">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted ps-3 pe-2">
+                            <i class="fas fa-search text-primary"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-1" 
+                               placeholder="ค้นหาชื่อโมดูล, รหัส, พืชสมุนไพร, หรือแกนเป้าหมาย เช่น Curcuma, TSPI-CURCUMA, Axis 1..." 
+                               value="{{ search_q }}">
+                        {% if search_q %}
+                        <a href="{% url 'patients:doctor_modules' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 col-lg-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 shadow-sm">
+                        <i class="fas fa-filter me-1"></i> ค้นหา
+                    </button>
+                    {% if search_q %}
+                    <a href="{% url 'patients:doctor_modules' %}" class="btn btn-outline-secondary">
+                        ล้าง
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Count Summary Badge -->
+    <div class="d-flex align-items-center justify-content-between small text-muted">
+        <span>
+            แสดง <strong class="text-dark">{{ modules|length }}</strong> โมดูล 
+            {% if search_q %}จากผลการค้นหา {{ total_count }} รายการ (จากคลัง {{ all_count }} โมดูล){% else %}จากทั้งหมด <strong class="text-primary">{{ all_count }}</strong> โมดูลในคลังระบบ{% endif %}
+        </span>
+        <span class="badge bg-light text-secondary border font-monospace">
+            <i class="fas fa-shield-alt text-primary me-1"></i> Standardized Phytochemical Extract
+        </span>
+    </div>
+
+    <!-- Modules Grid (Bootstrap 5.3 Responsive Grid) -->
     <div class="row g-3">
-        <template x-for="mod in filteredModules()" :key="mod.code">
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm border p-3">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace py-1 px-2" x-text="mod.code"></span>
-                            <h2 class="h6 fw-bold text-dark mt-1 mb-0" x-text="mod.name"></h2>
+        {% for mod in modules %}
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card h-100 shadow-sm border bg-white rounded-3 hover-shadow transition">
+                <div class="card-body p-3 d-flex flex-column justify-content-between">
+                    <div>
+                        <!-- Header with Code & Status -->
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                            <div>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace py-1 px-2 text-xs">
+                                    {{ mod.code|default:mod.PhytoCore_Code|default:"MOD" }}
+                                </span>
+                                <h2 class="h6 fw-bold text-dark mt-1.5 mb-0">
+                                    {{ mod.name|default:mod.Product_Derived_From|default:"Herbal Module" }}
+                                </h2>
+                            </div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace text-xs flex-shrink-0">
+                                <i class="fas fa-check-circle me-1"></i> Validated
+                            </span>
                         </div>
-                        <small class="text-muted font-monospace" style="font-size: 0.65rem;">Standardized</small>
+
+                        <!-- Botanical Composition -->
+                        {% if mod.Botanical_Composition %}
+                        <div class="mb-2">
+                            <small class="text-muted text-xs d-block">พืชสมุนไพรส่วนประกอบ:</small>
+                            <span class="small fw-semibold text-dark">{{ mod.Botanical_Composition }}</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Main Clinical Mechanism -->
+                        <p class="small text-muted mb-2.5 lh-sm" style="font-size: 0.8125rem;">
+                            {{ mod.description|default:mod.Mechanistic_Function|default:"โมดูลการรักษาระดับชีวโมเลกุลเพื่อฟื้นฟูสภาวะสมดุลของเซลล์"|truncatewords:28 }}
+                        </p>
+
+                        <!-- Target Axes Badges -->
+                        {% if mod.TSPI_Axis_Mapping %}
+                        <div class="mb-2.5 pt-2 border-top">
+                            <small class="text-muted text-xs d-block mb-1">แกนชีววิทยาเป้าหมาย (TSPI Axes):</small>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge bg-light text-secondary border font-monospace text-xs">
+                                    {{ mod.TSPI_Axis_Mapping|truncatechars:45 }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
 
-                    <div class="pt-2 border-top d-flex flex-column gap-1.5" style="font-size: 0.8rem;">
-                        <div>
-                            <span class="text-muted small">สารสำคัญ:</span>
-                            <span class="text-dark small d-block" x-text="mod.active"></span>
-                        </div>
-                        <div>
-                            <span class="text-muted small">แกนเป้าหมาย:</span>
-                            <span class="font-monospace text-primary fw-bold ms-1" x-text="mod.axes"></span>
-                        </div>
-                        <div class="mt-1">
-                            <span class="text-muted small d-block mb-1">ข้อบ่งใช้ทางคลินิก:</span>
-                            <div class="p-2 rounded bg-light border text-muted small" style="font-size: 0.775rem;" x-text="mod.indications"></div>
-                        </div>
+                    <!-- Footer Action -->
+                    <div class="pt-2 border-top d-flex align-items-center justify-content-between text-xs text-muted">
+                        <span>Pillar 3 · Botanical</span>
+                        <a href="{% url 'clinical:therapeutic_matrix' %}?q={{ mod.code }}" class="text-primary text-decoration-none fw-semibold">
+                            ดูรายละเอียดเมทริกซ์ <i class="fas fa-chevron-right ms-0.5"></i>
+                        </a>
                     </div>
                 </div>
             </div>
-        </template>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card border shadow-sm text-center py-5 bg-white">
+                <div class="card-body">
+                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center text-muted mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-search fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">ไม่พบโมดูลที่ตรงกับเงื่อนไขการค้นหา</h5>
+                    <p class="small text-muted mb-3">ลองค้นหาด้วยคำอื่น เช่น รหัสโมดูล หรือชื่อพืชสมุนไพร</p>
+                    <a href="{% url 'patients:doctor_modules' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-redo me-1"></i> แสดงโมดูลทั้งหมด
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 
 </div>

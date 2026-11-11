@@ -97,3 +97,13 @@ small, .small { font-size: .9rem; }
 @media (prefers-reduced-motion: reduce) {
     * { scroll-behavior: auto !important; }
 }
+
+/* Alpine: ซ่อนจนกว่าสคริปต์จะพร้อม (เดิมไม่มีกฎนี้ ของที่ควรซ่อนจึงโผล่ตอนโหลดหน้า) */
+[x-cloak] { display: none !important; }
+/* x-show ซ่อนด้วย style="display: none" ซึ่งแพ้คลาส d-flex / d-block ของ Bootstrap (มี !important)
+   กล่องที่ควรซ่อนจึงโผล่ค้าง เช่น "คนไข้ที่เลือก (HN: )" ในฟอร์มนัดเดิม กฎนี้ให้ x-show ชนะเสมอ */
+[x-show][style*="display: none"] { display: none !important; }
+
+/* Utility font size สำหรับป้ายและข้อมูลเชิงเทคนิคขนาดกะทัดรัด */
+.text-xs { font-size: 0.775rem !important; line-height: 1.3 !important; }
+

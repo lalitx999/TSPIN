@@ -24,6 +24,10 @@ EXTENSIONS = {
     'audio/x-m4a': '.m4a',
     'audio/aac': '.aac',
     'audio/mpeg': '.mp3',
+    'audio/mp4': '.m4a',
+    'audio/webm': '.webm',
+    'audio/ogg': '.ogg',
+    'audio/wav': '.wav',
     'video/mp4': '.mp4',
     'application/pdf': '.pdf',
 }

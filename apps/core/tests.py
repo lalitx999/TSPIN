@@ -58,7 +58,8 @@ class CorePagesLayoutTests(TestCase):
         self.assertTemplateUsed(response, 'patients/dashboard.html')
         self.assertTemplateUsed(response, 'layouts/doctor_base.html')
         self.assertContains(response, "DR. PATT EMR")
-        self.assertContains(response, "Clinical Overview Dashboard")
+        self.assertContains(response, 'class="adm-sidebar"')
+        self.assertContains(response, '<h1 class="adm-page-title">Dashboard</h1>', html=False)
 
     def test_patient_dashboard_uses_patient_layout_for_patient(self):
         """คนไข้ล็อกอินแล้วเปิดหน้า Dashboard ต้องเรนเดอร์โครงสร้าง patient_base.html"""
@@ -172,7 +173,7 @@ class LineBotLinkTests(TestCase):
     def test_hidden_until_enabled(self):
         resp = self.client.get('/')
         self.assertNotContains(resp, 'oaMessage')
-        self.assertContains(resp, 'LINE: @testoa')
+        self.assertContains(resp, '@testoa')
 
     @override_settings(LINE_BOT_LINK_ENABLED=True, LINE_OA_ID='@testoa')
     def test_link_prefills_the_exact_word_the_webhook_expects(self):
@@ -229,9 +230,20 @@ class GuestAssistantApiTests(TestCase):
     def test_daily_limit_per_ip(self):
         from core import views
         from unittest.mock import patch
+        self.assertEqual(views.GUEST_DAILY_LIMIT_PER_IP, 5)
         with patch.object(views, 'GUEST_DAILY_LIMIT_PER_IP', 2):
-            self._ask('ถาม 1')
-            self._ask('ถาม 2')
+            r1, _ = self._ask('ถาม 1')
+            self.assertEqual(r1.json()['remaining'], 1)
+            r2, _ = self._ask('ถาม 2')
+            self.assertEqual(r2.json()['remaining'], 0)
             resp, post = self._ask('ถาม 3')
         self.assertEqual(resp.status_code, 429)
+        self.assertTrue(resp.json().get('login_required'))
         post.assert_not_called()
+
+    def test_ai_page_renders_new_welcome_shell_without_navbar(self):
+        resp = self.client.get(reverse('core:assistant'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'guestChat()')
+        self.assertContains(resp, 'assistant_shell.css')
+        self.assertNotContains(resp, 'id="siteNav"')

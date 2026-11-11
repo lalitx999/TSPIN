@@ -2,198 +2,491 @@
 {% load static %}
 
 {% block title %}คุยกับ AI | TSPI Clinic{% endblock %}
+{% block body_class %}site ai-app-body{% endblock %}
 
+{% block extra_public_head %}
+<link rel="stylesheet" href="{% static 'css/assistant_shell.css' %}?v={{ ASSET_VERSION }}">
+<script src="{% static 'js/assistant_shared.js' %}?v={{ ASSET_VERSION }}"></script>
+{% endblock %}
+
+{% block site_header %}{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block content %}
-<!-- แชทผู้ช่วย AI สำหรับทุกคน (ไม่ต้องลงทะเบียน): ประวัติเก็บในเบราว์เซอร์ของผู้ใช้เท่านั้น -->
-<div class="chat-shell" x-data="guestChat()">
-    <div class="chat-scroll" x-ref="log">
-        <div class="chat-col">
+<!-- แชทผู้ช่วย AI สำหรับผู้เยี่ยมชมทั่วไป (จำกัด 5 ครั้ง/วัน ไม่เก็บข้อมูลบนเซิร์ฟเวอร์) -->
+<div class="ai-shell"
+     x-data="guestChat()"
+     x-init="init()"
+     :class="{ 'side-collapsed': sideCollapsed, 'side-mobile-open': mobileSideOpen }">
 
-            <!-- หน้าว่าง: ทักทาย + ตัวอย่างคำถาม -->
-            <div class="chat-welcome" x-show="!messages.length">
-                <span class="chat-avatar chat-avatar-lg"><i class="fas fa-leaf"></i></span>
-                <h1 class="h2 mt-3 mb-2">สวัสดีค่ะ มีอะไรให้ช่วยไหมคะ</h1>
-                <p class="text-muted fs-5 mb-4">ถามเรื่องโรค อาการ การรักษา หรือบริการของ TSPI Clinic ได้เลย</p>
-                <div class="row g-3 text-start">
-                    <template x-for="q in examples">
-                        <div class="col-sm-6">
-                            <button type="button" class="chat-suggest" @click="ask(q.text)">
-                                <i class="fas" :class="q.icon"></i>
-                                <span x-text="q.text"></span>
-                            </button>
-                        </div>
-                    </template>
-                </div>
-                <ul class="chat-promise">
-                    <li><i class="fas fa-book-medical"></i> ตอบจากเอกสารของคลินิก พร้อมเลขอ้างอิง</li>
-                    <li><i class="fas fa-robot"></i> ส่วนที่เป็นความรู้ทั่วไปจาก AI จะแยกกรอบให้เห็นชัด</li>
-                    <li><i class="fas fa-user-shield"></i> ไม่ต้องใส่ชื่อ เบอร์โทร หรือเลขบัตร</li>
-                </ul>
-            </div>
+    <div class="ai-backdrop" @click="mobileSideOpen = false"></div>
 
-            <!-- บทสนทนา -->
-            <template x-for="(m, i) in messages" :key="i">
-                <div>
-                    <!-- ผู้ใช้ -->
-                    <div class="chat-row user" x-show="m.role === 'user'">
-                        <div class="chat-user" x-text="m.content"></div>
-                    </div>
+    <!-- Sidebar ซ้าย -->
+    <aside class="ai-side" aria-label="แถบนำทางผู้ช่วย AI">
+        <a href="{% url 'core:home' %}" class="ai-brand">
+            <span class="ai-brand-badge"><i class="fas fa-leaf"></i></span>
+            <span>TSPI <span class="text-success">AI</span></span>
+        </a>
 
-                    <!-- ฉุกเฉิน -->
-                    <div class="chat-row" x-show="m.role === 'assistant' && m.kind === 'emergency'">
-                        <div class="alert alert-danger d-flex gap-3 mb-0 w-100" role="alert">
-                            <i class="fas fa-ambulance fs-3"></i>
-                            <div>
-                                <strong class="d-block fs-5 mb-1">อาจเป็นภาวะฉุกเฉิน</strong>
-                                <span x-text="m.content"></span>
-                                <a href="tel:1669" class="btn btn-danger mt-3 d-flex d-sm-inline-flex"><i class="fas fa-phone-alt"></i> โทร 1669</a>
-                            </div>
-                        </div>
-                    </div>
+        <div class="ai-nav-group">
+            <button type="button" class="ai-nav-btn" :class="{ 'active': !currentId }" @click="newThread()">
+                <i class="fas fa-plus"></i>
+                <span>แชทใหม่</span>
+            </button>
+            <a href="{% url 'core:home' %}" class="ai-nav-btn">
+                <i class="fas fa-home"></i>
+                <span>หน้าแรกคลินิก</span>
+            </a>
+            <a href="{% url 'core:platform' %}" class="ai-nav-btn">
+                <i class="fas fa-project-diagram"></i>
+                <span>ระบบ 39 แกนชีววิทยา</span>
+            </a>
+            {% if is_patient_logged_in %}
+            <a href="{% url 'portal_patient:assistant' %}" class="ai-nav-btn text-success">
+                <i class="fas fa-comments"></i>
+                <span>ห้องแชทคนไข้ (ไม่จำกัด)</span>
+            </a>
+            {% endif %}
+        </div>
 
-                    <!-- ผู้ช่วย -->
-                    <div class="chat-row bot" x-show="m.role === 'assistant' && m.kind !== 'emergency'">
-                        <span class="chat-avatar"><i class="fas fa-leaf"></i></span>
-                        <div class="chat-bot">
-                            <!-- ส่วนที่มาจากเอกสารคลินิก -->
-                            <template x-for="b in blocks(parts(m).clinic)">
-                                <div class="chat-block">
-                                    <p x-show="b.type === 'p'"><template x-for="seg in b.items[0]"><span><span x-text="seg.t" x-show="!seg.cite"></span><button type="button" class="chat-cite" x-show="seg.cite" x-text="seg.cite" @click="m.open = true" :title="(m.sources || [])[seg.cite - 1] || ''"></button></span></template></p>
-                                    <ul x-show="b.type === 'ul'"><template x-for="li in b.items"><li><template x-for="seg in li"><span><span x-text="seg.t" x-show="!seg.cite"></span><button type="button" class="chat-cite" x-show="seg.cite" x-text="seg.cite" @click="m.open = true"></button></span></template></li></template></ul>
-                                </div>
-                            </template>
+        <div class="ai-search-wrap">
+            <i class="fas fa-search"></i>
+            <input type="text" class="ai-search-input" placeholder="ค้นหาแชทในเครื่อง..." x-model="searchQuery">
+        </div>
 
-                            <!-- ความรู้ทั่วไปจาก AI ภายนอก -->
-                            <div class="chat-general" x-show="parts(m).general">
-                                <div class="chat-general-label"><i class="fas fa-robot"></i> ความรู้ทั่วไปจาก AI <span class="fw-normal">· ไม่ใช่เอกสารของคลินิก</span></div>
-                                <template x-for="b in blocks(parts(m).general)">
-                                    <div class="chat-block">
-                                        <p x-show="b.type === 'p'" x-text="b.items[0].map(s => s.t).join('')"></p>
-                                        <ul x-show="b.type === 'ul'"><template x-for="li in b.items"><li x-text="li.map(s => s.t).join('')"></li></template></ul>
-                                    </div>
-                                </template>
-                            </div>
-
-                            <!-- แหล่งอ้างอิง (กดเปิด/ปิด) -->
-                            <div class="chat-sources" x-show="m.sources && m.sources.length">
-                                <button type="button" class="chat-sources-toggle" @click="m.open = !m.open" :aria-expanded="!!m.open">
-                                    <i class="fas fa-book-medical"></i>
-                                    <span x-text="'อ้างอิงเอกสาร TSPI ' + (m.sources ? m.sources.length : 0) + ' รายการ'"></span>
-                                    <i class="fas" :class="m.open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                                </button>
-                                <ol class="chat-sources-list" x-show="m.open" x-transition>
-                                    <template x-for="s in (m.sources || [])"><li x-text="s"></li></template>
-                                </ol>
-                            </div>
-
-                            <!-- คำถามต่อ (เฉพาะคำตอบล่าสุด) -->
-                            <div class="d-flex flex-wrap gap-2 mt-3" x-show="i === messages.length - 1 && !sending && m.kind !== 'out_of_scope'">
-                                <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-sm btn-primary rounded-pill"><i class="fas fa-user-md"></i> ให้แพทย์ดูต่อ</a>
-                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" @click="ask('อธิบายให้เข้าใจง่ายกว่านี้หน่อย')">อธิบายง่าย ๆ อีกครั้ง</button>
-                            </div>
-                        </div>
+        <div class="ai-side-label">แชทล่าสุด (เก็บในเครื่องนี้เท่านั้น)</div>
+        <div class="ai-thread-list">
+            <template x-for="t in filteredThreads()" :key="t.id">
+                <div class="ai-thread-item" :class="{ 'active': currentId === t.id }" @click="openThread(t.id)">
+                    <i class="far fa-comment text-muted flex-shrink-0"></i>
+                    <span class="flex-grow-1 text-truncate" x-text="t.title"></span>
+                    <div class="ai-thread-actions" @click.stop>
+                        <button type="button" class="ai-icon-btn text-danger" title="ลบแชทนี้" @click="deleteThread(t.id)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </div>
                 </div>
             </template>
+            <p class="text-muted small text-center mt-3 px-2" x-show="filteredThreads().length === 0">
+                ยังไม่มีประวัติแชท
+            </p>
+        </div>
 
-            <!-- กำลังตอบ -->
-            <div class="chat-row bot" x-show="sending">
-                <span class="chat-avatar"><i class="fas fa-leaf"></i></span>
-                <div class="chat-bot w-100" aria-live="polite">
-                    <span class="visually-hidden">กำลังหาคำตอบ</span>
-                    <p class="placeholder-glow mb-2"><span class="placeholder col-10 rounded"></span></p>
-                    <p class="placeholder-glow mb-2"><span class="placeholder col-8 rounded"></span></p>
-                    <p class="placeholder-glow mb-0"><span class="placeholder col-6 rounded"></span></p>
+        <div class="ai-side-foot">
+            {% if is_patient_logged_in %}
+                <a href="{% url 'portal_patient:assistant' %}" class="btn btn-success btn-sm w-100 rounded-pill fw-semibold">
+                    <i class="fas fa-arrow-right me-1"></i> เข้าสู่แชทผู้ป่วยเต็มรูปแบบ
+                </a>
+            {% else %}
+                <div class="d-grid gap-2">
+                    <a href="{% url 'accounts:patient_login' %}?next={% url 'portal_patient:assistant' %}" class="btn btn-success btn-sm rounded-pill fw-semibold">
+                        <i class="fas fa-sign-in-alt me-1"></i> เข้าสู่ระบบ (คุยไม่จำกัด)
+                    </a>
+                    <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-outline-secondary btn-sm rounded-pill">
+                        ลงทะเบียนผู้ป่วยใหม่
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </aside>
+
+    <!-- พื้นที่แชทหลัก -->
+    <main class="ai-main">
+        <!-- แถบบน -->
+        <header class="ai-topbar" :class="{ 'has-border': messages.length > 0 }">
+            <div class="d-flex align-items-center gap-2 min-w-0">
+                <button type="button" class="ai-icon-btn d-none d-lg-inline-flex" @click="sideCollapsed = !sideCollapsed" aria-label="พับ/เปิดแถบข้าง" title="พับ/เปิดแถบข้าง">
+                    <i class="fas fa-columns"></i>
+                </button>
+                <button type="button" class="ai-icon-btn d-lg-none" @click="mobileSideOpen = true" aria-label="เปิดรายการแชท">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="fw-bold text-truncate" x-show="messages.length > 0" x-text="currentTitle()"></span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge rounded-pill"
+                      :class="remaining > 1 ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning-emphasis'"
+                      x-text="'ทดลองฟรีเหลือ ' + remaining + '/' + limit + ' ครั้ง'"></span>
+                {% if is_patient_logged_in %}
+                    <a href="{% url 'portal_patient:assistant' %}" class="btn btn-sm btn-success rounded-pill d-none d-sm-inline-flex align-items-center gap-1">
+                        <i class="fas fa-camera"></i> ใช้ห้องแชทคนไข้
+                    </a>
+                {% else %}
+                    <a href="{% url 'accounts:patient_login' %}?next={% url 'portal_patient:assistant' %}" class="btn btn-sm btn-outline-success rounded-pill d-none d-sm-inline-flex align-items-center gap-1">
+                        <i class="fas fa-user-check"></i> เข้าสู่ระบบ
+                    </a>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- หน้าเริ่มต้นแบบ Gemini / ChatGPT / DeepSeek -->
+        <section class="ai-welcome-stage" x-show="messages.length === 0">
+            <div class="ai-welcome-inner">
+                <h1 class="ai-greeting">สวัสดี, ให้ TSPI AI ช่วยดูแลเรื่องอะไรดีคะ</h1>
+                <p class="ai-subgreeting">ถามข้อมูลสุขภาพ 39 แกนชีววิทยา อาการเบื้องต้น หรือบริการของคลินิก — ทดลองคุยฟรี 5 ครั้ง ไม่เก็บข้อมูล</p>
+
+                <!-- กล่องพิมพ์หรือการ์ดแจ้งเตือนเมื่อครบ 5 ครั้ง -->
+                <template x-if="!isLimited()">
+                    <div class="w-100">
+                        <form class="ai-composer-card" @submit.prevent="send()">
+                            <label for="guest-q-welcome" class="visually-hidden">คำถามถึงผู้ช่วย</label>
+                            <textarea id="guest-q-welcome" x-ref="welcomeInput" class="ai-composer-textarea" rows="2" maxlength="1500"
+                                      placeholder="พิมพ์คำถามสุขภาพ หรือเล่าอาการเบื้องต้นได้เลย..."
+                                      x-model="draft"
+                                      @input="autoGrow($el)"
+                                      @keydown.enter="if (!$event.shiftKey && !$event.isComposing) { $event.preventDefault(); send(); }"
+                                      :disabled="sending"></textarea>
+                            <div class="ai-composer-bar">
+                                <div class="d-flex align-items-center gap-1">
+                                    <a href="{% url 'accounts:patient_login' %}?next={% url 'portal_patient:assistant' %}"
+                                       class="ai-tool-btn text-decoration-none" title="เข้าสู่ระบบเพื่อส่งรูปภาพและคลิปเสียง">
+                                        <i class="fas fa-plus"></i>
+                                        <span class="d-none d-sm-inline small">ส่งรูป/เสียง (เข้าสู่ระบบ)</span>
+                                    </a>
+                                </div>
+                                <div class="d-flex align-items-center gap-1">
+                                    <button type="button" class="ai-tool-btn" x-show="speechSupported"
+                                            :class="{ 'recording': listening }" @click="toggleMic()"
+                                            title="พูดด้วยเสียงภาษาไทย">
+                                        <i class="fas" :class="listening ? 'fa-stop' : 'fa-microphone'"></i>
+                                    </button>
+                                    <button type="submit" class="ai-send-btn" :disabled="sending || !draft.trim()" aria-label="ส่งคำถาม">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="alert alert-warning py-2 px-3 mt-2 mb-0 text-start small" x-show="error" x-text="error" role="alert"></div>
+
+                        <!-- แถว 1: โหมดคำถาม -->
+                        <div class="ai-action-pills">
+                            <template x-for="m in modes" :key="m.id">
+                                <button type="button" class="ai-pill-btn" :class="{ 'active': selectedMode === m.id }"
+                                        @click="applyMode(m)">
+                                    <i class="fas" :class="m.icon"></i>
+                                    <span x-text="m.label"></span>
+                                </button>
+                            </template>
+                        </div>
+
+                        <!-- แถว 2: คำถามแนะนำ (กดแล้วส่งเลย) -->
+                        <div class="ai-suggest-chips">
+                            <template x-for="q in examples" :key="q.text">
+                                <button type="button" class="ai-chip-btn" @click="ask(q.text)" x-text="q.text"></button>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <template x-if="isLimited()">
+                    <div class="ai-gate-card w-100 mt-2">
+                        <div class="mb-2 text-success fs-3"><i class="fas fa-user-shield"></i></div>
+                        <h2 class="h5 fw-bold mb-2">ครบสิทธิ์ทดลองคุยฟรี 5 ครั้งแล้ว</h2>
+                        <p class="text-muted mb-3">เข้าสู่ระบบหรือลงทะเบียนผู้ป่วย TSPI เพื่อคุยกับ AI ต่อได้ไม่จำกัด พร้อมบันทึกประวัติ แนบรูปภาพ และส่งคลิปเสียงให้แพทย์ตรวจ</p>
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <a href="{% url 'accounts:patient_login' %}?next={% url 'portal_patient:assistant' %}" class="btn btn-success px-4 rounded-pill fw-semibold">
+                                <i class="fas fa-sign-in-alt me-1"></i> เข้าสู่ระบบเพื่อคุยต่อ
+                            </a>
+                            <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-outline-success px-4 rounded-pill fw-semibold">
+                                ลงทะเบียนผู้ป่วยใหม่
+                            </a>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+
+        <!-- ห้องสนทนาเมื่อมีข้อความ -->
+        <section class="ai-scroll" x-ref="log" x-show="messages.length > 0">
+            <div class="ai-col">
+                <template x-for="(m, i) in messages" :key="i">
+                    <div>
+                        <!-- ข้อความผู้ใช้ -->
+                        <div class="ai-row user" x-show="m.role === 'user'">
+                            <div class="ai-user-bubble" x-text="m.content"></div>
+                        </div>
+
+                        <!-- ฉุกเฉิน -->
+                        <div class="ai-row" x-show="m.role === 'assistant' && m.kind === 'emergency'">
+                            <div class="alert alert-danger d-flex gap-3 mb-0 w-100 rounded-4" role="alert">
+                                <i class="fas fa-ambulance fs-3 mt-1"></i>
+                                <div>
+                                    <strong class="d-block fs-5 mb-1">อาจเป็นภาวะฉุกเฉิน</strong>
+                                    <span x-text="m.content"></span>
+                                    <div class="mt-3">
+                                        <a href="tel:1669" class="btn btn-danger rounded-pill px-3"><i class="fas fa-phone-alt me-1"></i> โทร 1669</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- คำตอบ AI -->
+                        <div class="ai-row" x-show="m.role === 'assistant' && m.kind !== 'emergency'">
+                            <span class="ai-bot-avatar"><i class="fas fa-leaf"></i></span>
+                            <div class="ai-bot-body">
+                                <template x-for="(b, bi) in blocks(parts(m).clinic)" :key="bi">
+                                    <div class="ai-block">
+                                        <p x-show="b.type === 'p'"><template x-for="(seg, si) in b.items[0]" :key="si"><span><span x-text="seg.t" x-show="!seg.cite"></span><button type="button" class="ai-cite" x-show="seg.cite" x-text="seg.cite" @click="m.open = true" :title="(m.sources || [])[seg.cite - 1] || ''"></button></span></template></p>
+                                        <ul x-show="b.type === 'ul'"><template x-for="(li, lii) in b.items" :key="lii"><li><template x-for="(seg, si) in li" :key="si"><span><span x-text="seg.t" x-show="!seg.cite"></span><button type="button" class="ai-cite" x-show="seg.cite" x-text="seg.cite" @click="m.open = true"></button></span></template></li></template></ul>
+                                    </div>
+                                </template>
+
+                                <div class="ai-general-box" x-show="parts(m).general">
+                                    <div class="ai-general-label"><i class="fas fa-robot me-1"></i> ความรู้ทั่วไปจาก AI <span class="fw-normal">· ไม่ใช่เอกสารของคลินิก</span></div>
+                                    <template x-for="(b, bi) in blocks(parts(m).general)" :key="bi">
+                                        <div class="ai-block">
+                                            <p x-show="b.type === 'p'" x-text="b.items[0].map(s => s.t).join('')"></p>
+                                            <ul x-show="b.type === 'ul'"><template x-for="(li, lii) in b.items" :key="lii"><li x-text="li.map(s => s.t).join('')"></li></template></ul>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <div class="ai-sources" x-show="m.sources && m.sources.length">
+                                    <button type="button" class="ai-sources-btn" @click="m.open = !m.open" :aria-expanded="!!m.open">
+                                        <i class="fas fa-book-medical"></i>
+                                        <span x-text="'อ้างอิงเอกสาร TSPI ' + (m.sources ? m.sources.length : 0) + ' รายการ'"></span>
+                                        <i class="fas" :class="m.open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                                    </button>
+                                    <ol class="small text-muted mt-2 mb-0 ps-3" x-show="m.open" x-transition>
+                                        <template x-for="(s, si) in (m.sources || [])" :key="si"><li x-text="s"></li></template>
+                                    </ol>
+                                </div>
+
+                                <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+                                    <button type="button" class="btn btn-sm btn-light rounded-pill" @click="copyMsg(m, i)">
+                                        <i class="far" :class="copiedIndex === i ? 'fa-check text-success' : 'fa-copy'"></i>
+                                        <span x-text="copiedIndex === i ? 'คัดลอกแล้ว' : 'คัดลอก'"></span>
+                                    </button>
+                                    <template x-if="i === messages.length - 1 && !sending && m.kind !== 'out_of_scope'">
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill"
+                                                    x-show="!isLimited()" @click="ask('อธิบายให้เข้าใจง่ายกว่านี้หน่อย')">
+                                                อธิบายง่าย ๆ อีกครั้ง
+                                            </button>
+                                            <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-sm btn-success rounded-pill">
+                                                <i class="fas fa-user-md me-1"></i> ให้แพทย์ดูต่อ
+                                            </a>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- กำลังคิด -->
+                <div class="ai-row" x-show="sending">
+                    <span class="ai-bot-avatar"><i class="fas fa-leaf"></i></span>
+                    <div class="ai-bot-body w-100" aria-live="polite">
+                        <p class="placeholder-glow mb-2"><span class="placeholder col-10 rounded"></span></p>
+                        <p class="placeholder-glow mb-2"><span class="placeholder col-8 rounded"></span></p>
+                        <p class="placeholder-glow mb-0"><span class="placeholder col-5 rounded"></span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- กล่องพิมพ์ด้านล่างเมื่อเข้าสู่การสนทนา -->
+        <div class="ai-dock" x-show="messages.length > 0">
+            <div class="ai-col">
+                <div class="alert alert-warning py-2 px-3 mb-2 small" x-show="error" x-text="error" role="alert"></div>
+
+                <template x-if="!isLimited()">
+                    <form class="ai-composer-card" @submit.prevent="send()">
+                        <label for="guest-q" class="visually-hidden">คำถามถึงผู้ช่วย</label>
+                        <textarea id="guest-q" x-ref="input" class="ai-composer-textarea" rows="1" maxlength="1500"
+                                  placeholder="ถามต่อ หรือเล่าอาการเพิ่มเติม..."
+                                  x-model="draft"
+                                  @input="autoGrow($el)"
+                                  @keydown.enter="if (!$event.shiftKey && !$event.isComposing) { $event.preventDefault(); send(); }"
+                                  :disabled="sending"></textarea>
+                        <div class="ai-composer-bar">
+                            <div class="small text-muted px-1">
+                                <span x-text="'เหลือสิทธิ์ทดลอง ' + remaining + '/' + limit + ' ครั้ง'"></span>
+                            </div>
+                            <div class="d-flex align-items-center gap-1">
+                                <button type="button" class="ai-tool-btn" x-show="speechSupported"
+                                        :class="{ 'recording': listening }" @click="toggleMic()"
+                                        title="พูดด้วยเสียงภาษาไทย">
+                                    <i class="fas" :class="listening ? 'fa-stop' : 'fa-microphone'"></i>
+                                </button>
+                                <button type="submit" class="ai-send-btn" :disabled="sending || !draft.trim()" aria-label="ส่งคำถาม">
+                                    <i class="fas fa-arrow-up"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </template>
+
+                <template x-if="isLimited()">
+                    <div class="ai-gate-card">
+                        <p class="fw-bold mb-1">ครบสิทธิ์ทดลองคุยฟรี 5 ครั้งแล้ว</p>
+                        <p class="small text-muted mb-3">เข้าสู่ระบบหรือลงทะเบียนเพื่อคุยต่อไม่จำกัด พร้อมส่งรูปภาพ/เสียง และบันทึกประวัติให้แพทย์ตรวจ</p>
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <a href="{% url 'accounts:patient_login' %}?next={% url 'portal_patient:assistant' %}" class="btn btn-sm btn-success rounded-pill px-4 fw-semibold">
+                                <i class="fas fa-sign-in-alt me-1"></i> เข้าสู่ระบบเพื่อคุยต่อ
+                            </a>
+                            <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-sm btn-outline-success rounded-pill px-4 fw-semibold">
+                                ลงทะเบียนผู้ป่วยใหม่
+                            </a>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="ai-foot-note">
+                    <span>ไม่ใช่การวินิจฉัยของแพทย์ &middot; ไม่มีเก็บข้อมูลบนเซิร์ฟเวอร์ &middot; ฉุกเฉินโทร <a href="tel:1669">1669</a></span>
+                    <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" @click="newThread()">
+                        <i class="fas fa-plus me-1"></i> แชทใหม่
+                    </button>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- ช่องพิมพ์ ติดขอบล่าง -->
-    <div class="chat-dock">
-        <div class="chat-col">
-            <div class="alert alert-warning py-2 mb-2" x-show="error" x-text="error" role="alert"></div>
-            <form class="chat-input" @submit.prevent="send()">
-                <label for="guest-q" class="visually-hidden">คำถามถึงผู้ช่วย</label>
-                <textarea id="guest-q" x-ref="input" rows="1" maxlength="1500" placeholder="พิมพ์คำถาม หรือเล่าอาการ…" x-model="draft"
-                          @input="grow($el)" @keydown.enter="if (!$event.shiftKey && !$event.isComposing) { $event.preventDefault(); send(); }"
-                          :disabled="sending"></textarea>
-                <button class="btn btn-primary" type="submit" :disabled="sending || !draft.trim()" aria-label="ส่งคำถาม">
-                    <i class="fas fa-arrow-up"></i>
-                </button>
-            </form>
-            <div class="d-flex justify-content-between align-items-center gap-2 mt-2 chat-foot">
-                <span>ไม่ใช่การวินิจฉัยของแพทย์ &middot; ฉุกเฉินโทร <a href="tel:1669">1669</a></span>
-                <button type="button" class="btn btn-link btn-sm p-0" x-show="messages.length" @click="clear()"><i class="fas fa-redo"></i> เริ่มคุยใหม่</button>
-            </div>
-        </div>
-    </div>
+    </main>
 </div>
 
 <script>
 function guestChat() {
-    const KEY = 'tspi_guest_chat_v1';
-    const GENERAL = 'ข้อมูลทั่วไปเพิ่มเติม';
-    let saved = [];
-    try { saved = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { saved = []; }
+    const THREADS_KEY = 'tspi_guest_threads_v2';
+    const LEGACY_KEY = 'tspi_guest_chat_v1';
+    const U = window.TspiAssistantUtils;
+
+    let initialThreads = [];
+    try {
+        initialThreads = JSON.parse(localStorage.getItem(THREADS_KEY) || '[]');
+        if (!Array.isArray(initialThreads) || !initialThreads.length) {
+            const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY) || '[]');
+            if (Array.isArray(legacy) && legacy.length) {
+                initialThreads = [{ id: 't_' + Date.now(), title: (legacy[0].content || 'แชทเดิม').slice(0, 36), messages: legacy.slice(-20) }];
+            }
+        }
+    } catch (e) { initialThreads = []; }
+
     return {
-        messages: Array.isArray(saved) ? saved.slice(-20) : [],
-        draft: '', sending: false, error: '',
+        threads: Array.isArray(initialThreads) ? initialThreads : [],
+        currentId: null,
+        messages: [],
+        draft: '',
+        sending: false,
+        error: '',
+        searchQuery: '',
+        sideCollapsed: false,
+        mobileSideOpen: false,
+        selectedMode: '',
+        copiedIndex: -1,
+        remaining: Number('{{ guest_remaining|default:5 }}'),
+        limit: Number('{{ guest_limit|default:5 }}'),
+        speechSupported: U.supportsSpeech(),
+        listening: false,
+        recognizer: null,
+        modes: [
+            { id: 'symptom', icon: 'fa-stethoscope', label: 'ซักประวัติเบื้องต้น', prefix: 'ขอสอบถามอาการเบื้องต้น: ' },
+            { id: 'axes', icon: 'fa-dna', label: 'ถามเรื่อง 39 แกน', prefix: 'อธิบายเรื่อง 39 แกนชีววิทยา: ' },
+            { id: 'clinic', icon: 'fa-calendar-check', label: 'บริการ & นัดหมาย', prefix: 'สอบถามบริการและนัดหมายคลินิก: ' },
+            { id: 'selfcare', icon: 'fa-seedling', label: 'ดูแลตัวเอง', prefix: 'แนวทางดูแลตัวเองเบื้องต้นเรื่อง ' },
+        ],
         examples: [
             { icon: 'fa-bacteria', text: 'ลำไส้รั่วคืออะไร รักษาอย่างไร' },
             { icon: 'fa-battery-quarter', text: 'อ่อนเพลียบ่อย เกี่ยวกับระบบไหน' },
             { icon: 'fa-allergies', text: 'สะเก็ดเงินดูแลตัวเองอย่างไร' },
             { icon: 'fa-calendar-check', text: 'นัดหมายคลินิกได้อย่างไร' },
         ],
+
         init() {
-            // มาจากการ์ดหน้าแรก (?q=...) ให้ถามทันที แล้วลบออกจาก URL กันถามซ้ำตอนรีเฟรช
             const q = new URLSearchParams(location.search).get('q');
-            if (q) { history.replaceState(null, '', location.pathname); this.ask(q.slice(0, 300)); }
-            else this.scroll();
-        },
-        // แยกคำตอบ: ส่วนจากเอกสารคลินิก กับ ส่วนความรู้ทั่วไปจาก AI
-        parts(m) {
-            const text = (m.content || '').replace(/\*\*/g, '').trim();
-            if (m.kind === 'general') return { clinic: '', general: text.replace(/ข้อมูลทั่วไปเพิ่มเติม[^:\n]*:\s*/, '').trim() };
-            const at = text.indexOf(GENERAL);
-            if (at < 0) return { clinic: text, general: '' };
-            return { clinic: text.slice(0, at).trim(), general: text.slice(at).replace(/^[^:\n]*:?\s*/, '').trim() };
-        },
-        // แปลงข้อความเป็นย่อหน้า/รายการ และแยกเลขอ้างอิง [n] ออกมาเป็นปุ่ม (ไม่ใช้ innerHTML)
-        blocks(text) {
-            const segs = (line) => line.split(/(\[\d+\])/).filter(Boolean)
-                .map(t => /^\[\d+\]$/.test(t) ? { cite: Number(t.slice(1, -1)) } : { t });
-            const out = [];
-            for (const raw of (text || '').split('\n')) {
-                const line = raw.trim();
-                if (!line) continue;
-                const li = line.match(/^(?:[-•*]|\d+[.)])\s+(.*)$/);
-                if (li) {
-                    const last = out[out.length - 1];
-                    if (last && last.type === 'ul') last.items.push(segs(li[1])); else out.push({ type: 'ul', items: [segs(li[1])] });
-                } else {
-                    out.push({ type: 'p', items: [segs(line)] });
-                }
+            if (q) {
+                history.replaceState(null, '', location.pathname);
+                this.ask(q.slice(0, 300));
             }
-            return out;
         },
-        grow(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 180) + 'px'; },
+        isLimited() { return this.remaining <= 0; },
+        filteredThreads() {
+            const q = this.searchQuery.trim().toLowerCase();
+            if (!q) return this.threads;
+            return this.threads.filter(t => (t.title || '').toLowerCase().includes(q));
+        },
+        currentTitle() {
+            const found = this.threads.find(t => t.id === this.currentId);
+            return found ? found.title : 'คุยกับ TSPI AI';
+        },
         persist() {
-            const keep = this.messages.slice(-20).map(({ open, ...m }) => m);
-            try { localStorage.setItem(KEY, JSON.stringify(keep)); } catch (e) {}
+            try { localStorage.setItem(THREADS_KEY, JSON.stringify(this.threads.slice(0, 20))); } catch (e) {}
         },
-        clear() { this.messages = []; this.error = ''; this.persist(); this.$refs.input.focus(); },
+        newThread() {
+            this.currentId = null;
+            this.messages = [];
+            this.error = '';
+            this.mobileSideOpen = false;
+            this.$nextTick(() => {
+                const el = this.$refs.welcomeInput;
+                if (el) el.focus();
+            });
+        },
+        openThread(id) {
+            const found = this.threads.find(t => t.id === id);
+            if (!found) return;
+            this.currentId = found.id;
+            this.messages = (found.messages || []).map(m => ({ ...m, open: false }));
+            this.error = '';
+            this.mobileSideOpen = false;
+            this.scroll();
+        },
+        deleteThread(id) {
+            this.threads = this.threads.filter(t => t.id !== id);
+            if (this.currentId === id) { this.currentId = null; this.messages = []; }
+            this.persist();
+        },
+        applyMode(m) {
+            this.selectedMode = m.id;
+            if (!this.draft.trim()) this.draft = m.prefix;
+            this.$nextTick(() => {
+                const el = this.$refs.welcomeInput || this.$refs.input;
+                if (el) { el.focus(); this.autoGrow(el); }
+            });
+        },
+        toggleMic() {
+            if (!this.speechSupported) return;
+            if (this.listening && this.recognizer) { this.recognizer.stop(); return; }
+            const base = this.draft ? this.draft.trim() + ' ' : '';
+            this.recognizer = U.createSpeechRecognizer(
+                (spoken) => {
+                    this.draft = base + spoken;
+                    this.$nextTick(() => this.autoGrow(this.$refs.welcomeInput || this.$refs.input));
+                },
+                (isOn, errMsg) => {
+                    this.listening = isOn;
+                    if (errMsg) this.error = errMsg;
+                }
+            );
+            if (this.recognizer) this.recognizer.start();
+        },
+        parts(m) { return U.parseParts(m); },
+        blocks(text) { return U.parseBlocks(text); },
+        autoGrow(el) { U.autoGrow(el); },
         scroll() { this.$nextTick(() => { const el = this.$refs.log; if (el) el.scrollTop = el.scrollHeight; }); },
+        async copyMsg(m, idx) {
+            if (await U.copyText(m.content || '')) {
+                this.copiedIndex = idx;
+                setTimeout(() => { if (this.copiedIndex === idx) this.copiedIndex = -1; }, 1600);
+            }
+        },
         ask(text) { this.draft = text; this.send(); },
         async send() {
             const text = this.draft.trim();
-            if (!text || this.sending) return;
+            if (!text || this.sending || this.isLimited()) return;
+            if (!this.currentId) {
+                const id = 't_' + Date.now();
+                const title = text.slice(0, 36) + (text.length > 36 ? '…' : '');
+                this.threads.unshift({ id, title, messages: [] });
+                this.currentId = id;
+            }
             this.messages.push({ role: 'user', content: text });
-            this.draft = ''; this.sending = true; this.error = '';
-            this.$nextTick(() => this.grow(this.$refs.input));
+            this.draft = '';
+            this.sending = true;
+            this.error = '';
+            this.$nextTick(() => { if (this.$refs.input) this.autoGrow(this.$refs.input); });
             this.scroll();
+
             try {
                 const r = await fetch('{% url "core:guest_assistant_api" %}', {
                     method: 'POST',
@@ -201,13 +494,23 @@ function guestChat() {
                     body: JSON.stringify({ messages: this.messages.slice(-8).map(m => ({ role: m.role, content: m.content })) }),
                 });
                 const d = await r.json();
-                if (r.ok) this.messages.push({ role: 'assistant', content: d.answer, kind: d.kind, sources: d.sources || [], open: false });
-                else this.error = d.error || 'ส่งคำถามไม่สำเร็จ กรุณาลองใหม่';
+                if (typeof d.remaining === 'number') this.remaining = d.remaining;
+                if (r.ok) {
+                    this.messages.push({ role: 'assistant', content: d.answer, kind: d.kind, sources: d.sources || [], open: false });
+                } else {
+                    if (d.limited) this.remaining = 0;
+                    this.error = d.error || 'ส่งคำถามไม่สำเร็จ กรุณาลองใหม่';
+                }
             } catch (e) {
                 this.error = 'เชื่อมต่อไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่';
             }
-            this.sending = false; this.persist(); this.scroll();
-            this.$nextTick(() => this.$refs.input.focus());
+
+            const thread = this.threads.find(t => t.id === this.currentId);
+            if (thread) thread.messages = this.messages.slice(-20).map(({ open, ...m }) => m);
+            this.sending = false;
+            this.persist();
+            this.scroll();
+            this.$nextTick(() => { if (this.$refs.input && !this.isLimited()) this.$refs.input.focus(); });
         },
     };
 }

@@ -67,6 +67,34 @@ class AssistantServiceTests(TestCase):
         self.assertNotIn('0812345678', prompt)  # ลบข้อมูลระบุตัวตนก่อนส่ง LLM
         self.assertIn('ห้ามอ้างว่าเป็นข้อมูลของคลินิก', fake.call_args.kwargs['messages'][0]['content'])
 
+    def test_image_chat_uses_gemini_vision_with_face_blur(self):
+        import base64
+        import io
+        from PIL import Image
+        buf = io.BytesIO()
+        Image.new('RGB', (40, 40), color=(200, 120, 120)).save(buf, format='JPEG')
+        b64 = base64.b64encode(buf.getvalue()).decode('ascii')
+        fake = self._llm('สังเกตเห็นรอยแดงเบื้องต้น กรุณาเล่าอาการคันร่วมด้วยค่ะ')
+        with patch('ai_service.main.gateway.call_gemini_chat', new=fake) as vis:
+            resp = self.client_ai.post('/api/ai/assistant/chat', headers=self.headers, json={
+                'messages': [{'role': 'user', 'content': 'ช่วยดูผื่นนี้หน่อย'}],
+                'images_base64': [{'data': b64, 'mime_type': 'image/jpeg'}],
+            })
+        data = resp.json()
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('รอยแดง', data['answer'])
+        self.assertTrue(vis.call_args.kwargs['images'])
+        self.assertIn('ห้ามวินิจฉัยโรคจากภาพ', vis.call_args.args[0])
+
+    def test_voice_endpoint_marks_simulated_when_gateway_fails(self):
+        fake_fail = AsyncMock(return_value={'success': False, 'error': 'GEMINI_API_KEY_MISSING', 'content': 'simulated'})
+        with patch('ai_service.main.gateway.call_gemini_audio', new=fake_fail):
+            resp = self.client_ai.post('/api/intake/voice', headers=self.headers,
+                                       data={'consent_granted': 'true'},
+                                       files={'file': ('v.webm', b'1234', 'audio/webm')})
+        data = resp.json()
+        self.assertTrue(data['simulated'])
+
 
 class AssistantThreadApiTests(TestCase):
     def setUp(self):
@@ -121,10 +149,66 @@ class AssistantThreadApiTests(TestCase):
         self.assertTrue(AssistantThread.objects.get(pk=tid).hidden_by_user)
         self.assertTrue(Box.objects.filter(pk=box.pk).exists())  # เวชระเบียนยังอยู่
 
-    def test_daily_limit(self):
+    def test_burst_limit_and_continuous_chat(self):
         from portal_patient import views_assistant
         tid = self._post('assistant_new_thread_api').json()['thread']['id']
-        with patch.object(views_assistant, 'DAILY_MESSAGE_LIMIT', 2):
+        with patch.object(views_assistant, 'BURST_LIMIT_PER_MINUTE', 2):
             self._send(tid, 'ถาม 1')
             self._send(tid, 'ถาม 2')
             self.assertEqual(self._send(tid, 'ถาม 3').status_code, 429)
+
+    def test_patient_can_upload_image_and_audio_but_not_video_and_idor_blocked(self):
+        import io
+        import tempfile
+        from PIL import Image
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from django.test import override_settings
+
+        img_buf = io.BytesIO()
+        Image.new('RGB', (32, 32), color=(180, 90, 90)).save(img_buf, format='JPEG')
+        img_file = SimpleUploadedFile('rash.jpg', img_buf.getvalue(), content_type='image/jpeg')
+        aud_file = SimpleUploadedFile('voice.webm', b'RIFF0000WEBP', content_type='audio/webm;codecs=opus')
+        vid_file = SimpleUploadedFile('clip.mp4', b'0000', content_type='video/mp4')
+
+        with tempfile.TemporaryDirectory() as tmpdir, override_settings(PRIVATE_MEDIA_ROOT=tmpdir):
+            tid = self._post('assistant_new_thread_api').json()['thread']['id']
+
+            # วิดีโอต้องถูกปฏิเสธ
+            r_vid = self.client.post(reverse('portal_patient:assistant_send_api', args=[tid]),
+                                     {'text': 'ส่งวิดีโอ', 'audio': vid_file})
+            self.assertEqual(r_vid.status_code, 400)
+
+            # รูป + เสียง ทำงานสำเร็จ เข้ารหัสเก็บ และเปิดดูได้เฉพาะเจ้าของ
+            fake_voice = MagicMock(status_code=200)
+            fake_voice.json.return_value = {'success': True, 'sanitized_transcript': 'มีผื่นคันที่แขนมาสามวัน'}
+            fake_chat = MagicMock(status_code=200)
+            fake_chat.json.return_value = {'answer': 'รับทราบค่ะ ควรให้แพทย์ตรวจเพิ่มเติม', 'kind': 'general',
+                                           'sources': [], 'provider': 'gemini', 'model': 'm', 'usage': {}}
+
+            def _mock_post(url, **kwargs):
+                return fake_voice if '/api/intake/voice' in url else fake_chat
+
+            with patch('portal_patient.views_assistant.httpx.post', side_effect=_mock_post):
+                r_ok = self.client.post(reverse('portal_patient:assistant_send_api', args=[tid]),
+                                        {'text': 'ช่วยดูหน่อย', 'images': [img_file], 'audio': aud_file})
+            self.assertEqual(r_ok.status_code, 200)
+            user_msg = r_ok.json()['messages'][0]
+            self.assertEqual(len(user_msg['attachments']), 2)
+            self.assertIn('มีผื่นคันที่แขนมาสามวัน', user_msg['content'])
+
+            # เจ้าของเปิดดูไฟล์แนบได้
+            att_url = user_msg['attachments'][0]['url']
+            self.assertEqual(self.client.get(att_url).status_code, 200)
+
+            # ผู้ป่วยคนอื่นเปิดดูไม่ได้ (IDOR)
+            other = User.objects.create_user(username='pt_other2', password='PatientPass2026!x', role=User.Role.PATIENT)
+            self.client.force_login(other)
+            self.assertEqual(self.client.get(att_url).status_code, 404)
+
+            # กลับมาเป็นเจ้าของแล้วส่งเข้าคลินิก -> Box มีทั้งข้อความและไฟล์แนบ
+            self.client.force_login(self.user)
+            self.assertEqual(self._post('assistant_submit_api', tid).status_code, 200)
+            box = Box.objects.get(patient=self.patient, source=Box.Source.WEB)
+            kinds = [m['kind'] for m in box.contents['messages']]
+            self.assertIn('image', kinds)
+            self.assertIn('audio', kinds)

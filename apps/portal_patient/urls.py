@@ -51,6 +51,7 @@ urlpatterns = [
     path('api/assistant/threads/<int:thread_id>/rename/', views_assistant.assistant_rename_api, name='assistant_rename_api'),
     path('api/assistant/threads/<int:thread_id>/delete/', views_assistant.assistant_delete_api, name='assistant_delete_api'),
     path('api/assistant/threads/<int:thread_id>/submit/', views_assistant.assistant_submit_api, name='assistant_submit_api'),
+    path('api/assistant/media/<int:message_id>/<str:media_id>/', views_assistant.assistant_media_view, name='assistant_media'),
     path('api/ai-intake/chat/', views.patient_ai_intake_chat_api, name='ai_intake_chat_api'),
     path('api/ai-intake/fallback/', views.patient_ai_intake_fallback_api, name='ai_intake_fallback_api'),
     path('checkin/', views.patient_checkin, name='patient_checkin'),

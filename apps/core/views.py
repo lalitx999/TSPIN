@@ -157,8 +157,24 @@ def about(request):
     return render(request, 'core/about.html')
 
 def assistant_view(request):
-    """คุยกับผู้ช่วย AI (ไม่ต้องลงทะเบียน) ใช้ API guest_assistant_api"""
-    return render(request, 'core/assistant.html')
+    """คุยกับผู้ช่วย AI (ไม่ต้องลงทะเบียน) ใช้ API guest_assistant_api จำกัด 5 ครั้ง/วัน ไม่มีเก็บข้อมูล"""
+    from django.core.cache import cache
+    from django.utils import timezone
+    from accounts.models import User
+    from accounts.views import get_client_ip
+
+    today = timezone.localdate().strftime('%Y%m%d')
+    ip_key = f"guest_asst_{get_client_ip(request)}_{today}"
+    used = int(cache.get(ip_key, 0) or 0)
+    remaining = max(0, GUEST_DAILY_LIMIT_PER_IP - used)
+    is_patient_logged_in = (
+        request.user.is_authenticated and getattr(request.user, 'role', None) == User.Role.PATIENT
+    )
+    return render(request, 'core/assistant.html', {
+        'guest_limit': GUEST_DAILY_LIMIT_PER_IP,
+        'guest_remaining': remaining,
+        'is_patient_logged_in': is_patient_logged_in,
+    })
 
 def guide_view(request):
     """Patient & User Onboarding Guide (Step 01 - Step 06)"""
@@ -202,9 +218,9 @@ def health_check_view(request):
 # ==============================================================================
 # ผู้ช่วย AI บนหน้าแรก สำหรับผู้ใช้ที่ยังไม่ลงทะเบียน
 # - ไม่เก็บบทสนทนาบนเซิร์ฟเวอร์ (ประวัติอยู่ในเบราว์เซอร์ของผู้ใช้) เพราะไม่รู้ตัวตนและไม่มีความยินยอม
-# - จำกัดจำนวนต่อ IP ต่อวัน และเพดานรวมทั้งระบบต่อวัน เพื่อกันงบ AI หมด
+# - จำกัด 5 ครั้ง/วัน ต่อ IP เพื่อกันงบ AI หมด แล้วชวนเข้าสู่ระบบเพื่อคุยต่อไม่จำกัด
 # ==============================================================================
-GUEST_DAILY_LIMIT_PER_IP = 15
+GUEST_DAILY_LIMIT_PER_IP = 5
 GUEST_DAILY_LIMIT_TOTAL = 1000
 
 
@@ -235,16 +251,29 @@ def guest_assistant_api(request):
     today = timezone.localdate().strftime('%Y%m%d')
     ip_key = f"guest_asst_{get_client_ip(request)}_{today}"
     total_key = f"guest_asst_total_{today}"
-    if cache.get(ip_key, 0) >= GUEST_DAILY_LIMIT_PER_IP or cache.get(total_key, 0) >= GUEST_DAILY_LIMIT_TOTAL:
-        return JsonResponse({'error': 'วันนี้ถามครบจำนวนแล้ว ลงทะเบียนเพื่อคุยต่อ หรือทักเจ้าหน้าที่ทาง LINE ได้เลยค่ะ',
-                             'limited': True}, status=429)
-    cache.set(ip_key, cache.get(ip_key, 0) + 1, timeout=60 * 60 * 24)
-    cache.set(total_key, cache.get(total_key, 0) + 1, timeout=60 * 60 * 24)
+    used_ip = int(cache.get(ip_key, 0) or 0)
+    used_total = int(cache.get(total_key, 0) or 0)
+    if used_ip >= GUEST_DAILY_LIMIT_PER_IP or used_total >= GUEST_DAILY_LIMIT_TOTAL:
+        return JsonResponse({
+            'error': 'ครบสิทธิ์ทดลองคุยฟรี 5 ครั้งแล้ว กรุณาเข้าสู่ระบบหรือลงทะเบียนผู้ป่วย เพื่อคุยต่อไม่จำกัดและส่งรูป/เสียงได้',
+            'limited': True,
+            'login_required': True,
+            'remaining': 0,
+            'limit': GUEST_DAILY_LIMIT_PER_IP,
+        }, status=429)
+
+    new_used_ip = used_ip + 1
+    cache.set(ip_key, new_used_ip, timeout=60 * 60 * 24)
+    cache.set(total_key, used_total + 1, timeout=60 * 60 * 24)
+    remaining = max(0, GUEST_DAILY_LIMIT_PER_IP - new_used_ip)
 
     provider = dj_settings.AI_SOAP_PROVIDER
     allowed, budget_msg = ai_budget.check_budget(provider)
     if not allowed:
-        return JsonResponse({'answer': budget_msg, 'kind': 'unavailable', 'sources': []})
+        return JsonResponse({
+            'answer': budget_msg, 'kind': 'unavailable', 'sources': [],
+            'remaining': remaining, 'limit': GUEST_DAILY_LIMIT_PER_IP,
+        })
     try:
         resp = httpx.post(
             f"{dj_settings.AI_SERVICE_URL}/api/ai/assistant/chat",
@@ -261,4 +290,6 @@ def guest_assistant_api(request):
         'answer': data.get('answer') or 'ขออภัยค่ะ ระบบผู้ช่วยไม่พร้อมใช้งานชั่วคราว กรุณาลองใหม่ภายหลัง',
         'kind': data.get('kind', 'unavailable'),
         'sources': data.get('sources', []),
+        'remaining': remaining,
+        'limit': GUEST_DAILY_LIMIT_PER_IP,
     })

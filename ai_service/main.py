@@ -253,7 +253,7 @@ async def intake_voice_endpoint(
     )
     mime_type = file.content_type or "audio/mp3"
     gemini_res = await gateway.call_gemini_audio(prompt=prompt, audio_bytes=raw_audio_bytes, mime_type=mime_type)
-    
+    is_simulated = not bool(gemini_res.get("success"))
     raw_transcript = gemini_res.get("content", "")
 
     # 3. Post-Process Transcript with M5 Text Sanitizer
@@ -261,6 +261,7 @@ async def intake_voice_endpoint(
 
     return {
         "success": True,
+        "simulated": is_simulated,
         "consent_granted": True,
         "sanitized_transcript": sanitized_res["sanitized_text"],
         "has_pii": sanitized_res["has_pii"],
@@ -439,6 +440,285 @@ async def generate_soap_endpoint(
         "provider": soap_res.get("provider", ""),
         "model": soap_res.get("model", ""),
         "usage": soap_res.get("usage", {}),
+    }
+
+
+# ============================================================================
+# ซักประวัติที่คลินิก -> Gemini สรุป SOAP (ข้อความ + สัญญาณชีพ + รูป)
+# ============================================================================
+VISIT_SOAP_MAX_IMAGES = 6
+VISIT_SOAP_IMAGE_EDGE = 1600  # ย่อด้านยาวก่อนส่ง ลดขนาดและ token
+
+VISIT_SOAP_PROMPT = """คุณเป็นผู้ช่วยจัดทำบันทึกเวชระเบียนของคลินิก TSPI ให้พยาบาลและแพทย์
+ได้รับ: ข้อความซักประวัติ (พิมพ์หรือพูด อาจไม่เรียบร้อย), สัญญาณชีพที่วัดจริง และรูปประกอบ (ถ้ามี)
+งาน: จัดข้อมูลเป็น SOAP ภาษาไทย กระชับ ใช้ข้อมูลที่ได้รับเท่านั้น ห้ามแต่งข้อมูลที่ไม่มี
+
+- subjective: อาการสำคัญ ระยะเวลา ลักษณะ ปัจจัยกระตุ้น อาการร่วม ยาที่ใช้ โรคประจำตัว การแพ้ ตามที่เล่า
+- objective: สัญญาณชีพทุกค่าพร้อมหน่วย และสิ่งที่เห็นในรูป (เช่น ลักษณะผื่น ตัวเลขในใบผลแล็บ) บรรยายตามที่เห็น
+- assessment: ข้อสังเกตเชิงการทำงานของร่างกาย และค่าที่ผิดปกติจากสัญญาณชีพ ห้ามฟันธงชื่อโรค ให้แพทย์เป็นผู้วินิจฉัย
+- plan: สิ่งที่ควรซักหรือตรวจเพิ่ม และประเด็นให้แพทย์พิจารณา ห้ามระบุยาหรือขนาดยา
+
+ถ้าข้อมูลส่วนใดไม่มี ให้เขียนว่า "ไม่มีข้อมูล" อย่าเว้นว่าง
+ถ้าในข้อความหรือรูปมีอาการฉุกเฉิน (เช่น เจ็บหน้าอก หายใจลำบาก อ่อนแรงครึ่งซีก) ให้ขึ้นต้น assessment ด้วย "⚠ ควรประเมินด่วน:"
+ตอบเป็น JSON เท่านั้น: {"subjective": "...", "objective": "...", "assessment": "...", "plan": "..."}"""
+
+VITAL_LABELS = [
+    ("bp_systolic", "ความดันบน", "mmHg"), ("bp_diastolic", "ความดันล่าง", "mmHg"), ("pulse", "ชีพจร", "ครั้ง/นาที"),
+    ("temperature", "อุณหภูมิ", "°C"), ("weight_kg", "น้ำหนัก", "กก."), ("height_cm", "ส่วนสูง", "ซม."),
+    ("bmi", "BMI", "กก./ม²"), ("spo2", "SpO2", "%"),
+]
+
+
+def _shrink_image(data: bytes) -> bytes:
+    """ย่อด้านยาวเหลือ VISIT_SOAP_IMAGE_EDGE และบันทึกเป็น JPEG (รูปผ่านการลบ EXIF/เบลอหน้ามาแล้ว)"""
+    import io
+    from PIL import Image
+    try:
+        with Image.open(io.BytesIO(data)) as img:
+            img = img.convert("RGB")
+            img.thumbnail((VISIT_SOAP_IMAGE_EDGE, VISIT_SOAP_IMAGE_EDGE))
+            out = io.BytesIO()
+            img.save(out, format="JPEG", quality=85)
+            return out.getvalue()
+    except Exception:
+        return data
+
+
+@app.post("/api/ai/visit/soap")
+async def visit_soap_endpoint(
+    history: str = Form(""),
+    vitals: str = Form("{}"),
+    images: List[UploadFile] = File(default=[]),
+):
+    """
+    สรุป SOAP จากการซักประวัติที่คลินิกด้วย Gemini เสมอ (ไม่ขึ้นกับ AI_SOAP_PROVIDER)
+    Django ลบข้อมูลระบุตัวตนในข้อความมาก่อน ที่นี่ลบ EXIF และเบลอใบหน้าในรูปซ้ำก่อนส่งออก
+    """
+    try:
+        vitals_data = json.loads(vitals or "{}")
+    except ValueError:
+        vitals_data = {}
+    history = TextDeidentifier.sanitize(history or "")["sanitized_text"].strip()
+
+    sent_images = []
+    for upload in (images or [])[:VISIT_SOAP_MAX_IMAGES]:
+        raw = await upload.read()
+        if not raw:
+            continue
+        clean, _faces = MediaSanitizer.blur_faces(raw, safety_margin=0.25)
+        sent_images.append({"data": _shrink_image(clean), "mime_type": "image/jpeg"})
+
+    if not history and not sent_images:
+        raise HTTPException(status_code=400, detail="ไม่มีข้อมูลซักประวัติ")
+
+    vital_lines = [f"- {label}: {vitals_data[key]} {unit}" for key, label, unit in VITAL_LABELS
+                   if vitals_data.get(key) not in (None, "")]
+    user_text = (
+        "สัญญาณชีพ:\n" + ("\n".join(vital_lines) or "- ไม่มี") +
+        f"\n\nข้อความซักประวัติ:\n{history or '(ไม่มีข้อความ มีเฉพาะรูป)'}" +
+        f"\n\nจำนวนรูปประกอบ: {len(sent_images)} รูป"
+    )
+
+    res = await gateway.call_gemini_json(VISIT_SOAP_PROMPT, user_text, images=sent_images,
+                                         temperature=0.2, max_tokens=4096)
+    meta = {"provider": res.get("provider", "gemini"), "model": res.get("model", ""), "usage": res.get("usage", {})}
+    if not res.get("success"):
+        return {"success": False, "error": res.get("error", "GEMINI_FAILED"), **meta}
+
+    content_raw = str(res.get("content") or "").strip()
+    try:
+        # ถอด markdown code fence หากโมเดลส่ง ```json ... ``` มา
+        if content_raw.startswith("```"):
+            lines = content_raw.splitlines()
+            if lines and lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].startswith("```"):
+                lines = lines[:-1]
+            content_raw = "\n".join(lines).strip()
+
+        # ดึงช่วง {...} หากมีข้อความข้างหน้าหรือข้างหลัง
+        start_idx = content_raw.find("{")
+        end_idx = content_raw.rfind("}")
+        if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+            content_raw = content_raw[start_idx:end_idx + 1]
+
+        raw_soap = json.loads(content_raw)
+        if not isinstance(raw_soap, dict):
+            raise ValueError("not an object")
+    except Exception as e:
+        logger.warning(f"[Visit SOAP] Gemini returned non-JSON content: {e} | Raw: {content_raw[:300]}")
+        return {"success": False, "error": "UNPARSEABLE", **meta}
+
+    soap = {k: str(raw_soap.get(k) or "").strip() for k in ("subjective", "objective", "assessment", "plan")}
+    guarded = ClinicalGuardrail.sanitize_and_guard(soap["assessment"])
+    soap["assessment"] = guarded["safe_text"]
+    return {
+        "success": True,
+        "soap": soap,
+        "images_sent": len(sent_images),
+        "guardrail": {"status": guarded["guardrail_status"], "redacted_violations": guarded["violated_patterns"]},
+        "gateway": f"gemini:{meta['model']}",
+        **meta,
+    }
+
+
+SUGGEST_AXES_PROMPT = """คุณคือ TSPI Clinical Systems Biology AI Copilot สำหรับคลินิกการแพทย์บูรณาการ ดร.พัทธ์
+หน้าที่ของคุณ:
+วิเคราะห์ข้อมูลการตรวจของผู้ป่วย (SOAP, สัญญาณชีพ, ประวัติแพ้ยา, โรคประจำตัว) เพื่อประเมินความผิดปกติของ "39 แกนชีววิทยา (39 Canonical Biological Axes)" ตามหลัก Functional & Systems Medicine
+
+รายชื่อ 39 แกนชีววิทยา:
+Axis 1: Systemic Inflammatory Load (การอักเสบระดับระบบ)
+Axis 2: Innate & Adaptive Immune Balance (สมดุลภูมิคุ้มกัน)
+Axis 3: Immune Senescence & Exhaustion (ความเสื่อมของภูมิคุ้มกัน)
+Axis 4: Chronic Latent Infection Burden (การติดเชื้อเรื้อรังแฝง)
+Axis 5: Glucose–Insulin Regulation (การควบคุมกลูโคสและอินซูลิน)
+Axis 6: Lipid Metabolism & Transport (การเผาผลาญและขนส่งไขมัน)
+Axis 7: Metabolic Flexibility & Energy Allocation (ความยืดหยุ่นทางเมแทบอลิซึม)
+Axis 8: Mitochondrial Network (เครือข่ายไมโทคอนเดรีย)
+Axis 9: Bioenergetic & Redox Coupling (การจับคู่พลังงานและรีดอกซ์)
+Axis 10: Metabolic Organ Cross-talk (การสื่อสารระหว่างอวัยวะเมแทบอลิก)
+Axis 11: DNA Repair & Genomic Stability (การซ่อมแซมดีเอ็นเอ)
+Axis 12: Epigenetic Programming (การควบคุมเอพิเจเนติกส์)
+Axis 13: Telomere Dynamics (พลวัตของเทโลเมียร์)
+Axis 14: Cellular Senescence & SASP (เซลล์ชราภาพ)
+Axis 15: Detoxification & Cellular Defense (การขับสารพิษและการปกป้องเซลล์)
+Axis 16: Upper GI & Digestive Capacity (ระบบย่อยอาหารส่วนบนและกรดกระเพาะ)
+Axis 17: Intestinal Barrier Integrity (ความสมบูรณ์ของเยื่อบุลำไส้และลำไส้รั่ว)
+Axis 18: Microbiome Diversity & Ecology (ความหลากหลายของจุลชีพในลำไส้)
+Axis 19: Gut–Immune–Systemic Axis (แกนลำไส้-ภูมิคุ้มกัน-ระบบ)
+Axis 20: Endothelial Function & Microcirculation (การทำงานของเยื่อบุหลอดเลือดและการไหลเวียนโลหิตฝอย)
+Axis 21: Arterial Stiffness & Vascular Compliance (ความยืดหยุ่นของหลอดเลือดแดง)
+Axis 22: Tissue Perfusion & Oxygenation (การลำเลียงออกซิเจนและการซึมซาบเนื้อเยื่อ)
+Axis 23: Lymphatic Drainage & Fluid Homeostasis (การระบายน้ำเหลืองและสมดุลของเหลว)
+Axis 24: Extracellular Matrix Dynamics (พลวัตของโครงร่างค้ำจุนภายนอกเซลล์)
+Axis 25: Wound Healing & Fibrogenic Balance (การสมานแผลและสมดุลพังผืด)
+Axis 26: Bone Remodeling & Mineral Homeostasis (การสร้างและสลายกระดูก)
+Axis 27: Stem Cell Niche & Regenerative Capacity (สเต็มเซลล์และความสามารถในการฟื้นฟู)
+Axis 28: Skeletal Muscle Mass & Quality (มวลและคุณภาพของกล้ามเนื้อลาย)
+Axis 29: Neuromuscular Junction & Motor Unit Integrity (การเชื่อมต่อประสาทและกล้ามเนื้อ)
+Axis 30: Connective Tissue Integrity (ความแข็งแรงของเนื้อเยื่อเกี่ยวพัน)
+Axis 31: HPA Axis & Stress Response (แกน HPA และการตอบสนองต่อความเครียด/คอร์ติซอล)
+Axis 32: Thyroid Hormone Economy (ระบบฮอร์โมนไทรอยด์)
+Axis 33: Sex Steroid & Reproductive Endocrine (ฮอร์โมนเพศ)
+Axis 34: Central Neurotransmitter Balance (สมดุลสารสื่อประสาทส่วนกลาง)
+Axis 35: Autonomic Nervous System & Vagal Tone (ระบบประสาทอัตโนมัติและ Vagal Tone)
+Axis 36: Sleep Architecture & Circadian Rhythm (วงจรการนอนและจังหวะชีวภาพ)
+Axis 37: Blood–Brain Barrier & Neuroinflammation (แผงกั้นเลือด-สมองและการอักเสบในระบบประสาท)
+Axis 38: Hepatorenal Clearance (การขจัดสารพิษของตับและไต)
+Axis 39: Systemic Immune–Oncology Surveillance (ระบบเฝ้าระวังภูมิคุ้มกันระดับโมเลกุล)
+
+เกณฑ์การให้คะแนน:
+- 50 คะแนน = ปกติ/ยังไม่พบสัญญาณบ่งชี้ชัดเจน (Default baseline)
+- 60-75 คะแนน = มีอาการหรือผลตรวจบ่งชี้ถึงความบกพร่อง/เสียสมดุลปานกลาง
+- 76-90 คะแนน = มีอาการชัดเจน รุนแรง หรือเรื้อรังตรงตามกลไกของแกนนั้น
+
+กฎเหล็ก:
+1. ตอบเป็น JSON object เท่านั้น ห้ามใส่คำบรรยายภายนอก JSON
+2. "suggested_scores": อ็อบเจกต์ที่ key เป็นหมายเลขแกน "1" ถึง "39" และ value เป็นคะแนนตัวเลขจำนวนเต็ม (0-100) ต้องมีครบทั้ง 39 แกน (แกนที่ไม่มีอาการให้ใส่ 50)
+3. "rationales": อ็อบเจกต์ที่ key เป็นหมายเลขแกนเฉพาะแกนที่มีคะแนน >= 60 พร้อมคำอธิบายสั้นๆ ภาษาไทย (1-2 ประโยค) ว่าทำไมจึงสงสัยแกนนี้จากอาการของผู้ป่วย
+4. "summary_insight": สรุปภาพรวมความผิดปกติระดับเซลล์ของผู้ป่วยรายนี้ 2-3 บรรทัดภาษาไทย
+"""
+
+
+class SuggestAxesPayload(BaseModel):
+    soap: Dict[str, str] = Field(default_factory=dict, description="SOAP note")
+    vitals: Dict[str, Any] = Field(default_factory=dict, description="Vitals")
+    history_text: Optional[str] = Field(default="", description="ข้อความซักประวัติเพิ่มเติม")
+    allergies: Optional[str] = Field(default="", description="ประวัติแพ้ยา")
+    medical_history: Optional[str] = Field(default="", description="โรคประจำตัว")
+    current_medications: Optional[str] = Field(default="", description="ยาประจำตัวหรืออาหารเสริม")
+    lab_biomarkers: Optional[List[Dict[str, Any]]] = Field(default_factory=list, description="ผลตรวจแล็บและตัวชี้วัดชีวเคมีล่าสุด")
+
+
+@app.post("/api/ai/clinical/suggest-axes")
+async def suggest_axes_endpoint(
+    payload: SuggestAxesPayload,
+    x_internal_token: Optional[str] = Header(None, alias="X-Internal-Token")
+):
+    """
+    วิเคราะห์ข้อมูล Encounter (SOAP + Vitals + ประวัติ + ผลแล็บ) แล้วร่างคะแนน 39 แกนชีววิทยาด้วย Gemini
+    """
+    if x_internal_token != config.INTERNAL_API_TOKEN:
+        raise HTTPException(status_code=401, detail="Unauthorized internal token")
+
+    soap = payload.soap or {}
+    vital_str = json.dumps(payload.vitals, ensure_ascii=False) if payload.vitals else "ไม่มี"
+
+    lab_str = "ไม่มี"
+    if payload.lab_biomarkers:
+        lab_lines = []
+        for l in payload.lab_biomarkers:
+            status_text = " (ผิดปกติ/สูงกว่าเกณฑ์)" if l.get('is_abnormal') else " (ปกติ)"
+            target = f" -> ส่งผลต่อ {l.get('target_axis')}" if l.get('target_axis') else ""
+            lab_lines.append(f"{l.get('name', l.get('code'))}: {l.get('value')} {l.get('unit', '')}{status_text}{target}")
+        lab_str = "\n  - " + "\n  - ".join(lab_lines)
+
+    user_prompt = (
+        f"ข้อมูลการตรวจของผู้ป่วย (Encounter Summary):\n"
+        f"- อาการที่ผู้ป่วยเล่า (S): {soap.get('subjective') or payload.history_text or 'ไม่มี'}\n"
+        f"- ผลตรวจร่างกายและสัญญาณชีพ (O): {soap.get('objective') or 'ไม่มี'} | สัญญาณชีพดิบ: {vital_str}\n"
+        f"- การประเมินของแพทย์ (A): {soap.get('assessment') or 'ไม่มี'}\n"
+        f"- แผนการตรวจรักษา (P): {soap.get('plan') or 'ไม่มี'}\n"
+        f"- ยาประจำตัว / อาหารเสริม: {payload.current_medications or 'ไม่มี'}\n"
+        f"- ประวัติแพ้ยา: {payload.allergies or 'ปฏิเสธ/ไม่มี'}\n"
+        f"- โรคประจำตัวเดิม: {payload.medical_history or 'ไม่มี'}\n"
+        f"- ผลตรวจแล็บและตัวชี้วัดชีวเคมี (Lab Biomarkers): {lab_str}\n\n"
+        f"กรุณาวิเคราะห์และคืนค่าผลการประเมิน 39 แกนตามข้อกำหนด JSON โดยนำผลตรวจแล็บที่ผิดปกติมาคิดคำนวณและอธิบายใน rationales ด้วย"
+    )
+
+    res = await gateway.call_gemini_json(
+        SUGGEST_AXES_PROMPT,
+        user_prompt,
+        temperature=0.2,
+        max_tokens=4096
+    )
+    meta = {"provider": res.get("provider", "gemini"), "model": res.get("model", ""), "usage": res.get("usage", {})}
+    if not res.get("success"):
+        return {"success": False, "error": res.get("error", "GEMINI_FAILED"), **meta}
+
+    content_raw = str(res.get("content") or "").strip()
+    try:
+        if content_raw.startswith("```"):
+            lines = content_raw.splitlines()
+            if lines and lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].startswith("```"):
+                lines = lines[:-1]
+            content_raw = "\n".join(lines).strip()
+
+        start_idx = content_raw.find("{")
+        end_idx = content_raw.rfind("}")
+        if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+            content_raw = content_raw[start_idx:end_idx + 1]
+
+        data = json.loads(content_raw)
+        if not isinstance(data, dict):
+            raise ValueError("not an object")
+    except Exception as e:
+        logger.warning(f"[Suggest Axes] Non-JSON content: {e} | Raw: {content_raw[:300]}")
+        return {"success": False, "error": "UNPARSEABLE", **meta}
+
+    scores = {}
+    for k, v in (data.get("suggested_scores") or {}).items():
+        try:
+            k_int = int(k)
+            if 1 <= k_int <= 39:
+                scores[str(k_int)] = max(0, min(100, int(v)))
+        except (ValueError, TypeError):
+            continue
+
+    # เติมแกนที่ขาดด้วยค่า default 50
+    for i in range(1, 40):
+        if str(i) not in scores:
+            scores[str(i)] = 50
+
+    return {
+        "success": True,
+        "suggested_scores": scores,
+        "rationales": data.get("rationales") or {},
+        "summary_insight": data.get("summary_insight") or "",
+        "gateway": f"gemini:{meta['model']}",
+        **meta,
     }
 
 
@@ -884,6 +1164,11 @@ def retrieve_tspi_knowledge(question: str, limit: int = 4) -> List[Dict[str, str
     return [{'title': f['title'], 'text': f['text']} for f in found[:limit]]
 
 
+class AssistantImageItem(BaseModel):
+    data: str
+    mime_type: str = "image/jpeg"
+
+
 class AssistantMessage(BaseModel):
     role: str
     content: str
@@ -891,6 +1176,7 @@ class AssistantMessage(BaseModel):
 
 class AssistantChatRequest(BaseModel):
     messages: List[AssistantMessage] = Field(..., description="บทสนทนาล่าสุด (ข้อความสุดท้ายคือคำถามของผู้ใช้)")
+    images_base64: Optional[List[AssistantImageItem]] = Field(default=None, description="ภาพประกอบที่ผู้ป่วยแนบมา (สูงสุด 3 ภาพ)")
 
 
 @app.post("/api/ai/assistant/chat")
@@ -898,25 +1184,48 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
     """
     แชทผู้ช่วยสำหรับผู้ป่วย: ฉุกเฉิน -> ข้อความ 1669 ทันที (ไม่เรียก LLM),
     อื่น ๆ -> LLM ตอบจากเอกสาร TSPI ที่ค้นได้ (อ้างอิง [n]) เสริมความรู้ทั่วไปแยกหัวข้อ, นอกเรื่องสุขภาพ -> ปฏิเสธ,
-    แล้วผ่าน Guardrail ห้ามวินิจฉัย
+    รองรับภาพประกอบ (เบลอใบหน้า + ลบ EXIF ก่อนส่ง Gemini Vision) แล้วผ่าน Guardrail ห้ามวินิจฉัย
     """
-    history = [m for m in req.messages if m.role in ('user', 'assistant') and m.content.strip()][-8:]
+    import base64
+    history = [m for m in req.messages if m.role in ('user', 'assistant') and (m.content.strip() or req.images_base64)][-8:]
     if not history or history[-1].role != 'user':
         raise HTTPException(status_code=400, detail="ข้อความสุดท้ายต้องเป็นคำถามของผู้ใช้")
-    question = TextDeidentifier.sanitize(history[-1].content)["sanitized_text"][:2000]
+    raw_question = history[-1].content.strip() or "ผู้ป่วยแนบรูปภาพนี้มาสอบถาม โปรดอธิบายสิ่งที่สังเกตเห็นเบื้องต้นอย่างระมัดระวังและซักถามอาการประกอบ โดยห้ามวินิจฉัยโรค"
+    question = TextDeidentifier.sanitize(raw_question)["sanitized_text"][:2000]
 
     if any(k in question for k in ASSISTANT_EMERGENCY_KEYWORDS):
         return {"answer": ASSISTANT_EMERGENCY, "kind": "emergency", "sources": [], "usage": {}}
 
+    sent_images: List[Dict[str, Any]] = []
+    for item in (req.images_base64 or [])[:3]:
+        try:
+            raw_bytes = base64.b64decode(item.data, validate=True)
+        except Exception:
+            continue
+        if not raw_bytes:
+            continue
+        clean, _faces = MediaSanitizer.blur_faces(raw_bytes, safety_margin=0.25)
+        sent_images.append({"data": _shrink_image(clean), "mime_type": "image/jpeg"})
+
     context = retrieve_tspi_knowledge(question)
     knowledge = "\n\n".join(f"[{i + 1}] {c['title']}\n{c['text']}" for i, c in enumerate(context)) \
         or "(ไม่พบเอกสารของคลินิกที่ตรงกับคำถามนี้)"
-    messages = [{"role": "system", "content": ASSISTANT_SYSTEM_PROMPT}]
-    for m in history[:-1]:
-        messages.append({"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]})
-    messages.append({"role": "user", "content": f"<ความรู้>\n{knowledge}\n</ความรู้>\n\nคำถาม: {question}"})
+    system_prompt = ASSISTANT_SYSTEM_PROMPT
+    if sent_images:
+        system_prompt += (
+            "\n6. ผู้ใช้ได้แนบรูปภาพมาด้วย ให้อธิบายสิ่งที่สังเกตเห็นเป็นข้อมูลเบื้องต้นและซักถามอาการประกอบ "
+            "ห้ามวินิจฉัยโรคจากภาพ ห้ามระบุชื่อโรค และแนะนำให้ส่งภาพให้แพทย์ของคลินิกตรวจเพิ่มเติม"
+        )
+    conv_messages = [
+        {"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]}
+        for m in history[:-1]
+    ]
+    conv_messages.append({"role": "user", "content": f"<ความรู้>\n{knowledge}\n</ความรู้>\n\nคำถาม: {question}"})
 
-    res = await gateway.call_chat(config.SOAP_PROVIDER, messages=messages, temperature=0.2, max_tokens=1500)
+    if sent_images:
+        res = await gateway.call_gemini_chat(system_prompt, conv_messages, images=sent_images, temperature=0.2, max_tokens=1500)
+    else:
+        res = await gateway.call_chat(config.SOAP_PROVIDER, messages=[{"role": "system", "content": system_prompt}, *conv_messages], temperature=0.2, max_tokens=1500)
     meta = {"provider": res.get("provider", config.SOAP_PROVIDER), "model": res.get("model", ""), "usage": res.get("usage", {})}
     answer = (res.get("content") or "").strip() if res.get("success") else ""
     sources = [c['title'] for c in context]
@@ -1015,6 +1324,75 @@ async def line_chat_endpoint(req: LineChatRequest):
     checked = line_chat_safety(answer)
     return {"answer": checked["text"], "kind": "answer", "blocked": checked["blocked"],
             "sources": [c['title'] for c in context], **meta}
+
+
+class ComposeThreeReportsRequest(BaseModel):
+    patient_summary: str = Field(..., description="สรุปเวชระเบียน: อายุ เพศ SOAP Vitals Labs 39 แกน โมดูล")
+    has_omics: bool = Field(default=False, description="มีข้อมูล Genomics/Microbiome/Metabolomics จริงหรือไม่")
+    doctor_notes: str = Field(default="", description="ความเห็นเพิ่มเติมของแพทย์")
+
+
+@app.post("/api/v1/reports/compose")
+async def compose_three_reports_endpoint(req: ComposeThreeReportsRequest):
+    """
+    สร้างเนื้อหารายงาน TSPI Precision Medicine ทั้ง 3 ฉบับ (Physician, Patient, Multi-Omics)
+    ตามมาตรฐานความปลอดภัย EP6 และ Clinical Safety Rules (ห้ามเดาแกนที่ยังไม่ตรวจ)
+    """
+    omics_rule = (
+        "ผู้ป่วยมีข้อมูล Multi-Omics จริง ให้เขียน Multi-Omics Edition 5 บทวิเคราะห์เชิงลึก (Genomics, Microbiome, Metabolomics, Mitochondrial & Network Mapping)"
+        if req.has_omics
+        else "ผู้ป่วยยังไม่มีผลตรวจ Omics (NGS/Microbiome/Metabolomics) ให้เขียน Multi-Omics Edition เป็น 3 บท (Chapter 1: Omics Readiness & Missing Datasets, Chapter 2: Clinical Utility of Omics Testing, Chapter 3: Preliminary Phenotype-based Inferences [HYPOTHESIS]) โดยห้ามเดาผล Omics เด็ดขาด"
+    )
+
+    system_prompt = (
+        "คุณคือ TSPI Chief Medical Officer & Systems Biology Writer.\n"
+        "จงเขียนเนื้อหารายงานทางการแพทย์จากข้อมูลจริงด้านล่าง ออกเป็น JSON ที่มีคีย์ 3 ตัว: \"physician\", \"patient\", \"multiomics\".\n"
+        "แต่ละคีย์เป็น JSON Array ของบท (chapters): [{\"title\": \"...\", \"content\": \"...\"}].\n\n"
+        "กฎความปลอดภัยเด็ดขาด:\n"
+        "1. ห้ามสร้างตัวเลขหรืออาการที่ไม่มีในข้อมูลนำเข้า (แกนที่ไม่มีผลให้ระบุ [NOT_AVAILABLE])\n"
+        "2. Physician Edition (5 บท): ใช้ศัพท์แพทย์ กำกับสถานะหลักฐาน [MEASURED], [DERIVED], [CLINICAL_INFERENCE], [HYPOTHESIS], [NOT_AVAILABLE]\n"
+        "3. Patient Edition (7 บท): ภาษาไทยอบอุ่นเข้าใจง่าย ห้ามใส่รหัสแกน (เช่น A8, AXIS_1) ห้ามใส่คะแนน /100 ห้ามใส่แท็ก [MEASURED]/[HYPOTHESIS] ห้ามใส่ชื่อโมดูลสมุนไพรที่ยังไม่อนุมัติ\n"
+        f"4. Multi-Omics Edition: {omics_rule}\n"
+        "5. ตอบกลับเป็น Valid JSON Object เท่านั้น ห้ามใส่ markdown code fence"
+    )
+
+    user_prompt = f"ข้อมูลเวชระเบียนจริง:\n{req.patient_summary[:5500]}\n\nความเห็นแพทย์: {req.doctor_notes[:800]}"
+
+    raw_content = ""
+    if config.is_gemini_available():
+        res = await gateway.call_gemini_json(f"{system_prompt}\n\n{user_prompt}")
+        if res.get("success"):
+            raw_content = res.get("content", "")
+    elif config.is_groq_available() or config.is_openai_available():
+        provider = "openai" if config.is_openai_available() else "groq"
+        res = await gateway.call_chat(
+            provider=provider,
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
+            temperature=0.2,
+            max_tokens=3200,
+            json_mode=True,
+        )
+        if res.get("success"):
+            raw_content = res.get("content", "")
+
+    if not raw_content:
+        return {"success": False, "reason": "no_llm_available"}
+
+    try:
+        clean = raw_content.strip()
+        if clean.startswith("```json"):
+            clean = clean[7:]
+        if clean.startswith("```"):
+            clean = clean[3:]
+        if clean.endswith("```"):
+            clean = clean[:-3]
+        parsed = json.loads(clean.strip())
+        if all(k in parsed and isinstance(parsed[k], list) for k in ("physician", "patient", "multiomics")):
+            return {"success": True, "editions": parsed, "has_omics": req.has_omics}
+    except Exception as exc:
+        logger.warning(f"Failed parsing AI composed report JSON: {exc}")
+
+    return {"success": False, "reason": "invalid_json"}
 
 
 if __name__ == "__main__":

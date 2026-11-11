@@ -193,6 +193,119 @@ class ExternalAIGateway:
     # =========================================================================
     # 3. GEMINI MULTIMODAL CLIENT (Voice, Lab Vision, Video Scan)
     # =========================================================================
+    async def _post_gemini_generate(
+        self,
+        system_prompt: str,
+        contents: List[Dict[str, Any]],
+        model: Optional[str] = None,
+        temperature: float = 0.2,
+        max_tokens: int = 2048,
+        response_mime_type: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """ตัวช่วยกลางเรียก Gemini generateContent (ส่งคีย์ทาง header และคัดกรอง thought)"""
+        chosen_model = model or config.GEMINI_FLASH_MODEL
+        meta = {"provider": "gemini", "model": chosen_model, "usage": {"prompt_tokens": 0, "completion_tokens": 0}}
+        if not config.is_gemini_available():
+            return {"success": False, "error": "GEMINI_API_KEY_MISSING", **meta}
+
+        gen_cfg: Dict[str, Any] = {
+            "temperature": temperature,
+            "maxOutputTokens": max(max_tokens, 8192),
+            "thinkingConfig": {"thinkingBudget": 512},
+        }
+        if response_mime_type:
+            gen_cfg["responseMimeType"] = response_mime_type
+
+        payload = {
+            "system_instruction": {"parts": [{"text": system_prompt}]},
+            "contents": contents,
+            "generationConfig": gen_cfg,
+        }
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{chosen_model}:generateContent"
+        try:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(90.0, connect=10.0)) as client:
+                resp = await client.post(url, json=payload, headers={"x-goog-api-key": config.GEMINI_API_KEY})
+            if resp.status_code != 200:
+                logger.error(f"Gemini error [{resp.status_code}]: {resp.text[:500]}")
+                return {"success": False, "error": f"HTTP_{resp.status_code}", **meta}
+            data = resp.json()
+            usage = data.get("usageMetadata") or {}
+            meta["usage"] = {
+                "prompt_tokens": int(usage.get("promptTokenCount") or 0),
+                "completion_tokens": int(usage.get("candidatesTokenCount") or 0) + int(usage.get("thoughtsTokenCount") or 0),
+            }
+            candidates = data.get("candidates") or []
+            if not candidates:
+                return {"success": False, "error": "EMPTY_GEMINI_CANDIDATES", **meta}
+            candidate_parts = (candidates[0].get("content") or {}).get("parts") or []
+            # แยก thought ออกจากเนื้อหาหลัก (ใน Gemini 2.5 parts อาจมี thought: true)
+            text = "".join(p.get("text", "") for p in candidate_parts if not p.get("thought"))
+            if not text:
+                text = "".join(p.get("text", "") for p in candidate_parts)
+            if not text:
+                return {"success": False, "error": "EMPTY_GEMINI_CANDIDATES", **meta}
+            return {"success": True, "content": text, **meta}
+        except Exception as e:
+            logger.error(f"Gemini request exception: {type(e).__name__}", exc_info=True)
+            return {"success": False, "error": type(e).__name__, **meta}
+
+    async def call_gemini_json(
+        self,
+        system_prompt: str,
+        user_text: str,
+        images: Optional[List[Dict[str, Any]]] = None,
+        model: Optional[str] = None,
+        temperature: float = 0.2,
+        max_tokens: int = 2048,
+    ) -> Dict[str, Any]:
+        """
+        ข้อความ + รูปหลายรูป -> คำตอบ JSON จาก Gemini
+        images: [{"data": bytes, "mime_type": "image/jpeg"}] ต้องผ่าน MediaSanitizer มาก่อน
+        """
+        import base64
+        parts: List[Dict[str, Any]] = [{"text": user_text}]
+        for img in images or []:
+            parts.append({"inline_data": {"mime_type": img.get("mime_type") or "image/jpeg",
+                                          "data": base64.b64encode(img["data"]).decode("ascii")}})
+        return await self._post_gemini_generate(
+            system_prompt=system_prompt,
+            contents=[{"role": "user", "parts": parts}],
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            response_mime_type="application/json",
+        )
+
+    async def call_gemini_chat(
+        self,
+        system_prompt: str,
+        messages: List[Dict[str, str]],
+        images: Optional[List[Dict[str, Any]]] = None,
+        model: Optional[str] = None,
+        temperature: float = 0.2,
+        max_tokens: int = 1500,
+    ) -> Dict[str, Any]:
+        """แชทหลายรอบ + รูปภาพ (แนบรูปเข้ากับข้อความล่าสุดของผู้ใช้)"""
+        import base64
+        contents: List[Dict[str, Any]] = []
+        for idx, msg in enumerate(messages):
+            role = "model" if msg.get("role") == "assistant" else "user"
+            parts: List[Dict[str, Any]] = [{"text": str(msg.get("content") or "")}]
+            if idx == len(messages) - 1 and role == "user" and images:
+                for img in images:
+                    parts.append({"inline_data": {
+                        "mime_type": img.get("mime_type") or "image/jpeg",
+                        "data": base64.b64encode(img["data"]).decode("ascii"),
+                    }})
+            contents.append({"role": role, "parts": parts})
+        return await self._post_gemini_generate(
+            system_prompt=system_prompt,
+            contents=contents,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+
     async def call_gemini_vision(
         self,
         prompt: str,

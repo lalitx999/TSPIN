@@ -22,13 +22,13 @@
     <!-- Sidebar ซ้าย -->
     <aside class="ai-side" aria-label="เมนูผู้ช่วย AI ของคนไข้">
         <a href="{% url 'portal_patient:dashboard' %}" class="ai-brand">
-            <span class="ai-brand-badge"><i class="fas fa-heartbeat"></i></span>
-            <span>TSPI <span class="text-success">Health AI</span></span>
+            <span class="ai-spark"><i class="fas fa-star"></i></span>
+            <span>TSPI <span class="text-primary">Health AI</span></span>
         </a>
 
         <div class="ai-nav-group">
             <button type="button" class="ai-nav-btn" :class="{ 'active': !current }" @click="startFresh()">
-                <i class="fas fa-plus"></i>
+                <i class="fas fa-pen-to-square"></i>
                 <span>แชทใหม่</span>
             </button>
             <a href="{% url 'portal_patient:dashboard' %}" class="ai-nav-btn">
@@ -54,7 +54,7 @@
             <input type="text" class="ai-search-input" placeholder="ค้นหาแชท..." x-model="searchQuery">
         </div>
 
-        <div class="ai-side-label">แชทล่าสุด (บันทึกเข้ารหัส)</div>
+        <div class="ai-side-label">แชทล่าสุด</div>
         <div class="ai-thread-list">
             <template x-for="t in filteredThreads()" :key="t.id">
                 <div class="ai-thread-item" :class="{ 'active': current && current.id === t.id }" @click="openThread(t.id)">
@@ -71,9 +71,7 @@
                     </div>
                 </div>
             </template>
-            <p class="text-muted small text-center mt-3 px-2" x-show="filteredThreads().length === 0">
-                ยังไม่มีประวัติแชท
-            </p>
+            <p class="text-muted small text-center mt-3 px-2" x-show="filteredThreads().length === 0">ยังไม่มีประวัติแชท</p>
         </div>
 
         <div class="ai-side-foot">
@@ -95,39 +93,45 @@
         </div>
     </aside>
 
-    <!-- พื้นที่แชทหลัก -->
+    <!-- พื้นที่หลัก (Gemini Minimal Layout) -->
     <main class="ai-main">
-        <!-- แถบบน -->
+        <!-- แถบบนโปร่งคลีนเหมือน Gemini Mobile -->
         <header class="ai-topbar" :class="{ 'has-border': current && messages.length > 0 }">
             <div class="d-flex align-items-center gap-2 min-w-0">
-                <button type="button" class="ai-icon-btn d-none d-lg-inline-flex" @click="sideCollapsed = !sideCollapsed" aria-label="พับ/เปิดแถบข้าง" title="พับ/เปิดแถบข้าง">
-                    <i class="fas fa-columns"></i>
-                </button>
-                <button type="button" class="ai-icon-btn d-lg-none" @click="mobileSideOpen = true" aria-label="เปิดรายการแชท">
+                <button type="button" class="ai-circle-btn d-none d-lg-inline-flex" @click="sideCollapsed = !sideCollapsed" aria-label="พับ/เปิดแถบข้าง">
                     <i class="fas fa-bars"></i>
                 </button>
-                <span class="fw-bold text-truncate" x-show="current" x-text="current ? current.title : ''"></span>
+                <button type="button" class="ai-circle-btn d-lg-none" @click="mobileSideOpen = true" aria-label="เปิดรายการแชท">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <button type="button" class="ai-model-btn text-truncate" @click="startFresh()">
+                    <span>TSPI AI</span>
+                    <span class="sub d-none d-sm-inline" x-text="current ? '· ' + current.title : '· ผู้ช่วยสุขภาพ'"></span>
+                </button>
             </div>
 
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-success-subtle text-success rounded-pill d-none d-sm-inline-flex align-items-center gap-1">
-                    <i class="fas fa-infinity"></i> คุยต่อเนื่อง · ส่งรูป/เสียงได้
-                </span>
+            <div class="d-flex align-items-center gap-2 flex-shrink-0">
                 <template x-if="current && messages.length > 0">
-                    <div class="d-flex align-items-center gap-1">
+                    <div>
                         <template x-if="current.submitted">
-                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                <i class="fas fa-check-circle me-1"></i> ส่งให้แพทย์แล้ว
+                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                <i class="fas fa-check-circle me-1"></i> ส่งแพทย์แล้ว
                             </span>
                         </template>
                         <template x-if="!current.submitted">
-                            <button type="button" class="btn btn-sm btn-outline-success rounded-pill fw-semibold"
+                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold"
                                     @click="submit()" :disabled="sending">
-                                <i class="fas fa-paper-plane me-1"></i> ส่งให้ทีมแพทย์ตรวจ
+                                <i class="fas fa-paper-plane me-1"></i> ส่งแพทย์
                             </button>
                         </template>
                     </div>
                 </template>
+                <button type="button" class="ai-circle-btn" @click="startFresh()" title="แชทใหม่" aria-label="แชทใหม่">
+                    <i class="fas fa-pen-to-square"></i>
+                </button>
+                <a href="{% url 'portal_patient:dashboard' %}" class="ai-user-avatar" title="กลับแดชบอร์ดคนไข้">
+                    {{ patient_display_name|slice:":1"|upper }}
+                </a>
             </div>
         </header>
 
@@ -135,103 +139,17 @@
         <input type="file" x-ref="imagePicker" class="d-none" accept="image/jpeg,image/png,image/webp" multiple @change="onPickImages($event)">
         <input type="file" x-ref="audioPicker" class="d-none" accept="audio/*" @change="onPickAudio($event)">
 
-        <!-- หน้าเริ่มต้นแบบ Gemini / ChatGPT / DeepSeek -->
+        <!-- หน้าเริ่มต้นโล่งสบายตาแบบ Gemini -->
         <section class="ai-welcome-stage" x-show="!current || messages.length === 0">
             <div class="ai-welcome-inner">
+                <span class="ai-spark ai-spark-lg"><i class="fas fa-star"></i></span>
                 <h1 class="ai-greeting">สวัสดี, คุณ{{ patient_display_name }}</h1>
-                <p class="ai-subgreeting">สอบถามอาการ ผล 39 แกน การดูแลตัวเอง หรือแนบรูป/อัดเสียงส่งเข้ามาได้เลย (บันทึกปลอดภัย)</p>
+                <p class="ai-subgreeting">เราควรดูแลสุขภาพเรื่องอะไรดี พิมพ์ถาม แนบรูป หรืออัดเสียงส่งมาได้เลย</p>
 
-                <div class="w-100">
-                    <form class="ai-composer-card" @submit.prevent="send()">
-                        <!-- แถบตัวอย่างไฟล์แนบก่อนส่ง -->
-                        <div class="ai-pending-strip" x-show="pendingImages.length || pendingAudio">
-                            <template x-for="(img, idx) in pendingImages" :key="img.id">
-                                <div class="ai-thumb-chip">
-                                    <img :src="img.preview" alt="ภาพแนบ">
-                                    <button type="button" class="ai-thumb-remove" @click="removePendingImage(idx)" aria-label="ลบรูป">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </template>
-                            <template x-if="pendingAudio">
-                                <div class="ai-audio-chip">
-                                    <i class="fas fa-volume-up text-success"></i>
-                                    <span x-text="pendingAudio.label"></span>
-                                    <button type="button" class="ai-icon-btn text-danger" @click="clearPendingAudio()" aria-label="ลบคลิปเสียง">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </template>
-                        </div>
-
-                        <label for="pt-q-welcome" class="visually-hidden">พิมพ์ข้อความถึงผู้ช่วย</label>
-                        <textarea id="pt-q-welcome" x-ref="welcomeInput" class="ai-composer-textarea" rows="2" maxlength="1500"
-                                  placeholder="พิมพ์คำถาม เล่าอาการ หรือกด + เพื่อแนบรูป/เสียง..."
-                                  x-model="draft"
-                                  @input="autoGrow($el)"
-                                  @keydown.enter="if (!$event.shiftKey && !$event.isComposing) { $event.preventDefault(); send(); }"
-                                  :disabled="sending"></textarea>
-
-                        <div class="ai-composer-bar">
-                            <div class="d-flex align-items-center gap-1 position-relative">
-                                <div class="dropdown">
-                                    <button type="button" class="ai-tool-btn" data-bs-toggle="dropdown" aria-expanded="false" title="แนบรูปหรือไฟล์เสียง">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                    <ul class="dropdown-menu shadow-sm border-0 rounded-3">
-                                        <li>
-                                            <button type="button" class="dropdown-item py-2" @click="$refs.imagePicker.click()">
-                                                <i class="far fa-image text-success me-2"></i> แนบรูปภาพ (สูงสุด 3 รูป)
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button type="button" class="dropdown-item py-2" @click="$refs.audioPicker.click()">
-                                                <i class="fas fa-file-audio text-primary me-2"></i> อัปโหลดไฟล์เสียง
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <button type="button" class="ai-tool-btn" @click="$refs.imagePicker.click()" title="แนบรูปภาพ">
-                                    <i class="far fa-image"></i>
-                                    <span class="d-none d-sm-inline small">รูปภาพ</span>
-                                </button>
-                                <button type="button" class="ai-tool-btn" :class="{ 'recording': recordingAudio }"
-                                        @click="toggleAudioRecord()" title="อัดคลิปเสียงส่งให้ AI">
-                                    <i class="fas" :class="recordingAudio ? 'fa-stop-circle' : 'fa-wave-square'"></i>
-                                    <span class="small" x-text="recordingAudio ? ('หยุดอัด ' + recordTimerLabel()) : 'อัดเสียง'"></span>
-                                </button>
-                            </div>
-
-                            <div class="d-flex align-items-center gap-1">
-                                <button type="button" class="ai-tool-btn" x-show="speechSupported"
-                                        :class="{ 'recording': listening }" @click="toggleMic()"
-                                        title="พูดด้วยเสียงเพื่อพิมพ์ข้อความ">
-                                    <i class="fas" :class="listening ? 'fa-stop' : 'fa-microphone'"></i>
-                                </button>
-                                <button type="submit" class="ai-send-btn" :disabled="!canSend()" aria-label="ส่งข้อความ">
-                                    <i class="fas fa-arrow-up"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                    <div class="alert alert-warning py-2 px-3 mt-2 mb-0 text-start small" x-show="error" x-text="error" role="alert"></div>
-
-                    <!-- แถว 1: โหมดคุย -->
-                    <div class="ai-action-pills">
-                        <template x-for="m in modes" :key="m.id">
-                            <button type="button" class="ai-pill-btn" :class="{ 'active': selectedMode === m.id }" @click="applyMode(m)">
-                                <i class="fas" :class="m.icon"></i>
-                                <span x-text="m.label"></span>
-                            </button>
-                        </template>
-                    </div>
-
-                    <!-- แถว 2: ตัวอย่างคำถาม -->
-                    <div class="ai-suggest-chips">
-                        <template x-for="q in examples" :key="q">
-                            <button type="button" class="ai-chip-btn" @click="ask(q)" x-text="q"></button>
-                        </template>
-                    </div>
+                <div class="ai-suggest-chips">
+                    <template x-for="q in examples" :key="q">
+                        <button type="button" class="ai-chip-btn" @click="ask(q)" x-text="q"></button>
+                    </template>
                 </div>
             </div>
         </section>
@@ -241,7 +159,6 @@
             <div class="ai-col">
                 <template x-for="(m, i) in messages" :key="m.id">
                     <div>
-                        <!-- ข้อความคนไข้ -->
                         <div class="ai-row user" x-show="m.role === 'user'">
                             <div class="ai-user-bubble">
                                 <div class="ai-msg-imgs" x-show="m.attachments && m.attachments.some(a => a.kind === 'image')">
@@ -251,30 +168,28 @@
                                 </div>
                                 <div class="ai-msg-audio" x-show="m.attachments && m.attachments.some(a => a.kind === 'audio')">
                                     <template x-for="att in (m.attachments || []).filter(a => a.kind === 'audio')" :key="att.media_id">
-                                        <audio controls preload="none" :src="att.url"></audio>
+                                        <audio controls preload="metadata" :src="att.url"></audio>
                                     </template>
                                 </div>
-                                <div class="mt-1" style="white-space: pre-wrap;" x-show="m.content" x-text="m.content"></div>
+                                <div style="white-space: pre-wrap;" x-show="m.content" x-text="m.content"></div>
                             </div>
                         </div>
 
-                        <!-- ฉุกเฉิน -->
                         <div class="ai-row" x-show="m.role === 'assistant' && m.kind === 'emergency'">
                             <div class="alert alert-danger d-flex gap-3 mb-0 w-100 rounded-4" role="alert">
                                 <i class="fas fa-ambulance fs-3 mt-1"></i>
                                 <div>
                                     <strong class="d-block fs-5 mb-1">อาจเป็นภาวะฉุกเฉิน</strong>
                                     <span x-text="m.content"></span>
-                                    <div class="mt-3">
-                                        <a href="tel:1669" class="btn btn-danger rounded-pill px-3"><i class="fas fa-phone-alt me-1"></i> โทร 1669</a>
+                                    <div class="mt-2">
+                                        <a href="tel:1669" class="btn btn-danger btn-sm rounded-pill px-3"><i class="fas fa-phone-alt me-1"></i> โทร 1669</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- คำตอบ AI -->
                         <div class="ai-row" x-show="m.role === 'assistant' && m.kind !== 'emergency'">
-                            <span class="ai-bot-avatar"><i class="fas fa-heartbeat"></i></span>
+                            <span class="ai-spark d-none d-md-inline-flex mt-1"><i class="fas fa-star"></i></span>
                             <div class="ai-bot-body">
                                 <template x-for="(b, bi) in blocks(parts(m).clinic)" :key="bi">
                                     <div class="ai-block">
@@ -311,7 +226,7 @@
                                     </button>
                                     <template x-if="i === messages.length - 1 && !sending && m.kind !== 'out_of_scope'">
                                         <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" @click="ask('อธิบายให้เข้าใจง่ายกว่านี้หน่อย')">
-                                            อธิบายง่าย ๆ อีกครั้ง
+                                            อธิบายง่ายขึ้น
                                         </button>
                                     </template>
                                 </div>
@@ -320,9 +235,8 @@
                     </div>
                 </template>
 
-                <!-- กำลังตอบ -->
                 <div class="ai-row" x-show="sending">
-                    <span class="ai-bot-avatar"><i class="fas fa-heartbeat"></i></span>
+                    <span class="ai-spark d-none d-md-inline-flex mt-1"><i class="fas fa-star"></i></span>
                     <div class="ai-bot-body w-100" aria-live="polite">
                         <p class="placeholder-glow mb-2"><span class="placeholder col-10 rounded"></span></p>
                         <p class="placeholder-glow mb-2"><span class="placeholder col-8 rounded"></span></p>
@@ -332,12 +246,21 @@
             </div>
         </section>
 
-        <!-- กล่องพิมพ์ด้านล่างเมื่อสนทนาแล้ว -->
-        <div class="ai-dock" x-show="current && messages.length > 0">
+        <!-- แถบแคปซูลพิมพ์ด้านล่าง (แถวเดียวกะทัดรัดสไตล์ Gemini) -->
+        <div class="ai-bottom-wrap" :class="{ 'in-chat': current && messages.length > 0 }">
             <div class="ai-col">
-                <div class="alert alert-warning py-2 px-3 mb-2 small" x-show="error" x-text="error" role="alert"></div>
+                <div class="alert alert-warning py-2 px-3 mb-2 small rounded-4" x-show="error" x-text="error" role="alert"></div>
 
-                <form class="ai-composer-card" @submit.prevent="send()">
+                <!-- สวิตช์โหมดด้านบนแคปซูล (เฉพาะตอนเริ่มต้น เหมือน แชท | งาน ใน Gemini) -->
+                <div class="ai-seg-wrap" x-show="!current || messages.length === 0">
+                    <div class="ai-seg-pill" role="tablist" aria-label="โหมดใช้งาน">
+                        <button type="button" :class="{ 'active': selectedMode !== 'symptom' }" @click="setMode('general')">แชท</button>
+                        <button type="button" :class="{ 'active': selectedMode === 'symptom' }" @click="setMode('symptom')">เล่าอาการ</button>
+                    </div>
+                </div>
+
+                <form class="ai-pill-composer" @submit.prevent="send()">
+                    <!-- แถบตัวอย่างไฟล์แนบก่อนส่ง -->
                     <div class="ai-pending-strip" x-show="pendingImages.length || pendingAudio">
                         <template x-for="(img, idx) in pendingImages" :key="img.id">
                             <div class="ai-thumb-chip">
@@ -349,59 +272,63 @@
                         </template>
                         <template x-if="pendingAudio">
                             <div class="ai-audio-chip">
-                                <i class="fas fa-volume-up text-success"></i>
+                                <i class="fas fa-volume-up text-primary"></i>
                                 <span x-text="pendingAudio.label"></span>
-                                <button type="button" class="ai-icon-btn text-danger" @click="clearPendingAudio()" aria-label="ลบคลิปเสียง">
+                                <button type="button" class="ai-icon-btn text-danger" style="width:22px;height:22px;" @click="clearPendingAudio()" aria-label="ลบคลิปเสียง">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
                         </template>
                     </div>
 
-                    <label for="pt-q-dock" class="visually-hidden">พิมพ์ข้อความถึงผู้ช่วย</label>
-                    <textarea id="pt-q-dock" x-ref="input" class="ai-composer-textarea" rows="1" maxlength="1500"
-                              placeholder="ถามต่อ เล่าอาการ หรือแนบรูป/เสียง..."
-                              x-model="draft"
-                              @input="autoGrow($el)"
-                              @keydown.enter="if (!$event.shiftKey && !$event.isComposing) { $event.preventDefault(); send(); }"
-                              :disabled="sending"></textarea>
-
-                    <div class="ai-composer-bar">
-                        <div class="d-flex align-items-center gap-1">
-                            <button type="button" class="ai-tool-btn" @click="$refs.imagePicker.click()" title="แนบรูปภาพ (สูงสุด 3 รูป)">
-                                <i class="far fa-image"></i>
-                                <span class="d-none d-sm-inline small">รูปภาพ</span>
+                    <div class="ai-pill-row">
+                        <div class="dropdown">
+                            <button type="button" class="ai-tool-btn" data-bs-toggle="dropdown" aria-expanded="false" title="แนบรูปภาพหรือไฟล์เสียง">
+                                <i class="fas fa-plus"></i>
                             </button>
-                            <button type="button" class="ai-tool-btn" @click="$refs.audioPicker.click()" title="อัปโหลดไฟล์เสียง">
-                                <i class="fas fa-file-audio"></i>
-                            </button>
-                            <button type="button" class="ai-tool-btn" :class="{ 'recording': recordingAudio }"
-                                    @click="toggleAudioRecord()" title="อัดคลิปเสียงส่งให้ AI">
-                                <i class="fas" :class="recordingAudio ? 'fa-stop-circle' : 'fa-wave-square'"></i>
-                                <span class="small" x-show="recordingAudio" x-text="recordTimerLabel()"></span>
-                            </button>
+                            <ul class="dropdown-menu shadow-sm border-0 rounded-4 p-1">
+                                <li>
+                                    <button type="button" class="dropdown-item rounded-3 py-2" @click="$refs.imagePicker.click()">
+                                        <i class="far fa-image text-success me-2"></i> แนบรูปภาพ (สูงสุด 3 รูป)
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item rounded-3 py-2" @click="$refs.audioPicker.click()">
+                                        <i class="fas fa-file-audio text-primary me-2"></i> อัปโหลดไฟล์เสียง
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
 
-                        <div class="d-flex align-items-center gap-1">
-                            <button type="button" class="ai-tool-btn" x-show="speechSupported"
-                                    :class="{ 'recording': listening }" @click="toggleMic()"
-                                    title="พูดด้วยเสียงเพื่อพิมพ์ข้อความ">
-                                <i class="fas" :class="listening ? 'fa-stop' : 'fa-microphone'"></i>
-                            </button>
-                            <button type="submit" class="ai-send-btn" :disabled="!canSend()" aria-label="ส่งข้อความ">
-                                <i class="fas fa-arrow-up"></i>
-                            </button>
-                        </div>
+                        <label for="pt-q-input" class="visually-hidden">พิมพ์ข้อความถึงผู้ช่วย</label>
+                        <textarea id="pt-q-input" x-ref="input" class="ai-pill-textarea" rows="1" maxlength="1500"
+                                  :placeholder="selectedMode === 'symptom' ? 'เล่าอาการที่เป็นอยู่ได้เลย...' : 'ขอความช่วยเหลือจาก TSPI AI...'"
+                                  x-model="draft"
+                                  @input="autoGrow($el)"
+                                  @keydown.enter="if (!$event.shiftKey && !$event.isComposing) { $event.preventDefault(); send(); }"
+                                  :disabled="sending"></textarea>
+
+                        <button type="button" class="ai-tool-btn" x-show="speechSupported"
+                                :class="{ 'recording': listening }" @click="toggleMic()"
+                                title="พูดด้วยเสียงเพื่อพิมพ์">
+                            <i class="fas" :class="listening ? 'fa-stop' : 'fa-microphone'"></i>
+                        </button>
+
+                        <!-- ถ้ายังว่างแสดงปุ่ม "พูด/อัดเสียง" แบบ Gemini, ถ้ามีข้อความ/ไฟล์แสดงปุ่มส่ง ↑ -->
+                        <button type="button" class="ai-voice-pill" x-show="!hasInput()"
+                                :class="{ 'recording': recordingAudio }" @click="toggleAudioRecord()"
+                                title="อัดคลิปเสียงส่งให้ AI และทีมแพทย์">
+                            <i class="fas" :class="recordingAudio ? 'fa-stop-circle' : 'fa-wave-square'"></i>
+                            <span x-text="recordingAudio ? recordTimerLabel() : 'พูด'"></span>
+                        </button>
+                        <button type="submit" class="ai-send-btn" x-show="hasInput()" :disabled="!canSend()" aria-label="ส่งข้อความ">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
                     </div>
                 </form>
 
-                <div class="ai-foot-note">
-                    <span>ไม่ใช่การวินิจฉัยของแพทย์ &middot; รูปและเสียงถูกเข้ารหัสในระบบคลินิก &middot; ฉุกเฉินโทร <a href="tel:1669">1669</a></span>
-                    <template x-if="current && !current.submitted">
-                        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" @click="submit()" :disabled="sending">
-                            <i class="fas fa-paper-plane me-1"></i> ส่งแชทนี้ให้แพทย์ตรวจ
-                        </button>
-                    </template>
+                <div class="ai-micro-foot">
+                    ไม่ใช่การวินิจฉัยของแพทย์ &middot; รูป/เสียงเข้ารหัสในระบบ &middot; ฉุกเฉิน <a href="tel:1669" class="text-decoration-none">1669</a>
                 </div>
             </div>
         </div>
@@ -409,7 +336,7 @@
 
     <!-- Lightbox ดูรูปขยาย -->
     <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3"
-         style="display: none; background: rgba(15, 23, 42, .8); z-index: 1080;"
+         style="display: none; background: rgba(15, 23, 42, .82); z-index: 1080;"
          x-show="previewUrl" x-transition @click="previewUrl = ''">
         <img :src="previewUrl" alt="ภาพขยาย" class="rounded-3 shadow-lg" style="max-width: 92vw; max-height: 88vh; object-fit: contain;" @click.stop>
         <button type="button" class="btn btn-light rounded-circle position-absolute top-0 end-0 m-3" @click="previewUrl = ''" aria-label="ปิดรูป">
@@ -441,7 +368,7 @@ function assistantApp() {
         searchQuery: '',
         sideCollapsed: false,
         mobileSideOpen: false,
-        selectedMode: '',
+        selectedMode: 'general',
         copiedIndex: -1,
         previewUrl: '',
         pendingImages: [],
@@ -454,12 +381,6 @@ function assistantApp() {
         recordChunks: [],
         recordSeconds: 0,
         recordTimer: null,
-        modes: [
-            { id: 'symptom', icon: 'fa-stethoscope', label: 'เล่าอาการ', prefix: 'ขอเล่าอาการที่เป็นอยู่ตอนนี้: ' },
-            { id: 'axes', icon: 'fa-dna', label: 'ถาม 39 แกน', prefix: 'สอบถามเรื่อง 39 แกนชีววิทยา: ' },
-            { id: 'clinic', icon: 'fa-calendar-check', label: 'นัดหมาย & บริการ', prefix: 'สอบถามเรื่องการนัดหมายและบริการคลินิก: ' },
-            { id: 'selfcare', icon: 'fa-seedling', label: 'ดูแลตัวเอง', prefix: 'ขอคำแนะนำการดูแลตัวเองเรื่อง ' },
-        ],
         examples: [
             'ลำไส้รั่วคืออะไร รักษาอย่างไร',
             'อ่อนเพลียบ่อย เกี่ยวกับระบบไหน',
@@ -470,7 +391,6 @@ function assistantApp() {
         async init() {
             const r = await fetch(base).then(res => res.json());
             this.threads = r.threads || [];
-            // เปิดหน้าเริ่มต้นแบบ Gemini/ChatGPT (ไม่เปิดห้องเก่าทับ ยกเว้นระบุ ?thread=)
             if (initialThreadId && this.threads.some(t => String(t.id) === String(initialThreadId))) {
                 await this.openThread(Number(initialThreadId));
             }
@@ -480,17 +400,22 @@ function assistantApp() {
             if (!q) return this.threads;
             return this.threads.filter(t => (t.title || '').toLowerCase().includes(q));
         },
+        hasInput() {
+            return !!this.draft.trim() || this.pendingImages.length > 0 || !!this.pendingAudio;
+        },
         canSend() {
-            return !this.sending && (!!this.draft.trim() || this.pendingImages.length > 0 || !!this.pendingAudio);
+            return !this.sending && this.hasInput();
+        },
+        setMode(mode) {
+            this.selectedMode = mode;
+            if (this.$refs.input) this.$refs.input.focus();
         },
         startFresh() {
             this.current = null;
             this.messages = [];
             this.error = '';
             this.mobileSideOpen = false;
-            this.$nextTick(() => {
-                if (this.$refs.welcomeInput) this.$refs.welcomeInput.focus();
-            });
+            this.$nextTick(() => { if (this.$refs.input) this.$refs.input.focus(); });
         },
         async openThread(id) {
             const r = await fetch(base + id + '/').then(res => res.json());
@@ -507,14 +432,6 @@ function assistantApp() {
                 this.threads.unshift(d.thread);
                 this.current = d.thread;
             }
-        },
-        applyMode(m) {
-            this.selectedMode = m.id;
-            if (!this.draft.trim()) this.draft = m.prefix;
-            this.$nextTick(() => {
-                const el = this.$refs.welcomeInput || this.$refs.input;
-                if (el) { el.focus(); this.autoGrow(el); }
-            });
         },
         onPickImages(ev) {
             this.error = '';
@@ -563,9 +480,7 @@ function assistantApp() {
             }
             this.pendingAudio = { file: f, label: f.name || 'ไฟล์เสียง' };
         },
-        clearPendingAudio() {
-            this.pendingAudio = null;
-        },
+        clearPendingAudio() { this.pendingAudio = null; },
         recordTimerLabel() {
             const m = Math.floor(this.recordSeconds / 60);
             const s = String(this.recordSeconds % 60).padStart(2, '0');
@@ -577,7 +492,7 @@ function assistantApp() {
                 return;
             }
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
-                this.error = 'เบราว์เซอร์นี้ไม่รองรับการอัดเสียงโดยตรง ลองเลือกอัปโหลดไฟล์เสียงแทนได้ครับ';
+                this.error = 'เบราว์เซอร์นี้ไม่รองรับการอัดเสียงโดยตรง ลองกด + แล้วเลือกอัปโหลดไฟล์เสียงแทนได้ครับ';
                 return;
             }
             this.error = '';
@@ -623,7 +538,7 @@ function assistantApp() {
             this.recognizer = U.createSpeechRecognizer(
                 (spoken) => {
                     this.draft = baseDraft + spoken;
-                    this.$nextTick(() => this.autoGrow(this.$refs.welcomeInput || this.$refs.input));
+                    this.$nextTick(() => this.autoGrow(this.$refs.input));
                 },
                 (isOn, errMsg) => {
                     this.listening = isOn;
@@ -725,7 +640,7 @@ function assistantApp() {
                 showCancelButton: true,
                 confirmButtonText: 'บันทึก',
                 cancelButtonText: 'ยกเลิก',
-                confirmButtonColor: '#2E7D32',
+                confirmButtonColor: '#1A73E8',
             });
             const title = (res.value || '').trim();
             if (!res.isConfirmed || !title) return;
@@ -766,7 +681,7 @@ function assistantApp() {
                 showCancelButton: true,
                 confirmButtonText: 'ส่งให้ทีมแพทย์',
                 cancelButtonText: 'ยกเลิก',
-                confirmButtonColor: '#2E7D32',
+                confirmButtonColor: '#1A73E8',
             });
             if (!res.isConfirmed) return;
             const { ok, d } = await postJson(base + this.current.id + '/submit/');

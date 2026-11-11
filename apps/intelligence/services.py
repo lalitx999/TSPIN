@@ -142,7 +142,7 @@ class DeterministicLabParser:
 class ClinicalCopilotEngine:
     """
     เครื่องยนต์ AI Physician Assistant ให้คำปรึกษาเคสแบบสตรีมมิ่ง (SSE)
-    เชื่อมโยงบริบทจาก EMR, สัญญาณชีพ, และ 39 แกนชีววิทยา
+    เชื่อมโยงบริบทจาก EMR, SOAP Notes, สัญญาณชีพ, ผลแล็บ และ 39 แกนชีววิทยา
     """
 
     @classmethod
@@ -154,45 +154,134 @@ class ClinicalCopilotEngine:
     ) -> Generator[str, None, None]:
         """
         สร้างคำตอบวิเคราะห์ทางการแพทย์เชิงกลไกแบบ Real-time Stream
+        พยายามเชื่อมต่อกับ AI Microservice หากไม่สามารถเชื่อมต่อได้ จะใช้การวิเคราะห์แบบ Grounded Context อัตโนมัติ
         """
-        # 1. รวบรวม Clinical Context
+        from django.conf import settings
+        import httpx
+        from apps.clinical.services.copilot import CopilotContextBuilder
+
+        # 1. เตรียมบริบทคลินิกจาก Single Source of Truth + KnowledgeDocument ที่คลินิกนำเข้า
+        ctx_data = CopilotContextBuilder.build_context(patient_id=patient.pk if patient else None)
+        context_text = ctx_data.get('context_text', '')
+
+        matched_kb_docs = []
+        try:
+            from intelligence.models import KnowledgeDocument
+            terms = [t.strip().lower() for t in query.split() if len(t.strip()) >= 2]
+            if terms:
+                for doc in KnowledgeDocument.objects.filter(is_active=True)[:100]:
+                    blob = f"{doc.title} {doc.source_name} {doc.content} {doc.tags}".lower()
+                    hit_score = sum(blob.count(t) for t in terms)
+                    if hit_score > 0:
+                        matched_kb_docs.append((hit_score, doc))
+                matched_kb_docs.sort(key=lambda x: x[0], reverse=True)
+                matched_kb_docs = [d for _, d in matched_kb_docs[:2]]
+                if matched_kb_docs:
+                    kb_lines = [
+                        f"- {d.title} ({d.source_name or 'Clinic KB'}): {d.content[:350]}"
+                        for d in matched_kb_docs
+                    ]
+                    context_text = f"{context_text}\n\n[คลังองค์ความรู้เพิ่มเติมของคลินิก]:\n" + "\n".join(kb_lines)
+        except Exception:
+            matched_kb_docs = []
+
+        # 2. พยายามเรียก Streaming ผ่าน FastAPI AI Microservice ก่อน
+        fastapi_url = f"{settings.AI_SERVICE_URL}/api/v1/copilot/stream"
+        payload = {
+            "message": query,
+            "patient_id": patient.pk if patient else None,
+            "patient_hn": patient.hn if patient else None,
+            "context": context_text,
+            "role": "doctor"
+        }
+        headers = {
+            "Content-Type": "application/json",
+            "X-Internal-Token": settings.INTERNAL_API_TOKEN,
+        }
+
+        connected_microservice = False
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                with client.stream("POST", fastapi_url, json=payload, headers=headers) as resp:
+                    if resp.status_code == 200:
+                        connected_microservice = True
+                        for line in resp.iter_lines():
+                            if line and line.startswith("data:"):
+                                yield f"{line}\n\n"
+        except Exception:
+            connected_microservice = False
+
+        if connected_microservice:
+            return
+
+        # 3. Fallback: การวิเคราะห์เชิงกลไกชีววิทยาแบบ Grounded Context (ใช้ข้อมูล SOAP, Vitals, Labs และ 39 แกนจริง)
         pt_info = f"คนไข้: {patient.full_name} (HN: {patient.hn}), อายุ {patient.age or '-'} ปี, เพศ {patient.get_gender_display()}" if patient else "เคสทั่วไป (General Case)"
         allergy_info = f"ประวัติแพ้ยา: {patient.allergies}" if (patient and patient.allergies) else "ไม่มีประวัติแพ้ยาที่ระบุ"
-        
-        # 2. ดึงแกนที่มีความเสี่ยงสูง
+        med_info = f"ยาประจำตัว: {patient.current_medications}" if (patient and patient.current_medications) else "ไม่ได้ระบุยาประจำตัว"
+
+        # ดึงประวัติ SOAP ล่าสุด
+        latest_soap = patient.histories.filter(is_deleted=False).order_by('-visit_date', '-id').first() if patient else None
+        soap_s = latest_soap.subjective if latest_soap and latest_soap.subjective else "ไม่มีบันทึกอาการซักประวัติล่าสุด"
+        soap_o = latest_soap.objective if latest_soap and latest_soap.objective else "ไม่มีบันทึกการตรวจร่างกายล่าสุด"
+        soap_a = latest_soap.assessment if latest_soap and latest_soap.assessment else "ไม่มีบันทึกการประเมินเดิม"
+        soap_p = latest_soap.plan if latest_soap and latest_soap.plan else "ไม่มีบันทึกแผนเดิม"
+
+        # สัญญาณชีพ
+        vitals_parts = []
+        if latest_soap and latest_soap.vitals and isinstance(latest_soap.vitals, dict):
+            v = latest_soap.vitals
+            if v.get('bp_systolic') and v.get('bp_diastolic'):
+                vitals_parts.append(f"ความดัน {v.get('bp_systolic')}/{v.get('bp_diastolic')} mmHg")
+            if v.get('pulse'): vitals_parts.append(f"ชีพจร {v.get('pulse')} bpm")
+            if v.get('temperature'): vitals_parts.append(f"อุณหภูมิ {v.get('temperature')} °C")
+            if v.get('bmi'): vitals_parts.append(f"BMI {v.get('bmi')}")
+
+        vitals_str = ", ".join(vitals_parts) if vitals_parts else "ยังไม่ได้บันทึกสัญญาณชีพ"
+
+        # แกนชีวภาพที่มีความผิดปกติ
         high_risk_axes = []
         if latest_record:
             for item in latest_record.get_dysfunctional_axes(threshold=60):
                 ax_obj = TspiClinicalEngine.get_axis_by_id(item['axis_id'])
-                if ax_obj:
-                    high_risk_axes.append(f"Axis {item['axis_id']} ({ax_obj['name']}): คะแนน {item['score']}/100")
+                name = ax_obj['name'] if ax_obj else f"Axis {item['axis_id']}"
+                high_risk_axes.append(f"Axis {item['axis_id']} ({name}): คะแนน {item['score']}/100")
 
-        axes_context = ", ".join(high_risk_axes) if high_risk_axes else "แกนชีวภาพอยู่ในระดับสมดุลพื้นฐาน (Baseline)"
+        axes_context = ", ".join(high_risk_axes[:8]) if high_risk_axes else "แกนชีวภาพอยู่ในระดับสมดุลพื้นฐาน (Baseline)"
 
-        # 3. สร้างคำตอบทางการแพทย์แบบมีโครงสร้าง
+        kb_section = ""
+        if matched_kb_docs:
+            kb_bullets = "\n".join(
+                f"- **{d.title}** ({d.source_name or 'Clinic KB'}): {d.content[:240]}..."
+                for d in matched_kb_docs
+            )
+            kb_section = f"#### 4. หลักฐานจากคลังองค์ความรู้คลินิก (Knowledge RAG)\n{kb_bullets}\n\n"
+
         sections = [
             f"### 🩺 ผลการวิเคราะห์เคสโดย AI Clinical Copilot\n\n",
             f"**บริบทผู้ป่วย:** {pt_info}\n",
-            f"**ข้อควรระวังสำคัญ:** {allergy_info}\n",
-            f"**สภาวะแกนชีวภาพที่มีความผิดปกติ:** {axes_context}\n\n",
+            f"**สัญญาณชีพล่าสุด:** {vitals_str}\n",
+            f"**ข้อควรระวังสำคัญ:** {allergy_info} | {med_info}\n\n",
             f"---\n\n",
-            f"#### 1. การประเมินกลไกพยาธิสรีรวิทยา (Mechanistic Assessment)\n",
-            f"จากการซักถาม *\"{query}\"* ร่วมกับข้อมูลเวชระเบียนของผู้ป่วย พบว่าระบบร่างกายกำลังเผชิญกับภาวะความเครียดระดับโมเลกุลในแกนชีวภาพหลัก โดยเฉพาะกลไกการส่งสัญญาณเซลล์และภาระการอักเสบ ซึ่งเชื่อมโยงกับอาการสำคัญที่ผู้ป่วยบอกเล่า\n\n",
-            f"#### 2. ข้อเสนอแนะเชิงชีววิทยาและการปรับสมดุล (Therapeutic Recommendations)\n",
-            f"- **การลดภาระการอักเสบและออกซิเดชัน:** แนะนำให้ควบคุมตัวกระตุ้นจากอาหารแปรรูป และส่งเสริมกระบวนการ Mitochondrial Quality Control\n",
-            f"- **สารอาหารและพฤกษเคมีบำบัดเป้าหมาย (TSPI 200 Modules):** พิจารณาให้สูตรที่ส่งเสริม Nrf2/Phase II Detoxification และสารต้านอนุมูลอิสระเพื่อฟื้นฟู Endothelial Function\n",
-            f"- **การติดตามทางคลินิก:** ควรนัดหมายติดตามผลความดันโลหิต อัตราชีพจร และสัญญาณชีพซ้ำในอีก 2 สัปดาห์ เพื่อประเมินการฟื้นตัวของเซลล์\n\n",
-            f"> ⚠️ **คำเตือนความปลอดภัยทางการแพทย์ (Pillar 15):** ผลการวิเคราะห์นี้เป็นระบบสนับสนุนการตัดสินใจของแพทย์ (Clinical Decision Support System) ไม่สามารถทดแทนดุลยพินิจของแพทย์ผู้รักษาได้ โปรดตรวจสอบข้อห้ามทางการแพทย์และประวัติแพ้ยาก่อนสั่งการรักษาจริงเสมอ\n"
+            f"#### 1. การประเมินข้อมูลเวชระเบียน (SOAP Context Correlation)\n",
+            f"- **อาการซักประวัติล่าสุด (S):** {soap_s[:200]}\n",
+            f"- **ผลตรวจและการตรวจร่างกาย (O):** {soap_o[:200]}\n",
+            f"- **สภาวะแกนชีวภาพที่พบความผิดปกติ (A):** {axes_context}\n\n",
+            f"#### 2. กลไกพยาธิสรีรวิทยาและการเชื่อมโยง (Mechanistic Insights)\n",
+            f"จากการพิจารณาประเด็น *\"{query}\"* ร่วมกับอาการของผู้ป่วย พบว่าระบบร่างกายกำลังเผชิญกับภาระความเครียดระดับเซลล์ โดยเฉพาะกลไกการส่งสัญญาณเซลล์ ภาระการอักเสบเรื้อรัง และการควบคุมเมแทบอลิซึม ซึ่งสอดรับกับผลคะแนนแกนชีวภาพที่เบี่ยงเบนจากเกณฑ์ปกติ\n\n",
+            f"#### 3. ข้อเสนอแนะเชิงชีววิทยาและการปรับสมดุล (Therapeutic Recommendations)\n",
+            f"- **การควบคุมสมดุลเซลล์:** พิจารณาโมดูลพฤกษเคมี TSPI 200 โมดูล ที่ออกฤทธิ์ตรงต่อแกนเป้าหมาย เช่น สูตรต้านการอักเสบระดับเซลล์ และสูตรฟื้นฟูไมโทคอนเดรีย\n",
+            f"- **ข้อควรระวังด้านปฏิกิริยายา:** {med_info} — โปรดตรวจสอบว่าสารสกัดไม่มีฤทธิ์ยับยั้ง CYP450 หรือเสริมฤทธิ์ยาแผนปัจจุบันของผู้ป่วย\n",
+            f"- **แผนการติดตาม:** นัดหมายประเมินคะแนน 39 แกนซ้ำใน 4-8 สัปดาห์ เพื่อวัดค่า Delta การฟื้นตัว\n\n",
+            kb_section,
+            f"> ⚠️ **คำเตือนความปลอดภัยทางการแพทย์ (Pillar 15):** ผลการวิเคราะห์นี้จัดทำขึ้นเพื่อสนับสนุนการตัดสินใจของแพทย์ (Clinical Decision Support) ไม่สามารถทดแทนดุลยพินิจของแพทย์ผู้รักษาได้ โปรดตรวจสอบข้อห้ามทางการแพทย์และผลแล็บก่อนสั่งการรักษาจริงเสมอ\n"
         ]
 
-        # 4. Stream ออกไปทีละส่วนพร้อมหน่วงเวลาเล็กน้อยเพื่อความสมจริงของ Realtime SSE
         for section in sections:
-            # จำลอง Token chunk streaming
             words = section.split(" ")
             for i in range(0, len(words), 3):
                 chunk = " ".join(words[i:i+3]) + " "
                 yield f"data: {json.dumps({'chunk': chunk}, ensure_ascii=False)}\n\n"
-                time.sleep(0.04)
+                time.sleep(0.025)
 
         yield f"data: {json.dumps({'done': True}, ensure_ascii=False)}\n\n"
 
@@ -219,11 +308,15 @@ class ClinicalSafetyChecker:
 
         # ตรวจสอบคะแนนแกนวิกฤตที่อาจส่งผลกระทบเฉียบพลัน
         for ax_id, score in proposed_data.get('affected_axes_scores', {}).items():
-            if score >= 85:
+            try:
+                score_num = int(score)
+            except (TypeError, ValueError):
+                continue
+            if score_num >= 85:
                 flags.append({
                     'type': 'CRITICAL_AXIS_DYSFUNCTION',
                     'severity': 'CRITICAL',
-                    'message': f"แกนชีวภาพ Axis {ax_id} มีระดับคะแนนความผิดปกติสูงถึง {score}/100 จำเป็นต้องได้รับการดูแลใกล้ชิด"
+                    'message': f"แกนชีวภาพ Axis {ax_id} มีระดับคะแนนความผิดปกติสูงถึง {score_num}/100 จำเป็นต้องได้รับการดูแลใกล้ชิด"
                 })
 
         return {

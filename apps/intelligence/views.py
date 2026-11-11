@@ -66,6 +66,42 @@ def ai_physician_view(request):
 
     past_messages = session.messages.all()
 
+    # ดึงบริบท SOAP, สัญญาณชีพ, แล็บชีวเคมี และ 39 แกนชีววิทยา
+    latest_soap = None
+    latest_vitals = {}
+    dysfunctional_axes = []
+    patient_labs = []
+
+    if patient:
+        latest_soap = patient.histories.filter(is_deleted=False).order_by('-visit_date', '-id').first()
+        if latest_soap and isinstance(latest_soap.vitals, dict):
+            latest_vitals = latest_soap.vitals
+
+        if latest_record:
+            from clinical.invariants import CANONICAL_39_AXES
+            for item in latest_record.get_dysfunctional_axes(threshold=60):
+                dysfunctional_axes.append({
+                    'axis_id': item['axis_id'],
+                    'name': CANONICAL_39_AXES.get(item['axis_id'], f"Axis {item['axis_id']}"),
+                    'score': item['score']
+                })
+
+        from intelligence.models import AgenticArtifact
+        lab_art = AgenticArtifact.objects.filter(
+            patient=patient,
+            artifact_type='lab_extraction'
+        ).order_by('-created_at').first()
+        if lab_art and isinstance(lab_art.proposed_data, dict):
+            data = lab_art.proposed_data
+            markers = data.get('extracted_biomarkers', data) if isinstance(data, dict) else {}
+            for k, m in markers.items():
+                if isinstance(m, dict) and 'value' in m:
+                    patient_labs.append(m)
+        elif patient.extra_data and isinstance(patient.extra_data.get('biomarkers'), dict):
+            for k, m in patient.extra_data['biomarkers'].items():
+                if isinstance(m, dict) and 'value' in m:
+                    patient_labs.append(m)
+
     # บันทึก AuditLog
     AuditLog.objects.create(
         user=request.user,
@@ -82,8 +118,13 @@ def ai_physician_view(request):
         'auto_selected': auto_selected,
         'recent_patients': recent_patients,
         'latest_record': latest_record,
+        'latest_soap': latest_soap,
+        'latest_vitals': latest_vitals,
+        'dysfunctional_axes': dysfunctional_axes,
+        'patient_labs': patient_labs,
         'session': session,
         'past_messages': past_messages,
+        'prefill': request.GET.get('prefill', '').strip(),
     })
 
 
@@ -135,26 +176,24 @@ def ai_physician_stream_api(request):
 @clinical_staff_required
 def lab_ocr_view(request):
     """
-    ระบบสแกนและสกัดค่าผลแล็บ (Lab OCR & Biomarker Value Extractor)
-    คำนวณความเสี่ยงและส่งต่อผลลัพธ์เข้าสู่ Artifact Review Gate
+    ระบบสแกนและสกัดค่าผลแล็บถูกย้ายรวมเข้าหน้า 'ตรวจทานผลแล็บ (Lab Review)' แบบ Modal แล้ว
+    หากเข้าผ่าน GET จะนำทางไปที่หน้า Lab Review พร้อมเปิด Modal ให้โดยอัตโนมัติ
     """
     patient_id = request.GET.get('patient_id')
+    if request.method == 'GET':
+        from django.urls import reverse
+        url = reverse('patients:doctor_lab_review')
+        params = ['open_upload=1']
+        if patient_id and str(patient_id).isdigit():
+            params.append(f"patient_id={patient_id}")
+        return redirect(f"{url}?{'&'.join(params)}")
+
     patient = None
     if patient_id:
         patient = get_object_or_404(Patient, pk=patient_id)
 
     parse_result = None
-    sample_text = (
-        "CBC and Chemistry Profile:\n"
-        "Fasting Blood Sugar: 128 mg/dL\n"
-        "HbA1c: 6.8 %\n"
-        "hs-CRP: 3.4 mg/L\n"
-        "Total Cholesterol: 245 mg/dL\n"
-        "Triglycerides: 210 mg/dL\n"
-        "LDL: 155 mg/dL\n"
-        "SGPT (ALT): 48 U/L\n"
-        "Creatinine: 1.1 mg/dL"
-    )
+    sample_text = ""
 
     if request.method == 'POST':
         raw_text = request.POST.get('lab_text', '').strip()
@@ -201,23 +240,60 @@ def lab_ocr_view(request):
 @clinical_staff_required
 def artifact_review_view(request):
     """
-    หน้าจอตรวจทานผลวิเคราะห์ AI (Artifact Review Gate - Pillar 15)
-    แพทย์ต้องเป็นผู้ลงนามอนุมัติ (Approve) ก่อนที่ข้อมูลจะถูกนำไปปรับปรุงในเวชระเบียนจริง
+    ศูนย์ตรวจทานข้อเสนอ AI และประวัติลงนามแพทย์ (Artifact Review Gate - Pillar 15)
+    รองรับการค้นหาคนไข้ กรองประเภทชิ้นงาน และแสดงผลโครงสร้างทางคลินิกโดยไม่แสดง JSON ดิบ
     """
+    from django.db.models import Q
+    from clinical.invariants import CANONICAL_39_AXES
+
     patient_id = request.GET.get('patient_id')
     status_filter = request.GET.get('status', 'pending')
+    type_filter = request.GET.get('type', 'all')
+    q = request.GET.get('q', '').strip()
 
-    queryset = AgenticArtifact.objects.all()
-    if patient_id:
+    queryset = AgenticArtifact.objects.select_related('patient', 'doctor').all()
+    if patient_id and str(patient_id).isdigit():
         queryset = queryset.filter(patient_id=patient_id)
     if status_filter and status_filter != 'all':
         queryset = queryset.filter(status=status_filter)
+    if type_filter in ('lab_extraction', 'axis_recommendation', 'therapeutic_plan'):
+        queryset = queryset.filter(artifact_type=type_filter)
+    if q:
+        queryset = queryset.filter(
+            Q(patient__first_name__icontains=q)
+            | Q(patient__last_name__icontains=q)
+            | Q(patient__hn__icontains=q)
+            | Q(title__icontains=q)
+        )
 
-    artifacts = queryset.order_by('-created_at')[:30]
+    artifacts = list(queryset.order_by('-created_at')[:30])
+    for art in artifacts:
+        data = art.proposed_data if isinstance(art.proposed_data, dict) else {}
+        axes_scores = data.get('affected_axes_scores') or data.get('suggested_scores') or {}
+        resolved_axes = []
+        if isinstance(axes_scores, dict):
+            for ax_id_raw, sc in axes_scores.items():
+                try:
+                    ax_id = int(ax_id_raw)
+                    resolved_axes.append({
+                        'axis_id': ax_id,
+                        'name': CANONICAL_39_AXES.get(ax_id, f"Axis {ax_id}"),
+                        'score': int(sc),
+                    })
+                except (TypeError, ValueError):
+                    continue
+        resolved_axes.sort(key=lambda x: x['score'], reverse=True)
+        art.resolved_axes = resolved_axes
+        art.resolved_modules = data.get('recommended_modules') or []
+        art.resolved_rules = data.get('triggered_rules') or []
+        art.resolved_phases = data.get('priority_phases') or []
+        art.resolved_docs = data.get('documents') or []
 
     return render(request, 'intelligence/artifact_review.html', {
         'artifacts': artifacts,
         'status_filter': status_filter,
+        'type_filter': type_filter,
+        'q': q,
         'pending_count': AgenticArtifact.objects.filter(status='pending').count(),
     })
 
@@ -240,18 +316,57 @@ def artifact_action_view(request, artifact_id):
         artifact.status = 'approved'
         artifact.save()
 
-        # หากเป็นผลแล็บที่มีคะแนนแกนชีวภาพ ให้บันทึกอัปเดตเข้า BiologicalRecord ของคนไข้จริง
-        affected_scores = artifact.proposed_data.get('affected_axes_scores', {})
-        if affected_scores:
+        data = artifact.proposed_data if isinstance(artifact.proposed_data, dict) else {}
+        affected_scores = data.get('affected_axes_scores') or data.get('suggested_scores') or {}
+        if isinstance(affected_scores, dict) and affected_scores:
             record = artifact.patient.biological_records.first()
             if not record:
                 record = BiologicalRecord.objects.create(patient=artifact.patient, doctor=request.user)
 
             for ax_id, score in affected_scores.items():
-                if 1 <= int(ax_id) <= 39:
-                    setattr(record, f'axis_{ax_id}', score)
+                try:
+                    ax_num = int(ax_id)
+                    if 1 <= ax_num <= 39:
+                        setattr(record, f'axis_{ax_num}', int(score))
+                except (TypeError, ValueError):
+                    continue
             record.notes = f"อัปเดตผลลัพธ์จาก Artifact #{artifact.pk}: {doctor_notes}"
             record.save()
+
+        # อัปเดตผลแล็บ / แผนบำบัดเข้าแฟ้มเวชระเบียนของคนไข้
+        patient = artifact.patient
+        changed_extra = False
+        markers = data.get('extracted_biomarkers')
+        if isinstance(markers, dict) and markers:
+            if not isinstance(patient.extra_data, dict):
+                patient.extra_data = {}
+            bio = patient.extra_data.get('biomarkers')
+            if not isinstance(bio, dict):
+                bio = {}
+            bio.update(markers)
+            patient.extra_data['biomarkers'] = bio
+            patient.extra_data['latest_lab_date'] = timezone.now().isoformat()
+            changed_extra = True
+
+        modules = data.get('recommended_modules')
+        if isinstance(modules, list) and modules:
+            if not isinstance(patient.extra_data, dict):
+                patient.extra_data = {}
+            protocols = patient.extra_data.get('approved_protocols')
+            if not isinstance(protocols, list):
+                protocols = []
+            protocols.insert(0, {
+                'artifact_id': artifact.pk,
+                'title': artifact.title,
+                'modules': [m.get('code') for m in modules if isinstance(m, dict)],
+                'approved_at': timezone.now().isoformat(),
+                'doctor_notes': doctor_notes,
+            })
+            patient.extra_data['approved_protocols'] = protocols[:10]
+            changed_extra = True
+
+        if changed_extra:
+            patient.save(update_fields=['extra_data'])
 
         AuditLog.objects.create(
             user=request.user,

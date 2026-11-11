@@ -1,90 +1,246 @@
 {% extends 'layouts/doctor_base.html' %}
 
-{% block title %}สืบค้นงานวิจัยทางคลินิก (Knowledge RAG) | TSPI CLINIC{% endblock %}
+{% block title %}สืบค้นองค์ความรู้และงานวิจัยทางคลินิก (Knowledge RAG) | TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column gap-4" x-data="{
-    query: '',
-    isSearching: false,
-    results: [
-        {
-            title: 'บทบาทของ NF-κB และ Inflammasome ในพยาธิกำเนิดของโรคสะเก็ดเงิน (Psoriasis Pathogenesis)',
-            source: 'TSPI Clinical Research Archive (38_tspi.txt & System Biology Vol. 4)',
-            excerpt: 'การกระตุ้นที่มากเกินไปของ NF-κB นำไปสู่การหลั่ง IL-6, TNF-α และ IL-17A อย่างต่อเนื่อง การใช้โมดูล KERRA ร่วมกับ MINOZA ช่วยลด Transcriptional Activity ของ NF-κB ได้อย่างมีนัยสำคัญ',
-            tags: ['A01: Systemic Inflammatory Load', 'A02: Immune Homeostasis', 'KERRA', 'MINOZA']
-        },
-        {
-            title: 'กลไกเยื่อบุผนังลำไส้รั่ว (Leaky Gut) กับการกระตุ้นการอักเสบเรื้อรังทั้งระบบ',
-            source: 'Clinical Protocol Phase 1: Gut Restoration & Tight Junction Repair',
-            excerpt: 'ระดับ Zonulin ที่สูงเกิน 38 ng/mL สะท้อนการคลายตัวของ Tight Junctions ในลำไส้ ส่งผลให้ Endotoxin (LPS) หลุดรอดเข้าสู่กระแสเลือด การใช้ CINNARA ร่วมกับ Probiotic Modules ฟื้นฟูสมดุลจุลินทรีย์ได้ภายใน 6-8 สัปดาห์',
-            tags: ['A19: Gut Barrier Integrity', 'Zonulin', 'CINNARA', 'Phase 1']
-        },
-        {
-            title: 'การฟื้นฟูความไวต่ออินซูลินและพลังงานไมโตคอนเดรียผ่าน AMPK Signaling',
-            source: 'Endocrine & Metabolic Core Integration Paper',
-            excerpt: 'โมดูล DB-1 ผสานสารสกัด Momordica charantia และสารสกัดมาตรฐาน มีฤทธิ์กระตุ้น AMPK Phosphorylation ปรับสมดุลกลูโคสในตับและลด Lipotoxicity ในเนื้อเยื่อตับ',
-            tags: ['A05: Glucose-Insulin Regulation', 'A08: Mitochondrial Network', 'DB1']
-        }
-    ]
-}">
+<div class="d-flex flex-column gap-4">
 
     <!-- Header Card -->
-    <div class="card shadow-sm border">
+    <div class="card shadow-sm border bg-white">
         <div class="card-body p-3 p-md-4">
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
-                    <i class="fas fa-book-medical me-1"></i> Retrieval-Augmented Generation (RAG)
-                </span>
-                <span class="text-muted small">ระบบสืบค้นเอกสารและงานวิจัยทางการแพทย์</span>
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
+                            <i class="fas fa-book-medical me-1"></i> Canonical &amp; Clinic Knowledge RAG
+                        </span>
+                        <span class="badge bg-light text-secondary border font-monospace text-xs">
+                            {{ counts.axes }} แกน &bull; {{ counts.modules }} โมดูล &bull; {{ counts.rules }} กฎคลินิก &bull; {{ counts.external }} ความรู้เพิ่มเติม
+                        </span>
+                    </div>
+                    <h1 class="h4 fw-bold mb-1 text-dark">สืบค้นองค์ความรู้และหลักฐานทางคลินิก (Knowledge RAG)</h1>
+                    <p class="text-muted small mb-0">
+                        สืบค้นข้อมูลกลไกชีวเคมี เอกสารกำกับโมดูลสมุนไพร กฎความเชื่อมโยงทางคลินิก และเพิ่มองค์ความรู้/งานวิจัยใหม่เข้าสู่ระบบ
+                    </p>
+                </div>
+
+                <div class="flex-shrink-0">
+                    <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#addKnowledgeModal">
+                        <i class="fas fa-plus-circle"></i> เพิ่มองค์ความรู้ / งานวิจัยใหม่
+                    </button>
+                </div>
             </div>
-            <h1 class="h4 fw-bold mb-1 text-dark">สืบค้นองค์ความรู้และหลักฐานทางคลินิก (Knowledge RAG)</h1>
-            <p class="text-muted small mb-0">
-                ค้นหาข้อมูลกลไกชีวเคมี เอกสารกำกับสูตรยา 200 โมดูล และผลการทดสอบทางคลินิก
-            </p>
         </div>
     </div>
 
-    <!-- Search Input Box -->
-    <div class="card shadow-sm border">
-        <div class="card-body p-4 d-flex flex-column gap-3">
-            <div class="input-group">
-                <span class="input-group-text bg-white border-end-0 text-muted">
-                    <i class="fas fa-search"></i>
-                </span>
-                <input type="text" x-model="query" placeholder="พิมพ์คำค้นหา เช่น 'กลไกสะเก็ดเงิน', 'Kerra ข้อห้ามใช้', 'Zonulin', 'Insulin Resistance'..." class="form-control border-start-0 ps-0">
-                <button type="button" class="btn btn-primary px-4">
-                    ค้นหา RAG
-                </button>
-            </div>
+    <!-- Search Input & Category Filters -->
+    <div class="card shadow-sm border bg-white">
+        <div class="card-body p-3 p-md-4 d-flex flex-column gap-3">
+            <form method="GET" action="{% url 'patients:doctor_knowledge_rag' %}" id="ragSearchForm">
+                <input type="hidden" name="cat" value="{{ cat }}" id="ragCatInput">
+                <div class="input-group input-group-lg border rounded-3 overflow-hidden shadow-xs">
+                    <span class="input-group-text bg-white border-0 text-muted ps-3">
+                        <i class="fas fa-search text-primary"></i>
+                    </span>
+                    <input type="text" name="q" id="ragQueryInput" value="{{ q }}" 
+                           placeholder="พิมพ์คำค้นหา เช่น 'Curcuma', 'NF-κB', 'Leaky Gut', 'HbA1c', 'AMPK', 'ตับ'..." 
+                           class="form-control border-0 shadow-none fs-6">
+                    {% if q %}
+                    <a href="{% url 'patients:doctor_knowledge_rag' %}{% if cat != 'all' %}?cat={{ cat }}{% endif %}" class="btn btn-link text-muted d-flex align-items-center text-decoration-none" title="ล้างคำค้นหา">
+                        <i class="fas fa-times"></i>
+                    </a>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary px-4 fs-6 fw-semibold">
+                        ค้นหา RAG
+                    </button>
+                </div>
+            </form>
 
-            <div class="d-flex flex-wrap align-items-center gap-2 text-muted small" style="font-size: 0.8rem;">
-                <span class="fw-bold text-dark">คำค้นยอดนิยม:</span>
-                <button type="button" @click="query = 'KERRA'" class="btn btn-sm btn-light border py-0.5 px-2">KERRA</button>
-                <button type="button" @click="query = 'Zonulin Leaky Gut'" class="btn btn-sm btn-light border py-0.5 px-2">Zonulin Leaky Gut</button>
-                <button type="button" @click="query = 'Phase 1 Detox'" class="btn btn-sm btn-light border py-0.5 px-2">Phase 1 Detox</button>
-                <button type="button" @click="query = 'Mitochondrial Renewal'" class="btn btn-sm btn-light border py-0.5 px-2">Mitochondrial Renewal</button>
+            <!-- Category Filter Pills -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div class="d-flex flex-wrap gap-1.5">
+                    <a href="?cat=all{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-sm rounded-pill {% if cat == 'all' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                        ทั้งหมด
+                    </a>
+                    <a href="?cat=external{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-sm rounded-pill {% if cat == 'external' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                        <i class="fas fa-star me-1"></i> ความรู้ที่เพิ่มเอง ({{ counts.external }})
+                    </a>
+                    <a href="?cat=axes{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-sm rounded-pill {% if cat == 'axes' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                        39 แกนชีววิทยา ({{ counts.axes }})
+                    </a>
+                    <a href="?cat=modules{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-sm rounded-pill {% if cat == 'modules' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                        โมดูลสมุนไพร ({{ counts.modules }})
+                    </a>
+                    <a href="?cat=rules{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-sm rounded-pill {% if cat == 'rules' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                        กฎคลินิก ({{ counts.rules }})
+                    </a>
+                    <a href="?cat=labs{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-sm rounded-pill {% if cat == 'labs' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                        เกณฑ์แล็บ ({{ counts.labs }})
+                    </a>
+                </div>
+
+                <!-- Popular Terms -->
+                <div class="d-flex flex-wrap align-items-center gap-1.5 text-xs">
+                    <span class="text-muted fw-semibold">คำค้นแนะนำ:</span>
+                    <a href="?q=Curcuma{% if cat != 'all' %}&cat={{ cat }}{% endif %}" class="badge bg-light text-dark border text-decoration-none py-1 px-2">Curcuma</a>
+                    <a href="?q=NF-κB{% if cat != 'all' %}&cat={{ cat }}{% endif %}" class="badge bg-light text-dark border text-decoration-none py-1 px-2">NF-κB</a>
+                    <a href="?q=Inflammatory{% if cat != 'all' %}&cat={{ cat }}{% endif %}" class="badge bg-light text-dark border text-decoration-none py-1 px-2">Inflammatory</a>
+                    <a href="?q=Glucose{% if cat != 'all' %}&cat={{ cat }}{% endif %}" class="badge bg-light text-dark border text-decoration-none py-1 px-2">Glucose</a>
+                    <a href="?q=Gut{% if cat != 'all' %}&cat={{ cat }}{% endif %}" class="badge bg-light text-dark border text-decoration-none py-1 px-2">Gut</a>
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- Search Results Header -->
+    <div class="d-flex justify-content-between align-items-center px-1">
+        <span class="small text-muted">
+            {% if q %}
+                ผลการสืบค้นคำว่า <strong class="text-dark">"{{ q }}"</strong> พบทั้งหมด <strong>{{ total_matched }}</strong> รายการ (แสดง {{ results|length }} อันดับแรก)
+            {% else %}
+                แสดงรายการองค์ความรู้ล่าสุดและหมวดหลักจากฐานข้อมูลคลินิก ({{ total_matched }} รายการในหมวดนี้)
+            {% endif %}
+        </span>
     </div>
 
     <!-- Search Results List -->
     <div class="d-flex flex-column gap-3">
-        <template x-for="item in results" :key="item.title">
-            <div class="card shadow-sm border p-4">
-                <div class="d-flex justify-content-between align-items-start gap-3 mb-1">
-                    <h2 class="h6 fw-bold text-dark mb-0" x-text="item.title"></h2>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle text-nowrap">Verified Evidence</span>
+        {% for item in results %}
+        <div class="card shadow-sm border bg-white">
+            <div class="card-body p-3 p-md-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-2 mb-2">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                            <span class="badge {% if item.is_external %}bg-info-subtle text-info-emphasis border border-info-subtle{% elif item.category == 'rules' %}bg-warning-subtle text-warning-emphasis border border-warning-subtle{% elif item.category == 'modules' %}bg-success-subtle text-success border border-success-subtle{% else %}bg-primary-subtle text-primary border border-primary-subtle{% endif %} text-xs">
+                                {{ item.category_label }}
+                            </span>
+                            <small class="text-muted font-monospace text-xs">{{ item.source }}</small>
+                        </div>
+                        <h2 class="h6 fw-bold text-dark mb-0">{{ item.title }}</h2>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                        {% if item.source_url %}
+                        <a href="{{ item.source_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary py-0.5 px-2 text-xs">
+                            <i class="fas fa-external-link-alt me-1"></i> แหล่งอ้างอิง
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'intelligence:ai_physician' %}?prefill={{ item.copilot_query|urlencode }}" class="btn btn-sm btn-outline-primary py-0.5 px-2.5 text-xs">
+                            <i class="fas fa-robot me-1"></i> ถาม AI Copilot
+                        </a>
+                        {% if item.is_external %}
+                        <form method="POST" action="{% url 'patients:doctor_knowledge_rag_delete' item.id %}" class="d-inline" onsubmit="return confirm('ต้องการนำองค์ความรู้นี้ออกจากคลังสืบค้นหรือไม่?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger py-0.5 px-2 text-xs" title="นำออกจากคลัง">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
                 </div>
-                <small class="text-muted font-monospace d-block mb-2" x-text="item.source"></small>
-                <div class="p-3 rounded-3 bg-light border text-muted small lh-base mb-2.5" style="font-size: 0.85rem;" x-text="item.excerpt"></div>
+
+                <div class="p-3 rounded-3 bg-light border text-dark small lh-base mb-2.5" style="white-space: pre-line; max-height: 220px; overflow-y: auto;">{{ item.excerpt }}</div>
+
+                {% if item.safety_note %}
+                <div class="alert alert-warning border-warning-subtle py-1.5 px-2.5 small mb-2.5">
+                    <i class="fas fa-shield-alt text-warning-emphasis me-1"></i> {{ item.safety_note }}
+                </div>
+                {% endif %}
+
+                {% if item.tags %}
                 <div class="d-flex flex-wrap gap-1.5">
-                    <template x-for="tag in item.tags" :key="tag">
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" x-text="tag"></span>
-                    </template>
+                    {% for tag in item.tags %}
+                        {% if tag %}
+                        <span class="badge bg-light text-secondary border font-monospace text-xs">{{ tag }}</span>
+                        {% endif %}
+                    {% endfor %}
                 </div>
+                {% endif %}
             </div>
-        </template>
+        </div>
+        {% empty %}
+        <div class="card shadow-sm border bg-white p-5 text-center text-muted">
+            <i class="fas fa-search fs-1 text-secondary opacity-50 mb-2 d-block"></i>
+            <h6 class="fw-bold text-dark">ไม่พบข้อมูลที่ตรงกับคำค้นหา "{{ q }}"</h6>
+            <p class="small mb-3">ลองใช้คำค้นอื่น หรือเพิ่มองค์ความรู้/งานวิจัยเรื่องนี้เข้าสู่ระบบใหม่</p>
+            <div>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addKnowledgeModal">
+                    <i class="fas fa-plus-circle me-1"></i> เพิ่มองค์ความรู้ใหม่เข้าระบบ
+                </button>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 
+</div>
+
+<!-- Modal: เพิ่มองค์ความรู้ภายนอก / งานวิจัยใหม่ -->
+<div class="modal fade" id="addKnowledgeModal" tabindex="-1" aria-labelledby="addKnowledgeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light border-bottom py-3 px-4">
+                <div>
+                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="addKnowledgeModalLabel">
+                        <i class="fas fa-book-medical text-primary"></i> เพิ่มองค์ความรู้ / งานวิจัยใหม่เข้าคลัง RAG
+                    </h5>
+                    <small class="text-muted">ข้อมูลที่เพิ่มจะถูกจัดทำดัชนีให้แพทย์สืบค้นได้ทันที และเชื่อมโยงกับ AI Physician Copilot</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form method="POST" action="{% url 'patients:doctor_knowledge_rag_add' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body p-4 d-flex flex-column gap-3">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-8">
+                            <label class="form-label small fw-bold text-dark">หัวข้องานวิจัย / องค์ความรู้ <span class="text-danger">*</span></label>
+                            <input type="text" name="title" class="form-control" required placeholder="เช่น บทบาทของ Berberine ต่อ AMPK และภาวะดื้ออินซูลิน (Meta-analysis 2026)">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold text-dark">หมวดหมู่</label>
+                            <select name="category" class="form-select">
+                                {% for val, label in kb_categories %}
+                                <option value="{{ val }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold text-dark">แหล่งที่มา / วารสาร / DOI</label>
+                            <input type="text" name="source_name" class="form-control" placeholder="เช่น PubMed PMID: 38492011, Frontiers in Pharmacology">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold text-dark">ลิงก์อ้างอิง (URL ถ้ามี)</label>
+                            <input type="url" name="source_url" class="form-control" placeholder="https://pubmed.ncbi.nlm.nih.gov/...">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label small fw-bold text-dark">อัปโหลดไฟล์เอกสารงานวิจัย (PDF, TXT, MD — ระบบจะสกัดข้อความให้อัตโนมัติ)</label>
+                        <input type="file" name="doc_file" class="form-control" accept=".pdf,.txt,.md">
+                    </div>
+
+                    <div>
+                        <label class="form-label small fw-bold text-dark">เนื้อหา / บทสรุปกลไกชีวเคมี / ข้อควรระวัง</label>
+                        <textarea name="content" rows="6" class="form-control" placeholder="วางบทคัดย่อ (Abstract), ข้อบ่งใช้, ขนาดยา หรือสรุปประเด็นสำคัญทางการแพทย์... (หากอัปโหลด PDF สามารถพิมพ์สรุปเพิ่มเติมหรือปล่อยว่างให้ระบบดึงจาก PDF ได้)"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="form-label small fw-bold text-dark">แท็กคำค้น / แกนชีววิทยาที่เกี่ยวข้อง (คั่นด้วยจุลภาค)</label>
+                        <input type="text" name="tags" class="form-control" placeholder="เช่น Axis 5, AMPK, Berberine, Insulin Resistance">
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light border-top py-2.5 px-4">
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-semibold shadow-sm">
+                        <i class="fas fa-save me-1"></i> บันทึกเข้าคลังความรู้ RAG
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

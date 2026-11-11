@@ -1,91 +1,151 @@
 {% extends 'layouts/doctor_base.html' %}
 {% load static %}
 
-{% block title %}ระบบตรวจทานผลวิเคราะห์ AI (Artifact Review Gate) | Dr. Patt EMR{% endblock %}
+{% block title %}ศูนย์ตรวจทานผลวิเคราะห์ AI (Artifact Review Gate) | Dr. Patt EMR{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-0">
-    <!-- Header -->
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 pb-3 mb-4 border-bottom">
-        <div class="d-flex align-items-center gap-3">
-            <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center shadow-xs" style="width: 44px; height: 44px;">
-                <i class="fas fa-tasks fs-5"></i>
+<div class="d-flex flex-column gap-4">
+
+    <!-- Header Card (Bootstrap 5.3 Standard) -->
+    <div class="card shadow-sm border bg-white">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
+                            <i class="fas fa-tasks me-1"></i> Pillar 15: Safety Boundary Gate
+                        </span>
+                        <span class="badge {% if pending_count > 0 %}bg-warning-subtle text-warning-emphasis border border-warning-subtle{% else %}bg-success-subtle text-success border border-success-subtle{% endif %} py-1 px-2.5">
+                            <i class="fas fa-hourglass-half me-1"></i> รอตรวจทาน {{ pending_count }} รายการ
+                        </span>
+                    </div>
+                    <h1 class="h4 fw-bold mb-1 text-dark">ระบบตรวจทานผลวิเคราะห์ AI (Artifact Review Gate)</h1>
+                    <p class="text-muted small mb-0">
+                        ศูนย์ตรวจสอบข้อเสนอของ AI, แผนสมุนไพรจาก TSPI Brain และผลแล็บ — แพทย์ต้องลงนามอนุมัติก่อนนำเข้าสู่เวชระเบียนจริง
+                    </p>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{% url 'patients:doctor_tspi_brain' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-brain me-1"></i> สร้างข้อเสนอจาก TSPI Brain
+                    </a>
+                    <a href="{% url 'patients:doctor_lab_review' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-vials me-1"></i> นำเข้าผลแล็บ
+                    </a>
+                </div>
             </div>
-            <div>
-                <h1 class="h4 fw-bold text-dark mb-0">ระบบตรวจทานผลวิเคราะห์ AI (Artifact Review Gate)</h1>
-                <p class="small text-muted mb-0">เกตความปลอดภัยขั้นเด็ดขาด (Pillar 15: Safety Boundary) — แพทย์ผู้รักษาต้องลงนามอนุมัติก่อนนำข้อมูลเข้าสู่เวชระเบียนจริง</p>
-            </div>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-warning-subtle text-warning border p-2">
-                <i class="fas fa-hourglass-half me-1"></i> รอตรวจทาน {{ pending_count }} รายการ
-            </span>
         </div>
     </div>
 
-    <!-- Status Filter Bar -->
-    <div class="card border-0 shadow-xs mb-4">
-        <div class="card-body p-2.5 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2">
-            <div class="btn-group btn-group-sm" role="group">
-                <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-                    <i class="fas fa-clock me-1"></i> รอดำเนินการ (Pending)
-                </a>
-                <a href="?status=approved" class="btn {% if status_filter == 'approved' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-                    <i class="fas fa-check-circle me-1"></i> อนุมัติแล้ว (Approved)
-                </a>
-                <a href="?status=rejected" class="btn {% if status_filter == 'rejected' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-                    <i class="fas fa-times-circle me-1"></i> ปฏิเสธแล้ว (Rejected)
-                </a>
-                <a href="?status=all" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-                    ทั้งหมด (All)
-                </a>
+    <!-- Search & Filter Bar -->
+    <div class="card shadow-sm border bg-white">
+        <div class="card-body p-3 d-flex flex-column gap-3">
+            <form method="GET" action="{% url 'intelligence:artifact_review' %}" class="row g-2 align-items-center">
+                <input type="hidden" name="status" value="{{ status_filter }}">
+                <input type="hidden" name="type" value="{{ type_filter }}">
+                <div class="col-12 col-md-5">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white text-muted"><i class="fas fa-search"></i></span>
+                        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="ค้นหาชื่อคนไข้, HN หรือชื่อรายการ...">
+                        {% if q %}
+                        <a href="?status={{ status_filter }}&type={{ type_filter }}" class="btn btn-outline-secondary" title="ล้างคำค้น">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary px-3">ค้นหา</button>
+                    </div>
+                </div>
+                <div class="col-12 col-md-7 d-flex align-items-center justify-content-md-end gap-2 flex-wrap">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="ตัวกรองสถานะ">
+                        <a href="?status=pending&type={{ type_filter }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                            รอดำเนินการ
+                        </a>
+                        <a href="?status=approved&type={{ type_filter }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn {% if status_filter == 'approved' %}btn-success{% else %}btn-outline-secondary{% endif %}">
+                            อนุมัติแล้ว
+                        </a>
+                        <a href="?status=rejected&type={{ type_filter }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn {% if status_filter == 'rejected' %}btn-danger{% else %}btn-outline-secondary{% endif %}">
+                            ปฏิเสธแล้ว
+                        </a>
+                        <a href="?status=all&type={{ type_filter }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn {% if status_filter == 'all' %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+                            ทั้งหมด
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Artifact Type Pills -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top">
+                <div class="d-flex flex-wrap gap-1.5">
+                    <a href="?status={{ status_filter }}&type=all{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-sm rounded-pill py-0.5 px-2.5 text-xs {% if type_filter == 'all' %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+                        ทุกประเภท
+                    </a>
+                    <a href="?status={{ status_filter }}&type=therapeutic_plan{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-sm rounded-pill py-0.5 px-2.5 text-xs {% if type_filter == 'therapeutic_plan' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                        แผนโมดูลสมุนไพร
+                    </a>
+                    <a href="?status={{ status_filter }}&type=axis_recommendation{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-sm rounded-pill py-0.5 px-2.5 text-xs {% if type_filter == 'axis_recommendation' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                        ข้อเสนอ 39 แกน
+                    </a>
+                    <a href="?status={{ status_filter }}&type=lab_extraction{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn btn-sm rounded-pill py-0.5 px-2.5 text-xs {% if type_filter == 'lab_extraction' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                        ผลสกัดแล็บ (Lab)
+                    </a>
+                </div>
+                <small class="text-muted text-xs">
+                    <i class="fas fa-shield-alt text-primary me-1"></i> คุ้มครองด้วย Pillar 8 AuditLog &amp; Pillar 15 Gate
+                </small>
             </div>
-            <small class="text-muted">
-                <i class="fas fa-shield-alt text-primary me-1"></i> คุ้มครองด้วย Pillar 8 AuditLog & Pillar 15 Gate
-            </small>
         </div>
     </div>
 
     <!-- Artifacts Queue Cards -->
     <div class="d-flex flex-column gap-3">
         {% for artifact in artifacts %}
-        <div class="card border-0 shadow-xs overflow-hidden">
+        <div class="card shadow-sm border bg-white overflow-hidden">
             <!-- Card Header -->
-            <div class="card-header bg-light border-bottom d-flex align-items-center justify-content-between py-2.5 px-3">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge {% if artifact.status == 'approved' %}bg-success-subtle text-success{% elif artifact.status == 'rejected' %}bg-danger-subtle text-danger{% else %}bg-warning-subtle text-warning{% endif %}">
+            <div class="card-header bg-light border-bottom d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 py-2.5 px-3">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge {% if artifact.status == 'approved' %}bg-success-subtle text-success border border-success-subtle{% elif artifact.status == 'rejected' %}bg-danger-subtle text-danger border border-danger-subtle{% else %}bg-warning-subtle text-warning-emphasis border border-warning-subtle{% endif %}">
                         {{ artifact.get_status_display }}
                     </span>
+                    <span class="badge bg-light text-secondary border font-monospace text-xs">{{ artifact.get_artifact_type_display }}</span>
                     <h6 class="fw-bold text-dark mb-0">{{ artifact.title }}</h6>
                     <small class="text-muted font-monospace">#{{ artifact.pk }}</small>
                 </div>
-                <small class="text-muted">
-                    <i class="far fa-clock me-1"></i>{{ artifact.created_at|date:"d M Y H:i" }}
+                <small class="text-muted font-monospace text-nowrap">
+                    <i class="far fa-clock me-1"></i>{{ artifact.created_at|date:"d/m/Y H:i" }}
                 </small>
             </div>
 
-            <div class="card-body p-3">
+            <div class="card-body p-3 p-md-4">
                 <!-- Patient Info -->
-                <div class="d-flex align-items-center gap-3 pb-3 border-bottom mb-3">
-                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold small" style="width: 40px; height: 40px;">
-                        {{ artifact.patient.first_name|slice:":1" }}
-                    </div>
-                    <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="fw-bold text-dark">{{ artifact.patient.full_name }}</span>
-                            <span class="badge bg-primary-subtle text-primary font-monospace">
-                                HN: {{ artifact.patient.hn }}
-                            </span>
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 pb-3 border-bottom mb-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-5 flex-shrink-0" style="width: 42px; height: 42px;">
+                            {{ artifact.patient.first_name|slice:":1" }}
                         </div>
-                        <small class="text-muted d-block mt-0.5">
-                            เพศ: {{ artifact.patient.get_gender_display }} | อายุ: {{ artifact.patient.age|default:"-" }} ปี
-                        </small>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <span class="fw-bold text-dark">{{ artifact.patient.full_name }}</span>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">HN: {{ artifact.patient.hn }}</span>
+                            </div>
+                            <small class="text-muted d-block mt-0.5">
+                                เพศ: {{ artifact.patient.get_gender_display }} | อายุ: {{ artifact.patient.age|default:"-" }} ปี
+                                {% if artifact.patient.allergies %} &bull; <span class="text-danger fw-semibold">แพ้ยา: {{ artifact.patient.allergies }}</span>{% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'patients:patient_detail' artifact.patient.pk %}" class="btn btn-sm btn-outline-secondary text-xs">
+                            <i class="fas fa-folder-open me-1"></i> แฟ้มคนไข้
+                        </a>
+                        <a href="{% url 'patients:doctor_tspi_brain' %}?patient_id={{ artifact.patient.pk }}" class="btn btn-sm btn-outline-primary text-xs">
+                            <i class="fas fa-brain me-1"></i> Traceability
+                        </a>
                     </div>
                 </div>
 
                 <!-- Safety Check Alerts (Pillar 15) -->
                 {% if artifact.safety_checks.flags %}
-                <div class="alert alert-danger border-0 p-3 mb-3">
+                <div class="alert alert-danger border-danger-subtle p-3 mb-3">
                     <div class="small fw-bold text-danger d-flex align-items-center gap-1.5 mb-1">
                         <i class="fas fa-exclamation-triangle"></i> การแจ้งเตือนความปลอดภัยทางการแพทย์ (Safety Boundary Alerts):
                     </div>
@@ -97,39 +157,88 @@
                 </div>
                 {% endif %}
 
-                <!-- Proposed Data Preview -->
-                <div class="p-3 rounded-3 bg-light border mb-3">
-                    <h6 class="small fw-bold text-uppercase text-muted mb-2">
-                        <i class="fas fa-database text-primary me-1"></i> ข้อมูลที่ AI เสนอแนะ (Proposed Data Summary):
+                <!-- Structured Clinical Summary (Zero Raw JSON!) -->
+                <div class="p-3 rounded-3 bg-light border mb-3 d-flex flex-column gap-3">
+                    <h6 class="small fw-bold text-uppercase text-muted mb-0">
+                        <i class="fas fa-clipboard-check text-primary me-1"></i> รายละเอียดข้อเสนอทางคลินิก (Clinical Proposal Summary)
                     </h6>
 
-                    {% if artifact.artifact_type == 'lab_extraction' %}
-                        <div class="row g-3 small">
-                            <div class="col-12 col-md-6">
-                                <span class="text-muted d-block mb-1">ค่าแล็บผิดปกติที่ตรวจพบ:</span>
-                                <div class="d-flex flex-wrap gap-1">
-                                    {% for k, bio in artifact.proposed_data.extracted_biomarkers.items %}
-                                        {% if bio.is_abnormal %}
-                                            <span class="badge bg-danger-subtle text-danger font-monospace">
-                                                {{ bio.name }}: {{ bio.value }} {{ bio.unit }}
-                                            </span>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <span class="text-muted d-block mb-1">คะแนนแกนชีวภาพที่เสนอแนะให้อัปเดต:</span>
-                                <div class="d-flex flex-wrap gap-1">
-                                    {% for ax_id, score in artifact.proposed_data.affected_axes_scores.items %}
-                                        <span class="badge bg-primary-subtle text-primary border font-monospace">
-                                            Axis {{ ax_id }} &rarr; {{ score }}/100
-                                        </span>
-                                    {% endfor %}
-                                </div>
-                            </div>
+                    <!-- 1. Lab Biomarkers (if any) -->
+                    {% if artifact.proposed_data.extracted_biomarkers %}
+                    <div>
+                        <span class="text-xs fw-bold text-dark d-block mb-1.5">ค่าแล็บชีวเคมีที่สกัดได้:</span>
+                        <div class="d-flex flex-wrap gap-1.5">
+                            {% for k, bio in artifact.proposed_data.extracted_biomarkers.items %}
+                            <span class="badge {% if bio.is_abnormal %}bg-danger-subtle text-danger border-danger-subtle{% else %}bg-success-subtle text-success border-success-subtle{% endif %} border font-monospace py-1 px-2">
+                                {{ bio.name }}: {{ bio.value }} {{ bio.unit }}
+                            </span>
+                            {% endfor %}
                         </div>
-                    {% else %}
-                        <pre class="bg-white p-2 rounded border small mb-0 font-monospace overflow-auto" style="max-height: 140px;">{{ artifact.proposed_data }}</pre>
+                    </div>
+                    {% endif %}
+
+                    <!-- 2. Attached Lab Docs (if any) -->
+                    {% if artifact.resolved_docs %}
+                    <div>
+                        <span class="text-xs fw-bold text-dark d-block mb-1.5">เอกสารแนบต้นฉบับ:</span>
+                        <div class="d-flex flex-wrap gap-1.5">
+                            {% for doc in artifact.resolved_docs %}
+                            <a href="{% url 'patients:patient_lab_document' artifact.patient.pk doc.media_id %}" target="_blank" class="badge bg-white text-primary border border-primary-subtle text-decoration-none py-1 px-2">
+                                <i class="fas fa-file-alt me-1"></i> {{ doc.filename }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- 3. Affected / Suggested 39 Biological Axes -->
+                    {% if artifact.resolved_axes %}
+                    <div>
+                        <span class="text-xs fw-bold text-dark d-block mb-1.5">คะแนนแกนชีวภาพที่เสนอแนะให้อัปเดต:</span>
+                        <div class="d-flex flex-wrap gap-1.5">
+                            {% for ax in artifact.resolved_axes %}
+                            <span class="badge {% if ax.score >= 75 %}bg-danger-subtle text-danger border-danger-subtle{% elif ax.score >= 60 %}bg-warning-subtle text-warning-emphasis border-warning-subtle{% else %}bg-primary-subtle text-primary border-primary-subtle{% endif %} border font-monospace py-1 px-2">
+                                Axis {{ ax.axis_id }} ({{ ax.name }}) &rarr; {{ ax.score }}/100
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- 4. Triggered Rules & Priority Phases -->
+                    {% if artifact.resolved_rules %}
+                    <div>
+                        <span class="text-xs fw-bold text-dark d-block mb-1.5">กฎข้ามแกนที่ตรวจพบ (Cross-Axis Rules):</span>
+                        <div class="d-flex flex-wrap gap-1.5">
+                            {% for rule in artifact.resolved_rules %}
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle py-1 px-2">
+                                <i class="fas fa-bolt me-1"></i> {{ rule.name }} ({{ rule.condition }})
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- 5. Recommended Phytochemical Modules -->
+                    {% if artifact.resolved_modules %}
+                    <div>
+                        <span class="text-xs fw-bold text-dark d-block mb-1.5">โมดูลพฤกษเคมีบำบัดที่แนะนำ:</span>
+                        <div class="row g-2">
+                            {% for mod in artifact.resolved_modules %}
+                            <div class="col-12 col-md-6">
+                                <div class="p-2 rounded bg-white border small">
+                                    <div class="d-flex align-items-center gap-1.5 mb-0.5">
+                                        <span class="badge bg-success text-white font-monospace text-xs">{{ mod.code }}</span>
+                                        <strong class="text-dark">{{ mod.name }}</strong>
+                                    </div>
+                                    {% if mod.description %}
+                                    <div class="text-muted text-xs text-truncate">{{ mod.description }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                     {% endif %}
                 </div>
 
@@ -147,7 +256,7 @@
                         <button type="submit" name="action" value="reject" class="btn btn-sm btn-outline-danger">
                             <i class="fas fa-times-circle me-1"></i> ปฏิเสธ (Reject)
                         </button>
-                        <button type="submit" name="action" value="approve" class="btn btn-sm btn-primary">
+                        <button type="submit" name="action" value="approve" class="btn btn-sm btn-primary shadow-xs">
                             <i class="fas fa-check-circle me-1"></i> อนุมัติเข้า EMR (Approve)
                         </button>
                     </div>
@@ -155,28 +264,31 @@
                 {% else %}
                 <div class="pt-2 border-top d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-1 small text-muted">
                     <span>
-                        <i class="fas fa-user-check text-success me-1"></i> ตรวจทานโดย: 
+                        <i class="fas fa-user-check text-success me-1"></i> ลงนามตรวจทานโดย: 
                         <strong class="text-dark">{{ artifact.doctor.get_full_name|default:artifact.doctor.username }}</strong>
-                        ณ เวลา {{ artifact.reviewed_at|date:"d M Y H:i" }}
+                        เมื่อ {{ artifact.reviewed_at|date:"d/m/Y H:i"|default:"-" }}
                     </span>
                     {% if artifact.doctor_notes %}
-                    <span><strong class="text-dark">ความเห็น:</strong> {{ artifact.doctor_notes }}</span>
+                    <span class="fst-italic text-dark">"{{ artifact.doctor_notes }}"</span>
                     {% endif %}
                 </div>
                 {% endif %}
             </div>
         </div>
         {% empty %}
-        <div class="card border-0 shadow-xs text-center py-5">
-            <div class="card-body">
-                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center text-muted mb-3" style="width: 60px; height: 60px;">
-                    <i class="fas fa-check-double fs-3"></i>
-                </div>
-                <h5 class="fw-bold text-dark mb-1">ไม่มีรายการชิ้นงานในสถานะนี้</h5>
-                <p class="small text-muted mb-0">การวิเคราะห์จาก Lab OCR หรือ AI ทั้งหมดได้รับการตรวจทานเรียบร้อยแล้ว</p>
+        <!-- Empty State -->
+        <div class="card shadow-sm border bg-white p-5 text-center text-muted">
+            <i class="fas fa-check-double fs-1 text-success opacity-50 mb-3 d-block"></i>
+            <h5 class="fw-bold text-dark">ไม่มีรายการชิ้นงานในสถานะนี้</h5>
+            <p class="small mb-3">ข้อเสนอจาก AI ทั้งหมดได้รับการตรวจทานเรียบร้อยแล้ว หรือลองสลับดูสถานะ "อนุมัติแล้ว / ทั้งหมด" ด้านบน</p>
+            <div>
+                <a href="{% url 'patients:doctor_tspi_brain' %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-brain me-1"></i> สร้างข้อเสนอใหม่จาก TSPI Brain Engine
+                </a>
             </div>
         </div>
         {% endfor %}
     </div>
+
 </div>
 {% endblock %}

@@ -1,80 +1,390 @@
 {% extends 'layouts/doctor_base.html' %}
 
-{% block title %}TSPI Brain Reasoning Engine | TSPI CLINIC{% endblock %}
+{% block title %}กลไกการคิดและตรวจสอบรอยแยก TSPI Brain Engine | TSPI CLINIC{% endblock %}
 
 {% block content %}
 <div class="d-flex flex-column gap-4">
 
-    <!-- Header Card -->
-    <div class="card shadow-sm border">
+    <!-- Header & Patient Search Card (Bootstrap 5.3 Standard) -->
+    <div class="card shadow-sm border bg-white">
         <div class="card-body p-3 p-md-4">
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
-                    <i class="fas fa-brain me-1"></i> Deterministic Inference Engine
-                </span>
-                <span class="text-muted small">ระบบประมวลผลการวินิจฉัยเชิงเหตุและผล</span>
+            <div class="row g-3 align-items-center">
+                <div class="col-12 col-xl-5">
+                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
+                            <i class="fas fa-brain me-1"></i> Deterministic Inference Traceability
+                        </span>
+                        <span class="text-muted small">ตรวจสอบรอยแยกการประมวลผลจริง 4 ขั้นตอน</span>
+                    </div>
+                    <h1 class="h4 fw-bold mb-1 text-dark">กลไกการคิดและให้เหตุผล TSPI Brain Engine</h1>
+                    <p class="text-muted small mb-0">
+                        ติดตามการประมวลผลจากเวชระเบียนจริง (SOAP, สัญญาณชีพ, ผลแล็บ) &rarr; กฎ 39 แกน &rarr; จัดระยะฟื้นฟู &rarr; โมดูลสมุนไพรบำบัด
+                    </p>
+                </div>
+
+                <!-- Right: Patient Search Bar & Recent Quick Pick -->
+                <div class="col-12 col-xl-7 position-relative">
+                    <div class="input-group input-group-lg shadow-xs border rounded-3 overflow-hidden bg-white">
+                        <span class="input-group-text bg-white border-0 text-muted ps-3 pe-2">
+                            <i class="fas fa-search text-primary"></i>
+                        </span>
+                        <input type="text" id="brainPatientSearchInput" class="form-control border-0 shadow-none px-2 fs-6" 
+                               placeholder="ค้นหาคนไข้เพื่อตรวจสอบรอยแยกการคิด (พิมพ์ชื่อ, สกุล หรือ HN)..." autocomplete="off">
+                        <button type="button" id="brainPatientSearchClearBtn" class="btn btn-link text-muted pe-3 d-none" onclick="clearBrainSearch()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <div id="brainPatientResults" class="position-absolute start-0 end-0 bg-white shadow-lg border rounded-3 mt-1 overflow-hidden d-none" style="max-height: 300px; overflow-y: auto; z-index: 1060;">
+                        <div class="list-group list-group-flush p-1" id="brainPatientResultsList"></div>
+                    </div>
+
+                    {% if recent_patients %}
+                    <div class="d-flex align-items-center gap-1.5 flex-wrap mt-2">
+                        <span class="text-muted text-xs me-1"><i class="fas fa-history text-secondary me-0.5"></i> เลือกเคสล่าสุด:</span>
+                        {% for p in recent_patients|slice:":5" %}
+                        <a href="{% url 'patients:doctor_tspi_brain' %}?patient_id={{ p.pk }}" 
+                           class="btn btn-sm btn-outline-secondary rounded-pill py-0.5 px-2.5 text-xs text-nowrap {% if patient and patient.pk == p.pk %}active bg-primary text-white border-primary{% endif %}">
+                            {{ p.full_name }} ({{ p.hn }})
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-            <h1 class="h4 fw-bold mb-1 text-dark">กลไกการคิดและให้เหตุผล TSPI Brain Engine</h1>
-            <p class="text-muted small mb-0">
-                ติดตามขั้นตอนการประมวลผลข้อมูลตั้งแต่ Input อาการ &amp; แล็บ สู่การคำนวณคะแนน 39 แกน (12 โดเมน) และจัดโปรโตคอลรักษา
-            </p>
         </div>
     </div>
 
-    <!-- Multi-stage Execution Flow Cards (Row 4 Cols) -->
+    {% if patient and trace %}
+    <!-- Selected Patient Banner -->
+    <div class="card shadow-sm border border-primary-subtle bg-white">
+        <div class="card-body p-3 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-primary text-white fw-bold fs-5 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
+                    {{ patient.first_name|slice:":1" }}
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h2 class="h6 fw-bold text-dark mb-0">{{ patient.full_name }}</h2>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">HN: {{ patient.hn }}</span>
+                        <span class="badge bg-light text-secondary border font-monospace">
+                            {% if patient.age %}{{ patient.age }} ปี{% else %}ไม่ระบุอายุ{% endif %} &bull; {{ patient.get_gender_display }}
+                        </span>
+                    </div>
+                    <small class="text-muted">
+                        <strong>แพ้ยา:</strong> {{ patient.allergies|default:"ไม่มี" }} &bull;
+                        <strong>ยาประจำตัว:</strong> {{ patient.current_medications|default:"ไม่ได้ระบุ" }}
+                    </small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-folder-open me-1"></i> แฟ้ม EMR
+                </a>
+                <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-dna me-1"></i> ประเมิน 39 แกน
+                </a>
+                <a href="{% url 'intelligence:ai_physician' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-robot me-1"></i> ถาม AI Copilot
+                </a>
+                <form method="POST" action="{% url 'patients:doctor_tspi_brain_dispatch' patient.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-primary shadow-xs">
+                        <i class="fas fa-paper-plane me-1"></i> ส่งแผนเข้าคิวตรวจทาน AI
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4-Stage Pipeline Cards (Truthful Live Status) -->
     <div class="row g-3">
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card h-100 shadow-sm border p-3">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace align-self-start mb-2">STAGE 01</span>
+        <!-- STAGE 01 -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm border bg-white p-3 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">STAGE 01</span>
+                    {% if trace.latest_soap or trace.patient_labs %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle text-xs">มีข้อมูลนำเข้า</span>
+                    {% else %}
+                        <span class="badge bg-secondary-subtle text-secondary border text-xs">รอข้อมูล</span>
+                    {% endif %}
+                </div>
                 <h2 class="h6 fw-bold text-dark mb-1">Symptom &amp; Lab Tokenizer</h2>
-                <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.775rem;">
-                    แปลงข้อความอาการซักประวัติและผลแล็บเป็น Normalized Clinical Tokens และตัวชี้วัดตัวเลข
+                <p class="text-muted small mb-2.5 flex-grow-1" style="font-size: 0.78rem;">
+                    ดึงข้อมูลซักประวัติ SOAP ล่าสุด สัญญาณชีพ และค่าชีวเคมีจากแฟ้มเวชระเบียน
                 </p>
-                <div class="p-2 rounded bg-success-subtle text-success border border-success-subtle font-monospace small" style="font-size: 0.725rem;">
-                    Status: 100% Parsed
+                <div class="p-2.5 rounded-2 bg-light border small" style="font-size: 0.76rem;">
+                    <div class="mb-1"><strong>SOAP ล่าสุด:</strong> {% if trace.latest_soap %}{{ trace.latest_soap.visit_date|date:"d/m/Y" }}{% else %}<span class="text-muted">ยังไม่มีบันทึก</span>{% endif %}</div>
+                    <div class="mb-1"><strong>สัญญาณชีพ:</strong> {% if trace.latest_vitals.bp_systolic %}BP {{ trace.latest_vitals.bp_systolic }}/{{ trace.latest_vitals.bp_diastolic }}{% else %}<span class="text-muted">ยังไม่มีบันทึก</span>{% endif %}</div>
+                    <div><strong>ผลแล็บชีวเคมี:</strong> {{ trace.patient_labs|length }} รายการ</div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card h-100 shadow-sm border p-3">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace align-self-start mb-2">STAGE 02</span>
-                <h2 class="h6 fw-bold text-dark mb-1">39-Axes Deterministic Scoring</h2>
-                <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.775rem;">
-                    คำนวณคะแนนความรุนแรง 0-100 ของแต่ละแกนใน 12 โดเมนผ่านค่าน้ำหนักที่กำหนดไว้ (Zero-Hallucination)
+        <!-- STAGE 02 -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm border bg-white p-3 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">STAGE 02</span>
+                    {% if trace.latest_record %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle text-xs">ประเมินแล้ว</span>
+                    {% else %}
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle text-xs">ยังไม่ประเมิน</span>
+                    {% endif %}
+                </div>
+                <h2 class="h6 fw-bold text-dark mb-1">39-Axes &amp; Rules Scoring</h2>
+                <p class="text-muted small mb-2.5 flex-grow-1" style="font-size: 0.78rem;">
+                    ตรวจสอบระดับความผิดปกติของ 39 แกน (คะแนน &ge; 60) และเงื่อนไขกฎความเชื่อมโยงข้ามแกน
                 </p>
-                <div class="p-2 rounded bg-success-subtle text-success border border-success-subtle font-monospace small" style="font-size: 0.725rem;">
-                    Status: 39/39 Scored
+                <div class="p-2.5 rounded-2 bg-light border small" style="font-size: 0.76rem;">
+                    <div class="mb-1"><strong>แกนผิดปกติ (&ge; 60):</strong> <span class="fw-bold {% if trace.dysfunctional_axes %}text-danger{% else %}text-success{% endif %}">{{ trace.dysfunctional_axes|length }} / 39 แกน</span></div>
+                    <div class="mb-1"><strong>กฎข้ามแกนที่เข้าเงื่อนไข:</strong> {{ trace.triggered_rules_count }} / {{ trace.evaluated_rules|length }} กฎ</div>
+                    <div><strong>ประเมินล่าสุด:</strong> {% if trace.latest_record %}{{ trace.latest_record.record_date|date:"d/m/Y H:i" }}{% else %}-{% endif %}</div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card h-100 shadow-sm border p-3">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace align-self-start mb-2">STAGE 03</span>
-                <h2 class="h6 fw-bold text-dark mb-1">9-Step Protocol Alignment</h2>
-                <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.775rem;">
-                    จัดลำดับการรักษาตามบันได 9 ขั้น (กำจัดสารพิษและรักษาลำไส้ก่อนฟื้นฟูเซลล์ระดับลึก)
+        <!-- STAGE 03 -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm border bg-white p-3 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">STAGE 03</span>
+                    <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle text-xs">Protocol Sequencing</span>
+                </div>
+                <h2 class="h6 fw-bold text-dark mb-1">3-Phase Protocol Alignment</h2>
+                <p class="text-muted small mb-2.5 flex-grow-1" style="font-size: 0.78rem;">
+                    จัดลำดับความสำคัญจากการลดอักเสบ/ฟื้นฟูลำไส้ ก่อนฟื้นฟูไมโทคอนเดรียและซ่อมแซมเซลล์
                 </p>
-                <div class="p-2 rounded bg-primary-subtle text-primary border border-primary-subtle font-monospace small" style="font-size: 0.725rem;">
-                    Target: Phase 1 Active
+                <div class="p-2.5 rounded-2 bg-light border small d-flex flex-column gap-1" style="font-size: 0.75rem;">
+                    {% for ph in trace.phases %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-truncate me-1">{{ ph.title|slice:":24" }}</span>
+                        <span class="badge {% if ph.is_priority %}bg-danger-subtle text-danger{% else %}bg-secondary-subtle text-secondary{% endif %} font-monospace">
+                            {% if ph.avg_score %}{{ ph.avg_score }}{% else %}-{% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card h-100 shadow-sm border p-3">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace align-self-start mb-2">STAGE 04</span>
-                <h2 class="h6 fw-bold text-dark mb-1">Module Dispatch</h2>
-                <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.775rem;">
-                    จับคู่โมดูลสมุนไพร 200 สูตรตำรับ และส่งเข้าสู่ระบบตรวจทานของแพทย์เพื่ออนุมัติ
+        <!-- STAGE 04 -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm border bg-white p-3 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">STAGE 04</span>
+                    {% if trace.pending_artifacts > 0 %}
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle text-xs">รอตรวจทาน {{ trace.pending_artifacts }}</span>
+                    {% elif trace.approved_artifacts > 0 %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle text-xs">อนุมัติแล้ว {{ trace.approved_artifacts }}</span>
+                    {% else %}
+                        <span class="badge bg-secondary-subtle text-secondary border text-xs">ยังไม่ส่งคิว</span>
+                    {% endif %}
+                </div>
+                <h2 class="h6 fw-bold text-dark mb-1">Module Dispatch &amp; Sign-off</h2>
+                <p class="text-muted small mb-2.5 flex-grow-1" style="font-size: 0.78rem;">
+                    จับคู่โมดูลสมุนไพรจากคลัง 281 สูตรตำรับ และส่งเข้าสู่คิวตรวจทานของแพทย์ (Pillar 15)
                 </p>
-                <div class="p-2 rounded bg-warning-subtle text-warning-emphasis border border-warning-subtle font-monospace small" style="font-size: 0.725rem;">
-                    Awaiting Sign-off
+                <div class="p-2.5 rounded-2 bg-light border small" style="font-size: 0.76rem;">
+                    <div class="mb-1"><strong>โมดูลที่จับคู่ได้:</strong> {{ trace.matched_modules|length }} โมดูล</div>
+                    <div class="mb-1"><strong>รอแพทย์ลงนาม:</strong> {{ trace.pending_artifacts }} รายการ</div>
+                    <div><strong>อนุมัติเข้า EMR แล้ว:</strong> {{ trace.approved_artifacts }} รายการ</div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Detailed Traceability Breakdown (2 Columns) -->
+    <div class="row g-4">
+        <!-- Left: Inputs, Dysfunctional Axes & Clinical Rules -->
+        <div class="col-12 col-lg-7 d-flex flex-column gap-4">
+            <!-- Cross-Axis Clinical Rules Evaluation -->
+            <div class="card shadow-sm border bg-white">
+                <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold text-dark mb-0 small">
+                        <i class="fas fa-code-branch text-primary me-1"></i> การประเมินกฎความเชื่อมโยงข้ามแกน (Deterministic Cross-Axis Rules)
+                    </h6>
+                    <span class="badge bg-light text-secondary border font-monospace">{{ trace.evaluated_rules|length }} กฎ</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm align-middle mb-0" style="font-size: 0.8rem;">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th class="ps-3 py-2">กฎ / เงื่อนไข</th>
+                                <th class="py-2">กลไก / โมดูลเป้าหมาย</th>
+                                <th class="pe-3 py-2 text-center">ผลการประเมิน</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in trace.evaluated_rules %}
+                            <tr>
+                                <td class="ps-3 py-2">
+                                    <div class="fw-bold text-dark">{{ r.name }}</div>
+                                    <code class="text-xs text-primary">{{ r.condition }}</code>
+                                </td>
+                                <td class="py-2 text-muted small">
+                                    <div>{{ r.params.reason }}</div>
+                                    <span class="badge bg-light text-dark border font-monospace mt-1">{{ r.params.moduleId }}</span>
+                                </td>
+                                <td class="pe-3 py-2 text-center">
+                                    {% if r.triggered %}
+                                        <span class="badge bg-danger text-white">เข้าเงื่อนไข (Triggered)</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-muted border">ยังไม่เข้าเงื่อนไข</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Dysfunctional Axes & SOAP Inputs -->
+            <div class="card shadow-sm border bg-white">
+                <div class="card-header bg-light py-2.5 px-3 border-bottom">
+                    <h6 class="fw-bold text-dark mb-0 small">
+                        <i class="fas fa-notes-medical text-primary me-1"></i> ข้อมูลดิบจากเวชระเบียนที่ใช้คำนวณ (Grounded EMR Inputs)
+                    </h6>
+                </div>
+                <div class="card-body p-3 d-flex flex-column gap-3 small">
+                    <div>
+                        <strong class="text-dark d-block mb-1">อาการซักประวัติล่าสุด (SOAP Subjective):</strong>
+                        <div class="p-2.5 rounded bg-light border text-dark">
+                            {{ trace.latest_soap.subjective|default:"ยังไม่มีบันทึกการซักประวัติ SOAP" }}
+                        </div>
+                    </div>
+                    <div>
+                        <strong class="text-dark d-block mb-1">แกนชีวภาพที่มีความผิดปกติ (คะแนน &ge; 60):</strong>
+                        {% if trace.dysfunctional_axes %}
+                        <div class="d-flex flex-wrap gap-1.5">
+                            {% for ax in trace.dysfunctional_axes %}
+                            <span class="badge {% if ax.score >= 75 %}bg-danger-subtle text-danger border-danger-subtle{% else %}bg-warning-subtle text-warning-emphasis border-warning-subtle{% endif %} border font-monospace py-1 px-2">
+                                Axis {{ ax.axis_id }}: {{ ax.name }} ({{ ax.score }}/100)
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <span class="text-muted">ยังไม่พบแกนที่คะแนน &ge; 60 หรือยังไม่ได้ประเมิน 39 แกน</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Stage 3 Priority & Stage 4 Dispatched Modules -->
+        <div class="col-12 col-lg-5 d-flex flex-column gap-4">
+            <div class="card shadow-sm border bg-white">
+                <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold text-dark mb-0 small">
+                        <i class="fas fa-leaf text-success me-1"></i> โมดูลพฤกษเคมีที่จับคู่ได้ (Matched Therapeutic Modules)
+                    </h6>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace">{{ trace.matched_modules|length }} โมดูล</span>
+                </div>
+                <div class="card-body p-3 d-flex flex-column gap-2.5">
+                    {% if trace.matched_modules %}
+                        {% for mod in trace.matched_modules %}
+                        <div class="p-2.5 rounded-3 border bg-light">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                <span class="badge bg-success text-white font-monospace">{{ mod.code }}</span>
+                                <span class="fw-bold text-dark small flex-grow-1">{{ mod.name }}</span>
+                            </div>
+                            <p class="text-muted text-xs mb-0 lh-base">{{ mod.description|truncatechars:180 }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted small">
+                            ยังไม่มีโมดูลที่จับคู่ได้ กรุณาประเมินคะแนน 39 แกนของผู้ป่วยก่อนครับ
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-white p-3 border-top d-flex justify-content-between align-items-center">
+                    <a href="{% url 'intelligence:artifact_review' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-tasks me-1"></i> เปิดคิวตรวจทานผล AI
+                    </a>
+                    <a href="{% url 'clinical:therapeutic_matrix' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-primary">
+                        เปิดเมทริกซ์การรักษา <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="card shadow-sm border bg-white p-5 text-center text-muted">
+        <i class="fas fa-brain fs-1 text-primary opacity-50 mb-3 d-block"></i>
+        <h5 class="fw-bold text-dark">เลือกคนไข้เพื่อตรวจสอบรอยแยกการประมวลผลของ TSPI Brain Engine</h5>
+        <p class="small mb-0">
+            พิมพ์ชื่อ นามสกุล หรือเลข HN ในช่องค้นหาด้านบน เพื่อดูขั้นตอนจริงตั้งแต่ข้อมูล SOAP &rarr; คะแนน 39 แกน &rarr; กฎคลินิก &rarr; โมดูลบำบัด
+        </p>
+    </div>
+    {% endif %}
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('brainPatientSearchInput');
+    const clearBtn = document.getElementById('brainPatientSearchClearBtn');
+    const box = document.getElementById('brainPatientResults');
+    const list = document.getElementById('brainPatientResultsList');
+    let timer = null;
+
+    if (input) {
+        input.addEventListener('input', function () {
+            const q = this.value.trim();
+            if (q) clearBtn.classList.remove('d-none');
+            else clearBtn.classList.add('d-none');
+
+            clearTimeout(timer);
+            if (!q) {
+                box.classList.add('d-none');
+                return;
+            }
+            timer = setTimeout(function () {
+                fetch("{% url 'patients:api_patient_search' %}?q=" + encodeURIComponent(q))
+                    .then(r => r.json())
+                    .then(data => {
+                        list.innerHTML = '';
+                        const pts = data.patients || [];
+                        if (pts.length === 0) {
+                            list.innerHTML = '<div class="p-3 text-center text-muted small">ไม่พบคนไข้ที่ค้นหา</div>';
+                        } else {
+                            pts.forEach(p => {
+                                const a = document.createElement('a');
+                                a.href = "{% url 'patients:doctor_tspi_brain' %}?patient_id=" + p.id;
+                                a.className = 'list-group-item list-group-item-action border-0 rounded-2 py-2 px-3 d-flex justify-content-between align-items-center';
+                                a.innerHTML = `
+                                    <div>
+                                        <span class="fw-bold text-dark">${p.full_name}</span>
+                                        <span class="badge bg-light text-primary border ms-1 font-monospace">${p.hn}</span>
+                                    </div>
+                                    <small class="text-muted">${p.gender_display || ''}</small>
+                                `;
+                                list.appendChild(a);
+                            });
+                        }
+                        box.classList.remove('d-none');
+                    });
+            }, 220);
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!input.contains(e.target) && !box.contains(e.target)) {
+                box.classList.add('d-none');
+            }
+        });
+    }
+});
+
+function clearBrainSearch() {
+    const input = document.getElementById('brainPatientSearchInput');
+    input.value = '';
+    document.getElementById('brainPatientSearchClearBtn').classList.add('d-none');
+    document.getElementById('brainPatientResults').classList.add('d-none');
+    input.focus();
+}
+</script>
 {% endblock %}

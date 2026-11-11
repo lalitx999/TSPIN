@@ -168,9 +168,51 @@ class AssistantMessage(models.Model):
     content = models.TextField()
     kind = models.CharField(max_length=20, blank=True, help_text="answer / out_of_scope / emergency / unavailable")
     sources = models.JSONField(default=list, blank=True)
+    # ไฟล์แนบ (รูป/เสียง) ที่เข้ารหัสไว้ใน PRIVATE_MEDIA_ROOT ผ่าน media_store
+    attachments = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         app_label = 'intelligence'
         db_table = 'ai_assistant_messages'
         ordering = ['created_at']
+
+
+class KnowledgeDocument(models.Model):
+    """
+    คลังองค์ความรู้และงานวิจัยภายนอกที่คลินิกนำเข้าเพิ่มเติม (External / Clinic Knowledge RAG)
+    """
+    CATEGORY_CHOICES = [
+        ('research', 'งานวิจัย / บทความวิชาการ (Research Paper)'),
+        ('protocol', 'โปรโตคอลการรักษาคลินิก (Clinical Protocol)'),
+        ('herb_note', 'ข้อมูลสารสกัด / สมุนไพรใหม่ (Botanical & Drug Note)'),
+        ('guideline', 'แนวทางเวชปฏิบัติ (Medical Guideline)'),
+    ]
+
+    title = models.CharField(max_length=255, db_index=True)
+    category = models.CharField(max_length=30, choices=CATEGORY_CHOICES, default='research', db_index=True)
+    source_name = models.CharField(max_length=200, blank=True, help_text="แหล่งที่มา เช่น PubMed, DOI, ชื่อวารสาร, ชื่อไฟล์")
+    source_url = models.URLField(max_length=500, blank=True, help_text="ลิงก์อ้างอิงภายนอก (ถ้ามี)")
+    content = models.TextField(help_text="เนื้อหาหลัก บทคัดย่อ หรือกลไกชีวเคมี")
+    tags = models.CharField(max_length=300, blank=True, help_text="แท็กคั่นด้วยจุลภาค เช่น Axis 1, NF-kB, Curcumin")
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='knowledge_documents',
+    )
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        app_label = 'intelligence'
+        db_table = 'ai_knowledge_documents'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.get_category_display()}] {self.title}"
+
+    def tag_list(self):
+        return [t.strip() for t in (self.tags or '').split(',') if t.strip()]

@@ -3,11 +3,12 @@ Unit & Security Tests for TSPI 39 Biological Axes Framework & Visualizer (EP 4).
 Validates Ontologies, Deterministic Domain Scoring, RBAC 403, and AuditLog Trail (Pillars 2, 8).
 """
 
+from unittest.mock import patch
 from django.test import TestCase, Client
 from django.urls import reverse
 from accounts.models import User, AuditLog
 from patients.models import Patient
-from clinical.models import BiologicalRecord, AnalysisRecord
+from clinical.models import BiologicalRecord, AnalysisRecord, Box
 from clinical.engine import TspiClinicalEngine
 from clinical.reports import PrecisionReportGenerator
 
@@ -409,4 +410,83 @@ class PrecisionReportTests(TestCase):
             pdf_resp = self.client.get(reverse('clinical:report_pdf', args=[analysis.pk]) + f'?edition={ed}')
             self.assertEqual(pdf_resp.status_code, 200)
             self.assertTrue(pdf_resp.content.startswith(b'%PDF'))
+
+
+class ClinicalRegression500Tests(TestCase):
+    """Regression tests for discovered HTTP 500 edge cases across clinical views and templates."""
+
+    def setUp(self):
+        self.doctor = User.objects.create_user(
+            username='dr_reg500',
+            email='dr_reg500@tspi.com',
+            password='Password12345!',
+            role='doctor',
+            first_name='หมอตรวจ',
+            last_name='ไม่พัง',
+        )
+        self.patient = Patient.objects.create(
+            hn='HN-REG-500',
+            first_name='สมชาย',
+            last_name='ทดสอบระบบ',
+            gender='M',
+            phone='0899990000',
+        )
+        self.client = Client()
+        self.client.force_login(self.doctor)
+
+    def test_report_create_without_bio_record_redirects_safely(self):
+        url = reverse('clinical:report_create', args=[self.patient.pk])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn(f"{reverse('clinical:axes_explorer')}?patient_id={self.patient.pk}", resp.url)
+        follow = self.client.get(resp.url)
+        self.assertEqual(follow.status_code, 200)
+
+    def test_box_dashboard_search_and_unlocked_relevant_axes_render(self):
+        box = Box.objects.create(
+            patient=self.patient,
+            source=Box.Source.WEB,
+            status=Box.Status.DONE,
+            contents={
+                'complaint': 'อ่อนเพลีย',
+                'soap': {'subjective': 'อ่อนเพลีย', 'objective': '-', 'assessment': '-', 'plan': '-'},
+                'relevant_axes': [
+                    {
+                        'axis_number': 1,
+                        'name': 'Cellular Energy',
+                        'clinical_significance': 'Mitochondrial ATP production',
+                        'citations': [{'source': 'TSPI Compendium'}],
+                    }
+                ],
+            },
+        )
+
+        search_resp = self.client.get(reverse('clinical:box_dashboard'), {'q': 'สมชาย'})
+        self.assertEqual(search_resp.status_code, 200)
+        self.assertContains(search_resp, 'HN-REG-500')
+
+        session = self.client.session
+        session[f'box_unlocked_{box.id}'] = True
+        session.save()
+
+        detail_resp = self.client.get(reverse('clinical:box_detail', args=[box.id]))
+        self.assertEqual(detail_resp.status_code, 200)
+        self.assertContains(detail_resp, 'Axis 1')
+        self.assertContains(detail_resp, 'Cellular Energy')
+
+    def test_therapeutic_matrix_with_axes_list_without_target_axes(self):
+        sample_modules = [
+            {
+                'code': 'MOD-AX-1',
+                'name': 'Test Phytochemical Module',
+                'description': 'Module with axes only',
+                'axes': [1, 2],
+            }
+        ]
+        with patch.object(TspiClinicalEngine, 'get_modules_data', return_value=sample_modules):
+            resp = self.client.get(reverse('clinical:therapeutic_matrix'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Axis 1')
+        self.assertContains(resp, 'Axis 2')
+
 

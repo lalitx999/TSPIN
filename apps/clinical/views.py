@@ -284,9 +284,9 @@ def therapeutic_matrix_view(request):
     if search_q:
         modules = [
             m for m in modules
-            if search_q in m.get('name', '').lower()
-            or search_q in m.get('code', '').lower()
-            or search_q in m.get('description', '').lower()
+            if search_q in str(m.get('name') or '').lower()
+            or search_q in str(m.get('code') or '').lower()
+            or search_q in str(m.get('description') or '').lower()
         ]
 
     if selected_axis and selected_axis.isdigit():
@@ -302,6 +302,8 @@ def therapeutic_matrix_view(request):
     for m in modules:
         m_copy = dict(m)
         mod_axes = m_copy.get('axes') or m_copy.get('target_axes') or []
+        m_copy['axes'] = mod_axes
+        m_copy['target_axes'] = mod_axes
         is_recommended = bool(patient_affected_axis_ids and any(ax in patient_affected_axis_ids for ax in mod_axes))
         m_copy['is_recommended_for_patient'] = is_recommended
         processed_modules.append(m_copy)

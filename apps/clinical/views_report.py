@@ -4,6 +4,7 @@ Enforces Human-in-the-loop Sign-off (Pillar 15), RBAC 403 (Pillar 2), and Comple
 """
 
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseForbidden
@@ -77,7 +78,7 @@ def report_create_view(request, patient_id):
 
     if not latest_bio:
         messages.error(request, f"ผู้ป่วย {patient.full_name} ยังไม่มีบันทึกคะแนน 39 แกนชีวภาพ กรุณาประเมินคะแนนก่อนออกรายงาน")
-        return redirect('clinical:axes_explorer', patient_id=patient.pk)
+        return redirect(f"{reverse('clinical:axes_explorer')}?patient_id={patient.pk}")
 
     snapshot_scores = latest_bio.to_scores_dict()
     clinical_snap = PrecisionReportAIWriter.extract_patient_clinical_snapshot(patient, snapshot_scores)

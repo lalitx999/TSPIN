@@ -158,7 +158,7 @@ class ClinicalCopilotEngine:
         """
         from django.conf import settings
         import httpx
-        from apps.clinical.services.copilot import CopilotContextBuilder
+        from clinical.services.copilot import CopilotContextBuilder
 
         # 1. เตรียมบริบทคลินิกจาก Single Source of Truth + KnowledgeDocument ที่คลินิกนำเข้า
         ctx_data = CopilotContextBuilder.build_context(patient_id=patient.pk if patient else None)

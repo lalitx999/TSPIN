@@ -7,6 +7,7 @@ Full Multimedia Review (Audio, Lab, Video, SOAP, 39 Axes), and Audit Logging.
 import json
 import logging
 from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse, HttpRequest, HttpResponseForbidden
 from django.contrib import messages
 from django.utils import timezone
@@ -54,7 +55,11 @@ def box_dashboard_view(request: HttpRequest) -> HttpResponse:
     if source_filter and source_filter in Box.Source.values:
         boxes_qs = boxes_qs.filter(source=source_filter)
     if query:
-        boxes_qs = boxes_qs.filter(patient__full_name__icontains=query) | boxes_qs.filter(patient__hn__icontains=query)
+        boxes_qs = boxes_qs.filter(
+            Q(patient__first_name__icontains=query)
+            | Q(patient__last_name__icontains=query)
+            | Q(patient__hn__icontains=query)
+        )
 
     boxes = list(boxes_qs[:100])
 
@@ -92,7 +97,17 @@ def box_detail_view(request: HttpRequest, box_id) -> HttpResponse:
     # If unlocked, unpack contents for the clinical viewer
     contents = box.contents or {}
     soap = contents.get('soap', {})
-    relevant_axes = contents.get('relevant_axes', [])
+    raw_axes = contents.get('relevant_axes', []) or []
+    relevant_axes = []
+    for ax in raw_axes:
+        if isinstance(ax, dict):
+            normalized_ax = dict(ax)
+            normalized_ax.setdefault('axis_number', ax.get('axis_number') or ax.get('id') or ax.get('axis_id') or '')
+            normalized_ax.setdefault('name', ax.get('name') or ax.get('title') or '')
+            normalized_ax.setdefault('clinical_significance', ax.get('clinical_significance') or ax.get('description') or '')
+            relevant_axes.append(normalized_ax)
+        else:
+            relevant_axes.append(ax)
     lab_markers = contents.get('lab_markers', [])
     lab_correlations = contents.get('lab_correlations', [])
     video_observations = contents.get('video_observations', '')

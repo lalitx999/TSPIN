@@ -51,9 +51,11 @@ class TspiClinicalEngine:
                         if not isinstance(item, dict):
                             continue
                         mod = dict(item)
-                        mod['code'] = mod.get('code') or mod.get('PhytoCore Code') or mod.get('Code /_Product ID') or 'MOD'
-                        mod['name'] = mod.get('name') or mod.get('Product Derived From') or mod.get('Botanical Composition') or 'Therapeutic Module'
-                        mod['description'] = mod.get('description') or mod.get('Main Key Mechanism_(3 Pillars)') or mod.get('Mechanistic Function') or ''
+                        mod['code'] = str(mod.get('code') or mod.get('PhytoCore Code') or mod.get('Code /_Product ID') or 'MOD')
+                        mod['name'] = str(mod.get('name') or mod.get('Product Derived From') or mod.get('Botanical Composition') or 'Therapeutic Module')
+                        mod['description'] = str(mod.get('description') or mod.get('Main Key Mechanism_(3 Pillars)') or mod.get('Mechanistic Function') or '')
+                        mod['botanical'] = str(mod.get('botanical') or mod.get('Botanical Composition') or '')
+                        mod['axis_mapping'] = str(mod.get('axis_mapping') or mod.get('TSPI Axis Mapping') or '')
                         normalized.append(mod)
                     cls._modules_cache = normalized
             else:

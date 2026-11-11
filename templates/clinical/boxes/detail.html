@@ -267,11 +267,11 @@
                                     <div class="col-md-6">
                                         <div class="card h-100 border border-secondary-subtle rounded-3 shadow-none p-3 bg-light">
                                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <span class="badge bg-dark rounded-pill">Axis {{ ax.axis_number|default:ax.id }}</span>
+                                                <span class="badge bg-dark rounded-pill">Axis {{ ax.axis_number|default:"-" }}</span>
                                                 <span class="badge bg-info-subtle text-info border border-info rounded-pill small">{{ ax.domain|default:"Biological Domain" }}</span>
                                             </div>
-                                            <h6 class="fw-bold text-dark mb-1">{{ ax.name|default:ax.title }}</h6>
-                                            <p class="text-muted small mb-2">{{ ax.clinical_significance|default:ax.description|truncatechars:120 }}</p>
+                                            <h6 class="fw-bold text-dark mb-1">{{ ax.name|default:"-" }}</h6>
+                                            <p class="text-muted small mb-2">{{ ax.clinical_significance|default:""|truncatechars:120 }}</p>
                                             
                                             {% if ax.citations %}
                                                 <div class="mt-auto pt-2 border-top">

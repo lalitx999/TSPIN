@@ -152,11 +152,11 @@
                         </p>
 
                         <!-- Target Axes Badges -->
-                        {% if mod.axes or mod.target_axes %}
+                        {% if mod.axes %}
                         <div class="mb-3">
                             <small class="d-block text-muted text-uppercase fw-semibold mb-1" style="font-size: 0.7rem;">แกนเป้าหมายการออกฤทธิ์:</small>
                             <div class="d-flex flex-wrap gap-1">
-                                {% for target_ax in mod.axes|default:mod.target_axes %}
+                                {% for target_ax in mod.axes %}
                                     <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.7rem;">
                                         Axis {{ target_ax }}
                                     </span>

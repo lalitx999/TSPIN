@@ -261,6 +261,12 @@ class DoctorPortalPageRegressionTests(TestCase):
             self.assertContains(resp, 'css/admin.css', msg_prefix=url)
             self.assertContains(resp, 'class="adm-sidebar"', msg_prefix=url)
 
+    def test_doctor_modules_and_matrix_render(self):
+        for url in ('/doctor/modules/', '/doctor/modules/?q=Curcuma', '/doctor/therapeutic-matrix/'):
+            resp = self.client.get(url)
+            self.assertEqual(resp.status_code, 200, url)
+        self.assertContains(self.client.get('/doctor/modules/?q=Curcuma'), 'TSPI-CURCUMA-01')
+
 
 class PatientPortalDataIsolationTests(TestCase):
     """บัญชีผู้ป่วยต้องเห็นเฉพาะข้อมูลของตัวเอง และไม่เห็นคะแนนที่ไม่ได้มาจากการประเมินจริง"""

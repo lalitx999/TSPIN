@@ -453,7 +453,7 @@ def doctor_modules(request):
     """
     ทะเบียนสูตรตำรับโมดูลสมุนไพร 200 โมดูล (/doctor/modules/)
     """
-    from apps.clinical.engine import TspiClinicalEngine
+    from clinical.engine import TspiClinicalEngine
     all_modules = TspiClinicalEngine.get_modules_data()
     q = request.GET.get('q', '').strip().lower()
     
@@ -461,11 +461,11 @@ def doctor_modules(request):
     if q:
         modules = [
             m for m in all_modules
-            if q in (m.get('code') or '').lower()
-            or q in (m.get('name') or '').lower()
-            or q in (m.get('Botanical Composition') or '').lower()
-            or q in (m.get('description') or '').lower()
-            or q in (m.get('TSPI Axis Mapping') or '').lower()
+            if q in str(m.get('code') or '').lower()
+            or q in str(m.get('name') or '').lower()
+            or q in str(m.get('botanical') or '').lower()
+            or q in str(m.get('description') or '').lower()
+            or q in str(m.get('axis_mapping') or '').lower()
         ]
     
     return render(request, 'patients/doctor_modules.html', {

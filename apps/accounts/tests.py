@@ -956,6 +956,15 @@ class AIServiceAuthTests(TestCase):
         self.assertIn('<ข้อมูลแฟ้มผู้ป่วย>', prompt_sent)
         self.assertIn('Penicillin', prompt_sent)
 
+    def test_sanitizer_does_not_corrupt_thai_khobkhun_or_khun_pronoun(self):
+        from ai_service.sanitizer import TextDeidentifier
+        safe = TextDeidentifier.sanitize('ขอบคุณครับ ตอนนี้คุณมีโรคประจำตัวของคุณไหมครับ')
+        self.assertEqual(safe['sanitized_text'], 'ขอบคุณครับ ตอนนี้คุณมีโรคประจำตัวของคุณไหมครับ')
+        self.assertEqual(safe['redacted_counts']['names'], 0)
+        real_name = TextDeidentifier.sanitize('คุณสมชาย ใจดี แจ้งอาการ')
+        self.assertIn('[PERSON_TOKEN]', real_name['sanitized_text'])
+        self.assertNotIn('สมชาย', real_name['sanitized_text'])
+
     def test_copilot_never_falls_back_to_default_products(self):
         from unittest.mock import patch
         from ai_service import main as ai_main

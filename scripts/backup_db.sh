@@ -26,7 +26,8 @@ fi
 echo "[TSPI Backup] Starting database backup at $(date)..."
 
 # ไม่ใช้ `docker ps | grep -q`: ภายใต้ pipefail grep ปิดท่อก่อน docker ps เขียนเสร็จ ทำให้เงื่อนไขเป็นเท็จแบบสุ่ม
-running() { [ "$(docker inspect -f '{{.State.Running}}' "$1" 2>/dev/null)" = "true" ]; }
+# เช็ก State.Status == "running" (ไม่ใช่ "restarting") เพื่อไม่ให้ docker exec ขวางการ deploy
+running() { [ "$(docker inspect -f '{{.State.Status}}' "$1" 2>/dev/null)" = "running" ]; }
 
 if command -v docker &> /dev/null && running tspi_postgres; then
     echo "[TSPI Backup] Exporting via Docker container tspi_postgres..."

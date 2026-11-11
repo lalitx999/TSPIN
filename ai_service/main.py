@@ -1153,6 +1153,19 @@ def _format_patient_context_block(ctx: Optional[Dict[str, Any]]) -> str:
     return "<ข้อมูลแฟ้มผู้ป่วย>\n" + "\n".join(lines) + "\n</ข้อมูลแฟ้มผู้ป่วย>\n\n"
 
 
+def _strip_leaked_tokens(text: str) -> str:
+    """กันไม่ให้โทเค็นภายใน (เช่น [PERSON_TOKEN]) หลุดไปแสดงในข้อความที่ตอบคนไข้"""
+    return re.sub(r'\[(?:PERSON|ID|PHONE|HN|EMAIL|PASSPORT)_TOKEN\]', '', text or '').replace('  ', ' ').strip()
+
+
+def _sanitize_history_turn(role: str, content: str) -> str:
+    """ลบ PII เฉพาะข้อความฝั่งผู้ใช้ ไม่รันทับข้อความฝั่ง assistant"""
+    text = str(content or '')[:1500]
+    if role == 'user':
+        return TextDeidentifier.sanitize(text)["sanitized_text"][:1500]
+    return _strip_leaked_tokens(text)
+
+
 def _patient_friendly_sources(context: List[Dict[str, str]]) -> List[str]:
     """ซ่อนชื่อ chunk เทคนิค (เช่น 'คลังความรู้ TSPI ส่วนที่ 92') ไม่ให้คนไข้สับสน"""
     out: List[str] = []
@@ -1262,7 +1275,7 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
             "ห้ามวินิจฉัยโรคจากภาพ ห้ามระบุชื่อโรค และแนะนำให้ส่งภาพให้แพทย์ของคลินิกตรวจเพิ่มเติม"
         )
     conv_messages = [
-        {"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]}
+        {"role": m.role, "content": _sanitize_history_turn(m.role, m.content)}
         for m in history[:-1]
     ]
     conv_messages.append({"role": "user", "content": f"{patient_block}<ความรู้>\n{knowledge}\n</ความรู้>\n\nคำถาม: {question}"})
@@ -1281,7 +1294,7 @@ async def assistant_chat_endpoint(req: AssistantChatRequest):
         return {"answer": ASSISTANT_REFUSAL, "kind": "out_of_scope", "sources": [], **meta}
     guarded = ClinicalGuardrail.sanitize_and_guard(answer)
     # answer = มีเอกสารคลินิกรองรับ, general = ความรู้ทั่วไปจาก AI ล้วน
-    return {"answer": guarded["safe_text"], "kind": "answer" if sources else "general", "sources": sources, **meta}
+    return {"answer": _strip_leaked_tokens(guarded["safe_text"]), "kind": "answer" if sources else "general", "sources": sources, **meta}
 
 
 # ==============================================================================
@@ -1388,7 +1401,7 @@ async def line_chat_endpoint(req: LineChatRequest):
     knowledge = "\n\n".join(f"{c['title']}\n{c['text']}" for c in context) or "(ไม่มีข้อมูลคลินิกที่เกี่ยวกับข้อความนี้)"
     patient_block = _format_patient_context_block(req.patient_context)
     conv_messages = [
-        {"role": m.role, "content": TextDeidentifier.sanitize(m.content)["sanitized_text"][:1500]}
+        {"role": m.role, "content": _sanitize_history_turn(m.role, m.content)}
         for m in history[:-1]
     ]
     conv_messages.append({"role": "user", "content": f"{patient_block}<ความรู้>\n{knowledge}\n</ความรู้>\n\nผู้ป่วย: {question}"})
@@ -1410,7 +1423,7 @@ async def line_chat_endpoint(req: LineChatRequest):
         is_summary = False
     sources = _patient_friendly_sources(context)
     return {
-        "answer": checked["text"],
+        "answer": _strip_leaked_tokens(checked["text"]),
         "kind": "summary" if is_summary else ("answer" if sources else "general"),
         "is_summary": is_summary,
         "blocked": checked["blocked"],

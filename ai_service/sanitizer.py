@@ -133,8 +133,17 @@ class TextDeidentifier:
     PASSPORT_REGEX = re.compile(r'\b(?:Passport|หนังสือเดินทาง)?\s*(?:No\.?|เลขที่)?\s*[:#]?\s*([A-Z]{1,2}\d{7,8})\b', re.IGNORECASE)
 
     # 6. Thai Names with honorific prefixes
+    # ใช้ (?<![ก-๙]) กันไม่ให้จับคำลงท้ายอย่าง "ขอบคุณ", "ของคุณ", "พระคุณ"
     NAME_PREFIX_REGEX = re.compile(
-        r'(?:นาย|นาง|นางสาว|น\.ส\.|ด\.ช\.|ด\.ญ\.|นพ\.|พญ\.|อาจารย์|อ\.|คุณลุง|คุณป้า|คุณตา|คุณยาย|คุณ)\s*([ก-๙]+(?:\s+[ก-๙]+)?)'
+        r'(?<![ก-๙])(นาย|นาง|นางสาว|น\.ส\.|ด\.ช\.|ด\.ญ\.|นพ\.|พญ\.|อาจารย์|อ\.|คุณลุง|คุณป้า|คุณตา|คุณยาย|คุณ)\s*([ก-๙]+(?:\s+[ก-๙]+)?)'
+    )
+    # คำสามัญที่มักตามหลังสรรพนาม "คุณ" (แปลว่า you) ไม่ใช่ชื่อบุคคล
+    _NON_NAME_AFTER_KHUN = (
+        'ครับ', 'ค่ะ', 'คะ', 'นะ', 'มี', 'เป็น', 'ไม่', 'ได้', 'จะ', 'ควร', 'สามารถ', 'ต้องการ',
+        'กำลัง', 'เคย', 'แพ้', 'กิน', 'ทาน', 'ใช้', 'รู้สึก', 'ปวด', 'เจ็บ', 'หมอ', 'พยาบาล',
+        'เจ้าหน้าที่', 'ผู้ป่วย', 'คนไข้', 'เอง', 'เลย', 'ด้วย', 'หรือ', 'และ', 'ที่', 'นี้', 'นั้น',
+        'ไว้', 'อาจ', 'ลอง', 'ช่วย', 'เล่า', 'แจ้ง', 'ตรวจ', 'นัด', 'อาการ', 'สุขภาพ', 'ถาม', 'ตอบ',
+        'กรุณา', 'โปรด', 'เข้า', 'ส่ง', 'ดู', 'อ่าน', 'พัก', 'ดื่ม', 'หลีก',
     )
 
     @classmethod
@@ -178,6 +187,10 @@ class TextDeidentifier:
 
         # 6. Redact Thai Names with prefixes
         def replace_name(match):
+            prefix = match.group(1)
+            following = (match.group(2) or "").strip()
+            if prefix == "คุณ" and any(following.startswith(w) for w in cls._NON_NAME_AFTER_KHUN):
+                return match.group(0)
             return "[PERSON_TOKEN]"
 
         sanitized, redacted_counts["names"] = cls.NAME_PREFIX_REGEX.subn(replace_name, sanitized)

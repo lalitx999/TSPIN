@@ -311,7 +311,7 @@ class ClinicalReviewItem(SoftDeleteModel):
     def __str__(self):
         return f"ReviewItem#{self.pk} [{self.get_review_type_display()}] for {self.patient.full_name} ({self.status})"
 
-    def approve(self, reviewer_user, clinical_summary: str = "", category: str = "soap"):
+    def approve(self, reviewer_user, clinical_summary: str = "", category: str = "soap", soap: dict = None):
         """
         อนุมัติรายการและแปลงเป็นเวชระเบียนทางการใน EMR
         บังคับใช้กฎ RBAC:
@@ -340,6 +340,17 @@ class ClinicalReviewItem(SoftDeleteModel):
         self.status = self.StatusChoices.APPROVED
 
         # สร้างประวัติการรักษาทางการใน EMR
+        if soap is not None:
+            # หน้ากล่องงานรอตรวจทาน: ผู้ตรวจเขียน/แก้ SOAP เองแล้วยืนยันว่าตรวจทานแล้ว บันทึกตามนั้นเท่านั้น
+            history = PatientHistory.objects.create(
+                patient=self.patient,
+                doctor=reviewer_user,
+                **{k: (soap.get(k) or '').strip() for k in ('subjective', 'objective', 'assessment', 'plan')},
+            )
+            self.committed_history = history
+            self.save()
+            return history
+
         clinical_note = clinical_summary or self.source_message.content
         history = PatientHistory.objects.create(
             patient=self.patient,

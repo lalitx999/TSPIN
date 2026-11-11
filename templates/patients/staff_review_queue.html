@@ -1,404 +1,214 @@
 {% extends 'layouts/doctor_base.html' %}
 {% load static %}
 
-{% block title %}Clinical Review Queue — คิวตรวจทานทางคลินิก TSPI Clinic{% endblock %}
+{% block title %}งานรอตรวจทาน | TSPI CLINIC{% endblock %}
 
 {% block extra_doctor_head %}
-<style>
-    .queue-card {
-        transition: all 0.25s ease-in-out;
-        border-radius: 0.85rem;
-    }
-    .queue-card.urgent-border {
-        border-left: 5px solid #DC2626 !important;
-    }
-    .queue-card.level1-border {
-        border-left: 5px solid #16A34A !important;
-    }
-    .fade-out {
-        opacity: 0;
-        transform: scale(0.95);
-        transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-    .pulse-dot {
-        width: 8px;
-        height: 8px;
-        background-color: #22C55E;
-        border-radius: 50%;
-        display: inline-block;
-        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-        animation: pulse-ring 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
-    }
-    @keyframes pulse-ring {
-        to {
-            box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
-        }
-    }
-</style>
+<script src="{% static 'js/review_hub.js' %}?v={{ ASSET_VERSION }}"></script>
+{% endblock %}
+
+{% block page_header %}
+<div class="adm-page-head">
+    <h1 class="adm-page-title">งานรอตรวจทาน</h1>
+    <ol class="adm-crumb" aria-label="ตำแหน่งหน้า">
+        <li><a href="{% url 'patients:dashboard' %}">TSPI</a></li>
+        <li>งานประจำวัน</li>
+        <li aria-current="page">งานรอตรวจทาน</li>
+    </ol>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-3 px-4">
-    <!-- Page Header & Live Status -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-2 border-bottom">
-        <div>
-            <h4 class="fw-bold text-dark mb-1">
-                <i class="fas fa-stethoscope text-primary me-2"></i>คิวตรวจทานทางคลินิก (Clinical Review Queue)
-            </h4>
-            <div class="text-muted small">
-                ระบบกำกับดูแลโดยบุคลากรทางการแพทย์ (Human-in-the-Loop) ก่อนข้อมูลเข้าสู่เวชระเบียนทางการใน EMR
+<div class="d-flex flex-column gap-3" x-data="reviewHub({
+        total: {{ counts.all }},
+        pollUrl: '{% url 'patients:api_review_queue_poll' %}',
+        isDoctor: {{ is_doctor|yesno:'true,false' }}
+     })">
+    {% csrf_token %}
+
+    <section class="adm-card">
+        <p class="text-muted mb-3">
+            ทุกอย่างที่ต้องให้พยาบาลหรือแพทย์ตัดสินใจก่อนเข้าเวชระเบียน รวมไว้ที่นี่ ไม่มีอะไรเข้าแฟ้มเองโดยไม่มีคนตรวจ
+        </p>
+        <div class="d-flex flex-wrap gap-2" role="tablist" aria-label="ประเภทงาน">
+            {% for key, label in tabs %}
+            <a class="adm-chip adm-chip-line {% if key == tab %}active{% endif %}" href="?tab={{ key }}" {% if key == tab %}aria-current="page"{% endif %}>
+                {{ label }}
+                {% if key != 'done' %}<span class="adm-chip-count" data-count="{{ key }}">{% if key == 'all' %}{{ counts.all }}{% elif key == 'chats' %}{{ counts.chats }}{% elif key == 'messages' %}{{ counts.messages }}{% else %}{{ counts.results }}{% endif %}</span>{% endif %}
+            </a>
+            {% endfor %}
+        </div>
+        <div class="alert alert-info d-flex align-items-center justify-content-between gap-2 mt-3 mb-0 py-2" x-show="hasNew" x-cloak role="status">
+            <span><i class="fas fa-bell me-1"></i> มีงานใหม่เข้ามา</span>
+            <button type="button" class="btn btn-sm btn-primary" @click="location.reload()">โหลดรายการใหม่</button>
+        </div>
+    </section>
+
+    {% if tab == 'all' and not counts.all %}
+    <section class="adm-card text-center py-5">
+        <span class="adm-tile-icon mb-3" style="background:#22A06B; box-shadow: 0 0 0 5px rgba(34,160,107,.18);"><i class="fas fa-check"></i></span>
+        <h2 class="h5 fw-bold">ไม่มีงานรอตรวจทาน</h2>
+        <p class="text-muted mb-0">เมื่อคนไข้เล่าอาการทาง LINE หรือมีผลแล็บ / ผล AI รออนุมัติ จะขึ้นที่นี่ (หน้านี้เช็กงานใหม่ทุก 30 วินาที)</p>
+    </section>
+    {% endif %}
+
+    {# ---------- 1. แชท LINE ที่มีอาการ ---------- #}
+    {% if tab == 'all' and chats or tab == 'chats' %}
+    <section class="adm-card">
+        <div class="adm-card-head">
+            <div>
+                <h2 class="adm-card-title"><i class="fab fa-line text-success me-1"></i> แชท LINE ที่มีอาการ ({{ counts.chats }})</h2>
+                <small class="text-muted">คนไข้คุยกับผู้ช่วย AI แล้วเล่าอาการ เปิดแชทเพื่อให้ AI สรุป SOAP ตรวจทาน แล้วบันทึกเข้าแฟ้ม</small>
             </div>
         </div>
-        <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
-            <span class="badge bg-light text-dark border py-1.5 px-2.5 d-flex align-items-center gap-1.5 small">
-                <span class="pulse-dot"></span>
-                <span>Real-time Live Sync (5s)</span>
-            </span>
-            <a href="{% url 'patients:staff_inbox' %}" class="btn btn-outline-primary btn-sm">
-                <i class="fas fa-inbox me-1"></i> ดู Inbox แชท
-            </a>
-        </div>
-    </div>
-
-    <!-- Alert Banner for New Incoming Cases (Hidden by default, triggered by Polling) -->
-    <div id="newCasesToast" class="alert alert-warning alert-dismissible fade show d-none border-warning shadow-xs mb-3" role="alert">
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-2">
-                <i class="fas fa-bell text-warning fs-5"></i>
-                <div>
-                    <strong class="text-dark">มีเคสใหม่ถูกส่งเข้ามาในคิวตรวจทาน!</strong>
-                    <span class="text-muted small ms-1">ตรวจพบข้อความอาการใหม่จากผู้ป่วย</span>
+        {% for box in chats %}
+        <div class="adm-review-row {% if box.red_flag %}is-urgent{% endif %}">
+            <span class="adm-avatar"{% if box.red_flag %} style="background:#FDE2E2;color:#B42318;"{% endif %}>{{ box.patient.first_name|slice:":1" }}</span>
+            <div class="flex-grow-1 min-w-0">
+                <div class="fw-semibold">
+                    {% if box.red_flag %}<span class="badge bg-danger me-1">ฉุกเฉิน</span>{% endif %}
+                    <a href="{% url 'patients:patient_detail' box.patient.pk %}" class="text-body">{{ box.patient.full_name }}</a>
+                    <small class="text-muted fw-normal">HN {{ box.patient.hn }}</small>
                 </div>
+                <small class="text-muted">{{ box.message_count }} ข้อความ &middot; {% if box.status == 'draft' %}กำลังคุยอยู่{% else %}จบรอบแล้ว{% endif %} &middot; ล่าสุด {{ box.last_activity_at|date:"j M H:i" }} น.</small>
             </div>
-            <button type="button" class="btn btn-warning btn-sm fw-bold px-3 py-1" onclick="window.location.reload()">
-                <i class="fas fa-sync-alt me-1"></i> รีเฟรชคิวทันที
-            </button>
+            <a href="{% url 'clinical:intake_detail' box.id %}" class="btn btn-sm btn-primary flex-shrink-0">เปิดแชท / สรุป SOAP</a>
         </div>
-    </div>
+        {% empty %}
+        <p class="text-muted mb-0">ไม่มีแชทที่รอตรวจ</p>
+        {% endfor %}
+    </section>
+    {% endif %}
 
-    <!-- Navigation Tabs: Level 1 Intake vs Level 2 Diagnostic -->
-    <ul class="nav nav-pills mb-3 gap-2" id="queueTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link {% if active_tab == 'level1' %}active bg-success{% endif %} fw-bold d-flex align-items-center gap-2 py-2 px-3.5 shadow-xs" 
-                    id="level1-tab" data-bs-toggle="pill" data-bs-target="#level1-pane" type="button" role="tab">
-                <i class="fas fa-user-nurse"></i>
-                <span>Level 1: คัดกรองทั่วไป (Intake)</span>
-                <span class="badge bg-white text-success rounded-pill font-monospace" id="badgeLevel1Count">{{ p_level1_count }}</span>
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link {% if active_tab == 'level2' %}active bg-danger{% endif %} fw-bold d-flex align-items-center gap-2 py-2 px-3.5 shadow-xs" 
-                    id="level2-tab" data-bs-toggle="pill" data-bs-target="#level2-pane" type="button" role="tab">
-                <i class="fas fa-user-md"></i>
-                <span>Level 2: วินิจฉัย/ด่วน (Doctor Only)</span>
-                <span class="badge bg-white text-danger rounded-pill font-monospace" id="badgeLevel2Count">{{ p_level2_count }}</span>
-            </button>
-        </li>
-    </ul>
-
-    <!-- Filter Bar: Status -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 bg-white p-2.5 rounded-3 border shadow-xs">
-        <div class="d-flex align-items-center gap-1.5">
-            <span class="text-muted small fw-semibold me-1">สถานะ:</span>
-            <a href="?tab={{ active_tab }}&status=PENDING_REVIEW" class="btn btn-sm {% if status_filter == 'PENDING_REVIEW' %}btn-primary{% else %}btn-outline-secondary{% endif %}" style="font-size: 0.8rem;">
-                รอตรวจทาน (Pending)
-            </a>
-            <a href="?tab={{ active_tab }}&status=APPROVED" class="btn btn-sm {% if status_filter == 'APPROVED' %}btn-primary{% else %}btn-outline-secondary{% endif %}" style="font-size: 0.8rem;">
-                อนุมัติแล้ว (Approved)
-            </a>
-            <a href="?tab={{ active_tab }}&status=REJECTED" class="btn btn-sm {% if status_filter == 'REJECTED' %}btn-primary{% else %}btn-outline-secondary{% endif %}" style="font-size: 0.8rem;">
-                ปฏิเสธ (Rejected)
-            </a>
-            <a href="?tab={{ active_tab }}&status=all" class="btn btn-sm {% if status_filter == 'all' %}btn-primary{% else %}btn-outline-secondary{% endif %}" style="font-size: 0.8rem;">
-                ทั้งหมด
-            </a>
-        </div>
-        <div class="text-muted small mt-2 mt-md-0">
-            {% if is_doctor %}
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
-                <i class="fas fa-certificate me-1"></i> สิทธิ์แพทย์: สามารถอนุมัติได้ทั้ง Level 1 และ Level 2
-            </span>
-            {% else %}
-            <span class="badge bg-success-subtle text-success border border-success-subtle">
-                <i class="fas fa-user-nurse me-1"></i> สิทธิ์พยาบาล: อนุมัติได้เฉพาะ Level 1 Intake
-            </span>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Tab Contents -->
-    <div class="tab-content" id="queueTabsContent">
-        <!-- TAB 1: LEVEL 1 INTAKE (Nurse & Doctor) -->
-        <div class="tab-pane fade {% if active_tab == 'level1' %}show active{% endif %}" id="level1-pane" role="tabpanel">
-            <div class="d-flex flex-column gap-3">
-                {% for item in level1_items %}
-                <div class="card queue-card level1-border border shadow-sm" id="item-card-{{ item.id }}">
-                    <div class="card-header bg-white py-2.5 px-3 d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle">Level 1 Intake</span>
-                            <strong class="text-dark">{{ item.patient.full_name }}</strong>
-                            <span class="text-primary font-monospace small">(HN: {{ item.patient.hn }})</span>
-                            <span class="badge bg-light text-muted border" style="font-size: 0.75rem;">
-                                ติดต่อผ่าน: {{ item.source_message.line_user.display_name }}
-                            </span>
-                        </div>
-                        <span class="text-muted font-monospace small" style="font-size: 0.8rem;">
-                            {{ item.created_at|date:"d M Y, H:i" }} น.
-                        </span>
-                    </div>
-                    <div class="card-body p-3">
-                        <div class="p-2.5 bg-light rounded-3 mb-3 border text-dark">
-                            <div class="text-muted small fw-bold mb-1">
-                                <i class="far fa-comment-dots text-primary me-1"></i> ข้อความที่คนไข้/ผู้ดูแลพิมพ์มา:
-                            </div>
-                            <div class="fst-italic fs-6">"{{ item.source_message.content }}"</div>
-                            {% if item.review_notes %}
-                            <div class="text-muted small mt-2 pt-1 border-top font-monospace" style="font-size: 0.75rem;">
-                                {{ item.review_notes|linebreaksbr }}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Status Action Bar -->
-                        {% if item.status == 'PENDING_REVIEW' %}
-                        <form onsubmit="event.preventDefault(); approveItem('{{ item.id }}');" class="mt-2">
-                            <div class="row g-2 align-items-center">
-                                <div class="col-12 col-md-8">
-                                    <input type="text" class="form-control form-control-sm" id="summary-{{ item.id }}" 
-                                           placeholder="บันทึกสรุปประวัติอาการ (Clinical Summary) เพื่อลงเวชระเบียน SOAP..." 
-                                           value="{{ item.source_message.content|truncatechars:60 }}">
-                                </div>
-                                <div class="col-12 col-md-4 d-flex justify-content-end gap-2">
-                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="rejectItem('{{ item.id }}')">
-                                        <i class="fas fa-times me-1"></i> ปฏิเสธ
-                                    </button>
-                                    <button type="submit" class="btn btn-success btn-sm fw-bold px-3 shadow-xs" id="btn-approve-{{ item.id }}">
-                                        <i class="fas fa-check me-1"></i> อนุมัติลงเวชระเบียน EMR
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                        {% elif item.status == 'APPROVED' %}
-                        <div class="alert alert-success py-2 px-3 mb-0 small d-flex justify-content-between align-items-center">
-                            <span>
-                                <i class="fas fa-check-circle me-1"></i> อนุมัติแล้วโดย <strong>{{ item.reviewer.get_full_name|default:item.reviewer.username }}</strong> ({{ item.reviewer_role }}) เมื่อ {{ item.reviewed_at|date:"d/m/Y H:i" }}
-                            </span>
-                            <span class="badge bg-success">บันทึกลง EMR เรียบร้อย</span>
-                        </div>
-                        {% elif item.status == 'REJECTED' %}
-                        <div class="alert alert-secondary py-2 px-3 mb-0 small text-muted">
-                            <i class="fas fa-times-circle me-1 text-danger"></i> ปฏิเสธเมื่อ {{ item.reviewed_at|date:"d/m/Y H:i" }}: {{ item.rejection_reason }}
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-                {% empty %}
-                <div class="card p-5 text-center text-muted border-0 shadow-sm">
-                    <i class="fas fa-check-circle text-success fs-1 mb-2"></i>
-                    <h5 class="fw-bold text-dark">ไม่มีรายการ Level 1 Intake ในสถานะนี้</h5>
-                    <p class="small">ระบบคัดกรองทำงานเป็นปกติ ข้อความทั่วไปจะแสดงที่นี่เมื่อมีผู้ป่วยส่งอาการเข้ามา</p>
-                </div>
-                {% endfor %}
+    {# ---------- 2. ข้อความอาการตอนบอทปิด ---------- #}
+    {% if tab == 'all' and message_items or tab == 'messages' %}
+    <section class="adm-card">
+        <div class="adm-card-head">
+            <div>
+                <h2 class="adm-card-title"><i class="far fa-comment-dots me-1"></i> ข้อความอาการที่พิมพ์หาฝ่ายขาย (<span data-count="messages">{{ counts.messages }}</span>)</h2>
+                <small class="text-muted">คนไข้เล่าอาการตอนบอทปิด ระบบจับคำเกี่ยวกับอาการไว้ไม่ให้ตกหล่น เขียน SOAP แล้วบันทึก หรือระบุว่าไม่เกี่ยวกับการรักษา</small>
             </div>
         </div>
-
-        <!-- TAB 2: LEVEL 2 DIAGNOSTIC (Doctor Only) -->
-        <div class="tab-pane fade {% if active_tab == 'level2' %}show active{% endif %}" id="level2-pane" role="tabpanel">
-            <div class="d-flex flex-column gap-3">
-                {% for item in level2_items %}
-                <div class="card queue-card urgent-border border shadow-sm" id="item-card-{{ item.id }}">
-                    <div class="card-header bg-white py-2.5 px-3 d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-danger text-white">
-                                <i class="fas fa-exclamation-triangle me-1"></i> Level 2: วินิจฉัย/ด่วน
-                            </span>
-                            <strong class="text-dark">{{ item.patient.full_name }}</strong>
-                            <span class="text-primary font-monospace small">(HN: {{ item.patient.hn }})</span>
-                            <span class="badge bg-light text-muted border" style="font-size: 0.75rem;">
-                                ผู้ดูแล: {{ item.source_message.line_user.display_name }}
-                            </span>
-                        </div>
-                        <span class="text-muted font-monospace small" style="font-size: 0.8rem;">
-                            {{ item.created_at|date:"d M Y, H:i" }} น.
-                        </span>
-                    </div>
-                    <div class="card-body p-3">
-                        <div class="p-3 bg-danger bg-opacity-10 rounded-3 mb-3 border border-danger-subtle text-dark">
-                            <div class="text-danger small fw-bold mb-1">
-                                <i class="fas fa-exclamation-circle me-1"></i> ตรวจพบอาการหรือผลตรวจด่วนวิกฤต:
-                            </div>
-                            <div class="fw-bold fs-6 text-danger">"{{ item.source_message.content }}"</div>
-                            {% if item.review_notes %}
-                            <div class="text-muted small mt-2 pt-1 border-top border-danger-subtle font-monospace" style="font-size: 0.75rem;">
-                                {{ item.review_notes|linebreaksbr }}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Status Action Bar -->
-                        {% if item.status == 'PENDING_REVIEW' %}
-                            {% if is_doctor %}
-                            <!-- Doctor Action: Allowed -->
-                            <form onsubmit="event.preventDefault(); approveItem('{{ item.id }}');" class="mt-2">
-                                <div class="row g-2 align-items-center">
-                                    <div class="col-12 col-md-8">
-                                        <input type="text" class="form-control form-control-sm border-danger-subtle" id="summary-{{ item.id }}" 
-                                               placeholder="บันทึกการวินิจฉัย/คำสั่งการรักษาทางการแพทย์ (Doctor Diagnostic Note)..." 
-                                               value="ตรวจอาการด่วน: {{ item.source_message.content|truncatechars:50 }}">
-                                    </div>
-                                    <div class="col-12 col-md-4 d-flex justify-content-end gap-2">
-                                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="rejectItem('{{ item.id }}')">
-                                            <i class="fas fa-times me-1"></i> ปฏิเสธ
-                                        </button>
-                                        <button type="submit" class="btn btn-danger btn-sm fw-bold px-3 shadow-xs" id="btn-approve-{{ item.id }}">
-                                            <i class="fas fa-signature me-1"></i> แพทย์ลงนามอนุมัติ EMR
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                            {% else %}
-                            <!-- Nurse Action: Blocked (Clinical Safety Gate) -->
-                            <div class="alert alert-warning py-2.5 px-3 mb-0 small d-flex align-items-center justify-content-between">
-                                <div>
-                                    <i class="fas fa-lock text-danger me-1"></i>
-                                    <strong>สงวนสิทธิ์เฉพาะแพทย์ผู้ดูแล:</strong> เคสนี้จัดอยู่ในกลุ่มอาการวิกฤตหรือคำสั่งการรักษา พยาบาลไม่สามารถลงนามอนุมัติได้
-                                </div>
-                                <span class="badge bg-danger text-white">Doctor Only</span>
-                            </div>
-                            {% endif %}
-                        {% elif item.status == 'APPROVED' %}
-                        <div class="alert alert-success py-2 px-3 mb-0 small d-flex justify-content-between align-items-center">
-                            <span>
-                                <i class="fas fa-check-double me-1"></i> แพทย์ลงนามอนุมัติแล้วโดย <strong>{{ item.reviewer.get_full_name|default:item.reviewer.username }}</strong> เมื่อ {{ item.reviewed_at|date:"d/m/Y H:i" }}
-                            </span>
-                            <span class="badge bg-success">บันทึกเวชระเบียนทางการ</span>
-                        </div>
-                        {% elif item.status == 'REJECTED' %}
-                        <div class="alert alert-secondary py-2 px-3 mb-0 small text-muted">
-                            <i class="fas fa-times-circle me-1 text-danger"></i> ปฏิเสธเมื่อ {{ item.reviewed_at|date:"d/m/Y H:i" }}: {{ item.rejection_reason }}
-                        </div>
-                        {% endif %}
-                    </div>
+        {% for item in message_items %}
+        <article class="adm-review-row is-message {% if item.is_urgent %}is-urgent{% endif %}" id="item-{{ item.pk }}">
+            <span class="adm-avatar"{% if item.is_urgent %} style="background:#FDE2E2;color:#B42318;"{% endif %}>{{ item.patient.first_name|slice:":1" }}</span>
+            <div class="flex-grow-1 min-w-0">
+                <div class="fw-semibold">
+                    {% if item.is_urgent %}<span class="badge bg-danger me-1">ด่วน · แพทย์เท่านั้น</span>{% endif %}
+                    <a href="{% url 'patients:patient_detail' item.patient.pk %}" class="text-body">{{ item.patient.full_name }}</a>
+                    <small class="text-muted fw-normal">HN {{ item.patient.hn }} &middot; {{ item.created_at|date:"j M H:i" }} น.</small>
                 </div>
-                {% empty %}
-                <div class="card p-5 text-center text-muted border-0 shadow-sm">
-                    <i class="fas fa-heartbeat text-danger fs-1 mb-2"></i>
-                    <h5 class="fw-bold text-dark">ไม่มีรายการ Level 2 Diagnostic คั่งค้าง</h5>
-                    <p class="small">ไม่มีข้อความอาการวิกฤตหรือผลแล็บที่รอแพทย์ตรวจสอบ</p>
+                <div class="adm-review-bubbles">
+                    {% for t in item.texts %}<div class="adm-bubble">{{ t }}</div>{% empty %}<div class="adm-bubble text-muted">ไม่มีข้อความ (ไฟล์)</div>{% endfor %}
                 </div>
-                {% endfor %}
+                <small class="text-muted">ส่งโดย LINE: {{ item.source_message.line_user.display_name|default:"-" }}
+                    &middot; <a href="{% url 'patients:staff_inbox' %}?user_id={{ item.source_message.line_user.line_user_id|urlencode }}">ดูแชททั้งหมด</a></small>
             </div>
+            <div class="adm-review-actions">
+                {% if item.is_urgent and not is_doctor %}
+                <span class="small text-danger text-end"><i class="fas fa-user-md me-1"></i>รอแพทย์ตัดสิน</span>
+                <small class="text-muted text-end">แจ้งแพทย์ หรือโทรหาคนไข้</small>
+                {% else %}
+                <button type="button" class="btn btn-sm btn-primary"
+                        @click="openApprove({ id: {{ item.pk }}, name: '{{ item.patient.full_name|escapejs }}', hn: '{{ item.patient.hn|escapejs }}', url: '{% url 'patients:api_approve_review_item' item.pk %}' })">
+                    เขียน SOAP / บันทึก
+                </button>
+                <button type="button" class="btn btn-sm btn-light"
+                        @click="reject({ id: {{ item.pk }}, name: '{{ item.patient.full_name|escapejs }}', url: '{% url 'patients:api_reject_review_item' item.pk %}' })">
+                    ไม่เกี่ยวกับการรักษา
+                </button>
+                {% endif %}
+            </div>
+        </article>
+        {% empty %}
+        <p class="text-muted mb-0">ไม่มีข้อความอาการรอตรวจ</p>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {# ---------- 3. ผลแล็บ / ผล AI ---------- #}
+    {% if tab == 'all' and results or tab == 'results' %}
+    <section class="adm-card">
+        <div class="adm-card-head">
+            <div>
+                <h2 class="adm-card-title"><i class="fas fa-vials me-1"></i> ผลแล็บ / ผล AI รอแพทย์อนุมัติ ({{ counts.results }})</h2>
+                <small class="text-muted">ค่าที่ AI อ่านจากใบแล็บหรือคะแนนที่ AI เสนอ จะเข้าแฟ้มเมื่อแพทย์อนุมัติเท่านั้น</small>
+            </div>
+        </div>
+        {% for art in results %}
+        <div class="adm-review-row">
+            <span class="adm-avatar"><i class="fas {% if art.artifact_type == 'lab_extraction' %}fa-vial{% else %}fa-magic{% endif %}"></i></span>
+            <div class="flex-grow-1 min-w-0">
+                <div class="fw-semibold text-truncate">{{ art.title }}</div>
+                <small class="text-muted">{% if art.patient %}{{ art.patient.full_name }} &middot; HN {{ art.patient.hn }} &middot; {% endif %}{{ art.get_artifact_type_display }} &middot; {{ art.created_at|date:"j M H:i" }} น.</small>
+            </div>
+            <a href="{% if art.artifact_type == 'lab_extraction' %}{% url 'patients:doctor_lab_review' %}{% else %}{% url 'intelligence:artifact_review' %}{% endif %}" class="btn btn-sm btn-outline-primary flex-shrink-0">
+                {% if is_doctor %}ตรวจทาน{% else %}ดูรายละเอียด{% endif %}
+            </a>
+        </div>
+        {% empty %}
+        <p class="text-muted mb-0">ไม่มีผลรออนุมัติ</p>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {# ---------- จัดการแล้ว ---------- #}
+    {% if tab == 'done' %}
+    <section class="adm-card">
+        <div class="adm-card-head"><h2 class="adm-card-title">ข้อความอาการที่จัดการแล้ว (30 รายการล่าสุด)</h2></div>
+        {% for item in done %}
+        <div class="adm-review-row">
+            <span class="adm-avatar">{{ item.patient.first_name|slice:":1" }}</span>
+            <div class="flex-grow-1 min-w-0">
+                <div class="fw-semibold">{{ item.patient.full_name }} <small class="text-muted fw-normal">HN {{ item.patient.hn }}</small></div>
+                <small class="text-muted d-block text-truncate">{{ item.texts|join:" / "|default:"-" }}</small>
+                <small class="text-muted">
+                    {% if item.status == 'APPROVED' %}<span class="adm-status">บันทึกเข้าแฟ้มแล้ว</span>{% else %}<span class="adm-status is-off">ไม่เกี่ยวกับการรักษา: {{ item.rejection_reason }}</span>{% endif %}
+                    &middot; {{ item.reviewer.get_full_name|default:item.reviewer.username }} &middot; {{ item.reviewed_at|date:"j M H:i" }} น.
+                </small>
+            </div>
+            {% if item.committed_history_id %}<a href="{% url 'patients:patient_detail' item.patient.pk %}#soap-{{ item.committed_history_id }}" class="btn btn-sm btn-light flex-shrink-0">ดูในแฟ้ม</a>{% endif %}
+        </div>
+        {% empty %}
+        <p class="text-muted mb-0">ยังไม่มีรายการที่จัดการแล้ว</p>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    <!-- เขียน SOAP จากข้อความ แล้วบันทึกเข้าแฟ้ม -->
+    <div class="modal fade" x-ref="modal" tabindex="-1" aria-labelledby="reviewModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+            <form class="modal-content" @submit.prevent="submitApprove()" novalidate>
+                <div class="modal-header">
+                    <div>
+                        <h2 class="modal-title h5" id="reviewModalTitle">บันทึกเข้าเวชระเบียน</h2>
+                        <small class="text-muted" x-text="current ? current.name + ' · HN ' + current.hn : ''"></small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted">ข้อความของคนไข้ใส่ไว้ในช่อง S ให้แล้ว แก้ให้กระชับ แล้วเติมช่องอื่นเท่าที่มีข้อมูล</p>
+                    <div class="row g-3">
+                        <template x-for="f in fields" :key="f.name">
+                            <div class="col-md-6">
+                                <label class="form-label" :for="'rv-' + f.name"><span class="adm-soap-tag" x-text="f.tag"></span> <span x-text="f.label"></span> <span class="text-danger" x-show="f.name === 'subjective'">*</span></label>
+                                <textarea class="form-control" rows="4" :id="'rv-' + f.name" x-model="soap[f.name]"></textarea>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="form-check mt-3">
+                        <input class="form-check-input" type="checkbox" id="rv-reviewed" x-model="reviewed">
+                        <label class="form-check-label" for="rv-reviewed">ฉันตรวจทาน SOAP แล้ว ข้อมูลถูกต้อง</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="submit" class="btn btn-primary" :disabled="saving || !reviewed">
+                        <i class="fas" :class="saving ? 'fa-spinner fa-spin' : 'fa-file-medical'"></i> บันทึกเข้าเวชระเบียน
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-
-<script>
-    // Optimistic UI Approve Method with Race Condition Prevention
-    function approveItem(itemId) {
-        const summaryInput = document.getElementById('summary-' + itemId);
-        const summary = summaryInput ? summaryInput.value : '';
-        const btn = document.getElementById('btn-approve-' + itemId);
-        const card = document.getElementById('item-card-' + itemId);
-
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> กำลังบันทึก...';
-        }
-
-        fetch('/staff/api/review-item/' + itemId + '/approve/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: new URLSearchParams({
-                clinical_summary: summary,
-                category: 'soap'
-            })
-        })
-        .then(r => r.json().then(data => ({ status: r.status, data })))
-        .then(({ status, data }) => {
-            if (status === 200 && data.status === 'ok') {
-                // Optimistic UI Animation
-                if (card) {
-                    card.classList.add('fade-out');
-                    setTimeout(() => {
-                        card.remove();
-                    }, 300);
-                }
-            } else {
-                alert(data.message || 'เกิดข้อผิดพลาดในการอนุมัติ');
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-check me-1"></i> ลองใหม่อีกครั้ง';
-                }
-            }
-        })
-        .catch(err => {
-            alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-check me-1"></i> อนุมัติลงเวชระเบียน EMR';
-            }
-        });
-    }
-
-    // Reject Action
-    function rejectItem(itemId) {
-        const reason = prompt('กรุณาระบุเหตุผลในการปฏิเสธคำขอนี้:', 'ไม่เกี่ยวข้องกับอาการทางการแพทย์');
-        if (reason === null) return;
-
-        const card = document.getElementById('item-card-' + itemId);
-
-        fetch('/staff/api/review-item/' + itemId + '/reject/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: new URLSearchParams({
-                reason: reason
-            })
-        })
-        .then(r => r.json().then(data => ({ status: r.status, data })))
-        .then(({ status, data }) => {
-            if (status === 200 && data.status === 'ok') {
-                if (card) {
-                    card.classList.add('fade-out');
-                    setTimeout(() => {
-                        card.remove();
-                    }, 300);
-                }
-            } else {
-                alert(data.message || 'เกิดข้อผิดพลาด');
-            }
-        })
-        .catch(err => {
-            alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
-        });
-    }
-
-    // Real-Time Polling Engine (Every 5 seconds)
-    setInterval(function() {
-        fetch('{% url "patients:api_review_queue_poll" %}')
-        .then(r => r.json())
-        .then(data => {
-            if (data.status === 'ok') {
-                // อัปเดตตัวเลข Badge
-                const b1 = document.getElementById('badgeLevel1Count');
-                if (b1) b1.innerText = data.pending_level1;
-
-                const b2 = document.getElementById('badgeLevel2Count');
-                if (b2) b2.innerText = data.pending_level2;
-
-                // หากมีเคสใหม่เข้ามา แสดงแถบเตือน Toast
-                if (data.has_new_items) {
-                    const toast = document.getElementById('newCasesToast');
-                    if (toast) toast.classList.remove('d-none');
-                }
-            }
-        })
-        .catch(() => {});
-    }, 5000);
-</script>
 {% endblock %}

@@ -230,80 +230,105 @@ def staff_create_review_from_message_api(request: HttpRequest) -> JsonResponse:
 # 3. CLINICAL REVIEW QUEUE (/staff/review-queue/)
 # ==============================================================================
 
+REVIEW_TABS = (
+    ('all', 'ทั้งหมด'),
+    ('chats', 'แชท LINE มีอาการ'),
+    ('messages', 'ข้อความอาการ (บอทปิด)'),
+    ('results', 'ผลแล็บ / ผล AI'),
+    ('done', 'จัดการแล้ว'),
+)
+
+
+def _message_texts(item) -> list:
+    """ข้อความของคนไข้ในรายการนี้ (ข้อความแรก + ข้อความที่รวมเข้ามาภายใน 5 นาที)"""
+    texts = [item.source_message.content] if item.source_message and item.source_message.content else []
+    for line in (item.review_notes or '').splitlines():
+        if line.startswith('[+ข้อความต่อเนื่อง]:'):
+            texts.append(line.split(':', 1)[1].rsplit(' (คำสำคัญ', 1)[0].strip())
+    return texts
+
+
+def _review_hub_data() -> dict:
+    """ทุกอย่างที่รอบุคลากรตัดสินใจ (ใช้ทั้งหน้าและตัวนับที่ถามทุก 30 วินาที)"""
+    from clinical import services_intake
+    from clinical.models import Box
+    from intelligence.models import AgenticArtifact
+
+    services_intake.close_idle_line_sessions()
+    chats = (
+        Box.objects.filter(
+            (Q(status=Box.Status.DONE) & services_intake.needs_doctor_q()) | Q(status=Box.Status.DRAFT, contents__red_flag=True),
+            source=Box.Source.LINE, patient__isnull=False,
+        ).select_related('patient').order_by('-last_activity_at')
+    )
+    messages_qs = (clinical_review_items().filter(status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW)
+                   .select_related('patient', 'source_message', 'source_message__line_user').order_by('-created_at'))
+    results = (AgenticArtifact.objects.filter(status='pending').select_related('patient').order_by('-created_at'))
+    return {'chats': chats, 'messages': messages_qs, 'results': results}
+
+
 @clinical_staff_required
 def staff_review_queue_view(request: HttpRequest) -> HttpResponse:
     """
-    หน้าจอจัดการคิวตรวจทานทางคลินิก (Human-in-the-Loop Clinical Review Queue)
-    - Tab 1: Level 1 Intake (พยาบาล + แพทย์)
-    - Tab 2: Level 2 Diagnostic (แพทย์เท่านั้น, พยาบาลดูได้อย่างเดียว)
+    กล่องงานรอตรวจทาน: รวมทุกอย่างที่ต้องให้พยาบาล/แพทย์ตัดสินใจไว้หน้าเดียว
+    - แชท LINE ที่มีอาการ (รอบคุยกับ AI)  -> เปิดหน้าแชทเพื่อสรุป SOAP และบันทึก
+    - ข้อความอาการที่พิมพ์หาฝ่ายขายตอนบอทปิด -> เขียน SOAP ตรวจทาน แล้วบันทึก / หรือระบุว่าไม่เกี่ยวกับการรักษา
+      ข้อความด่วน (Level 2) แพทย์เท่านั้นที่บันทึกได้
+    - ผลแล็บ / ผล AI ที่รอแพทย์อนุมัติ -> ไปหน้าตรวจทานของมัน
     """
-    status_filter = request.GET.get('status', ClinicalReviewItem.StatusChoices.PENDING_REVIEW)
-    active_tab = request.GET.get('tab', 'level1')
+    tab = request.GET.get('tab', 'all')
+    if tab not in dict(REVIEW_TABS):
+        tab = 'all'
+    data = _review_hub_data()
+    chats = list(data['chats'][:50])
+    for box in chats:
+        contents = box.contents or {}
+        box.red_flag = bool(contents.get('red_flag'))
+        box.message_count = len(contents.get('messages', []))
+    message_items = list(data['messages'][:50])
+    for item in message_items:
+        item.texts = _message_texts(item)
+        item.is_urgent = item.review_type == ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC
+    results = list(data['results'][:50])
+    done = list(clinical_review_items().filter(status__in=[ClinicalReviewItem.StatusChoices.APPROVED,
+                                                            ClinicalReviewItem.StatusChoices.REJECTED])
+                .select_related('patient', 'reviewer', 'source_message').order_by('-reviewed_at')[:30]) if tab == 'done' else []
+    for item in done:
+        item.texts = _message_texts(item)
 
-    base_qs = clinical_review_items().select_related(
-        'patient', 'source_message', 'source_message__line_user', 'reviewer'
-    ).order_by('-created_at')
-
-    if status_filter != 'all':
-        base_qs = base_qs.filter(status=status_filter)
-
-    level1_items = base_qs.filter(review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_1_INTAKE)
-    level2_items = base_qs.filter(review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC)
-
-    # นับจำนวนสำหรับ Badges
-    p_level1_count = clinical_review_items().filter(
-        status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
-        review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_1_INTAKE
-    ).count()
-
-    p_level2_count = clinical_review_items().filter(
-        status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
-        review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC
-    ).count()
-
-    is_doctor = request.user.role == User.Role.DOCTOR or request.user.is_superuser
-
+    counts = {'chats': data['chats'].count(), 'messages': data['messages'].count(), 'results': data['results'].count()}
+    counts['all'] = counts['chats'] + counts['messages'] + counts['results']
     return render(request, 'patients/staff_review_queue.html', {
-        'level1_items': level1_items[:50],
-        'level2_items': level2_items[:50],
-        'p_level1_count': p_level1_count,
-        'p_level2_count': p_level2_count,
-        'status_filter': status_filter,
-        'active_tab': active_tab,
-        'is_doctor': is_doctor,
+        'tab': tab,
+        'tabs': REVIEW_TABS,
+        'counts': counts,
+        'chats': chats,
+        'message_items': message_items,
+        'results': results,
+        'done': done,
+        'is_doctor': request.user.role == User.Role.DOCTOR or request.user.is_superuser,
     })
 
 
 @clinical_staff_required
 @require_GET
 def staff_review_queue_poll_api(request: HttpRequest) -> JsonResponse:
-    """
-    Real-time Polling API (5 วินาที) สำหรับตรวจสอบจำนวนเคสรอตรวจทานแบบ Real-time
-    """
-    p_level1_count = clinical_review_items().filter(
-        status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
-        review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_1_INTAKE
-    ).count()
-
-    p_level2_count = clinical_review_items().filter(
-        status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
-        review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC
-    ).count()
-
-    # ตรวจสอบว่ามีรายการใหม่เข้ามาในช่วง 10 วินาทีล่าสุดหรือไม่
-    recent_threshold = timezone.now() - timedelta(seconds=10)
-    has_new_items = clinical_review_items().filter(
-        status=ClinicalReviewItem.StatusChoices.PENDING_REVIEW,
-        created_at__gte=recent_threshold
-    ).exists()
-
+    """ตัวนับงานรอตรวจทาน (หน้าเว็บถามทุก 30 วินาที แล้วบอกว่ามีงานใหม่)"""
+    data = _review_hub_data()
+    pending = data['messages']
+    p_level1 = pending.filter(review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_1_INTAKE).count()
+    p_level2 = pending.filter(review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC).count()
+    chats, results = data['chats'].count(), data['results'].count()
     return JsonResponse({
         'status': 'ok',
-        'pending_level1': p_level1_count,
-        'pending_level2': p_level2_count,
-        'total_pending': p_level1_count + p_level2_count,
-        'has_new_items': has_new_items,
-        'timestamp': timezone.now().isoformat()
+        'pending_level1': p_level1,
+        'pending_level2': p_level2,
+        'total_pending': p_level1 + p_level2,
+        'chats': chats,
+        'results': results,
+        'hub_total': chats + p_level1 + p_level2 + results,
+        'has_new_items': pending.filter(created_at__gte=timezone.now() - timedelta(seconds=10)).exists(),
+        'timestamp': timezone.now().isoformat(),
     })
 
 
@@ -320,8 +345,13 @@ def staff_approve_review_item_api(request: HttpRequest, item_id: int) -> JsonRes
     1. ป้องกัน Race Condition ด้วย select_for_update() ใน Database Transaction
     2. บังคับใช้ Model-level RBAC: หากเป็น LEVEL_2_DIAGNOSTIC แต่ผู้ใช้ไม่ใช่แพทย์ จะติด PermissionDenied
     """
-    clinical_summary = request.POST.get('clinical_summary', '').strip()
-    category = request.POST.get('category', 'soap').strip()
+    # บันทึกเข้าเวชระเบียนเป็น SOAP ที่ผู้ตรวจเขียน/แก้เอง และต้องยืนยันว่าตรวจทานแล้ว
+    # (เดิมเขียนข้อความสำเร็จรูป "ผ่านการตรวจทาน..." ลงแฟ้ม ซึ่งไม่ใช่บันทึกทางคลินิกจริง)
+    soap = {k: request.POST.get(k, '').strip() for k in ('subjective', 'objective', 'assessment', 'plan')}
+    if request.POST.get('reviewed') != '1':
+        return JsonResponse({'status': 'error', 'message': 'กรุณาตรวจทาน SOAP และติ๊กยืนยันก่อนบันทึก'}, status=400)
+    if not soap['subjective']:
+        return JsonResponse({'status': 'error', 'message': 'กรุณากรอก S (อาการที่คนไข้เล่า) อย่างน้อยหนึ่งช่อง'}, status=400)
 
     try:
         with transaction.atomic():
@@ -342,11 +372,7 @@ def staff_approve_review_item_api(request: HttpRequest, item_id: int) -> JsonRes
 
             # 2. บันทึกการอนุมัติผ่านโมเดล method ที่มี Guard RBAC
             try:
-                history = item.approve(
-                    reviewer_user=request.user,
-                    clinical_summary=clinical_summary,
-                    category=category
-                )
+                history = item.approve(reviewer_user=request.user, soap=soap)
             except PermissionDenied as pe:
                 return JsonResponse({
                     'status': 'error',
@@ -403,6 +429,11 @@ def staff_reject_review_item_api(request: HttpRequest, item_id: int) -> JsonResp
                     'status': 'error',
                     'message': f'รายการนี้ได้รับการประมวลผลแล้วโดยผู้อื่น (สถานะปัจจุบัน: {item.get_status_display()})'
                 }, status=409)
+
+            # ข้อความด่วน (Level 2) ปิดทิ้งได้เฉพาะแพทย์ เช่นเดียวกับการบันทึก กันพยาบาลปิดอาการฉุกเฉินโดยไม่มีแพทย์เห็น
+            if (item.review_type == ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC
+                    and getattr(request.user, 'role', '') not in ('doctor', 'admin') and not request.user.is_superuser):
+                return JsonResponse({'status': 'error', 'message': 'ข้อความด่วนต้องให้แพทย์เป็นผู้ตัดสิน'}, status=403)
 
             item.status = ClinicalReviewItem.StatusChoices.REJECTED
             item.reviewer = request.user

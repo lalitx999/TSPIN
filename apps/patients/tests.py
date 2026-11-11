@@ -258,7 +258,8 @@ class DoctorPortalPageRegressionTests(TestCase):
         for url in ('/staff/inbox/', '/staff/review-queue/', '/clinical/boxes/'):
             resp = self.client.get(url)
             self.assertEqual(resp.status_code, 200, url)
-            self.assertContains(resp, '.doctor-sidebar', msg_prefix=url)
+            self.assertContains(resp, 'css/admin.css', msg_prefix=url)
+            self.assertContains(resp, 'class="adm-sidebar"', msg_prefix=url)
 
 
 class PatientPortalDataIsolationTests(TestCase):
@@ -283,3 +284,65 @@ class PatientPortalDataIsolationTests(TestCase):
         resp = self.client.get('/patient/axes-result/')
         self.assertContains(resp, 'ยังไม่ประเมิน')
         self.assertNotContains(resp, '50/100')
+
+
+class LabIntakeModalWorkflowTests(TestCase):
+    """ทดสอบระบบ Modal นำเข้าเอกสารผลแล็บหลายไฟล์ + เก็บเข้ารหัสในเวชระเบียน EMR + อนุมัติเข้า 39 แกน"""
+
+    def setUp(self):
+        import tempfile
+        self.media_dir = tempfile.mkdtemp()
+        self.doctor = User.objects.create_user(username='dr_lab', password='DoctorPass2026!x', role=User.Role.DOCTOR)
+        self.patient = Patient.objects.create(hn='HN-LAB-99', first_name='ทดสอบ', last_name='แล็บเอกสาร', phone='0899999999')
+        self.client.force_login(self.doctor)
+
+    def test_lab_ocr_get_redirects_to_lab_review_modal(self):
+        resp = self.client.get(reverse('intelligence:lab_ocr'))
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn('/doctor/lab-review/', resp['Location'])
+        self.assertIn('open_upload=1', resp['Location'])
+
+    def test_multi_file_upload_saves_encrypted_docs_and_commits_emr(self):
+        from django.test import override_settings
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from intelligence.models import AgenticArtifact
+
+        with override_settings(PRIVATE_MEDIA_ROOT=self.media_dir):
+            f1 = SimpleUploadedFile('lab_report_1.pdf', b'%PDF-1.4\n%fake-pdf', content_type='application/pdf')
+            f2 = SimpleUploadedFile('lab_scan_2.jpg', b'\xff\xd8\xff\xe0fake-jpg', content_type='image/jpeg')
+
+            resp = self.client.post(
+                reverse('patients:doctor_lab_intake'),
+                data={
+                    'patient_id': self.patient.pk,
+                    'lab_files': [f1, f2],
+                    'raw_text': 'hs-CRP: 4.2 mg/L\nHbA1c: 6.5 %',
+                    'auto_approve': '1',
+                }
+            )
+            self.assertEqual(resp.status_code, 302)
+
+            # ตรวจสอบเอกสารแนบที่บันทึกในเวชระเบียนคนไข้
+            self.patient.refresh_from_db()
+            docs = self.patient.extra_data.get('lab_documents', [])
+            self.assertEqual(len(docs), 2)
+            self.assertEqual(docs[0]['filename'], 'lab_report_1.pdf')
+            self.assertEqual(docs[1]['filename'], 'lab_scan_2.jpg')
+
+            # ตรวจสอบค่า Biomarkers ใน EMR
+            biomarkers = self.patient.extra_data.get('biomarkers', {})
+            self.assertEqual(biomarkers['crp']['value'], 4.2)
+            self.assertEqual(biomarkers['hba1c']['value'], 6.5)
+
+            # ตรวจสอบ BiologicalRecord (Axis 1 และ Axis 5 ได้รับการอัปเดต)
+            bio_rec = self.patient.biological_records.first()
+            self.assertIsNotNone(bio_rec)
+            self.assertGreaterEqual(bio_rec.axis_1, 60)
+            self.assertGreaterEqual(bio_rec.axis_5, 60)
+
+            # ตรวจสอบเปิดดูเอกสารที่เข้ารหัสไว้ได้และบันทึก AuditLog
+            media_id = docs[0]['media_id']
+            doc_resp = self.client.get(reverse('patients:patient_lab_document', args=[self.patient.pk, media_id]))
+            self.assertEqual(doc_resp.status_code, 200)
+            self.assertEqual(doc_resp.content, b'%PDF-1.4\n%fake-pdf')
+            self.assertTrue(AuditLog.objects.filter(action='LAB_DOCUMENT_VIEWED', object_id=str(self.patient.pk)).exists())

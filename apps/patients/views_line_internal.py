@@ -220,7 +220,10 @@ def ingest_line_event(event: dict) -> Tuple[dict, int]:
     binding_required = False
 
     # 7. สร้าง Human-in-the-Loop ClinicalReviewItem หากเป็นข้อมูลอาการทางการแพทย์
-    if is_clinical:
+    # ตอนบอทเปิด ข้อความอยู่ในรอบแชท LINE (Box) ที่ AI สรุป SOAP ให้อยู่แล้ว ไม่สร้างซ้ำในคิวตรวจทาน
+    # คิวนี้จึงรับเฉพาะอาการที่คนไข้พิมพ์หาฝ่ายขายตอนบอทปิด เพื่อไม่ให้ตกหล่น
+    routed_to_chat = is_clinical and line_user.is_bot_on()
+    if is_clinical and not routed_to_chat:
         if patient:
             review_type = (
                 ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC
@@ -266,5 +269,6 @@ def ingest_line_event(event: dict) -> Tuple[dict, int]:
         'is_urgent': is_urgent,
         'matched_keywords': matched_kws,
         'review_item_id': review_item_id,
-        'binding_required': binding_required
+        'binding_required': binding_required,
+        'routed_to_chat': routed_to_chat,
     }, 200

@@ -242,7 +242,7 @@ else:
 
 # Shared secret for Django <-> FastAPI calls. No default: unset means internal calls fail closed.
 INTERNAL_API_TOKEN = os.environ.get('INTERNAL_API_TOKEN', '')
-AI_SERVICE_URL = os.environ.get('AI_SERVICE_URL', 'http://127.0.0.1:8088')
+AI_SERVICE_URL = os.environ.get('AI_SERVICE_URL', 'http://127.0.0.1:8090')
 # ผู้ให้บริการที่ใช้ร่าง SOAP (ต้องตรงกับ AI service) ใช้ตรวจงบก่อนเรียก
 AI_SOAP_PROVIDER = os.environ.get('AI_SOAP_PROVIDER', 'groq').strip().lower()
 # ให้บอท LINE ถามต่อด้วย AI (ใช้งบ) ปิดไว้เป็นค่าเริ่มต้น

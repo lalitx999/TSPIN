@@ -1,223 +1,289 @@
 {% extends 'layouts/doctor_base.html' %}
 {% load static %}
 
-{% block title %}ตารางนัดหมายแพทย์ (Appointments) | TSPI CLINIC{% endblock %}
+{% block title %}ปฏิทินนัดหมาย | TSPI CLINIC{% endblock %}
+
+{% block extra_doctor_head %}
+<script src="{% static 'js/appointments.js' %}?v={{ ASSET_VERSION }}"></script>
+{% endblock %}
+
+{% block page_header %}
+<div class="adm-page-head">
+    <h1 class="adm-page-title">ปฏิทินนัดหมาย</h1>
+    <ol class="adm-crumb" aria-label="ตำแหน่งหน้า">
+        <li><a href="{% url 'patients:dashboard' %}">TSPI</a></li>
+        <li>แพทย์</li>
+        <li aria-current="page">ปฏิทินนัดหมาย</li>
+    </ol>
+</div>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column gap-4">
+{{ calendar_data|json_script:"calendar-data" }}
+<div x-data="apptCalendar(JSON.parse(document.getElementById('calendar-data').textContent))" class="d-flex flex-column gap-3">
+    {% csrf_token %}
 
-    <!-- Top Header -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 pb-3 border-bottom">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
-                    <i class="fas fa-calendar-alt me-1"></i> Appointment Management
-                </span>
-                <span class="text-muted small">ระบบบริหารจัดการคิวตรวจคนไข้</span>
-            </div>
-            <h1 class="h4 fw-bold mb-1 text-dark">ปฏิทินและตารางนัดหมายแพทย์</h1>
-            <p class="text-muted small mb-0">
-                ติดตามนัดหมายคนไข้รายวัน ยืนยันคิวตรวจ และเชื่อมต่อการแจ้งเตือนอัตโนมัติผ่าน LINE OA
-            </p>
+    <div class="row g-3">
+        <!-- ปฏิทินรายเดือน -->
+        <div class="col-12 col-xxl-9">
+            <section class="adm-card h-100" aria-labelledby="cal-title">
+                <div class="adm-cal-toolbar">
+                    <div class="d-flex align-items-center gap-2">
+                        <a class="adm-icon-btn" href="?month={{ prev_month }}{% if doctor_filter %}&doctor={{ doctor_filter }}{% endif %}" aria-label="เดือนก่อน"><i class="fas fa-chevron-left"></i></a>
+                        <h2 class="adm-cal-title" id="cal-title">{{ month_title }}</h2>
+                        <a class="adm-icon-btn" href="?month={{ next_month }}{% if doctor_filter %}&doctor={{ doctor_filter }}{% endif %}" aria-label="เดือนถัดไป"><i class="fas fa-chevron-right"></i></a>
+                        {% if month_value != this_month %}<a class="btn btn-sm btn-light ms-1" href="?month={{ this_month }}{% if doctor_filter %}&doctor={{ doctor_filter }}{% endif %}">วันนี้</a>{% endif %}
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <div class="adm-field">
+                            <i class="fas fa-user-md"></i>
+                            <select class="form-select form-select-sm" aria-label="กรองตามแพทย์"
+                                    onchange="location.href='?month={{ month_value }}' + (this.value ? '&doctor=' + this.value : '')">
+                                <option value="">แพทย์ทุกคน</option>
+                                {% for d in doctors %}<option value="{{ d.id }}" {% if doctor_filter == d.id|stringformat:'s' %}selected{% endif %}>{{ d.name }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" @click="openCreate(selected)"><i class="fas fa-plus"></i> สร้างนัดหมาย</button>
+                    </div>
+                </div>
+
+                <div class="adm-cal-legend" aria-hidden="true">
+                    <span class="adm-appt-dot is-scheduled"></span> รอยืนยัน
+                    <span class="adm-appt-dot is-confirmed"></span> ยืนยันแล้ว
+                    <span class="adm-appt-dot is-completed"></span> มาตรวจแล้ว
+                    <span class="adm-appt-dot is-cancelled"></span> ยกเลิก
+                </div>
+
+                <div class="adm-cal" role="grid" aria-labelledby="cal-title">
+                    <div class="adm-cal-row adm-cal-head" role="row">
+                        <template x-for="(wd, i) in ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์']" :key="wd">
+                            <div class="adm-cal-wd" role="columnheader" :class="{ 'is-weekend': i === 0 || i === 6 }" :aria-label="wd">
+                                <span class="d-none d-md-inline" x-text="wd"></span><span class="d-md-none" x-text="['อา','จ','อ','พ','พฤ','ศ','ส'][i]"></span>
+                            </div>
+                        </template>
+                    </div>
+                    <template x-for="week in weeks" :key="week[0]">
+                        <div class="adm-cal-row" role="row">
+                            <template x-for="day in week" :key="day">
+                                <button type="button" class="adm-cal-day" role="gridcell" @click="pick(day)"
+                                        :class="{ 'is-out': !inMonth(day), 'is-today': day === today, 'is-selected': day === selected, 'is-past': day < today }"
+                                        :aria-label="longDate(day) + ' นัด ' + activeCount(day) + ' ราย'" :aria-selected="day === selected">
+                                    <span class="adm-cal-num" x-text="Number(day.slice(8))"></span>
+                                    <span class="adm-cal-count d-md-none" x-show="activeCount(day)" x-text="activeCount(day)"></span>
+                                    <span class="adm-cal-items d-none d-md-flex">
+                                        <template x-for="a in byDay(day).slice(0, 3)" :key="a.id">
+                                            <span class="adm-cal-pill" :class="'is-' + a.status">
+                                                <b x-text="a.time"></b> <span x-text="a.patient.name"></span>
+                                            </span>
+                                        </template>
+                                        <span class="adm-cal-more" x-show="byDay(day).length > 3" x-text="'+ อีก ' + (byDay(day).length - 3) + ' นัด'"></span>
+                                    </span>
+                                </button>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </section>
         </div>
 
-        <div>
-            <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#newAppointmentModal">
-                <i class="fas fa-plus"></i> สร้างนัดหมายใหม่
+        <!-- สรุปเดือนนี้ + นัดถัดไป -->
+        <div class="col-12 col-xxl-3">
+            <div class="row g-3">
+                <div class="col-12 col-md-6 col-xxl-12">
+                    <section class="adm-card h-100">
+                        <div class="adm-card-head"><h2 class="adm-card-title">สรุป{{ month_title }}</h2><span class="text-muted small">{{ month_total }} นัด</span></div>
+                        <div class="adm-cal-stats">
+                            <div><span class="adm-appt-dot is-scheduled"></span> รอยืนยัน <b>{{ stats.scheduled }}</b></div>
+                            <div><span class="adm-appt-dot is-confirmed"></span> ยืนยันแล้ว <b>{{ stats.confirmed }}</b></div>
+                            <div><span class="adm-appt-dot is-completed"></span> มาตรวจแล้ว <b>{{ stats.completed }}</b></div>
+                            <div><span class="adm-appt-dot is-cancelled"></span> ยกเลิก <b>{{ stats.cancelled }}</b></div>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-12 col-md-6 col-xxl-12">
+                    <section class="adm-card h-100">
+                        <div class="adm-card-head"><h2 class="adm-card-title">นัดที่กำลังจะถึง</h2></div>
+                        {% for a in upcoming %}
+                        <a class="adm-person text-decoration-none" href="?month={{ a.appointment_date|date:'Y-m' }}&day={{ a.appointment_date|date:'Y-m-d' }}#day-panel">
+                            <span class="adm-avatar">{{ a.patient.first_name|slice:":1" }}</span>
+                            <span class="flex-grow-1 min-w-0">
+                                <span class="adm-person-name d-block text-truncate">{{ a.patient.full_name }}</span>
+                                <span class="adm-person-sub">{{ a.appointment_date|date:"j M" }} &middot; {{ a.appointment_time|time:"H:i" }} น.</span>
+                            </span>
+                            <span class="adm-status {% if a.status == 'scheduled' %}is-warn{% endif %}">{% if a.status == 'scheduled' %}รอยืนยัน{% else %}ยืนยันแล้ว{% endif %}</span>
+                        </a>
+                        {% empty %}
+                        <p class="text-muted mb-0">ยังไม่มีนัดที่กำลังจะถึง</p>
+                        {% endfor %}
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- นัดหมายของวันที่เลือก (กดวันในปฏิทินแล้วเลื่อนมาที่นี่) -->
+    <section class="adm-card" id="day-panel" aria-live="polite">
+        <div class="adm-card-head flex-wrap">
+            <div>
+                <h2 class="adm-card-title" x-text="'นัดหมาย' + longDate(selected)"></h2>
+                <small class="text-muted" x-text="dayCountLabel()"></small>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary" @click="openCreate(selected)" :disabled="selected < today">
+                <i class="fas fa-plus"></i> เพิ่มนัดวันนี้
             </button>
         </div>
-    </div>
 
-    <!-- Appointments Table Card -->
-    <div class="card shadow-sm border">
-        <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
-            <h6 class="fw-bold text-dark mb-0 small">รายการนัดหมายทั้งหมด ({{ appointments.count }})</h6>
-            <span class="small text-muted" style="font-size: 0.75rem;">เรียงตามวันและเวลานัด</span>
-        </div>
+        <template x-if="!inMonth(selected)">
+            <p class="text-muted">วันนี้อยู่นอกเดือนที่แสดง <a :href="pageUrl(selected)">ไปที่เดือนนั้น</a></p>
+        </template>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" style="font-size: 0.8125rem;">
-                <thead class="table-light text-muted border-bottom">
-                    <tr>
-                        <th class="px-3 py-2.5 fw-semibold">วัน-เวลานัด</th>
-                        <th class="px-3 py-2.5 fw-semibold">คนไข้ (HN)</th>
-                        <th class="px-3 py-2.5 fw-semibold">แพทย์ผู้ตรวจ</th>
-                        <th class="px-3 py-2.5 fw-semibold">จุดประสงค์ / หมายเหตุ</th>
-                        <th class="px-3 py-2.5 fw-semibold text-center">สถานะ</th>
-                        <th class="px-3 py-2.5 fw-semibold text-end">การจัดการ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for appt in appointments %}
-                        <tr>
-                            <td class="px-3 py-2.5 font-monospace text-dark">
-                                <i class="far fa-clock text-primary me-1.5"></i>
-                                <span>{{ appt.appointment_date|date:"d M Y" }} &bull; {{ appt.appointment_time|time:"H:i" }} น.</span>
-                            </td>
-                            <td class="px-3 py-2.5">
-                                <a href="{% url 'patients:patient_detail' appt.patient.id %}" class="fw-bold text-dark text-decoration-none">
-                                    {{ appt.patient.full_name }}
-                                </a>
-                                <div class="text-muted font-monospace" style="font-size: 0.725rem;">HN: {{ appt.patient.hn }}</div>
-                            </td>
-                            <td class="px-3 py-2.5 text-muted">
-                                นพ./พญ. {{ appt.doctor.first_name|default:appt.doctor.username }}
-                            </td>
-                            <td class="px-3 py-2.5 text-muted text-truncate" style="max-width: 250px;">
-                                {{ appt.notes|default:"นัดติดตามผลโปรโตคอลและการฟื้นฟู" }}
-                            </td>
-                            <td class="px-3 py-2.5 text-center">
-                                <span class="{{ appt.status_badge_class }}">
-                                    {{ appt.status_label }}
-                                </span>
-                            </td>
-                            <td class="px-3 py-2.5 text-end">
-                                <a href="{% url 'patients:doctor_pre_visit' %}?patient_id={{ appt.patient.id }}" class="btn btn-sm btn-outline-primary" style="font-size: 0.75rem;">
-                                    <i class="fas fa-clipboard-check me-1"></i> Pre-visit
-                                </a>
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
-                                <i class="far fa-calendar-times fs-2 mb-2 text-secondary d-block"></i>
-                                ยังไม่มีรายการนัดหมายในระบบ
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Universal Pagination Partial -->
-        {% include 'partials/pagination.html' %}
-    </div>
-
-    <!-- Create Appointment Modal (Bootstrap 5 Native) -->
-    <div class="modal fade" id="newAppointmentModal" tabindex="-1" aria-labelledby="newAppointmentModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title h6 fw-bold" id="newAppointmentModalLabel">
-                        <i class="fas fa-calendar-plus text-primary me-2"></i>สร้างนัดหมายแพทย์ใหม่
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="POST" action="{% url 'patients:doctor_appointments' %}" x-data="{
-                    patientQuery: '',
-                    patientResults: [],
-                    isSearching: false,
-                    selectedPatientId: '',
-                    selectedPatientName: '',
-                    selectedPatientHn: '',
-                    searchPatients() {
-                        if (!this.patientQuery || this.patientQuery.trim().length < 1) {
-                            this.patientResults = [];
-                            return;
-                        }
-                        this.isSearching = true;
-                        fetch(`/doctor/patients/api/search/?q=${encodeURIComponent(this.patientQuery)}`)
-                            .then(res => res.json())
-                            .then(data => {
-                                this.patientResults = data.results || [];
-                                this.isSearching = false;
-                            })
-                            .catch(() => { this.isSearching = false; });
-                    },
-                    selectPatient(p) {
-                        this.selectedPatientId = p.id;
-                        this.selectedPatientName = p.full_name;
-                        this.selectedPatientHn = p.hn;
-                        this.patientQuery = p.full_name;
-                        this.patientResults = [];
-                    },
-                    clearPatient() {
-                        this.selectedPatientId = '';
-                        this.selectedPatientName = '';
-                        this.selectedPatientHn = '';
-                        this.patientQuery = '';
-                        this.patientResults = [];
-                    }
-                }">
-                    {% csrf_token %}
-                    <input type="hidden" name="patient_id" :value="selectedPatientId" required>
-                    <div class="modal-body p-4 d-flex flex-column gap-3">
-                        <div class="position-relative">
-                            <label class="form-label small fw-medium text-dark mb-1">
-                                ค้นหาคนไข้ <span class="text-danger">*</span>
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="fas" :class="isSearching ? 'fa-spinner fa-spin text-primary' : 'fa-search text-muted'"></i>
-                                </span>
-                                <input type="text" 
-                                       class="form-control border-start-0" 
-                                       placeholder="พิมพ์ชื่อ นามสกุล หรือ HN คนไข้ (ค้นหา Real-time)..."
-                                       x-model="patientQuery"
-                                       @input.debounce.250ms="searchPatients()"
-                                       @focus="if(patientQuery.length >= 1) searchPatients()">
-                                <button class="btn btn-outline-secondary" type="button" x-show="selectedPatientId" @click="clearPatient()">
-                                    <i class="fas fa-times"></i>
+        <div class="adm-appt-list" x-show="byDay(selected).length">
+            <template x-for="a in byDay(selected)" :key="a.id">
+                <article class="adm-appt" :class="'is-' + a.status">
+                    <div class="adm-appt-time"><b x-text="a.time"></b><small>น.</small></div>
+                    <div class="adm-appt-main">
+                        <a :href="a.urls.patient" class="d-flex align-items-center gap-2 text-decoration-none">
+                            <span class="adm-avatar adm-avatar-sm" x-text="a.patient.initial"></span>
+                            <span class="lh-sm">
+                                <span class="fw-semibold text-body d-block" x-text="a.patient.name"></span>
+                                <small class="text-muted" x-text="'HN ' + a.patient.hn + (a.patient.phone ? ' · ' + a.patient.phone : '')"></small>
+                            </span>
+                        </a>
+                        <div class="adm-appt-meta">
+                            <span><i class="fas fa-user-md"></i> <span x-text="a.doctor"></span></span>
+                            <span x-show="a.notes"><i class="far fa-sticky-note"></i> <span x-text="a.notes"></span></span>
+                        </div>
+                    </div>
+                    <div class="adm-appt-side">
+                        <span class="adm-appt-status" :class="'is-' + a.status" x-text="a.status_label"></span>
+                        <div class="d-flex gap-1">
+                            <a :href="a.urls.previsit" class="btn btn-sm btn-light" title="สรุปคนไข้ก่อนเข้าห้องตรวจ">สรุปก่อนตรวจ</a>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false" :aria-label="'เปลี่ยนสถานะนัดของ ' + a.patient.name">
+                                    สถานะ <i class="fas fa-chevron-down ms-1 small"></i>
                                 </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><button class="dropdown-item" type="button" @click="setStatus(a, 'confirmed')" :disabled="a.status === 'confirmed'"><span class="adm-appt-dot is-confirmed"></span> ยืนยันนัด</button></li>
+                                    <li><button class="dropdown-item" type="button" @click="setStatus(a, 'completed')" :disabled="a.status === 'completed' || a.date > today"><span class="adm-appt-dot is-completed"></span> มาตรวจแล้ว</button></li>
+                                    <li><button class="dropdown-item" type="button" @click="setStatus(a, 'scheduled')" :disabled="a.status === 'scheduled'"><span class="adm-appt-dot is-scheduled"></span> กลับเป็นรอยืนยัน</button></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><button class="dropdown-item text-danger" type="button" @click="setStatus(a, 'cancelled')" :disabled="a.status === 'cancelled'"><span class="adm-appt-dot is-cancelled"></span> ยกเลิกนัด</button></li>
+                                </ul>
                             </div>
+                        </div>
+                    </div>
+                </article>
+            </template>
+        </div>
+        <div class="text-center text-muted py-4" x-show="inMonth(selected) && !byDay(selected).length">
+            <i class="far fa-calendar fs-2 d-block mb-2"></i> ไม่มีนัดในวันนี้
+        </div>
+    </section>
 
-                            <!-- Autocomplete Dropdown List -->
-                            <div class="list-group shadow position-absolute w-100 mt-1" 
-                                 style="z-index: 1055; max-height: 220px; overflow-y: auto;"
-                                 x-show="patientResults.length > 0"
-                                 @click.away="patientResults = []"
-                                 x-cloak>
-                                <template x-for="p in patientResults" :key="p.id">
-                                    <button type="button" 
-                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2 px-3 text-start"
-                                            @click="selectPatient(p)">
-                                        <div>
-                                            <span class="fw-bold text-dark" x-text="p.full_name"></span>
-                                            <span class="badge bg-secondary ms-2 font-monospace" x-text="'HN: ' + p.hn"></span>
-                                            <small class="text-muted d-block" x-text="'เพศ ' + (p.gender === 'M' ? 'ชาย' : 'หญิง') + ' • ' + (p.phone || '-')"></small>
-                                        </div>
-                                        <span class="btn btn-xs btn-outline-primary py-0 px-2">เลือก</span>
+    <!-- สร้างนัดหมาย -->
+    <div class="modal fade" id="apptModal" x-ref="modal" tabindex="-1" aria-labelledby="apptModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+            <form class="modal-content" @submit.prevent="submitCreate()" novalidate>
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="apptModalTitle">สร้างนัดหมาย</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+                </div>
+                <div class="modal-body d-flex flex-column gap-3">
+                    <!-- คนไข้ -->
+                    <div>
+                        <label class="form-label" for="apptPatient">คนไข้ <span class="text-danger">*</span></label>
+                        <div class="adm-appt-picked" x-show="form.patient" x-cloak>
+                            <span class="adm-avatar" x-text="form.patient && form.patient.full_name.slice(0, 1)"></span>
+                            <span class="flex-grow-1 lh-sm">
+                                <span class="fw-semibold d-block" x-text="form.patient && form.patient.full_name"></span>
+                                <small class="text-muted" x-text="form.patient && ('HN ' + form.patient.hn + ' · ' + form.patient.gender + ' · ' + form.patient.phone)"></small>
+                            </span>
+                            <button type="button" class="btn btn-sm btn-light" @click="clearPatient()">เปลี่ยน</button>
+                        </div>
+                        <div class="position-relative" x-show="!form.patient">
+                            <div class="adm-field">
+                                <i class="fas" :class="searching ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+                                <input type="search" id="apptPatient" class="form-control" autocomplete="off"
+                                       :class="{ 'is-invalid': invalid.includes('patient_id') }"
+                                       placeholder="พิมพ์ชื่อ นามสกุล HN หรือเบอร์โทร"
+                                       x-model="query" @input.debounce.250ms="search()" @keydown.down.prevent="move(1)" @keydown.up.prevent="move(-1)"
+                                       @keydown.enter.prevent="results[active] && choose(results[active])" @keydown.escape="results = []"
+                                       role="combobox" aria-autocomplete="list" aria-controls="apptPatientList" :aria-expanded="results.length > 0">
+                            </div>
+                            <div class="adm-suggest" id="apptPatientList" role="listbox" x-show="results.length || (query.trim() && !searching && searched)" x-cloak @click.outside="results = []">
+                                <template x-for="(p, i) in results" :key="p.id">
+                                    <button type="button" class="adm-suggest-item" role="option" :class="{ 'is-active': i === active }" @click="choose(p)" @mouseenter="active = i">
+                                        <span class="adm-avatar adm-avatar-sm" x-text="p.full_name.slice(0, 1)"></span>
+                                        <span class="flex-grow-1 lh-sm text-start">
+                                            <span class="fw-semibold d-block" x-text="p.full_name"></span>
+                                            <small class="text-muted" x-text="'HN ' + p.hn + ' · ' + p.gender + ' · ' + p.phone"></small>
+                                        </span>
                                     </button>
                                 </template>
+                                <div class="adm-suggest-empty" x-show="!results.length">ไม่พบคนไข้ <a href="{% url 'patients:patient_create' %}">เพิ่มคนไข้ใหม่</a></div>
                             </div>
-
-                            <div x-show="selectedPatientId" class="mt-2 p-2 bg-success-subtle border border-success rounded-2 d-flex align-items-center justify-content-between" x-cloak>
-                                <small class="text-success-emphasis fw-bold">
-                                    <i class="fas fa-check-circle me-1"></i>
-                                    <span x-text="selectedPatientName"></span> (HN: <span x-text="selectedPatientHn"></span>)
-                                </small>
-                                <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none p-0" @click="clearPatient()">ยกเลิก</button>
-                            </div>
-                        </div>
-
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <label class="form-label small fw-medium text-dark mb-1">วันที่นัด <span class="text-danger">*</span></label>
-                                <input type="date" name="appointment_date" required class="form-control">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label small fw-medium text-dark mb-1">เวลานัด <span class="text-danger">*</span></label>
-                                <input type="time" name="appointment_time" required value="09:00" class="form-control">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="form-label small fw-medium text-dark mb-1">บันทึกจุดประสงค์การนัด</label>
-                            <textarea name="notes" rows="2" placeholder="เช่น นัดตรวจแล็บติดตามผล, ติดตามผลการฟื้นฟู Phase 2" class="form-control"></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer border-top bg-light">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                            ยกเลิก
-                        </button>
-                        <button type="submit" class="btn btn-sm btn-primary" :disabled="!selectedPatientId">
-                            <i class="fas fa-save me-1"></i> บันทึกนัดหมาย
-                        </button>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="apptDoctor">แพทย์ผู้ตรวจ <span class="text-danger">*</span></label>
+                            <div class="adm-field">
+                                <i class="fas fa-user-md"></i>
+                                <select id="apptDoctor" class="form-select" x-model="form.doctor_id" @change="loadTaken()" :class="{ 'is-invalid': invalid.includes('doctor_id') }">
+                                    <option value="">เลือกแพทย์</option>
+                                    {% for d in doctors %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="apptDate">วันที่นัด <span class="text-danger">*</span></label>
+                            <div class="adm-field">
+                                <i class="far fa-calendar"></i>
+                                <input type="date" id="apptDate" class="form-control" :min="today" x-model="form.date" @change="loadTaken()"
+                                       :class="{ 'is-invalid': invalid.includes('appointment_date') }">
+                            </div>
+                            <small class="text-muted" x-text="form.date ? longDate(form.date) : ''"></small>
+                        </div>
                     </div>
-                </form>
-            </div>
+
+                    <div>
+                        <label class="form-label">เวลานัด <span class="text-danger">*</span>
+                            <small class="text-muted fw-normal" x-show="!form.doctor_id || !form.date">(เลือกแพทย์และวันที่ก่อน จะเห็นเวลาที่ไม่ว่าง)</small></label>
+                        <div class="adm-slots" role="radiogroup" aria-label="เวลานัด">
+                            <template x-for="t in slots" :key="t">
+                                <button type="button" class="adm-slot" role="radio" :aria-checked="form.time === t"
+                                        :class="{ 'is-on': form.time === t, 'is-taken': isTaken(t) }" :disabled="isTaken(t) || isPastSlot(t)"
+                                        @click="form.time = t" :title="isTaken(t) ? 'แพทย์มีนัดเวลานี้แล้ว' : ''" x-text="t"></button>
+                            </template>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <small class="text-muted">หรือระบุเวลาเอง</small>
+                            <input type="time" class="form-control form-control-sm" style="max-width: 140px;" x-model="form.time" aria-label="ระบุเวลาเอง"
+                                   :class="{ 'is-invalid': invalid.includes('appointment_time') }">
+                        </div>
+                        <div class="small text-warning-emphasis mt-1" x-show="patientTimes.length" x-cloak
+                               x-text="'คนไข้รายนี้มีนัดวันนี้แล้วเวลา ' + patientTimes.join(', ') + ' น.'"></div>
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="apptNotes">จุดประสงค์การนัด</label>
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            <template x-for="tag in ['ติดตามผลการรักษา', 'ตรวจแล็บ', 'ฟังผลแล็บ', 'ปรึกษาแพทย์', 'รับยา / สมุนไพร']" :key="tag">
+                                <button type="button" class="adm-chip adm-chip-line" @click="addTag(tag)" x-text="'+ ' + tag"></button>
+                            </template>
+                        </div>
+                        <textarea id="apptNotes" class="form-control" rows="2" maxlength="500" x-model="form.notes" placeholder="เช่น นัดติดตามผลหลังปรับยา 2 สัปดาห์"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="submit" class="btn btn-primary" :disabled="saving">
+                        <i class="fas" :class="saving ? 'fa-spinner fa-spin' : 'fa-calendar-check'"></i> บันทึกนัดหมาย
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-
 </div>
 {% endblock %}

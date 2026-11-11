@@ -87,6 +87,7 @@ class Patient(SoftDeleteModel):
     allergies = models.TextField(blank=True, help_text="ประวัติการแพ้ยา สารอาหาร และข้อห้ามทางการแพทย์")
     chief_complaint = models.TextField(blank=True, help_text="อาการสำคัญหรือสาเหตุที่มารับการรักษา")
     medical_history = models.TextField(blank=True, help_text="โรคประจำตัวและประวัติการผ่าตัด")
+    current_medications = models.TextField(blank=True, help_text="ยาประจำตัว อาหารเสริม หรือสมุนไพรที่กำลังใช้อยู่")
 
     # Metadata & Extensibility
     extra_data = models.JSONField(default=dict, blank=True, help_text="ข้อมูลผลแล็บดิบและพารามิเตอร์เสริม")

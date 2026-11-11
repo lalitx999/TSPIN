@@ -1,290 +1,273 @@
 {% extends 'layouts/doctor_base.html' %}
 {% load static %}
 
-{% block title %}ซักประวัติล่วงหน้า (Pre-Visit Briefing) | TSPI CLINIC{% endblock %}
+{% block title %}คิวคนไข้วันนี้ | TSPI CLINIC{% endblock %}
+
+{% block page_header %}
+<div class="adm-page-head">
+    <h1 class="adm-page-title">{% if is_today %}คิวคนไข้วันนี้{% else %}คิวคนไข้{% endif %}</h1>
+    <ol class="adm-crumb" aria-label="ตำแหน่งหน้า">
+        <li><a href="{% url 'patients:dashboard' %}">TSPI</a></li>
+        <li>งานประจำวัน</li>
+        <li aria-current="page">คิวคนไข้</li>
+    </ol>
+</div>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column gap-4">
+<div class="row g-3 align-items-start">
 
-    <!-- Header & Patient Selector Bar -->
-    <div class="card shadow-sm border">
-        <div class="card-body p-3 p-md-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
-                            <i class="fas fa-stethoscope me-1"></i> Pre-Visit Briefing
-                        </span>
-                        <span class="text-muted small">ระบบคัดกรองอัจฉริยะ 39 แกนชีววิทยา (12 โดเมน)</span>
-                    </div>
-                    <h1 class="h4 fw-bold mb-1 text-dark">สรุปข้อมูลคนไข้ก่อนเข้าพบแพทย์ (Pre-Visit Anamnesis)</h1>
-                    <p class="text-muted small mb-0">
-                        ประมวลผลข้อมูลอาการล่วงหน้า ผลแล็บ และการประเมินความเสี่ยงทางกลไกชีวภาพเพื่อเตรียมความพร้อมในการตรวจรักษา
-                    </p>
+    <!-- ซ้าย: คิวของวัน -->
+    <div class="col-12 col-xl-4">
+        <section class="adm-card adm-queue" aria-labelledby="queue-title">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                <a class="adm-icon-btn" href="?date={{ prev_day }}{% if mine %}&mine=1{% endif %}" aria-label="วันก่อนหน้า"><i class="fas fa-chevron-left"></i></a>
+                <div class="text-center">
+                    <h2 class="adm-card-title" id="queue-title">{{ day_label }}</h2>
+                    {% if not is_today %}<a href="?date={{ today }}{% if mine %}&mine=1{% endif %}" class="small">กลับไปวันนี้</a>{% endif %}
                 </div>
+                <a class="adm-icon-btn" href="?date={{ next_day }}{% if mine %}&mine=1{% endif %}" aria-label="วันถัดไป"><i class="fas fa-chevron-right"></i></a>
+            </div>
 
-                <!-- Patient Quick Switcher -->
-                <div class="d-flex align-items-center gap-2">
-                    <label class="small text-muted text-nowrap mb-0">เลือกคนไข้:</label>
-                    <form method="GET" action="{% url 'patients:doctor_pre_visit' %}" class="d-flex align-items-center gap-2">
-                        <select name="patient_id" onchange="this.form.submit()" class="form-select form-select-sm" style="min-width: 220px;">
-                            {% for p in waiting_patients %}
-                                <option value="{{ p.id }}" {% if patient and patient.id == p.id %}selected{% endif %}>
-                                    {{ p.full_name }} (HN: {{ p.hn }})
-                                </option>
-                            {% empty %}
-                                <option value="">ไม่มีข้อมูลคนไข้</option>
-                            {% endfor %}
-                        </select>
-                        <noscript><button type="submit" class="btn btn-sm btn-primary">เลือก</button></noscript>
-                    </form>
+            <div class="adm-queue-sum">
+                <span><b>{{ waiting }}</b> รอตรวจ</span>
+                <span><b>{{ counts.completed }}</b> มาตรวจแล้ว</span>
+                {% if counts.cancelled %}<span><b>{{ counts.cancelled }}</b> ยกเลิก</span>{% endif %}
+            </div>
+
+            {% if is_doctor %}
+            <div class="d-flex gap-2 mb-3" role="tablist" aria-label="แสดงคิว">
+                <a class="adm-chip adm-chip-line {% if not mine %}active{% endif %}" href="?date={{ day|date:'Y-m-d' }}">ทุกคน</a>
+                <a class="adm-chip adm-chip-line {% if mine %}active{% endif %}" href="?date={{ day|date:'Y-m-d' }}&mine=1">นัดของฉัน</a>
+            </div>
+            {% endif %}
+
+            <!-- คนไข้ไม่ได้นัด (walk-in) -->
+            <div class="position-relative mb-3" x-data="{
+                q: '', results: [], busy: false,
+                search() {
+                    const q = this.q.trim();
+                    if (!q) { this.results = []; return; }
+                    this.busy = true;
+                    fetch('{% url 'patients:api_patient_search' %}?q=' + encodeURIComponent(q), { credentials: 'same-origin' })
+                        .then(r => r.json()).then(d => { if (this.q.trim() === q) this.results = d.results || []; })
+                        .finally(() => { this.busy = false; });
+                }
+            }">
+                <div class="adm-field">
+                    <i class="fas" :class="busy ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+                    <input type="search" class="form-control" placeholder="คนไข้ไม่ได้นัด: ค้นหาชื่อ / HN" aria-label="ค้นหาคนไข้ที่ไม่ได้นัด"
+                           x-model="q" @input.debounce.250ms="search()" @keydown.escape="results = []">
+                </div>
+                <div class="adm-suggest" x-show="results.length" x-cloak @click.outside="results = []">
+                    <template x-for="p in results" :key="p.id">
+                        <a class="adm-suggest-item text-decoration-none" :href="'?date={{ day|date:'Y-m-d' }}&patient_id=' + p.id">
+                            <span class="adm-avatar adm-avatar-sm" x-text="p.full_name.slice(0, 1)"></span>
+                            <span class="flex-grow-1 lh-sm">
+                                <span class="fw-semibold d-block" x-text="p.full_name"></span>
+                                <small class="text-muted" x-text="'HN ' + p.hn + ' · ' + p.phone"></small>
+                            </span>
+                        </a>
+                    </template>
                 </div>
             </div>
-        </div>
+
+            <div class="adm-queue-list" role="list">
+                {% for a in queue %}
+                <a role="listitem" href="?date={{ day|date:'Y-m-d' }}&appointment_id={{ a.pk }}{% if mine %}&mine=1{% endif %}"
+                   class="adm-queue-item is-{{ a.status }} {% if appointment and appointment.pk == a.pk %}active{% endif %}"
+                   {% if appointment and appointment.pk == a.pk %}aria-current="true"{% endif %}>
+                    <span class="adm-queue-time">{{ a.appointment_time|time:"H:i" }}</span>
+                    <span class="flex-grow-1 min-w-0 lh-sm">
+                        <span class="fw-semibold d-block text-truncate">{{ a.patient.full_name }}</span>
+                        <small class="text-muted d-block text-truncate">{{ a.notes|default:"ไม่ได้ระบุจุดประสงค์" }}</small>
+                    </span>
+                    <span class="adm-appt-status is-{{ a.status }}">{% for k, v in status_short.items %}{% if k == a.status %}{{ v }}{% endif %}{% endfor %}</span>
+                </a>
+                {% empty %}
+                <div class="text-center text-muted py-4">
+                    <i class="far fa-calendar fs-2 d-block mb-2"></i>ไม่มีนัดใน{{ day_label }}
+                    <div class="mt-2"><a href="{% url 'patients:doctor_appointments' %}?month={{ day|date:'Y-m' }}&day={{ day|date:'Y-m-d' }}#day-panel" class="btn btn-sm btn-light">ไปที่ปฏิทินนัด</a></div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
     </div>
 
+    <!-- ขวา: สรุปก่อนเข้าห้องตรวจ -->
+    <div class="col-12 col-xl-8 d-flex flex-column gap-3">
     {% if patient %}
-    <div class="row g-4">
-
-        <!-- Left Column: Patient Profile & Intake Summary (5 cols) -->
-        <div class="col-12 col-lg-5">
-            <div class="d-flex flex-column gap-3">
-                <!-- Profile Summary Card -->
-                <div class="card shadow-sm border">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start pb-3 border-bottom">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-3 flex-shrink-0" style="width: 52px; height: 52px;">
-                                    {{ patient.first_name|slice:":1" }}
-                                </div>
-                                <div>
-                                    <h2 class="h5 fw-bold text-dark mb-0">{{ patient.full_name }}</h2>
-                                    <div class="text-muted small mt-0.5">HN: <span class="font-monospace fw-bold text-dark">{{ patient.hn }}</span></div>
-                                    <div class="d-flex align-items-center gap-1.5 mt-2">
-                                        <span class="badge bg-light text-dark border">
-                                            {{ patient.get_gender_display }}
-                                        </span>
-                                        <span class="badge bg-light text-dark border font-monospace">
-                                            กรุ๊ป {{ patient.blood_type }}
-                                        </span>
-                                        {% if patient.birth_date %}
-                                            <span class="badge bg-light text-dark border">
-                                                เกิด {{ patient.birth_date|date:"d/m/Y" }}
-                                            </span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                {% if patient.status == 'urgent' %}
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
-                                        <i class="fas fa-exclamation-triangle me-1"></i> เคสด่วน
-                                    </span>
-                                {% elif patient.status == 'medicine' %}
-                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
-                                        <i class="fas fa-pills me-1"></i> รับการบำบัด
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle">
-                                        <i class="fas fa-check-circle me-1"></i> ปกติ/รอนัด
-                                    </span>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Intake Highlights -->
-                        <div class="d-flex flex-column gap-3 mt-3">
-                            <div>
-                                <span class="fw-bold text-dark text-uppercase d-block mb-1 small">อาการสำคัญ (Chief Complaint)</span>
-                                <div class="p-3 rounded-3 bg-light border text-dark fw-medium">
-                                    {{ patient.chief_complaint|default:"มีอาการผื่นคันเรื้อรังตามลำตัวและข้อศอก อ่อนเพลียเรื้อรังหลังอาหาร และนอนหลับไม่สนิท มีประวัติท้องอืดร่วมด้วย" }}
-                                </div>
-                            </div>
-
-                            <div>
-                                <span class="fw-bold text-dark text-uppercase d-block mb-1 small">ประวัติการแพ้และยาที่ใช้อยู่</span>
-                                <div class="row g-2">
-                                    <div class="col-6">
-                                        <div class="p-3 rounded-3 bg-danger-subtle border border-danger h-100">
-                                            <span class="fw-bold text-danger d-block mb-1 small"><i class="fas fa-ban me-1"></i> ประวัติแพ้ยา/อาหาร</span>
-                                            <span class="text-danger-emphasis fw-medium small">{{ patient.allergies|default:"ปฏิเสธการแพ้ยาและอาหาร" }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="p-3 rounded-3 bg-primary-subtle border border-primary h-100">
-                                            <span class="fw-bold text-primary d-block mb-1 small"><i class="fas fa-capsules me-1"></i> ยาประจำตัว</span>
-                                            <span class="text-primary-emphasis fw-medium small">{{ patient.current_medications|default:"ไม่มีการใช้ยาปฏิชีวนะประจำ" }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Contact & LINE Connection -->
-                            <div class="pt-3 border-top d-flex justify-content-between align-items-center text-dark">
-                                <span class="fw-medium"><i class="fas fa-phone me-1 text-primary"></i> {{ patient.phone|default:"-" }}</span>
-                                {% if patient.line_id %}
-                                    <span class="text-success fw-bold"><i class="fab fa-line me-1"></i> ผูก LINE OA แล้ว</span>
-                                {% else %}
-                                    <span class="text-muted fw-medium"><i class="fab fa-line me-1"></i> ยังไม่ได้ผูก LINE</span>
-                                {% endif %}
-                            </div>
-                        </div>
+        <!-- หัว: คนไข้ + นัดครั้งนี้ + ปุ่มเริ่มตรวจ -->
+        <section class="adm-card">
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <span class="adm-avatar adm-avatar-lg">{{ patient.first_name|slice:":1" }}</span>
+                <div class="flex-grow-1 min-w-0">
+                    <h2 class="h5 fw-bold mb-1 text-truncate">{{ patient.full_name }}</h2>
+                    <div class="d-flex flex-wrap gap-2 small text-muted">
+                        <span>HN {{ patient.hn }}</span>
+                        <span>&middot; {{ patient.get_gender_display }}</span>
+                        <span>&middot; {% if patient.age %}{{ patient.age }} ปี{% else %}ไม่ทราบอายุ{% endif %}</span>
+                        <span>&middot; <i class="fas fa-phone"></i> {{ patient.phone|default:"-" }}</span>
+                        <span>&middot; {% if patient.line_user_id %}<span class="adm-status">เชื่อม LINE แล้ว</span>{% else %}<span class="adm-status is-off">ยังไม่เชื่อม LINE</span>{% endif %}</span>
                     </div>
                 </div>
-
-                <!-- Pre-Visit Action Buttons -->
-                <div class="card shadow-sm border">
-                    <div class="card-header bg-light py-2.5 px-3 border-bottom">
-                        <span class="fw-bold text-dark text-uppercase small"><i class="fas fa-tasks text-primary me-1"></i> การดำเนินการของแพทย์</span>
-                    </div>
-                    <div class="card-body p-3 d-flex flex-column gap-2">
-                        <a href="{% url 'patients:patient_detail' patient.id %}" class="btn btn-primary d-flex align-items-center justify-content-center gap-2 py-2.5 fw-bold shadow-sm">
-                            <i class="fas fa-stethoscope"></i> เริ่มการตรวจ / เข้าสู่แฟ้มเวชระเบียน
-                        </a>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <a href="{% url 'clinical:report_create' patient.id %}" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-1.5 w-100 py-2 fw-semibold">
-                                    <i class="fas fa-file-medical-alt"></i> Precision Report
-                                </a>
-                            </div>
-                            <div class="col-6">
-                                <a href="{% url 'intelligence:lab_ocr' %}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-1.5 w-100 py-2 fw-semibold">
-                                    <i class="fas fa-file-upload"></i> Lab OCR
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-light">เปิดแฟ้ม</a>
+                    {% if appointment and appointment.status != 'cancelled' and is_today and appointment.appointment_date == day %}
+                    <form method="post" action="{% url 'patients:previsit_start' appointment.pk %}" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-stethoscope"></i> {% if appointment.status == 'completed' %}บันทึกการตรวจ{% else %}เริ่มตรวจ{% endif %}</button>
+                    </form>
+                    {% elif not appointment %}
+                    <a href="{% url 'patients:patient_detail' patient.pk %}?visit=1#new-soap" class="btn btn-primary"><i class="fas fa-stethoscope"></i> บันทึกการตรวจ</a>
+                    {% endif %}
                 </div>
             </div>
+
+            <div class="adm-previsit-appt">
+                {% if appointment %}
+                <span><i class="far fa-clock"></i> {{ appointment_day_label }} &middot; <b>{{ appointment.appointment_time|time:"H:i" }} น.</b></span>
+                <span><i class="fas fa-user-md"></i> {{ appointment.doctor.get_full_name|default:appointment.doctor.username|default:"ยังไม่ระบุแพทย์" }}</span>
+                <span><i class="far fa-sticky-note"></i> {{ appointment.notes|default:"ไม่ได้ระบุจุดประสงค์" }}</span>
+                <span class="adm-appt-status is-{{ appointment.status }}">{% for k, v in status_short.items %}{% if k == appointment.status %}{{ v }}{% endif %}{% endfor %}</span>
+                {% else %}
+                <span><i class="fas fa-walking"></i> คนไข้ไม่ได้นัดใน{{ day_label }}</span>
+                {% endif %}
+            </div>
+            {% if brief.own_draft %}
+            <div class="alert alert-info py-2 mt-3 mb-0"><i class="fas fa-pen me-1"></i> คุณมีร่างบันทึกการตรวจของคนไข้รายนี้ค้างอยู่ <a href="{% url 'patients:patient_detail' patient.pk %}?visit=1#new-soap">ทำต่อ</a></div>
+            {% endif %}
+        </section>
+
+        <!-- แพ้ยา: สำคัญที่สุด ไม่มีข้อมูลต้องบอกว่าต้องถาม -->
+        {% if brief.allergies %}
+        <div class="adm-previsit-allergy is-known" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div><b>แพ้ยา / อาหาร</b><div style="white-space: pre-line;">{{ brief.allergies }}</div></div>
         </div>
+        {% else %}
+        <div class="adm-previsit-allergy is-unknown" role="alert">
+            <i class="fas fa-question-circle"></i>
+            <div><b>ยังไม่ได้บันทึกประวัติแพ้ยา</b><div>ต้องถามคนไข้ก่อนสั่งยาหรือสมุนไพร แล้ว<a href="{% url 'patients:patient_edit' patient.pk %}">บันทึกในแฟ้ม</a></div></div>
+        </div>
+        {% endif %}
 
-        <!-- Right Column: 38-Axes & Biomarker Triaging Intelligence (7 cols) -->
-        <div class="col-12 col-lg-7">
-            <div class="d-flex flex-column gap-3">
-                <!-- Biological Focus Axes Card -->
-                <div class="card shadow-sm border">
-                    <div class="card-header bg-light py-3 px-3.5 border-bottom d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="fw-bold text-dark mb-0 fs-6">แกนชีววิทยาที่พบความผิดปกติ (Biological Axes Triaging)</h6>
-                            <small class="text-muted fw-medium">ประเมินจากผลตรวจแล็บ อาการทางคลินิก และประวัติสุขภาพ</small>
-                        </div>
-                        <a href="{% url 'clinical:axes_explorer' %}" class="btn btn-sm btn-outline-primary fw-semibold">
-                            ดูทั้ง 39 แกน <i class="fas fa-arrow-right ms-1"></i>
-                        </a>
-                    </div>
-                    <div class="card-body p-3 d-flex flex-column gap-2.5">
-                        {% for ax in focus_axes %}
-                            <div class="p-3 rounded-3 border d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 {% if ax.status == 'critical' %}bg-danger-subtle border-danger text-dark{% elif ax.status == 'warning' %}bg-warning-subtle border-warning text-dark{% else %}bg-white border text-dark{% endif %}">
-                                <div>
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <span class="badge font-monospace fw-bold {% if ax.status == 'critical' %}bg-danger text-white{% elif ax.status == 'warning' %}bg-warning text-dark{% elif ax.status == 'unassessed' %}bg-secondary text-white{% else %}bg-success text-white{% endif %}">
-                                            {{ ax.code }}
-                                        </span>
-                                        <h6 class="fw-bold text-dark mb-0 fs-6">{{ ax.name }}</h6>
-                                    </div>
-                                    <div class="text-dark fw-medium small">
-                                        <span class="fw-bold">ตัวชี้วัด:</span> {{ ax.biomarker }}
-                                    </div>
-                                    {% if ax.status != 'unassessed' %}
-                                    <div class="text-primary fw-semibold small">
-                                        <span class="fw-bold text-dark">โมดูลที่แนะนำ:</span> {{ ax.target_module }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <div class="text-md-end bg-white py-1.5 px-3 rounded-2 border">
-                                    <span class="small text-muted d-block fw-semibold">Severity Score</span>
-                                    {% if ax.score is None %}
-                                    <span class="fs-6 fw-bold text-secondary">ยังไม่ประเมิน</span>
-                                    {% else %}
-                                    <span class="fs-5 fw-bolder font-monospace {% if ax.score >= 80 %}text-danger{% elif ax.score >= 60 %}text-warning-emphasis{% else %}text-success{% endif %}">
-                                        {{ ax.score }}/100
-                                    </span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
+        <div class="row g-3">
+            <!-- อาการสำคัญและโรคประจำตัว -->
+            <div class="col-12 col-lg-6">
+                <section class="adm-card h-100">
+                    <div class="adm-card-head"><h3 class="adm-card-title">อาการและประวัติ</h3></div>
+                    <div class="adm-label">อาการสำคัญ</div>
+                    {% if brief.chief_complaint %}<p style="white-space: pre-line;">{{ brief.chief_complaint }}</p>
+                    {% else %}<p class="adm-empty">ยังไม่ได้บันทึกอาการสำคัญ</p>{% endif %}
+                    <div class="adm-label">โรคประจำตัว / ประวัติผ่าตัด</div>
+                    {% if brief.medical_history %}<p class="mb-2" style="white-space: pre-line;">{{ brief.medical_history }}</p>
+                    {% else %}<p class="adm-empty mb-2">ยังไม่ได้บันทึก</p>{% endif %}
 
-                <!-- Recommended Clinical Protocol (9-Step Ladder) -->
-                <div class="card shadow-sm border">
-                    <div class="card-header bg-light py-3 px-3.5 border-bottom d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="fw-bold text-dark mb-0 fs-6">โปรโตคอลการฟื้นฟูที่แนะนำ (9-Step Recovery Plan)</h6>
-                            <small class="text-muted fw-medium">แผนลำดับขั้นการรักษาเชิงกลไกสำหรับเคสนี้</small>
-                        </div>
-                        <span class="badge bg-light text-secondary border fw-bold px-2.5 py-1">
-                            แนวทางอ้างอิง (ยังไม่ผูกกับเคสนี้)
+                    <div class="adm-label">ยาประจำตัว / อาหารเสริมเดิม</div>
+                    {% if brief.current_medications %}<p class="mb-0" style="white-space: pre-line;">{{ brief.current_medications }}</p>
+                    {% else %}<p class="adm-empty mb-0">ยังไม่ได้บันทึก</p>{% endif %}
+                </section>
+            </div>
+
+            <!-- การตรวจครั้งล่าสุด -->
+            <div class="col-12 col-lg-6">
+                <section class="adm-card h-100">
+                    <div class="adm-card-head">
+                        <h3 class="adm-card-title">การตรวจครั้งล่าสุด</h3>
+                        <span class="text-muted small">ทั้งหมด {{ brief.visit_count }} ครั้ง</span>
+                    </div>
+                    {% with v=brief.last_visit %}
+                    {% if v %}
+                    <p class="small text-muted mb-2">{{ v.visit_date|date:"j M Y H:i" }} &middot; {% if v.doctor %}{{ v.doctor.get_full_name|default:v.doctor.username }}{% else %}ไม่ระบุผู้บันทึก{% endif %}</p>
+                    {% if v.vitals %}
+                    <div class="d-flex flex-wrap gap-1 mb-2">
+                        {% if v.vitals.bp_systolic %}<span class="adm-pill">BP {{ v.vitals.bp_systolic }}/{{ v.vitals.bp_diastolic }}</span>{% endif %}
+                        {% if v.vitals.pulse %}<span class="adm-pill">ชีพจร {{ v.vitals.pulse }}</span>{% endif %}
+                        {% if v.vitals.temperature %}<span class="adm-pill">{{ v.vitals.temperature }} °C</span>{% endif %}
+                        {% if v.vitals.weight_kg %}<span class="adm-pill">{{ v.vitals.weight_kg }} กก.</span>{% endif %}
+                        {% if v.vitals.bmi %}<span class="adm-pill">BMI {{ v.vitals.bmi }}</span>{% endif %}
+                        {% if v.vitals.spo2 %}<span class="adm-pill">SpO2 {{ v.vitals.spo2 }}%</span>{% endif %}
+                    </div>
+                    {% endif %}
+                    <div class="adm-label"><span class="adm-soap-tag">A</span> การประเมิน</div>
+                    <p class="small">{{ v.assessment|default:"-"|truncatechars:220 }}</p>
+                    <div class="adm-label"><span class="adm-soap-tag">P</span> แผน</div>
+                    <p class="small mb-2">{{ v.plan|default:"-"|truncatechars:220 }}</p>
+                    <a href="{% url 'patients:patient_detail' patient.pk %}#soap-{{ v.pk }}" class="small">อ่าน SOAP เต็ม &rarr;</a>
+                    {% else %}
+                    <p class="adm-empty mb-0">ยังไม่เคยมีบันทึกการตรวจ (มาครั้งแรก)</p>
+                    {% endif %}
+                    {% endwith %}
+                </section>
+            </div>
+
+            <!-- แชท LINE ที่ยังไม่ได้บันทึก -->
+            <div class="col-12 col-lg-6">
+                <section class="adm-card h-100">
+                    <div class="adm-card-head"><h3 class="adm-card-title"><i class="fab fa-line text-success me-1"></i> แชท LINE ที่ยังไม่ได้บันทึก</h3></div>
+                    {% for b in brief.line_boxes %}
+                    <a href="{% url 'clinical:intake_detail' b.id %}" class="adm-person text-decoration-none">
+                        <span class="adm-avatar"{% if b.red_flag %} style="background:#FDE2E2;color:#B42318;"{% endif %}><i class="far fa-comments"></i></span>
+                        <span class="flex-grow-1 min-w-0">
+                            <span class="adm-person-name d-block">
+                                {% if b.red_flag %}<span class="badge bg-danger me-1">ฉุกเฉิน</span>{% elif b.has_symptoms %}<span class="badge bg-warning-subtle text-warning-emphasis me-1">มีอาการ</span>{% endif %}
+                                {% if b.status == 'draft' %}กำลังคุย{% else %}จบรอบแล้ว รอบันทึก{% endif %}
+                            </span>
+                            <span class="adm-person-sub">{{ b.message_count }} ข้อความ &middot; ล่าสุด {{ b.last_activity_at|date:"j M H:i" }}</span>
                         </span>
+                        <i class="fas fa-chevron-right text-muted"></i>
+                    </a>
+                    {% empty %}
+                    <p class="adm-empty mb-0">ไม่มีแชทค้าง{% if not patient.line_user_id %} (ยังไม่เชื่อม LINE){% endif %}</p>
+                    {% endfor %}
+                </section>
+            </div>
+
+            <!-- 39 แกน + ผลแล็บ + นัดถัดไป -->
+            <div class="col-12 col-lg-6">
+                <section class="adm-card h-100">
+                    <div class="adm-card-head">
+                        <h3 class="adm-card-title">39 แกนชีววิทยา</h3>
+                        {% if brief.record %}<span class="text-muted small">ประเมินเมื่อ {{ brief.record.record_date|date:"j M Y" }}</span>{% endif %}
                     </div>
-                    <div class="card-body p-3">
-                        <div class="row g-2">
-                            <div class="col-12 col-md-4">
-                                <div class="p-3 rounded-3 bg-success-subtle border border-success h-100">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="fw-bold text-success font-monospace small">STEP 01</span>
-                                        <i class="fas fa-check-circle text-success"></i>
-                                    </div>
-                                    <h6 class="fw-bold text-dark small mb-1">Deep Assessment</h6>
-                                    <p class="text-dark fw-medium small mb-0">วิเคราะห์เชิงลึก 39 แกนและผลแล็บเสร็จสิ้น</p>
-                                </div>
-                            </div>
+                    {% if not brief.record %}
+                    <p class="adm-empty">ยังไม่เคยประเมิน 39 แกน</p>
+                    {% elif brief.abnormal_axes %}
+                    <p class="small text-muted mb-2">แกนที่คะแนนตั้งแต่ {{ axis_threshold }} ขึ้นไป</p>
+                    {% for ax in brief.abnormal_axes %}
+                    <div class="adm-axis">
+                        <span class="adm-axis-id">{{ ax.id }}</span>
+                        <span class="flex-grow-1 min-w-0 text-truncate">{{ ax.name }}</span>
+                        <span class="adm-axis-score {% if ax.score >= 75 %}is-high{% endif %}">{{ ax.score }}</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="adm-empty">ไม่มีแกนที่คะแนนตั้งแต่ {{ axis_threshold }} ขึ้นไป</p>
+                    {% endif %}
+                    <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}" class="small d-inline-block mb-3">ดูทั้ง 39 แกน &rarr;</a>
 
-                            <div class="col-12 col-md-4">
-                                <div class="p-3 rounded-3 bg-warning-subtle border border-warning h-100">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="fw-bold text-warning-emphasis font-monospace small">STEP 02</span>
-                                        <span class="badge bg-warning text-dark fw-bold">รอเริ่มบำบัด</span>
-                                    </div>
-                                    <h6 class="fw-bold text-dark small mb-1">Detoxification</h6>
-                                    <p class="text-dark fw-medium small mb-0">เคลียร์ภาระสารพิษตับ Phase 1/2</p>
-                                </div>
-                            </div>
-
-                            <div class="col-12 col-md-4">
-                                <div class="p-3 rounded-3 bg-light border h-100">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="fw-bold text-secondary font-monospace small">STEP 03</span>
-                                        <span class="badge bg-secondary-subtle text-dark border">ลำดับถัดไป</span>
-                                    </div>
-                                    <h6 class="fw-bold text-dark small mb-1">Gut Restoration</h6>
-                                    <p class="text-dark fw-medium small mb-0">ฟื้นฟูเยื่อบุลำไส้และสมดุลจุลินทรีย์</p>
-                                </div>
-                            </div>
+                    <div class="d-flex flex-column gap-2 pt-3 border-top">
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <span><i class="fas fa-vials text-muted me-1"></i> ผลแล็บรอแพทย์ตรวจทาน</span>
+                            {% if brief.pending_labs %}<a href="{% url 'patients:doctor_lab_review' %}" class="badge bg-warning-subtle text-warning-emphasis">{{ brief.pending_labs }} ชุด</a>{% else %}<span class="text-muted small">ไม่มี</span>{% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <span><i class="far fa-calendar-check text-muted me-1"></i> นัดครั้งถัดไป</span>
+                            {% if brief.next_appt %}<span class="small text-end">{{ brief.next_appt_label }} {{ brief.next_appt.appointment_time|time:"H:i" }} น.</span>{% else %}<span class="text-muted small">ยังไม่มี</span>{% endif %}
                         </div>
                     </div>
-                </div>
-
-                <!-- Doctor Pre-visit Notes / Scratchpad -->
-                <div class="card shadow-sm border">
-                    <div class="card-body p-3">
-                        <h6 class="fw-bold text-dark fs-6 mb-2">บันทึกเตือนความจำแพทย์ (Physician Quick Note)</h6>
-                        <textarea rows="3" placeholder="พิมพ์ข้อสังเกตหรือจุดที่ต้องการซักถามเพิ่มเติมกับคนไข้รายนี้..." class="form-control mb-2"></textarea>
-                        <div class="d-flex justify-content-end">
-                            <button type="button" class="btn btn-sm btn-primary fw-semibold px-3">
-                                <i class="fas fa-save me-1"></i> บันทึกชั่วคราว
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                </section>
             </div>
         </div>
-
-    </div>
     {% else %}
-    <div class="card shadow-sm border text-center p-5">
-        <div class="rounded-circle bg-light text-muted d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 58px; height: 58px; font-size: 1.5rem;">
-            <i class="fas fa-user-slash"></i>
-        </div>
-        <h5 class="fw-bold text-dark mb-1">ไม่พบข้อมูลคนไข้ในระบบ</h5>
-        <p class="small text-muted mb-4">กรุณาเพิ่มคนไข้ใหม่เข้าสู่เวชระเบียน หรือสร้างนัดหมายเพื่อเริ่มการซักประวัติล่วงหน้า</p>
-        <div>
-            <a href="{% url 'patients:patient_create' %}" class="btn btn-primary">
-                <i class="fas fa-user-plus me-1"></i> เพิ่มคนไข้ใหม่
-            </a>
-        </div>
-    </div>
+        <section class="adm-card text-center py-5">
+            <i class="fas fa-user-clock fs-1 text-muted mb-3 d-block"></i>
+            <h2 class="h5 fw-bold">ยังไม่ได้เลือกคนไข้</h2>
+            <p class="text-muted mb-3">ไม่มีนัดใน{{ day_label }} ค้นหาคนไข้ที่ไม่ได้นัดจากช่องด้านซ้าย หรือสร้างนัดในปฏิทิน</p>
+            <a href="{% url 'patients:doctor_appointments' %}" class="btn btn-primary"><i class="far fa-calendar"></i> ไปที่ปฏิทินนัด</a>
+        </section>
     {% endif %}
-
+    </div>
 </div>
 {% endblock %}

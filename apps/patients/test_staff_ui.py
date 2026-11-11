@@ -127,7 +127,7 @@ class StaffUITests(TestCase):
 
         resp = self.client.post(
             reverse('patients:api_approve_review_item', kwargs={'item_id': item.pk}),
-            data={'clinical_summary': 'คัดกรองอาการไข้ต่ำ แนะนำดื่มน้ำมากๆ และพักผ่อน'}
+            data={'subjective': 'ไข้ต่ำ 2 วัน', 'objective': '', 'assessment': 'ไข้ต่ำ ไม่มีอาการรุนแรง', 'plan': 'ดื่มน้ำ พักผ่อน นัดติดตาม', 'reviewed': '1'}
         )
 
         self.assertEqual(resp.status_code, 200)
@@ -142,9 +142,12 @@ class StaffUITests(TestCase):
         self.assertIsNotNone(item.committed_history)
 
         # ตรวจสอบว่าถูกสร้างเป็น PatientHistory ใน EMR จริง
+        # บันทึกตาม SOAP ที่ผู้ตรวจเขียนเท่านั้น ไม่มีข้อความสำเร็จรูป
         history = item.committed_history
         self.assertEqual(history.patient, self.patient)
-        self.assertIn('วนิดา', history.assessment)
+        self.assertEqual(history.doctor, self.nurse)
+        self.assertEqual(history.assessment, 'ไข้ต่ำ ไม่มีอาการรุนแรง')
+        self.assertNotIn('ผ่านการตรวจทานและรับรองโดย', history.assessment)
 
     def test_nurse_cannot_approve_level2_diagnostic_permission_denied(self):
         """5. พยาบาล พยายามอนุมัติเคส Level 2 Diagnostic (แพทย์เท่านั้น) -> ต้องติด 403 Forbidden"""
@@ -168,7 +171,7 @@ class StaffUITests(TestCase):
 
         resp = self.client.post(
             reverse('patients:api_approve_review_item', kwargs={'item_id': item.pk}),
-            data={'clinical_summary': 'พยาบาลพยายามลงนาม'}
+            data={'subjective': 'ไข้ต่ำ 2 วัน', 'objective': '', 'assessment': 'ไข้ต่ำ ไม่มีอาการรุนแรง', 'plan': 'ดื่มน้ำ พักผ่อน นัดติดตาม', 'reviewed': '1'}
         )
 
         # ต้องติดสิทธิ์ 403
@@ -198,7 +201,7 @@ class StaffUITests(TestCase):
 
         resp = self.client.post(
             reverse('patients:api_approve_review_item', kwargs={'item_id': item.pk}),
-            data={'clinical_summary': 'วินิจฉัยสงสัยภาวะหลอดเลือดหัวใจ แนะนำมาพบแพทย์ทันที'}
+            data={'subjective': 'ไข้ต่ำ 2 วัน', 'objective': '', 'assessment': 'ไข้ต่ำ ไม่มีอาการรุนแรง', 'plan': 'ดื่มน้ำ พักผ่อน นัดติดตาม', 'reviewed': '1'}
         )
 
         self.assertEqual(resp.status_code, 200)
@@ -246,7 +249,7 @@ class StaffUITests(TestCase):
 
         resp = self.client.post(
             reverse('patients:api_approve_review_item', kwargs={'item_id': item.pk}),
-            data={'clinical_summary': 'กดซ้ำ'}
+            data={'subjective': 'ไข้ต่ำ 2 วัน', 'objective': '', 'assessment': 'ไข้ต่ำ ไม่มีอาการรุนแรง', 'plan': 'ดื่มน้ำ พักผ่อน นัดติดตาม', 'reviewed': '1'}
         )
 
         self.assertEqual(resp.status_code, 409)
@@ -301,3 +304,65 @@ class StaffUITests(TestCase):
         self.assertEqual(review.patient, self.patient)
         general_msg.refresh_from_db()
         self.assertTrue(general_msg.is_clinical_candidate)
+
+
+class ReviewHubTests(TestCase):
+    """กล่องงานรอตรวจทาน: รวมงานทุกประเภท, บันทึกต้องเขียน SOAP + ยืนยัน, ข้อความด่วนเป็นของแพทย์, ไม่ซ้ำกับแชทบอท"""
+
+    def setUp(self):
+        from clinical.models import Box
+        self.nurse = User.objects.create_user(username='nurse_hub', password='Password123!', role=User.Role.NURSE)
+        self.doctor = User.objects.create_user(username='doc_hub', password='Password123!', role=User.Role.DOCTOR)
+        self.patient = Patient.objects.create(hn='HN-HUB-1', first_name='สมใจ', last_name='ดีงาม', phone='0811111111')
+        self.line_user = LineUser.objects.create(line_user_id='U_HUB_1', display_name='สมใจ', active_patient=self.patient)
+        self.msg = CommunicationRecord.objects.create(line_message_id='hub_msg_1', line_user=self.line_user, patient=self.patient,
+                                                      content='ปวดท้องมาก', is_clinical_candidate=True)
+        self.item = ClinicalReviewItem.objects.create(patient=self.patient, source_message=self.msg,
+                                                      review_notes='ตรวจพบคีย์เวิร์ด: ปวด\n[+ข้อความต่อเนื่อง]: ท้องเสียด้วย (คำสำคัญ: ท้องเสีย)')
+        self.urgent_msg = CommunicationRecord.objects.create(line_message_id='hub_msg_2', line_user=self.line_user,
+                                                             patient=self.patient, content='แน่นหน้าอก', is_clinical_candidate=True)
+        self.urgent = ClinicalReviewItem.objects.create(patient=self.patient, source_message=self.urgent_msg,
+                                                        review_type=ClinicalReviewItem.ReviewTypeChoices.LEVEL_2_DIAGNOSTIC)
+        self.box = Box.objects.create(patient=self.patient, source=Box.Source.LINE, status=Box.Status.DONE,
+                                      contents={'messages': [{'text': 'ปวดหัว'}], 'has_symptoms': True},
+                                      last_activity_at=timezone.now())
+
+    def test_hub_lists_chats_messages_with_grouped_texts(self):
+        self.client.force_login(self.nurse)
+        resp = self.client.get(reverse('patients:staff_review_queue'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context['counts']['chats'], 1)
+        self.assertEqual(resp.context['counts']['messages'], 2)
+        item = next(i for i in resp.context['message_items'] if i.pk == self.item.pk)
+        self.assertEqual(item.texts, ['ปวดท้องมาก', 'ท้องเสียด้วย'])
+        self.assertContains(resp, reverse('clinical:intake_detail', args=[self.box.id]))
+        self.assertContains(resp, 'รอแพทย์ตัดสิน')  # พยาบาลเห็นข้อความด่วนแต่ตัดสินเองไม่ได้
+        poll = self.client.get(reverse('patients:api_review_queue_poll')).json()
+        self.assertEqual(poll['hub_total'], 3)
+
+    def test_approve_requires_review_tick_and_subjective(self):
+        self.client.force_login(self.nurse)
+        url = reverse('patients:api_approve_review_item', kwargs={'item_id': self.item.pk})
+        self.assertEqual(self.client.post(url, {'subjective': 'ปวดท้อง'}).status_code, 400)
+        self.assertEqual(self.client.post(url, {'subjective': '', 'reviewed': '1'}).status_code, 400)
+        self.assertFalse(PatientHistory.objects.exists())
+
+    def test_only_doctor_can_dismiss_urgent_message(self):
+        url = reverse('patients:api_reject_review_item', kwargs={'item_id': self.urgent.pk})
+        self.client.force_login(self.nurse)
+        self.assertEqual(self.client.post(url, {'reason': 'ไม่เกี่ยว'}).status_code, 403)
+        self.urgent.refresh_from_db()
+        self.assertEqual(self.urgent.status, ClinicalReviewItem.StatusChoices.PENDING_REVIEW)
+        self.client.force_login(self.doctor)
+        self.assertEqual(self.client.post(url, {'reason': 'ไม่เกี่ยว'}).status_code, 200)
+
+    def test_symptom_message_while_bot_on_goes_to_chat_only(self):
+        from patients.views_line_internal import ingest_line_event
+        self.line_user.bot_enabled = True
+        self.line_user.bot_last_active_at = timezone.now()
+        self.line_user.save()
+        result, _ = ingest_line_event({'type': 'message', 'source': {'userId': 'U_HUB_1'},
+                                       'message': {'id': 'hub_bot_on_1', 'type': 'text', 'text': 'มีไข้สูง ปวดหัวมาก'}})
+        self.assertTrue(result['routed_to_chat'])
+        self.assertIsNone(result['review_item_id'])
+        self.assertFalse(ClinicalReviewItem.objects.filter(source_message__line_message_id='hub_bot_on_1').exists())

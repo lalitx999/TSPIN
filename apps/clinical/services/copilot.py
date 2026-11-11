@@ -164,3 +164,103 @@ class CopilotContextBuilder:
             'scored_axes_count': len(scored_axes),
             'safety_alerts': safety_alerts,
         }
+
+
+def suggest_axes_from_encounter(patient: Patient, user=None) -> Dict[str, Any]:
+    """
+    ดึงข้อมูล Encounter (SOAP ล่าสุด + Vitals + โรคประจำตัว + แพ้ยา) ของคนไข้
+    ส่งให้ AI Copilot (Gemini 2.5) วิเคราะห์และร่างคะแนน 39 แกนชีววิทยา
+    """
+    import httpx
+    from django.conf import settings
+    from accounts.models import AuditLog
+    from ai_service.sanitizer import TextDeidentifier
+
+    last_history = patient.histories.order_by('-visit_date').first()
+
+    # ลบข้อมูลระบุตัวตนก่อนส่งออก
+    clean_subj = TextDeidentifier.sanitize(last_history.subjective if last_history else '')['sanitized_text']
+    clean_obj = TextDeidentifier.sanitize(last_history.objective if last_history else '')['sanitized_text']
+    clean_ass = TextDeidentifier.sanitize(last_history.assessment if last_history else '')['sanitized_text']
+    clean_plan = TextDeidentifier.sanitize(last_history.plan if last_history else '')['sanitized_text']
+    clean_med = TextDeidentifier.sanitize(patient.medical_history or '')['sanitized_text']
+    clean_cur_med = TextDeidentifier.sanitize(getattr(patient, 'current_medications', '') or '')['sanitized_text']
+    vitals = last_history.vitals if (last_history and last_history.vitals) else {}
+
+    # ดึงผลแล็บล่าสุดของคนไข้ (Biomarkers) เพื่อส่งให้ AI ประเมินร่วมกับ SOAP
+    patient_labs = []
+    try:
+        from intelligence.models import AgenticArtifact
+        latest_lab_art = AgenticArtifact.objects.filter(
+            patient=patient,
+            artifact_type='lab_extraction'
+        ).order_by('-created_at').first()
+
+        if latest_lab_art and isinstance(latest_lab_art.proposed_data, dict):
+            markers = latest_lab_art.proposed_data.get('extracted_biomarkers', latest_lab_art.proposed_data)
+            if isinstance(markers, dict):
+                for k, m in markers.items():
+                    if isinstance(m, dict) and 'value' in m:
+                        patient_labs.append({
+                            'code': k,
+                            'name': m.get('name') or k,
+                            'value': m.get('value'),
+                            'unit': m.get('unit', ''),
+                            'is_abnormal': bool(m.get('is_abnormal')),
+                            'target_axis': m.get('target_axis', ''),
+                        })
+        elif patient.extra_data and isinstance(patient.extra_data.get('biomarkers'), dict):
+            markers = patient.extra_data['biomarkers']
+            for k, m in markers.items():
+                if isinstance(m, dict) and 'value' in m:
+                    patient_labs.append({
+                        'code': k,
+                        'name': m.get('name') or k,
+                        'value': m.get('value'),
+                        'unit': m.get('unit', ''),
+                        'is_abnormal': bool(m.get('is_abnormal')),
+                        'target_axis': m.get('target_axis', ''),
+                    })
+    except Exception as e:
+        logger.warning(f"[Copilot Suggest Axes] Failed reading patient labs: {e}")
+
+    payload = {
+        'soap': {
+            'subjective': clean_subj,
+            'objective': clean_obj,
+            'assessment': clean_ass,
+            'plan': clean_plan,
+        },
+        'vitals': vitals,
+        'history_text': clean_subj,
+        'allergies': patient.allergies or '',
+        'medical_history': clean_med,
+        'current_medications': clean_cur_med,
+        'lab_biomarkers': patient_labs,
+    }
+
+    try:
+        url = f"{settings.AI_SERVICE_URL}/api/ai/clinical/suggest-axes"
+        resp = httpx.post(
+            url,
+            json=payload,
+            headers={'X-Internal-Token': settings.INTERNAL_API_TOKEN},
+            timeout=90.0,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            if data.get('success'):
+                if user:
+                    AuditLog.objects.create(
+                        user=user,
+                        action='AI_AXES_SUGGESTION_GENERATED',
+                        model='BiologicalRecord',
+                        object_id=str(patient.pk),
+                        changes={'patient_hn': patient.hn, 'flagged_count': len(data.get('rationales', {}))},
+                    )
+                return data
+    except Exception as exc:
+        logger.error(f"[Copilot Suggest Axes] Failed for patient {patient.pk}: {exc}")
+
+    return {'success': False, 'suggested_scores': {}, 'rationales': {}, 'summary_insight': ''}
+

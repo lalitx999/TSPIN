@@ -1,109 +1,925 @@
 {% extends 'layouts/doctor_base.html' %}
+{% load static %}
 
-{% block title %}แมปค่าแล็บและอาการสู่ 39 แกนชีววิทยา (Axes Mapping) | TSPI CLINIC{% endblock %}
+{% block title %}การแมปตัวชี้วัดแล็บและอาการสู่ 39 แกนชีววิทยา (Biomarker to 39 Axes Mapping) | TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column gap-4" x-data="{
-    search: '',
-    selectedCategory: 'all',
-    mappings: [
+<!-- Safe JSON Payload for Patient Data & Labs -->
+<script id="axes-hub-data" type="application/json">
+{
+    "patient": {% if patient %}{ "id": {{ patient.pk }}, "name": "{{ patient.full_name|escapejs }}", "hn": "{{ patient.hn|escapejs }}", "age": "{{ patient.age|default:'' }}", "gender": "{{ patient.get_gender_display|escapejs }}" }{% else %}null{% endif %},
+    "patientLabs": {{ patient_labs_json|default:'[]'|safe }}
+}
+</script>
+
+<div class="d-flex flex-column gap-4">
+
+    <!-- Header Card -->
+    <div class="card shadow-sm border">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1.5 flex-wrap">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5 font-monospace">
+                            <i class="fas fa-sitemap me-1"></i> Diagnostic Ontology &amp; Simulation
+                        </span>
+                        <span class="text-muted small">ระบบแปลผลค่าชีวเคมีสู่กลไกระดับเซลล์ 39 แกน ใน 12 โดเมน</span>
+                    </div>
+                    <h1 class="h4 fw-bold mb-1 text-dark">การแมปตัวชี้วัดแล็บและอาการ (Biomarker to 39 Axes Mapping)</h1>
+                    <p class="text-muted small mb-0">
+                        เกณฑ์ความสัมพันธ์ระหว่างผลตรวจแล็บทางคลินิก (Biomarkers) กับระดับความผิดปกติของเครือข่ายชีวภาพ 39 แกน เพื่อการแพทย์แม่นยำระดับเซลล์
+                    </p>
+                </div>
+
+                <!-- Navigation Tabs (Bootstrap 5.3 Pure Data-BS-Toggle Pills - Never freeze or blank) -->
+                <ul class="nav nav-pills bg-body-secondary p-1 rounded-pill border gap-1" id="axesTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill px-3 py-1.5 small fw-medium {% if not patient %}active shadow-sm bg-primary text-white{% else %}text-secondary{% endif %}" 
+                                id="simulator-tab" data-bs-toggle="pill" data-bs-target="#simulator-pane" type="button" role="tab" aria-controls="simulator-pane" aria-selected="{% if not patient %}true{% else %}false{% endif %}">
+                            <i class="fas fa-calculator me-1"></i> คำนวณสด (Simulator)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill px-3 py-1.5 small fw-medium {% if patient %}active shadow-sm bg-primary text-white{% else %}text-secondary{% endif %}" 
+                                id="patient-tab" data-bs-toggle="pill" data-bs-target="#patient-pane" type="button" role="tab" aria-controls="patient-pane" aria-selected="{% if patient %}true{% else %}false{% endif %}">
+                            <i class="fas fa-user-check me-1"></i> ดึงผลแล็บคนไข้จริง
+                            {% if patient %}
+                                <span class="badge bg-white text-primary ms-1 font-monospace">{{ patient.hn }}</span>
+                            {% endif %}
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill px-3 py-1.5 small fw-medium text-secondary" 
+                                id="table-tab" data-bs-toggle="pill" data-bs-target="#table-pane" type="button" role="tab" aria-controls="table-pane" aria-selected="false">
+                            <i class="fas fa-table me-1"></i> ตารางเกณฑ์ Cutoff
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Contents (Standard Bootstrap 5.3 tab-content - 100% Guaranteed Visibility) -->
+    <div class="tab-content" id="axesTabsContent">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: Interactive Biomarker Simulator     -->
+        <!-- ========================================== -->
+        <div class="tab-pane fade {% if not patient %}show active{% endif %}" id="simulator-pane" role="tabpanel" aria-labelledby="simulator-tab" tabindex="0">
+            <div class="d-flex flex-column gap-4" id="simulator-container">
+                
+                <!-- Concept Explanation Banner -->
+                <div class="alert alert-info border-info-subtle shadow-sm mb-0 p-3">
+                    <div class="d-flex gap-2.5 align-items-center justify-content-between flex-wrap">
+                        <div class="d-flex gap-2.5 align-items-center">
+                            <div class="fs-4 text-info flex-shrink-0">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <div>
+                                <strong class="d-block mb-0.5 text-dark">เครื่องมือจำลองผลแล็บชีวเคมี (Biomarker Simulator):</strong>
+                                <p class="small text-muted mb-0">
+                                    กรอกตัวเลขผลตรวจเลือดทางซ้ายมือ ระบบจะนำไปเทียบกับเกณฑ์ Cutoff ทางคลินิก และประมวลผลเป็น <strong>คะแนนความผิดปกติของแกนชีวภาพ (0–100)</strong> ทางขวามือแบบ Real-time
+                                </p>
+                            </div>
+                        </div>
+                        {% if patient and patient_labs %}
+                        <button type="button" class="btn btn-sm btn-primary shadow-sm" onclick="loadPatientLabsToSimulatorInputs()">
+                            <i class="fas fa-file-import me-1"></i> ดึงผลแล็บของ {{ patient.full_name }} เข้ามาจำลอง
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Left Column: Input Form (5 Clinical Groups) -->
+                    <div class="col-12 col-xl-7">
+                        <div class="card shadow-sm border">
+                            <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
+                                <span class="small fw-bold text-dark d-flex align-items-center gap-1.5">
+                                    <i class="fas fa-vial text-primary"></i> กรอกค่าผลตรวจแล็บที่ต้องการทดสอบ:
+                                </span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 text-xs" onclick="resetSimulatorInputs()">
+                                    <i class="fas fa-undo me-1"></i> ล้างค่าทั้งหมด
+                                </button>
+                            </div>
+                            <div class="card-body p-3 p-md-4">
+                                <div class="row g-3">
+                                    
+                                    <!-- 1. การอักเสบและภูมิคุ้มกัน -->
+                                    <div class="col-12">
+                                        <h6 class="small fw-bold text-primary text-uppercase mb-2 pb-1 border-bottom" style="font-size: 0.8rem;">
+                                            <i class="fas fa-shield-virus me-1"></i> 1. การอักเสบและภูมิคุ้มกัน (Immune &amp; Inflammation)
+                                        </h6>
+                                        <div class="row g-2">
+                                            <div class="col-12 col-sm-6">
+                                                <label class="form-label text-dark mb-1" style="font-size: 0.8125rem;">
+                                                    hsCRP <span class="text-muted">(ปกติ &le; 1.0 mg/L)</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="0.1" id="sim_hscrp" class="form-control" placeholder="เช่น 3.5" oninput="runLiveSimulation()">
+                                                    <span class="input-group-text text-muted" style="font-size: 0.775rem;">mg/L</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <label class="form-label text-dark mb-1" style="font-size: 0.8125rem;">
+                                                    IL-6 <span class="text-muted">(ปกติ &le; 1.8 pg/mL)</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="0.1" id="sim_il6" class="form-control" placeholder="เช่น 6.2" oninput="runLiveSimulation()">
+                                                    <span class="input-group-text text-muted" style="font-size: 0.775rem;">pg/mL</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 2. น้ำตาลและเมแทบอลิซึม -->
+                                    <div class="col-12 pt-2">
+                                        <h6 class="small fw-bold text-primary text-uppercase mb-2 pb-1 border-bottom" style="font-size: 0.8rem;">
+                                            <i class="fas fa-fire me-1"></i> 2. น้ำตาลและเมแทบอลิซึม (Glucose &amp; Metabolism)
+                                        </h6>
+                                        <div class="row g-2">
+                                            <div class="col-12 col-sm-4">
+                                                <label class="form-label text-dark mb-1" style="font-size: 0.8125rem;">
+                                                    Fasting Insulin <span class="text-muted">(&le; 6.0)</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="0.1" id="sim_insulin" class="form-control" placeholder="เช่น 12.0" oninput="runLiveSimulation()">
+                                                    <span class="input-group-text text-muted" style="font-size: 0.775rem;">&mu;IU/mL</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-4">
+                                                <label class="form-label text-dark mb-1" style="font-size: 0.8125rem;">
+                                                    HOMA-IR <span class="text-muted">(&le; 1.5)</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="0.1" id="sim_homair" class="form-control" placeholder="เช่น 2.8" oninput="runLiveSimulation()">
+                                                    <span class="input-group-text text-muted" style="font-size: 0.775rem;">Index</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-4">
+                                                <label class="form-label text-dark mb-1" style="font-size: 0.8125rem;">
+                                                    HbA1c <span class="text-muted">(&lt; 5.7%)</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="0.1" id="sim_hba1c" class="form-control" placeholder="เช่น 6.0" oninput="runLiveSimulation()">
+                                                    <span class="input-group-text text-muted" style="font-size: 0.775rem;">%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. ไขมันและหลอดเลือด -->
+                                    <div class="col-12 pt-2">
+                                        <h6 class="small fw-bold text-primary text-uppercase mb-2 pb-1 border-bottom" style="font-size: 0.8rem;">
+                                            <i class="fas fa-heartbeat me-1"></i> 3. ไขมันและหลอดเลือด (Lipid &amp; Vascular)
+                                        </h6>
+                                        <div class="row g-2">
+                                            <div class="col-12 col-sm-6">
+                                                <label class="form-label text-dark mb-1" style="font-size: 0.8125rem;">
+                                                    TG / HDL Ratio <span class="text-muted">(ปกติ &le; 2.0)</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="0.1" id="sim_tghdl" class="form-control" placeholder="เช่น 3.2" oninput="runLiveSimulation()">
+                                                    <span class="input-group-text text-muted" style="font-size: 0.775rem;">Ratio</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <label class="form-label text-dark mb-1" style="font-size: 0.8125rem;">
+                                                    Endothelin-1 <span class="text-muted">(&le; 1.5 pg/mL)</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="0.1" id="sim_endothelin" class="form-control" placeholder="เช่น 2.5" oninput="runLiveSimulation()">
+                                                    <span class="input-group-text text-muted" style="font-size: 0.775rem;">pg/mL</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 4. ลำไส้และการดูดซึม -->
+                                    <div class="col-12 pt-2">
+                                        <h6 class="small fw-bold text-primary text-uppercase mb-2 pb-1 border-bottom" style="font-size: 0.8rem;">
+                                            <i class="fas fa-dna me-1"></i> 4. ลำไส้และเยื่อบุผิว (Gut Barrier &amp; Mucosal)
+                                        </h6>
+                                        <div class="row g-2">
+                                            <div class="col-12 col-sm-6">
+                                                <label class="form-label text-dark mb-1" style="font-size: 0.8125rem;">
+                                                    Zonulin <span class="text-muted">(ปกติ &le; 38 ng/mL)</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="1" id="sim_zonulin" class="form-control" placeholder="เช่น 45" oninput="runLiveSimulation()">
+                                                    <span class="input-group-text text-muted" style="font-size: 0.775rem;">ng/mL</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <label class="form-label text-dark mb-1" style="font-size: 0.8125rem;">
+                                                    Calprotectin <span class="text-muted">(ปกติ &le; 50 &mu;g/g)</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="1" id="sim_calprotectin" class="form-control" placeholder="เช่น 85" oninput="runLiveSimulation()">
+                                                    <span class="input-group-text text-muted" style="font-size: 0.775rem;">&mu;g/g</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 5. การขจัดสารพิษและดีเอ็นเอ -->
+                                    <div class="col-12 pt-2">
+                                        <h6 class="small fw-bold text-primary text-uppercase mb-2 pb-1 border-bottom" style="font-size: 0.8rem;">
+                                            <i class="fas fa-recycle me-1"></i> 5. การขจัดสารพิษและดีเอ็นเอ (Detox &amp; DNA Damage)
+                                        </h6>
+                                        <div class="row g-2">
+                                            <div class="col-12 col-sm-6">
+                                                <label class="form-label text-dark mb-1" style="font-size: 0.8125rem;">
+                                                    ALT / AST <span class="text-muted">(ปกติ &le; 35 U/L)</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="1" id="sim_alt" class="form-control" placeholder="เช่น 48" oninput="runLiveSimulation()">
+                                                    <span class="input-group-text text-muted" style="font-size: 0.775rem;">U/L</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <label class="form-label text-dark mb-1" style="font-size: 0.8125rem;">
+                                                    8-OHdG <span class="text-muted">(ปกติ &le; 5.0 ng/mg)</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="number" step="0.1" id="sim_ohdg" class="form-control" placeholder="เช่น 6.2" oninput="runLiveSimulation()">
+                                                    <span class="input-group-text text-muted" style="font-size: 0.775rem;">ng/mg</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Live Results Simulation Dashboard -->
+                    <div class="col-12 col-xl-5">
+                        <div class="card shadow-sm border bg-light-subtle d-flex flex-column" style="min-height: 480px;">
+                            <div class="card-header bg-white py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
+                                <span class="small fw-bold text-dark d-flex align-items-center gap-1.5">
+                                    <i class="fas fa-project-diagram text-primary"></i> ผลกระทบต่อ 39 แกนชีวภาพ (Calculated):
+                                </span>
+                                <span class="badge bg-primary text-white font-monospace" id="sim_count_badge">0 แกนผิดปกติ</span>
+                            </div>
+                            
+                            <div class="card-body p-3 flex-grow-1" id="sim_results_list" style="max-height: 540px; overflow-y: auto;">
+                                <!-- Rendered dynamically by runLiveSimulation() -->
+                                <div class="text-center py-5 text-muted" id="sim_empty_state">
+                                    <i class="fas fa-check-circle fs-1 text-success opacity-50 mb-2"></i>
+                                    <h6 class="fw-bold text-dark">ค่าแล็บทั้งหมดอยู่ในเกณฑ์ปกติ</h6>
+                                    <p class="small mb-0">ลองกรอกตัวเลขที่เกินเกณฑ์ Cutoff ทางซ้ายมือ เพื่อดูการคำนวณและผลกระทบระดับเซลล์</p>
+                                </div>
+                                <div id="sim_cards_container" class="d-flex flex-column gap-2.5 d-none"></div>
+                            </div>
+
+                            <!-- Footer Action -->
+                            <div class="card-footer bg-white p-3 border-top text-center" id="sim_footer" style="display: none;">
+                                <a href="{% url 'clinical:axes_explorer' %}{% if patient %}?patient_id={{ patient.pk }}&auto_ai=1{% endif %}" 
+                                   class="btn btn-sm btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-1.5 shadow-sm">
+                                    <i class="fas fa-external-link-alt"></i> เปิดหน้าประเมิน 39 แกนชีววิทยา (Axes Explorer)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: Patient Labs Mapping Bridge         -->
+        <!-- ========================================== -->
+        <div class="tab-pane fade {% if patient %}show active{% endif %}" id="patient-pane" role="tabpanel" aria-labelledby="patient-tab" tabindex="0">
+            <div class="d-flex flex-column gap-4">
+                
+                <!-- Patient Search & Selection Card (Bootstrap 5.3 Modern Bar) -->
+                <div class="card shadow-sm border">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-12 col-lg-4">
+                                <h6 class="fw-bold text-dark mb-1">
+                                    <i class="fas fa-user-search text-primary me-1"></i> เลือกคนไข้เพื่อตรวจผลแล็บ:
+                                </h6>
+                                <small class="text-muted">พิมพ์ค้นหาจากชื่อ นามสกุล หรือเลขประจำตัว (HN)</small>
+                            </div>
+                            
+                            <div class="col-12 col-lg-8 position-relative">
+                                <div class="input-group input-group-lg shadow-xs border rounded-3 overflow-hidden bg-white">
+                                    <span class="input-group-text bg-white border-0 text-muted ps-3 pe-2">
+                                        <i class="fas fa-search text-primary"></i>
+                                    </span>
+                                    <input type="text" id="patientSearchInput" class="form-control border-0 shadow-none px-2 fs-6" 
+                                           placeholder="พิมพ์ชื่อ, สกุล หรือ HN เช่น หนุมาน, 3030, 26-00001..." 
+                                           autocomplete="off">
+                                    <button type="button" id="patientSearchClearBtn" class="btn btn-link text-muted pe-3 d-none" onclick="clearPatientSearch()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Autocomplete Dropdown Popover (Bootstrap 5.3 list-group) -->
+                                <div id="patientSearchResults" 
+                                     class="position-absolute start-0 end-0 bg-white shadow-lg border rounded-3 mt-1 overflow-hidden d-none" 
+                                     style="max-height: 320px; overflow-y: auto; z-index: 1060;">
+                                    <div class="list-group list-group-flush p-1" id="patientSearchResultsList"></div>
+                                </div>
+
+                                <!-- Quick Pick Pills for Recent Patients -->
+                                {% if recent_patients %}
+                                <div class="d-flex align-items-center gap-1.5 flex-wrap mt-2">
+                                    <span class="text-muted text-xs me-1"><i class="fas fa-history text-secondary me-0.5"></i> คนไข้ล่าสุด:</span>
+                                    {% for p in recent_patients %}
+                                    <a href="{% url 'patients:doctor_axes_mapping' %}?patient_id={{ p.pk }}" 
+                                       class="btn btn-sm btn-outline-secondary rounded-pill py-0.5 px-2.5 text-xs text-nowrap {% if patient and patient.pk == p.pk %}active bg-primary text-white border-primary{% endif %}">
+                                        {{ p.full_name }} ({{ p.hn }})
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- If Patient Selected -->
+                {% if patient %}
+                <div class="card shadow-sm border border-primary-subtle bg-primary-subtle">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-primary text-white fw-bold fs-4 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                                    {{ patient.first_name|slice:":1" }}
+                                </div>
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                        <h2 class="h5 fw-bold text-dark mb-0">{{ patient.full_name }}</h2>
+                                        <span class="badge bg-white text-primary border border-primary-subtle font-monospace">HN: {{ patient.hn }}</span>
+                                        <span class="badge bg-light text-secondary border font-monospace">
+                                            {% if patient.age %}{{ patient.age }} ปี{% else %}ไม่ระบุอายุ{% endif %} &bull; {{ patient.get_gender_display }}
+                                        </span>
+                                    </div>
+                                    <small class="text-muted d-block">
+                                        <strong>โรคประจำตัว:</strong> {{ patient.medical_history|default:"ยังไม่ได้ระบุ" }} &bull; 
+                                        <strong>แพ้ยา:</strong> {{ patient.allergies|default:"ยังไม่ได้ระบุ" }} &bull;
+                                        <strong>ยาประจำตัว:</strong> {{ patient.current_medications|default:"ไม่ได้ระบุ" }}
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadPatientLabsToSimulatorInputs(true)">
+                                    <i class="fas fa-calculator me-1"></i> นำเข้า Simulator
+                                </button>
+                                <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}&auto_ai=1" class="btn btn-sm btn-primary shadow-sm">
+                                    <i class="fas fa-brain me-1"></i> ประเมิน 39 แกน (AI Copilot)
+                                </a>
+                                <a href="{% url 'patients:doctor_digital_twin' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-child me-1"></i> Digital Twin
+                                </a>
+                                <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-folder-open me-1"></i> แฟ้มคนไข้
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patient Labs Results Table -->
+                <div class="card shadow-sm border">
+                    <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold text-dark mb-0 small">
+                            <i class="fas fa-file-medical-alt text-primary me-1"></i> ผลตรวจแล็บที่บันทึกไว้ในเวชระเบียน (Extracted Lab Biomarkers)
+                        </h6>
+                        <span class="badge bg-light text-dark border font-monospace">{{ patient_labs|length }} รายการ</span>
+                    </div>
+                    
+                    {% if patient_labs %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.8125rem;">
+                            <thead class="table-light text-muted border-bottom">
+                                <tr>
+                                    <th class="px-3 py-2.5 fw-semibold">ตัวชี้วัด (Biomarker)</th>
+                                    <th class="px-3 py-2.5 fw-semibold">ค่าที่ตรวจได้</th>
+                                    <th class="px-3 py-2.5 fw-semibold">หน่วย</th>
+                                    <th class="px-3 py-2.5 fw-semibold">สถานะทางคลินิก</th>
+                                    <th class="px-3 py-2.5 fw-semibold">แกนชีวภาพที่ได้รับผลกระทบ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lab in patient_labs %}
+                                <tr>
+                                    <td class="px-3 py-2.5 font-monospace fw-bold text-dark">{{ lab.name }}</td>
+                                    <td class="px-3 py-2.5 font-monospace fs-6 fw-bold {% if lab.is_abnormal %}text-danger{% else %}text-dark{% endif %}">
+                                        {{ lab.value }}
+                                    </td>
+                                    <td class="px-3 py-2.5 text-muted">{{ lab.unit|default:"-" }}</td>
+                                    <td class="px-3 py-2.5">
+                                        {% if lab.is_abnormal %}
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                                <i class="fas fa-exclamation-triangle me-1"></i> ผิดปกติ (Abnormal)
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                                <i class="fas fa-check me-1"></i> ปกติ (Normal)
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-3 py-2.5">
+                                        {% if lab.target_axis %}
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">
+                                                {{ lab.target_axis }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-light text-muted border font-monospace">
+                                                Systemic Integration
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer bg-light p-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt text-primary me-1"></i> ข้อมูลเชื่อมโยงกับฐานข้อมูลเวชระเบียนและ 39 แกนชีวภาพแบบอัตโนมัติ
+                        </small>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-plus-circle me-1"></i> บันทึกค่าแล็บเพิ่มเติม
+                            </a>
+                            <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}&auto_ai=1" class="btn btn-sm btn-primary">
+                                <i class="fas fa-brain me-1"></i> ประเมิน 39 แกนด้วย AI Copilot
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="p-5 text-center text-muted">
+                        <i class="fas fa-microscope fs-1 text-secondary opacity-50 mb-2"></i>
+                        <h6 class="fw-bold text-dark">ยังไม่มีบันทึกผลแล็บในระบบสำหรับ {{ patient.full_name }}</h6>
+                        <p class="small mb-3">ท่านสามารถบันทึกผลแล็บตัวชี้วัดชีวเคมีได้โดยตรงในหน้าแฟ้มคนไข้</p>
+                        <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-folder-open me-1"></i> ไปที่หน้าแฟ้มคนไข้เพื่อบันทึกผลแล็บ
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <!-- No patient selected state -->
+                <div class="card shadow-sm border p-5 text-center text-muted">
+                    <i class="fas fa-user-search fs-1 text-secondary opacity-50 mb-2"></i>
+                    <h6 class="fw-bold text-dark">กรุณาเลือกคนไข้จากช่องค้นหาด้านบน</h6>
+                    <p class="small mb-0">พิมพ์ชื่อ สกุล หรือเลข HN หรือเลือกจากรายชื่อคนไข้ล่าสุด เพื่อดึงผลแล็บและดูการแมปเข้ากับ 39 แกนชีววิทยา</p>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: Full Cutoff Ontology Table          -->
+        <!-- ========================================== -->
+        <div class="tab-pane fade" id="table-pane" role="tabpanel" aria-labelledby="table-tab" tabindex="0">
+            <div class="d-flex flex-column gap-3">
+                
+                <!-- Filter Controls -->
+                <div class="card shadow-sm border">
+                    <div class="card-body p-3">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-12 col-md-5">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white text-muted"><i class="fas fa-search"></i></span>
+                                    <input type="text" id="ontologySearch" placeholder="ค้นหาตัวชี้วัด เช่น hsCRP, HOMA-IR หรือชื่อแกน..." class="form-control" oninput="filterOntologyTable()">
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <select class="form-select form-select-sm" id="domainSelect" onchange="filterOntologyTable()">
+                                    <option value="all">ทุกโดเมน (All 12 Domains)</option>
+                                    <option value="Immune">Immune–Infection Governance</option>
+                                    <option value="Metabolic">Metabolic–Energy Core</option>
+                                    <option value="Genomic">Genomic Programming</option>
+                                    <option value="Detoxification">Detoxification &amp; Clearance</option>
+                                    <option value="Digestive">Digestive–Gut Ecosystem</option>
+                                    <option value="Vascular">Vascular–Circulation</option>
+                                    <option value="Repair">Repair–Regeneration</option>
+                                    <option value="Musculoskeletal">Musculoskeletal &amp; Structural</option>
+                                    <option value="Endocrine">Endocrine Network</option>
+                                    <option value="Organ">Organ Axis</option>
+                                    <option value="Oncology">Oncology &amp; System-Level</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <select class="form-select form-select-sm" id="weightSelect" onchange="filterOntologyTable()">
+                                    <option value="all">ทุกระดับความสำคัญ (All Weights)</option>
+                                    <option value="Critical">Critical (วิกฤต)</option>
+                                    <option value="High">High (สูง)</option>
+                                    <option value="Moderate">Moderate (ปานกลาง)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Card -->
+                <div class="card shadow-sm border">
+                    <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
+                        <span class="small fw-bold text-dark">
+                            <i class="fas fa-table-list text-primary me-1"></i> ตารางความสัมพันธ์แล็บและแกนชีวภาพ (Biomarker Mappings)
+                        </span>
+                        <span class="badge bg-light text-dark border font-monospace" id="ontologyCountBadge">19 รายการ</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.8125rem;" id="ontologyTable">
+                            <thead class="table-light text-muted border-bottom">
+                                <tr>
+                                    <th class="px-3 py-2.5 fw-semibold" style="width: 180px;">ตัวชี้วัด (Biomarker)</th>
+                                    <th class="px-3 py-2.5 fw-semibold">Domain ทางคลินิก</th>
+                                    <th class="px-3 py-2.5 fw-semibold">แกนชีววิทยาเป้าหมาย</th>
+                                    <th class="px-3 py-2.5 fw-semibold">เกณฑ์ผิดปกติ (Cutoff)</th>
+                                    <th class="px-3 py-2.5 fw-semibold text-center" style="width: 140px;">ระดับผลกระทบ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ontologyTableBody">
+                                <!-- Populated dynamically by populateOntologyTable() -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Interactive Client-side Script (Standard DOM & Bootstrap 5.3 APIs - 100% Reliable) -->
+<script>
+(function() {
+    // 1. Data Store
+    let hubData = { patient: null, patientLabs: [] };
+    try {
+        const el = document.getElementById('axes-hub-data');
+        if (el && el.textContent) {
+            hubData = JSON.parse(el.textContent);
+        }
+    } catch(e) {
+        console.error("Failed parsing axes-hub-data:", e);
+    }
+
+    const ONTOLOGY_MAPPINGS = [
         { biomarker: 'hsCRP', domain: 'Immune–Infection Governance', axis: 'Axis 1: Systemic Inflammatory Load', threshold: '> 3.0 mg/L', weight: 'High' },
         { biomarker: 'IL-6', domain: 'Immune–Infection Governance', axis: 'Axis 1: Systemic Inflammatory Load', threshold: '> 5.0 pg/mL', weight: 'High' },
         { biomarker: 'Fasting Insulin', domain: 'Metabolic–Energy Core', axis: 'Axis 5: Glucose–Insulin Regulation', threshold: '> 10.0 uIU/mL', weight: 'High' },
         { biomarker: 'HOMA-IR', domain: 'Metabolic–Energy Core', axis: 'Axis 5: Glucose–Insulin Regulation', threshold: '> 2.0', weight: 'Critical' },
         { biomarker: 'HbA1c', domain: 'Metabolic–Energy Core', axis: 'Axis 5: Glucose–Insulin Regulation', threshold: '> 5.7 %', weight: 'Moderate' },
         { biomarker: 'TG / HDL Ratio', domain: 'Metabolic–Energy Core', axis: 'Axis 6: Lipid–Lipotoxicity', threshold: '> 2.5', weight: 'Moderate' },
-        { biomarker: '8-OHdG', domain: 'Genomic Programming', axis: 'Axis 11: DNA Repair & Genomic Stability', threshold: '> 5.0 ng/mg', weight: 'High' },
-        { biomarker: 'ALT / AST', domain: 'Detoxification & Cellular Clearance', axis: 'Axis 15: Detoxification & Cellular Defense', threshold: '> 35 U/L', weight: 'High' },
-        { biomarker: 'Zonulin', domain: 'Digestive–Gut Ecosystem', axis: 'Axis 16: Digestive–Absorptive & Mucosa', threshold: '> 38 ng/mL', weight: 'Critical' },
-        { biomarker: 'Calprotectin', domain: 'Digestive–Gut Ecosystem', axis: 'Axis 16: Digestive–Absorptive & Mucosa', threshold: '> 50 ug/g', weight: 'High' },
-        { biomarker: 'Endothelin-1', domain: 'Vascular–Circulation', axis: 'Axis 20: Endothelial Function', threshold: '> 2.0 pg/mL', weight: 'Moderate' },
-        { biomarker: 'TGF-beta 1', domain: 'Repair–Regeneration', axis: 'Axis 24: Wound Healing (Internal/External)', threshold: '> 35 ng/mL', weight: 'High' },
-        { biomarker: 'CK-MB / Troponin', domain: 'Musculoskeletal & Structural', axis: 'Axis 28: Muscle Protein Turnover', threshold: 'Elevated', weight: 'Critical' },
-        { biomarker: 'Estradiol / Progesterone', domain: 'Endocrine Network', axis: 'Axis 31: Female Hormone Network', threshold: 'Ratio Imbalance', weight: 'Moderate' },
-        { biomarker: 'Cortisol (Morning)', domain: 'Neurological Regulation', axis: 'Axis 34: Neuro–Sleep–Stress–Brain Clearance', threshold: 'Out of 10-20 ug/dL', weight: 'Moderate' },
-        { biomarker: 'eGFR / BUN / Creatinine', domain: 'Organ Axis', axis: 'Axis 35: Organ Resilience (Kidney/Liver)', threshold: 'eGFR < 90 mL/min', weight: 'High' },
-        { biomarker: 'CEA / CA-19-9 / AFP', domain: 'Oncology & System-Level', axis: 'Axis 37: Oncologic Cell Fate', threshold: 'Above Cut-off', weight: 'Critical' },
-        { biomarker: 'VEGF / MMP-9', domain: 'Oncology & System-Level', axis: 'Axis 38: Tumor Microenvironment & Metastatic Dynamics', threshold: 'Elevated', weight: 'Critical' },
-        { biomarker: 'Circulating Tumor DNA', domain: 'Oncology & System-Level', axis: 'Axis 39: Genomic Regulation Homeostasis', threshold: 'Positive Signal', weight: 'Critical' }
-    ],
-    filteredMappings() {
-        return this.mappings.filter(item => {
-            const matchesSearch = item.biomarker.toLowerCase().includes(this.search.toLowerCase()) ||
-                                  item.axis.toLowerCase().includes(this.search.toLowerCase()) ||
-                                  item.domain.toLowerCase().includes(this.search.toLowerCase());
-            return matchesSearch;
+        { biomarker: '8-OHdG', domain: 'Genomic Programming', axis: 'Axis 9: DNA Damage Response & Telomere', threshold: '> 5.0 ng/mg', weight: 'High' },
+        { biomarker: 'ALT / AST', domain: 'Detoxification & Cellular Clearance', axis: 'Axis 11: Phase I/II Hepatic Biotransformation', threshold: '> 35 U/L', weight: 'High' },
+        { biomarker: 'Zonulin', domain: 'Digestive–Gut Ecosystem', axis: 'Axis 15: Gut Mucosal Barrier & Tight Junctions', threshold: '> 38 ng/mL', weight: 'Critical' },
+        { biomarker: 'Calprotectin', domain: 'Digestive–Gut Ecosystem', axis: 'Axis 15: Gut Mucosal Barrier & Tight Junctions', threshold: '> 50 ug/g', weight: 'High' },
+        { biomarker: 'Endothelin-1', domain: 'Vascular–Circulation', axis: 'Axis 17: Endothelial Function & Nitric Oxide', threshold: '> 2.0 pg/mL', weight: 'Moderate' },
+        { biomarker: 'TGF-beta 1', domain: 'Repair–Regeneration', axis: 'Axis 21: Tissue Remodeling & Fibrosis', threshold: '> 35 ng/mL', weight: 'High' },
+        { biomarker: 'CK-MB / Troponin', domain: 'Musculoskeletal & Structural', axis: 'Axis 25: Muscle Protein Synthesis & Turnover', threshold: 'Elevated', weight: 'Critical' },
+        { biomarker: 'Estradiol / Progesterone', domain: 'Endocrine Network', axis: 'Axis 28: Gonadal Hormone Balance', threshold: 'Ratio Imbalance', weight: 'Moderate' },
+        { biomarker: 'Cortisol (Morning)', domain: 'Endocrine Network', axis: 'Axis 26: HPA Axis Dynamics & Cortisol Rhythm', threshold: 'Out of 10-20 ug/dL', weight: 'Moderate' },
+        { biomarker: 'eGFR', domain: 'Organ Axis', axis: 'Axis 33: Cardiorenal Synergies & Pressure', threshold: '< 90 mL/min', weight: 'High' },
+        { biomarker: 'CEA / CA-19-9 / AFP', domain: 'Oncology & System-Level', axis: 'Axis 35: Immune Surveillance & Tumor Environment', threshold: 'Above Cut-off', weight: 'Critical' },
+        { biomarker: 'VEGF / MMP-9', domain: 'Oncology & System-Level', axis: 'Axis 35: Immune Surveillance & Tumor Environment', threshold: 'Elevated', weight: 'Critical' },
+        { biomarker: 'Heavy Metal Efflux', domain: 'Oncology & System-Level', axis: 'Axis 39: Environmental Toxin Burden', threshold: 'Positive Signal', weight: 'Critical' }
+    ];
+
+    // 2. Populate Ontology Table
+    window.filterOntologyTable = function() {
+        const q = (document.getElementById('ontologySearch').value || '').toLowerCase().trim();
+        const dom = document.getElementById('domainSelect').value;
+        const wgt = document.getElementById('weightSelect').value;
+
+        const filtered = ONTOLOGY_MAPPINGS.filter(item => {
+            const matchesQ = !q || item.biomarker.toLowerCase().includes(q) || item.axis.toLowerCase().includes(q) || item.domain.toLowerCase().includes(q);
+            const matchesDom = dom === 'all' || item.domain.includes(dom);
+            const matchesWgt = wgt === 'all' || item.weight === wgt;
+            return matchesQ && matchesDom && matchesWgt;
+        });
+
+        const tbody = document.getElementById('ontologyTableBody');
+        tbody.innerHTML = '';
+        document.getElementById('ontologyCountBadge').textContent = filtered.length + ' รายการ';
+
+        filtered.forEach(item => {
+            const tr = document.createElement('tr');
+            let weightBadgeClass = 'bg-primary-subtle text-primary border border-primary-subtle';
+            if (item.weight === 'Critical') weightBadgeClass = 'bg-danger-subtle text-danger border border-danger-subtle';
+            else if (item.weight === 'High') weightBadgeClass = 'bg-warning-subtle text-warning-emphasis border border-warning-subtle';
+
+            tr.innerHTML = `
+                <td class="px-3 py-2.5 font-monospace fw-bold text-dark">${item.biomarker}</td>
+                <td class="px-3 py-2.5 text-muted small">${item.domain}</td>
+                <td class="px-3 py-2.5">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">${item.axis}</span>
+                </td>
+                <td class="px-3 py-2.5 font-monospace text-dark">${item.threshold}</td>
+                <td class="px-3 py-2.5 text-center">
+                    <span class="badge ${weightBadgeClass}">${item.weight}</span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    };
+
+    // 3. Live Simulation Logic
+    window.runLiveSimulation = function() {
+        const getVal = id => {
+            const el = document.getElementById(id);
+            if (!el || !el.value) return null;
+            const v = parseFloat(el.value);
+            return isNaN(v) ? null : v;
+        };
+
+        const hscrp = getVal('sim_hscrp');
+        const il6 = getVal('sim_il6');
+        const insulin = getVal('sim_insulin');
+        const homair = getVal('sim_homair');
+        const hba1c = getVal('sim_hba1c');
+        const tghdl = getVal('sim_tghdl');
+        const endothelin = getVal('sim_endothelin');
+        const zonulin = getVal('sim_zonulin');
+        const calprotectin = getVal('sim_calprotectin');
+        const alt = getVal('sim_alt');
+        const ohdg = getVal('sim_ohdg');
+
+        let axes = [];
+
+        // Axis 1: Systemic Inflammation
+        if ((hscrp && hscrp > 3.0) || (il6 && il6 > 5.0)) {
+            let score = 75;
+            if (hscrp > 5.0 || il6 > 10.0) score = 88;
+            axes.push({
+                axis_id: 1,
+                name: 'Systemic Inflammation & Cytokine Cascades',
+                score: score,
+                level: score >= 80 ? 'พยาธิสภาพรุนแรง (Critical)' : 'ความผิดปกติสูง (High)',
+                reason: 'พบค่า hsCRP (' + (hscrp || '-') + ' mg/L) หรือ IL-6 (' + (il6 || '-') + ' pg/mL) สูงเกินเกณฑ์ บ่งชี้การอักเสบเรื้อรังระดับเซลล์'
+            });
+        }
+
+        // Axis 5: Glucose-Insulin
+        if ((homair && homair > 2.0) || (insulin && insulin > 10.0) || (hba1c && hba1c >= 5.7)) {
+            let score = 70;
+            if (homair > 3.0 || insulin > 15.0 || hba1c >= 6.5) score = 85;
+            axes.push({
+                axis_id: 5,
+                name: 'Glycemic Regulation & Insulin Sensitivity',
+                score: score,
+                level: score >= 80 ? 'ภาวะดื้ออินซูลินรุนแรง (Critical)' : 'ความไวต่ออินซูลินลดลง (High)',
+                reason: 'HOMA-IR (' + (homair || '-') + ') หรือ Fasting Insulin บ่งชี้ภาวะดื้อต่ออินซูลิน (Insulin Resistance)'
+            });
+        }
+
+        // Axis 6: Lipid Lipotoxicity
+        if (tghdl && tghdl > 2.5) {
+            let score = tghdl > 3.5 ? 80 : 68;
+            axes.push({
+                axis_id: 6,
+                name: 'Lipid Homeostasis & Adipokine Signalling',
+                score: score,
+                level: score >= 80 ? 'ภาวะเป็นพิษจากไขมันสูง (High)' : 'สมดุลไขมันผิดปกติ (Moderate)',
+                reason: 'TG/HDL Ratio (' + tghdl + ') เกิน 2.5 สะท้อนความผิดปกติของอนุภาคไขมันขนาดเล็กและไขมันพอกตับ'
+            });
+        }
+
+        // Axis 15: Gut Mucosal Barrier
+        if ((zonulin && zonulin > 38) || (calprotectin && calprotectin > 50)) {
+            let score = (zonulin > 50 || calprotectin > 100) ? 88 : 78;
+            axes.push({
+                axis_id: 15,
+                name: 'Gut Mucosal Barrier & Tight Junctions',
+                score: score,
+                level: 'ภาวะลำไส้รั่วซึม (Leaky Gut - Critical)',
+                reason: 'Zonulin (' + (zonulin || '-') + ' ng/mL) หรือ Calprotectin บ่งบอกการอักเสบและการเปิดของช่องรอยต่อเยื่อบุผนังลำไส้'
+            });
+        }
+
+        // Axis 11: Hepatic Biotransformation
+        if (alt && alt > 35) {
+            let score = alt > 60 ? 82 : 70;
+            axes.push({
+                axis_id: 11,
+                name: 'Phase I/II Hepatic Biotransformation',
+                score: score,
+                level: 'ตับเผชิญภาระสารพิษสะสม (High)',
+                reason: 'เอนไซม์ตับ ALT (' + alt + ' U/L) สูงกว่า 35 บ่งชี้เซลล์ตับอักเสบหรือการขับสารพิษติดขัด'
+            });
+        }
+
+        // Axis 9: DNA Damage
+        if (ohdg && ohdg > 5.0) {
+            let score = ohdg > 8.0 ? 85 : 74;
+            axes.push({
+                axis_id: 9,
+                name: 'DNA Damage Response & Telomere Integrity',
+                score: score,
+                level: 'ความเสียหายสารพันธุกรรม (High)',
+                reason: 'สารบ่งชี้ 8-OHdG (' + ohdg + ' ng/mg) สะท้อนภาวะ Oxidative Stress ที่ทำลายสายดีเอ็นเอ'
+            });
+        }
+
+        // Axis 17: Endothelial Function
+        if (endothelin && endothelin > 2.0) {
+            axes.push({
+                axis_id: 17,
+                name: 'Endothelial Function & Nitric Oxide',
+                score: 68,
+                level: 'หลอดเลือดตึงตัวสูง (Moderate)',
+                reason: 'Endothelin-1 (' + endothelin + ' pg/mL) ส่งผลให้หลอดเลือดหดเกร็งและความดันเลือดแปรปรวน'
+            });
+        }
+
+        // Render Cards
+        const countBadge = document.getElementById('sim_count_badge');
+        const emptyState = document.getElementById('sim_empty_state');
+        const cardsContainer = document.getElementById('sim_cards_container');
+        const footer = document.getElementById('sim_footer');
+
+        countBadge.textContent = axes.length + ' แกนผิดปกติ';
+
+        if (axes.length === 0) {
+            emptyState.classList.remove('d-none');
+            cardsContainer.classList.add('d-none');
+            cardsContainer.innerHTML = '';
+            footer.style.display = 'none';
+        } else {
+            emptyState.classList.add('d-none');
+            cardsContainer.classList.remove('d-none');
+            cardsContainer.innerHTML = '';
+            footer.style.display = 'block';
+
+            axes.forEach(ax => {
+                let badgeClass = 'bg-primary text-white';
+                let barClass = 'bg-primary';
+                if (ax.score >= 75) {
+                    badgeClass = 'bg-danger text-white';
+                    barClass = 'bg-danger';
+                } else if (ax.score >= 60) {
+                    badgeClass = 'bg-warning text-dark';
+                    barClass = 'bg-warning';
+                }
+
+                const card = document.createElement('div');
+                card.className = 'card bg-white border p-3 shadow-xs';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-1.5">
+                        <div>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace text-xs">AXIS ${ax.axis_id}</span>
+                            <strong class="text-dark small d-block mt-0.5">${ax.name}</strong>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge ${badgeClass}">${ax.score} / 100</span>
+                            <small class="d-block text-muted text-xs">${ax.level}</small>
+                        </div>
+                    </div>
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div class="progress-bar ${barClass}" role="progressbar" style="width: ${ax.score}%;"></div>
+                    </div>
+                    <p class="small text-muted mb-0" style="font-size: 0.775rem;">
+                        <i class="fas fa-info-circle text-primary me-1"></i>
+                        ${ax.reason}
+                    </p>
+                `;
+                cardsContainer.appendChild(card);
+            });
+        }
+    };
+
+    window.resetSimulatorInputs = function() {
+        ['sim_hscrp', 'sim_il6', 'sim_insulin', 'sim_homair', 'sim_hba1c', 'sim_tghdl', 'sim_endothelin', 'sim_zonulin', 'sim_calprotectin', 'sim_alt', 'sim_ohdg'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        runLiveSimulation();
+    };
+
+    window.loadPatientLabsToSimulatorInputs = function(switchToSimulator = false) {
+        if (!hubData.patientLabs || !hubData.patientLabs.length) return;
+        for (let l of hubData.patientLabs) {
+            const code = (l.code || l.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            const val = parseFloat(l.value);
+            if (isNaN(val)) continue;
+
+            if (code.includes('hscrp')) document.getElementById('sim_hscrp').value = val;
+            else if (code.includes('il6')) document.getElementById('sim_il6').value = val;
+            else if (code.includes('homair')) document.getElementById('sim_homair').value = val;
+            else if (code.includes('insulin')) document.getElementById('sim_insulin').value = val;
+            else if (code.includes('hba1c')) document.getElementById('sim_hba1c').value = val;
+            else if (code.includes('tghdl')) document.getElementById('sim_tghdl').value = val;
+            else if (code.includes('zonulin')) document.getElementById('sim_zonulin').value = val;
+            else if (code.includes('calprotectin')) document.getElementById('sim_calprotectin').value = val;
+            else if (code.includes('alt')) document.getElementById('sim_alt').value = val;
+            else if (code.includes('ohdg')) document.getElementById('sim_ohdg').value = val;
+            else if (code.includes('endothelin')) document.getElementById('sim_endothelin').value = val;
+        }
+        runLiveSimulation();
+
+        if (switchToSimulator) {
+            const triggerEl = document.querySelector('#simulator-tab');
+            if (triggerEl) {
+                bootstrap.Tab.getOrCreateInstance(triggerEl).show();
+            }
+        }
+    };
+
+    // 4. Patient Search Dropdown
+    const searchInput = document.getElementById('patientSearchInput');
+    const searchResults = document.getElementById('patientSearchResults');
+    const searchResultsList = document.getElementById('patientSearchResultsList');
+    const clearBtn = document.getElementById('patientSearchClearBtn');
+
+    let searchTimeout = null;
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const q = this.value.trim();
+            if (clearBtn) {
+                if (q.length > 0) clearBtn.classList.remove('d-none');
+                else clearBtn.classList.add('d-none');
+            }
+
+            if (searchTimeout) clearTimeout(searchTimeout);
+            if (!q) {
+                searchResults.classList.add('d-none');
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                fetch('{% url 'patients:api_patient_search' %}?q=' + encodeURIComponent(q))
+                    .then(res => res.json())
+                    .then(data => {
+                        const list = (data && (data.patients || data.results)) ? (data.patients || data.results) : [];
+                        searchResultsList.innerHTML = '';
+                        if (list.length === 0) {
+                            searchResultsList.innerHTML = `
+                                <div class="p-3 text-center text-muted small">
+                                    <i class="fas fa-search me-1"></i> ไม่พบคนไข้ที่ตรงกับ "${q}"
+                                </div>
+                            `;
+                        } else {
+                            list.forEach(p => {
+                                const initial = (p.full_name || 'P').charAt(0);
+                                const item = document.createElement('a');
+                                item.href = '{% url 'patients:doctor_axes_mapping' %}?patient_id=' + p.id;
+                                item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center rounded-3 px-3 py-2.5 border-0 mb-1';
+                                item.innerHTML = `
+                                    <div class="d-flex align-items-center gap-2.5 min-w-0">
+                                        <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; font-size: 0.875rem;">
+                                            ${initial}
+                                        </div>
+                                        <div class="text-truncate">
+                                            <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                                <span class="fw-bold text-dark small text-truncate">${p.full_name}</span>
+                                                <span class="badge bg-light text-secondary border font-monospace text-xs">HN: ${p.hn}</span>
+                                            </div>
+                                            <small class="text-muted d-block text-xs">${p.gender || 'ไม่ระบุเพศ'}${p.age ? ' • ' + p.age + ' ปี' : ''}</small>
+                                        </div>
+                                    </div>
+                                    <span class="btn btn-sm btn-outline-primary rounded-pill py-1 px-3 text-xs flex-shrink-0 ms-2">
+                                        เลือก <i class="fas fa-chevron-right ms-1"></i>
+                                    </span>
+                                `;
+                                searchResultsList.appendChild(item);
+                            });
+                        }
+                        searchResults.classList.remove('d-none');
+                    })
+                    .catch(() => {
+                        searchResults.classList.add('d-none');
+                    });
+            }, 250);
+        });
+
+        // Hide when click outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add('d-none');
+            }
         });
     }
-}">
 
-    <!-- Header Card -->
-    <div class="card shadow-sm border">
-        <div class="card-body p-3 p-md-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
-                            <i class="fas fa-sitemap me-1"></i> Diagnostic Ontology
-                        </span>
-                        <span class="text-muted small">ระบบแมปตัวชี้วัดสู่กลไก 39 แกน 12 โดเมน</span>
-                    </div>
-                    <h1 class="h4 fw-bold mb-1 text-dark">การแมปตัวชี้วัดแล็บและอาการ (Biomarker to 39 Axes Mapping)</h1>
-                    <p class="text-muted small mb-0">
-                        กำหนดเกณฑ์ความผิดปกติและค่าน้ำหนักผลกระทบของค่าชีวเคมีต่อทั้ง 39 แกนชีววิทยา ใน 12 โดเมน
-                    </p>
-                </div>
+    window.clearPatientSearch = function() {
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.focus();
+        }
+        if (clearBtn) clearBtn.classList.add('d-none');
+        if (searchResults) searchResults.classList.add('d-none');
+    };
 
-                <div style="min-width: 260px;">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0 text-muted">
-                            <i class="fas fa-search small"></i>
-                        </span>
-                        <input type="text" x-model="search" placeholder="ค้นหาตัวชี้วัด หรือชื่อแกน..." class="form-control border-start-0 ps-0">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mapping Table Card -->
-    <div class="card shadow-sm border">
-        <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
-            <h6 class="fw-bold text-dark mb-0 small">ตารางความสัมพันธ์แล็บและแกนชีวภาพ (Biomarker Mappings)</h6>
-            <span class="badge bg-light text-dark border font-monospace" x-text="filteredMappings().length + ' รายการ'"></span>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" style="font-size: 0.8125rem;">
-                <thead class="table-light text-muted border-bottom">
-                    <tr>
-                        <th class="px-3 py-2.5 fw-semibold">ตัวชี้วัด (Biomarker)</th>
-                        <th class="px-3 py-2.5 fw-semibold">Domain ทางคลินิก</th>
-                        <th class="px-3 py-2.5 fw-semibold">แกนชีววิทยาเป้าหมาย</th>
-                        <th class="px-3 py-2.5 fw-semibold">เกณฑ์ผิดปกติ (Cutoff)</th>
-                        <th class="px-3 py-2.5 fw-semibold text-center">ระดับผลกระทบ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template x-for="item in filteredMappings()" :key="item.biomarker">
-                        <tr>
-                            <td class="px-3 py-2.5 font-monospace fw-bold text-dark" x-text="item.biomarker"></td>
-                            <td class="px-3 py-2.5 text-muted small" x-text="item.domain"></td>
-                            <td class="px-3 py-2.5">
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle" x-text="item.axis"></span>
-                            </td>
-                            <td class="px-3 py-2.5 font-monospace text-dark" x-text="item.threshold"></td>
-                            <td class="px-3 py-2.5 text-center">
-                                <span class="badge"
-                                      :class="item.weight === 'Critical' ? 'bg-danger-subtle text-danger border border-danger-subtle' : (item.weight === 'High' ? 'bg-warning-subtle text-warning-emphasis border border-warning-subtle' : 'bg-primary-subtle text-primary border border-primary-subtle')"
-                                      x-text="item.weight"></span>
-                            </td>
-                        </tr>
-                    </template>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-</div>
+    // 5. Initializations
+    filterOntologyTable();
+    if (hubData.patient && hubData.patientLabs && hubData.patientLabs.length > 0) {
+        loadPatientLabsToSimulatorInputs(false);
+    }
+})();
+</script>
 {% endblock %}

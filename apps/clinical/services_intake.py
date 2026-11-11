@@ -180,7 +180,7 @@ def summarize_with_ai(box: Box, user) -> Tuple[bool, str]:
     return True, ''
 
 
-def commit_to_emr(box: Box, user, soap: Dict[str, str]) -> PatientHistory:
+def commit_to_emr(box: Box, user, soap: Dict[str, str], vitals: Optional[Dict[str, Any]] = None) -> PatientHistory:
     """
     บันทึก SOAP ที่บุคลากรตรวจ/แก้แล้วเข้าเวชระเบียน ในชื่อผู้กดบันทึก
     เก็บร่าง AI เดิมไว้ในกล่องเพื่อเทียบได้ว่าแก้อะไรไป
@@ -199,6 +199,7 @@ def commit_to_emr(box: Box, user, soap: Dict[str, str]) -> PatientHistory:
         history = PatientHistory.objects.create(
             patient=locked.patient,
             doctor=user,
+            vitals=vitals or {},
             **final_soap,
         )
         ai_soap = (locked.contents or {}).get('soap', {})

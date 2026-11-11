@@ -1,81 +1,172 @@
 {% extends 'layouts/doctor_base.html' %}
 
-{% block title %}ตรวจทานผลแล็บ (Lab Review) | TSPI CLINIC{% endblock %}
+{% block title %}นำเข้าและตรวจทานผลแล็บ (Lab Review) | TSPI CLINIC{% endblock %}
 
 {% block content %}
 <div class="d-flex flex-column gap-4">
 
     <!-- Header Card -->
-    <div class="card shadow-sm border">
+    <div class="card shadow-sm border bg-white">
         <div class="card-body p-3 p-md-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
+                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
                             <i class="fas fa-vials me-1"></i> Laboratory Intelligence
                         </span>
-                        <span class="text-muted small">ระบบตรวจสอบความถูกต้องของค่าแล็บ</span>
+                        {% if pending_count > 0 %}
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle py-1 px-2.5">
+                            <i class="fas fa-clock me-1"></i> รอตรวจทาน {{ pending_count }} รายการ
+                        </span>
+                        {% endif %}
                     </div>
                     <h1 class="h4 fw-bold mb-1 text-dark">ตรวจทานผลการตรวจทางห้องปฏิบัติการ (Lab Review)</h1>
                     <p class="text-muted small mb-0">
-                        ตรวจทานค่าชีวเคมีที่สแกนจากระบบ Lab OCR หรือเชื่อมโยงจาก EMR ก่อนยืนยันเข้าสู่การคำนวณคะแนนแกนชีววิทยา
+                        อัปโหลดเอกสารผลแล็บ (PDF / รูปภาพ) เพื่อสกัดค่าชีวเคมีและจัดเก็บเข้าแฟ้มเวชระเบียน (EMR) พร้อมคำนวณ 39 แกนชีววิทยา
                     </p>
                 </div>
 
-                <div>
-                    <a href="{% url 'intelligence:lab_ocr' %}" class="btn btn-primary d-inline-flex align-items-center gap-2">
-                        <i class="fas fa-file-upload"></i> อัปโหลดผลแล็บใหม่ (Lab OCR)
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{% url 'patients:doctor_axes_mapping' %}" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1.5">
+                        <i class="fas fa-sitemap"></i> แมปผลแล็บสู่ 39 แกน
                     </a>
+                    <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#labIntakeModal">
+                        <i class="fas fa-file-upload"></i> นำเข้าเอกสารผลแล็บใหม่
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Filter & Search Card -->
+    <div class="card shadow-sm border bg-white">
+        <div class="card-body p-3">
+            <form method="GET" action="{% url 'patients:doctor_lab_review' %}" class="row g-2 align-items-center">
+                <div class="col-12 col-md-5">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white text-muted"><i class="fas fa-search"></i></span>
+                        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="ค้นหาชื่อคนไข้, HN หรือชื่อรายการแล็บ...">
+                        {% if q %}
+                        <a href="{% url 'patients:doctor_lab_review' %}" class="btn btn-outline-secondary" title="ล้างคำค้น">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-md-7 d-flex align-items-center justify-content-md-end gap-2 flex-wrap">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="ตัวกรองสถานะ">
+                        <a href="?status=all{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-outline-secondary{% endif %}">ทั้งหมด</a>
+                        <a href="?status=pending{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn {% if status_filter == 'pending' %}btn-warning text-dark fw-semibold{% else %}btn-outline-secondary{% endif %}">รอตรวจทาน</a>
+                        <a href="?status=approved{% if q %}&q={{ q|urlencode }}{% endif %}" class="btn {% if status_filter == 'approved' %}btn-success{% else %}btn-outline-secondary{% endif %}">อนุมัติแล้ว</a>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-outline-primary">ค้นหา</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Lab Table Card -->
-    <div class="card shadow-sm border">
-        <div class="card-header bg-light py-2.5 px-3 border-bottom">
-            <h6 class="fw-bold text-dark mb-0 small">รายการผลแล็บล่าสุดที่นำเข้าสู่ระบบ</h6>
+    <div class="card shadow-sm border bg-white">
+        <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold text-dark mb-0 small">
+                <i class="fas fa-list-alt text-primary me-1"></i> รายการผลแล็บและเอกสารที่นำเข้าสู่ระบบ
+            </h6>
+            <span class="badge bg-light text-secondary border font-monospace">{{ lab_rows|length }} รายการ</span>
         </div>
 
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" style="font-size: 0.8125rem;">
                 <thead class="table-light text-muted border-bottom">
                     <tr>
-                        <th class="px-3 py-2.5 fw-semibold">วันที่ตรวจ</th>
+                        <th class="px-3 py-2.5 fw-semibold">วันที่นำเข้า</th>
                         <th class="px-3 py-2.5 fw-semibold">คนไข้</th>
-                        <th class="px-3 py-2.5 fw-semibold">รายการทดสอบ</th>
+                        <th class="px-3 py-2.5 fw-semibold">รายการทดสอบ / เอกสาร</th>
                         <th class="px-3 py-2.5 fw-semibold">ค่าที่ตรวจได้</th>
-                        <th class="px-3 py-2.5 fw-semibold">ช่วงอ้างอิงปกติ</th>
-                        <th class="px-3 py-2.5 fw-semibold text-center">สถานะ</th>
+                        <th class="px-3 py-2.5 fw-semibold">เกณฑ์ปกติ</th>
+                        <th class="px-3 py-2.5 fw-semibold">เอกสารแนบ (EMR)</th>
+                        <th class="px-3 py-2.5 fw-semibold text-center">สถานะผล</th>
                         <th class="px-3 py-2.5 fw-semibold text-end">การจัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in lab_rows %}
                     <tr>
-                        <td class="px-3 py-2.5 font-monospace text-muted">{{ row.artifact.created_at|date:"d/m/Y" }}</td>
-                        <td class="px-3 py-2.5 fw-bold text-dark">{% if row.artifact.patient %}{{ row.artifact.patient.full_name }} (HN: {{ row.artifact.patient.hn }}){% else %}—{% endif %}</td>
+                        <td class="px-3 py-2.5 font-monospace text-muted text-nowrap">{{ row.artifact.created_at|date:"d/m/Y H:i" }}</td>
+                        <td class="px-3 py-2.5">
+                            {% if row.artifact.patient %}
+                            <a href="{% url 'patients:patient_detail' row.artifact.patient.pk %}" class="fw-bold text-dark text-decoration-none">
+                                {{ row.artifact.patient.full_name }}
+                            </a>
+                            <div class="text-xs text-muted font-monospace">HN: {{ row.artifact.patient.hn }}</div>
+                            {% else %}—{% endif %}
+                        </td>
                         <td class="px-3 py-2.5 fw-bold text-dark">{{ row.marker }}</td>
-                        <td class="px-3 py-2.5 font-monospace fw-bold {% if row.is_abnormal %}text-danger{% else %}text-dark{% endif %}">{{ row.value }} {{ row.unit }}</td>
+                        <td class="px-3 py-2.5 font-monospace fw-bold {% if row.is_abnormal %}text-danger{% else %}text-dark{% endif %}">
+                            {{ row.value }} <span class="fw-normal text-muted">{{ row.unit }}</span>
+                        </td>
                         <td class="px-3 py-2.5 font-monospace text-muted small">{{ row.reference|default:"—" }}</td>
-                        <td class="px-3 py-2.5 text-center">
-                            {% if row.is_abnormal %}
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">ผิดปกติ</span>
+                        <td class="px-3 py-2.5">
+                            {% if row.documents %}
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for doc in row.documents %}
+                                    <a href="{% url 'patients:patient_lab_document' row.artifact.patient.pk doc.media_id %}" 
+                                       target="_blank" 
+                                       class="badge bg-light text-primary border border-primary-subtle text-decoration-none py-1 px-2"
+                                       title="เปิดดูเอกสารต้นฉบับ: {{ doc.filename }}">
+                                        <i class="fas {% if 'pdf' in doc.content_type %}fa-file-pdf text-danger{% else %}fa-file-image text-info{% endif %} me-1"></i>
+                                        {{ doc.filename|truncatechars:18 }}
+                                    </a>
+                                    {% endfor %}
+                                </div>
                             {% else %}
-                            <span class="badge bg-success-subtle text-success border border-success-subtle">ปกติ</span>
+                                <span class="text-muted text-xs">ข้อความ / คีย์ตรง</span>
                             {% endif %}
                         </td>
-                        <td class="px-3 py-2.5 text-end fw-medium">
-                            {% if row.artifact.status == 'pending' %}
-                            <a href="{% url 'intelligence:artifact_review' %}" class="text-primary">รอแพทย์ตรวจทาน</a>
+                        <td class="px-3 py-2.5 text-center">
+                            {% if row.is_document_only %}
+                                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">เอกสารแนบ</span>
+                            {% elif row.is_abnormal %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">ผิดปกติ</span>
                             {% else %}
-                            <span class="text-muted">{{ row.artifact.get_status_display }}</span>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">ปกติ</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-3 py-2.5 text-end text-nowrap">
+                            {% if row.artifact.status == 'pending' %}
+                            <div class="d-inline-flex gap-1 align-items-center">
+                                <form method="POST" action="{% url 'patients:doctor_lab_approve' row.artifact.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="approve">
+                                    <button type="submit" class="btn btn-sm btn-success py-0.5 px-2 text-xs shadow-xs" title="ยืนยันนำเข้าแฟ้ม EMR และ 39 แกน">
+                                        <i class="fas fa-check me-1"></i> อนุมัติเข้า EMR
+                                    </button>
+                                </form>
+                                <form method="POST" action="{% url 'patients:doctor_lab_approve' row.artifact.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="reject">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0.5 px-1.5 text-xs" title="ปฏิเสธ">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            {% elif row.artifact.status == 'approved' %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2">
+                                    <i class="fas fa-check-circle me-1"></i> อนุมัติเข้าแฟ้ม EMR
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border py-1 px-2">{{ row.artifact.get_status_display }}</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">ยังไม่มีผลแล็บที่นำเข้าระบบ</td>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="fas fa-vial fs-2 text-secondary opacity-50 mb-2 d-block"></i>
+                            <div class="fw-semibold text-dark mb-1">ยังไม่มีผลแล็บในระบบตามเงื่อนไขที่เลือก</div>
+                            <button type="button" class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#labIntakeModal">
+                                <i class="fas fa-file-upload me-1"></i> นำเข้าเอกสารผลแล็บใหม่
+                            </button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -84,4 +175,335 @@
     </div>
 
 </div>
+
+<!-- ========================================================================= -->
+<!-- Bootstrap 5.3 Modal Popup Form: อัปโหลดเอกสารผลแล็บหลายไฟล์ + ค้นหาคนไข้     -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="labIntakeModal" tabindex="-1" aria-labelledby="labIntakeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light border-bottom py-3 px-4">
+                <div>
+                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="labIntakeModalLabel">
+                        <i class="fas fa-file-medical text-primary"></i> นำเข้าเอกสารผลตรวจแล็บ (Lab Document Intake)
+                    </h5>
+                    <small class="text-muted">ค้นหาชื่อคนไข้และแนบไฟล์ผลแล็บ (เพิ่มได้หลายเอกสาร) เพื่อจัดเก็บเข้าแฟ้มเวชระเบียน</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form method="POST" action="{% url 'patients:doctor_lab_intake' %}" enctype="multipart/form-data" id="labIntakeForm">
+                {% csrf_token %}
+                <input type="hidden" name="patient_id" id="modalPatientId" value="{% if selected_patient %}{{ selected_patient.pk }}{% endif %}">
+
+                <div class="modal-body p-4 d-flex flex-column gap-4">
+
+                    <!-- STEP 1: ค้นหาและเลือกคนไข้ -->
+                    <div>
+                        <label class="form-label fw-bold text-dark small mb-1.5">
+                            1. ค้นหาชื่อคนไข้หรือ HN <span class="text-danger">*</span>
+                        </label>
+                        
+                        <!-- Selected Patient Banner -->
+                        <div id="selectedPatientCard" class="p-2.5 rounded-3 border border-primary-subtle bg-primary-subtle d-flex justify-content-between align-items-center mb-2 {% if not selected_patient %}d-none{% endif %}">
+                            <div class="d-flex align-items-center gap-2.5">
+                                <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" id="selectedPatientInitial">
+                                    {% if selected_patient %}{{ selected_patient.first_name|slice:":1" }}{% endif %}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark small" id="selectedPatientName">
+                                        {% if selected_patient %}{{ selected_patient.full_name }}{% endif %}
+                                    </div>
+                                    <div class="text-xs text-muted font-monospace" id="selectedPatientMeta">
+                                        {% if selected_patient %}HN: {{ selected_patient.hn }} &bull; {{ selected_patient.get_gender_display }}{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary bg-white py-0.5 px-2 text-xs" onclick="resetModalPatient()">
+                                <i class="fas fa-exchange-alt me-1"></i> เปลี่ยนคนไข้
+                            </button>
+                        </div>
+
+                        <!-- Search Input Wrapper -->
+                        <div id="modalPatientSearchBox" class="position-relative {% if selected_patient %}d-none{% endif %}">
+                            <div class="input-group shadow-xs border rounded-3 overflow-hidden">
+                                <span class="input-group-text bg-white border-0 text-muted ps-3">
+                                    <i class="fas fa-search text-primary"></i>
+                                </span>
+                                <input type="text" id="modalPatientSearchInput" class="form-control border-0 shadow-none" 
+                                       placeholder="พิมพ์ชื่อ, นามสกุล หรือเลข HN เช่น หนุมาน, 3030..." autocomplete="off">
+                            </div>
+
+                            <!-- Autocomplete Results Dropdown -->
+                            <div id="modalPatientResults" class="position-absolute start-0 end-0 bg-white shadow-lg border rounded-3 mt-1 overflow-hidden d-none" style="max-height: 220px; overflow-y: auto; z-index: 1080;">
+                                <div class="list-group list-group-flush p-1" id="modalPatientResultsList"></div>
+                            </div>
+
+                            <!-- Quick Pick Recent Patients -->
+                            {% if recent_patients %}
+                            <div class="d-flex align-items-center gap-1.5 flex-wrap mt-2">
+                                <span class="text-muted text-xs"><i class="fas fa-history me-1"></i> คนไข้ล่าสุด:</span>
+                                {% for p in recent_patients|slice:":4" %}
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0.5 px-2.5 text-xs"
+                                        onclick="selectModalPatient({{ p.pk }}, '{{ p.full_name|escapejs }}', '{{ p.hn|escapejs }}', '{{ p.get_gender_display|escapejs }}')">
+                                    {{ p.full_name }} ({{ p.hn }})
+                                </button>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: เอกสารแล็บ (เพิ่มได้หลายไฟล์) -->
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-1.5">
+                            <label class="form-label fw-bold text-dark small mb-0">
+                                2. เอกสารผลแล็บ (PDF / รูปภาพ — เพิ่มได้หลายไฟล์)
+                            </label>
+                            <button type="button" class="btn btn-sm btn-outline-primary py-0.5 px-2 text-xs" onclick="document.getElementById('labFilesPicker').click()">
+                                <i class="fas fa-plus me-1"></i> เพิ่มไฟล์เอกสารแล็บ
+                            </button>
+                        </div>
+
+                        <!-- Hidden actual input submitted with form -->
+                        <input type="file" name="lab_files" id="labFilesActual" multiple class="d-none" accept=".pdf,image/jpeg,image/png,image/webp">
+                        <!-- Helper picker to append files incrementally -->
+                        <input type="file" id="labFilesPicker" multiple class="d-none" accept=".pdf,image/jpeg,image/png,image/webp">
+
+                        <!-- Interactive Dropzone -->
+                        <div id="labDropzone" class="border border-2 border-dashed rounded-3 p-4 text-center bg-light cursor-pointer" style="border-style: dashed !important; cursor: pointer;" onclick="document.getElementById('labFilesPicker').click()">
+                            <i class="fas fa-cloud-upload-alt fs-2 text-primary opacity-75 mb-2 d-block"></i>
+                            <div class="fw-semibold text-dark small mb-0.5">คลิกเพื่อเลือกไฟล์ หรือลากเอกสารผลแล็บมาวางที่นี่</div>
+                            <small class="text-muted text-xs">รองรับไฟล์ PDF, JPG, PNG, WEBP สูงสุดไฟล์ละ 15 MB (เลือกหรือเพิ่มต่อกันได้หลายอัน)</small>
+                        </div>
+
+                        <!-- File Queue List -->
+                        <ul class="list-group mt-2 d-none" id="labFilesQueueList"></ul>
+                    </div>
+
+                    <!-- STEP 3: ข้อความผลแล็บเพิ่มเติม (Optional Accordion) -->
+                    <div class="accordion" id="rawTextAccordion">
+                        <div class="accordion-item border rounded-3 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed py-2 px-3 small fw-semibold bg-light text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRawText" aria-expanded="false">
+                                    <i class="fas fa-keyboard text-secondary me-2"></i> วางข้อความตัวเลขผลแล็บเพิ่มเติม (กรณีต้องการคีย์หรือวาง Copy-Paste)
+                                </button>
+                            </h2>
+                            <div id="collapseRawText" class="accordion-collapse collapse" data-bs-parent="#rawTextAccordion">
+                                <div class="accordion-body p-3">
+                                    <textarea name="raw_text" id="modalRawText" rows="4" class="form-control font-monospace small" 
+                                              placeholder="เช่น Fasting Blood Sugar: 118 mg/dL&#10;HbA1c: 6.4 %&#10;hs-CRP: 3.5 mg/L"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: ตัวเลือกบันทึกเข้าเวชระเบียนทันที -->
+                    <div class="form-check form-switch p-3 rounded-3 bg-light border d-flex align-items-center justify-content-between">
+                        <div>
+                            <label class="form-check-label fw-bold text-dark small d-block" for="autoApproveSwitch">
+                                ยืนยันผลแล็บและจัดเก็บเข้าแฟ้มเวชระเบียน (EMR) ทันที
+                            </label>
+                            <small class="text-muted text-xs">หากไม่เลือก ระบบจะเก็บเอกสารเข้าเวชระเบียนและส่งตัวเลขที่สกัดได้มารอตรวจทานในตารางก่อน</small>
+                        </div>
+                        <input class="form-check-input ms-3 fs-5" type="checkbox" role="switch" name="auto_approve" value="1" id="autoApproveSwitch" checked>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer bg-light border-top py-2.5 px-4 d-flex justify-content-between">
+                    <small class="text-muted text-xs">
+                        <i class="fas fa-lock text-success me-1"></i> เอกสารทั้งหมดจะถูกเข้ารหัส AES-256 เก็บในเวชระเบียนอย่างปลอดภัย
+                    </small>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary btn-sm px-4 fw-semibold shadow-sm" id="labSubmitBtn">
+                            <i class="fas fa-save me-1"></i> บันทึกเอกสารและวิเคราะห์ผลแล็บ
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Auto-open modal if redirected from /ai/lab-ocr/
+    {% if open_upload %}
+    var modalEl = document.getElementById('labIntakeModal');
+    if (modalEl && window.bootstrap) {
+        new bootstrap.Modal(modalEl).show();
+    }
+    {% endif %}
+
+    // 2. Real-time Patient Search inside Modal
+    const searchInput = document.getElementById('modalPatientSearchInput');
+    const resultsBox = document.getElementById('modalPatientResults');
+    const resultsList = document.getElementById('modalPatientResultsList');
+    let searchTimer = null;
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            const q = this.value.trim();
+            clearTimeout(searchTimer);
+            if (!q) {
+                resultsBox.classList.add('d-none');
+                return;
+            }
+            searchTimer = setTimeout(function () {
+                fetch("{% url 'patients:api_patient_search' %}?q=" + encodeURIComponent(q))
+                    .then(r => r.json())
+                    .then(data => {
+                        resultsList.innerHTML = '';
+                        const patients = data.patients || [];
+                        if (patients.length === 0) {
+                            resultsList.innerHTML = '<div class="p-3 text-center text-muted small">ไม่พบข้อมูลคนไข้ที่ค้นหา</div>';
+                        } else {
+                            patients.forEach(p => {
+                                const btn = document.createElement('button');
+                                btn.type = 'button';
+                                btn.className = 'list-group-item list-group-item-action border-0 rounded-2 py-2 px-3 d-flex justify-content-between align-items-center';
+                                btn.innerHTML = `
+                                    <div>
+                                        <span class="fw-bold text-dark">${p.full_name}</span>
+                                        <span class="badge bg-light text-primary border ms-1 font-monospace">${p.hn}</span>
+                                    </div>
+                                    <small class="text-muted">${p.gender_display || ''}</small>
+                                `;
+                                btn.onclick = function () {
+                                    selectModalPatient(p.id, p.full_name, p.hn, p.gender_display || '');
+                                };
+                                resultsList.appendChild(btn);
+                            });
+                        }
+                        resultsBox.classList.remove('d-none');
+                    })
+                    .catch(() => { resultsBox.classList.add('d-none'); });
+            }, 220);
+        });
+    }
+
+    // 3. Multi-File Incremental Queue using DataTransfer
+    const picker = document.getElementById('labFilesPicker');
+    const actualInput = document.getElementById('labFilesActual');
+    const queueList = document.getElementById('labFilesQueueList');
+    const dropzone = document.getElementById('labDropzone');
+    const dt = new DataTransfer();
+
+    function syncAndRenderFiles() {
+        actualInput.files = dt.files;
+        queueList.innerHTML = '';
+        if (dt.files.length === 0) {
+            queueList.classList.add('d-none');
+            return;
+        }
+        queueList.classList.remove('d-none');
+        Array.from(dt.files).forEach((file, idx) => {
+            const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center py-2 px-3';
+            li.innerHTML = `
+                <div class="d-flex align-items-center gap-2 text-truncate">
+                    <i class="fas ${isPdf ? 'fa-file-pdf text-danger' : 'fa-file-image text-info'} fs-5"></i>
+                    <div class="text-truncate">
+                        <div class="fw-semibold text-dark small text-truncate">${file.name}</div>
+                        <small class="text-muted font-monospace" style="font-size: 0.72rem;">${sizeMb} MB</small>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 text-xs flex-shrink-0" title="นำไฟล์นี้ออก">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            `;
+            li.querySelector('button').onclick = function () {
+                const nextDt = new DataTransfer();
+                Array.from(dt.files).forEach((f, i) => {
+                    if (i !== idx) nextDt.items.add(f);
+                });
+                dt.items.clear();
+                Array.from(nextDt.files).forEach(f => dt.items.add(f));
+                syncAndRenderFiles();
+            };
+            queueList.appendChild(li);
+        });
+    }
+
+    function addFiles(fileList) {
+        Array.from(fileList).forEach(f => {
+            // Avoid duplicates by name + size
+            const exists = Array.from(dt.files).some(ex => ex.name === f.name && ex.size === f.size);
+            if (!exists) dt.items.add(f);
+        });
+        syncAndRenderFiles();
+    }
+
+    if (picker) {
+        picker.addEventListener('change', function () {
+            if (this.files.length > 0) addFiles(this.files);
+            this.value = ''; // Reset so same/more files can be selected again
+        });
+    }
+
+    if (dropzone) {
+        dropzone.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            this.classList.add('border-primary', 'bg-primary-subtle');
+        });
+        dropzone.addEventListener('dragleave', function () {
+            this.classList.remove('border-primary', 'bg-primary-subtle');
+        });
+        dropzone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            this.classList.remove('border-primary', 'bg-primary-subtle');
+            if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+                addFiles(e.dataTransfer.files);
+            }
+        });
+    }
+
+    // 4. Form Validation before Submit
+    const form = document.getElementById('labIntakeForm');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            const pid = document.getElementById('modalPatientId').value;
+            const rawText = document.getElementById('modalRawText').value.trim();
+            if (!pid) {
+                e.preventDefault();
+                alert('กรุณาค้นหาและเลือกชื่อคนไข้ก่อนบันทึกครับ');
+                return false;
+            }
+            if (dt.files.length === 0 && !rawText) {
+                e.preventDefault();
+                alert('กรุณาแนบไฟล์เอกสารผลแล็บอย่างน้อย 1 ไฟล์ หรือวางข้อความผลแล็บครับ');
+                return false;
+            }
+            const btn = document.getElementById('labSubmitBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> กำลังประมวลผลและบันทึก...';
+            }
+        });
+    }
+});
+
+function selectModalPatient(id, fullName, hn, genderDisplay) {
+    document.getElementById('modalPatientId').value = id;
+    document.getElementById('selectedPatientInitial').textContent = (fullName || 'P').charAt(0);
+    document.getElementById('selectedPatientName').textContent = fullName;
+    document.getElementById('selectedPatientMeta').textContent = 'HN: ' + hn + (genderDisplay ? ' • ' + genderDisplay : '');
+    document.getElementById('selectedPatientCard').classList.remove('d-none');
+    document.getElementById('modalPatientSearchBox').classList.add('d-none');
+    document.getElementById('modalPatientResults').classList.add('d-none');
+}
+
+function resetModalPatient() {
+    document.getElementById('modalPatientId').value = '';
+    document.getElementById('selectedPatientCard').classList.add('d-none');
+    document.getElementById('modalPatientSearchBox').classList.remove('d-none');
+    const input = document.getElementById('modalPatientSearchInput');
+    input.value = '';
+    input.focus();
+}
+</script>
 {% endblock %}

@@ -144,6 +144,7 @@ class CoreAnalysisPayload(BaseModel):
     clinical_summary: str = ""
     physician_notes: Optional[str] = None
     certified_by_office_staff: bool = False
+    ai_editions: Dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode='after')
     def enforce_approval_state_rules(self) -> 'CoreAnalysisPayload':

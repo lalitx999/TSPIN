@@ -1,33 +1,548 @@
 {% extends 'layouts/doctor_base.html' %}
+{% load static %}
 
-{% block title %}แบบจำลอง Digital Twin 3 มิติ | TSPI CLINIC{% endblock %}
+{% block title %}แบบจำลอง Digital Twin สรีรวิทยาบุคคล | TSPI CLINIC{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column gap-4">
+<!-- Safe JSON Payload for Alpine Hub -->
+<script id="digital-twin-data" type="application/json">
+{
+    "patient": {% if patient %}{ "id": {{ patient.pk }}, "name": "{{ patient.full_name|escapejs }}", "hn": "{{ patient.hn|escapejs }}" }{% else %}null{% endif %},
+    "organSystems": {{ organ_systems_json|default:'[]'|safe }},
+    "cellularResilience": {{ cellular_resilience|default:50 }}
+}
+</script>
 
-    <!-- Header Card -->
-    <div class="card shadow-sm border">
+<div class="d-flex flex-column gap-4" x-data="digitalTwinHub()">
+
+    <!-- Header & Patient Selector Card (Bootstrap 5.3 Unified Bar) -->
+    <div class="card shadow-sm border bg-white">
         <div class="card-body p-3 p-md-4">
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5">
-                    <i class="fas fa-child me-1"></i> Virtual Physiological Twin
-                </span>
+            <div class="row g-3 align-items-center">
+                
+                <!-- Left: Title & Concept -->
+                <div class="col-12 col-xl-5">
+                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2.5 font-monospace">
+                            <i class="fas fa-child me-1"></i> Virtual Physiological Twin
+                        </span>
+                        <span class="text-body-secondary small">ระบบจำลองคู่แฝดดิจิทัลระดับสรีรวิทยาและอวัยวะ 8 ระบบ จาก 39 แกน</span>
+                    </div>
+                    <h1 class="h4 fw-bold mb-1 text-dark">แบบจำลอง Digital Twin สรีรวิทยาบุคคล</h1>
+                    <p class="text-muted small mb-0">
+                        ฉายภาพความผิดปกติระดับเซลล์ลงบน 8 ระบบอวัยวะ เพื่อระบุจุดเฝ้าระวังและจำลองการฟื้นฟูเฉพาะบุคคล
+                    </p>
+                </div>
+
+                <!-- Right: Patient Search Bar & Autocomplete (No overlapping dropdown) -->
+                <div class="col-12 col-xl-7 position-relative">
+                    <div class="input-group input-group-lg shadow-xs border rounded-3 overflow-hidden bg-white">
+                        <span class="input-group-text bg-white border-0 text-muted ps-3 pe-2">
+                            <i class="fas fa-search text-primary"></i>
+                        </span>
+                        <input type="text" id="twinPatientSearchInput" class="form-control border-0 shadow-none px-2 fs-6" 
+                               placeholder="ค้นหาคนไข้เพื่อเปิด Digital Twin (พิมพ์ชื่อ, สกุล หรือ HN)..." 
+                               autocomplete="off">
+                        <button type="button" id="twinPatientSearchClearBtn" class="btn btn-link text-muted pe-3 d-none" onclick="clearTwinPatientSearch()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <!-- Autocomplete Dropdown Popover (Bootstrap 5.3 list-group) -->
+                    <div id="twinPatientSearchResults" 
+                         class="position-absolute start-0 end-0 bg-white shadow-lg border rounded-3 mt-1 overflow-hidden d-none" 
+                         style="max-height: 320px; overflow-y: auto; z-index: 1060;">
+                        <div class="list-group list-group-flush p-1" id="twinPatientSearchResultsList"></div>
+                    </div>
+
+                    <!-- Quick Pick Pills for Recent Patients -->
+                    {% if recent_patients %}
+                    <div class="d-flex align-items-center gap-1.5 flex-wrap mt-2">
+                        <span class="text-muted text-xs me-1"><i class="fas fa-history text-secondary me-0.5"></i> เลือกดูคนไข้:</span>
+                        {% for p in recent_patients|slice:":5" %}
+                        <a href="{% url 'patients:doctor_digital_twin' %}?patient_id={{ p.pk }}" 
+                           class="btn btn-sm btn-outline-secondary rounded-pill py-0.5 px-2.5 text-xs text-nowrap {% if patient and patient.pk == p.pk %}active bg-primary text-white border-primary{% endif %}">
+                            {{ p.full_name }} ({{ p.hn }})
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
             </div>
-            <h1 class="h4 fw-bold mb-1 text-dark">แบบจำลอง Digital Twin สรีรวิทยาบุคคล</h1>
-            <p class="text-muted small mb-0">แสดงจุดเฝ้าระวังของอวัยวะจากผลประเมิน 39 แกนชีววิทยาของผู้ป่วยแต่ละราย</p>
         </div>
     </div>
 
-    {# หน้านี้ยังไม่ได้เชื่อมกับผลประเมินรายผู้ป่วย จึงไม่แสดงตัวเลขหรือจุดเตือนใด ๆ #}
-    <div class="card shadow-sm border">
-        <div class="card-body p-5 text-center text-muted">
-            <i class="fas fa-person-circle-question fs-1 mb-3 d-block text-secondary"></i>
-            <p class="mb-3">แบบจำลองรายผู้ป่วยยังไม่เปิดใช้งาน ระหว่างนี้ดูคะแนนจริงของผู้ป่วยได้ที่หน้าเรดาร์ 39 แกน</p>
-            <a href="{% url 'clinical:axis_graph' %}" class="btn btn-outline-primary">
-                <i class="fas fa-diagram-project me-1"></i> เปิดหน้าเรดาร์ 39 แกน
+    {% if patient %}
+    <!-- Unified Patient Command Card (Single Layer, No Nested Clutter) -->
+    <div class="card shadow-sm border border-primary-subtle bg-white">
+        <div class="card-body p-3 p-md-4">
+            <div class="row g-3 align-items-center">
+                
+                <!-- Patient Profile Summary -->
+                <div class="col-12 col-lg-5">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary text-white fw-bold fs-4 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                            {{ patient.first_name|slice:":1" }}
+                        </div>
+                        <div class="min-w-0">
+                            <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                <h2 class="h5 fw-bold text-dark mb-0 text-truncate">{{ patient.full_name }}</h2>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">HN: {{ patient.hn }}</span>
+                                <span class="badge bg-light text-secondary border font-monospace">
+                                    {% if patient.age %}{{ patient.age }} ปี{% else %}ไม่ระบุอายุ{% endif %} &bull; {{ patient.get_gender_display|default:"ไม่ระบุเพศ" }}
+                                </span>
+                            </div>
+                            <small class="text-muted d-block text-truncate">
+                                <strong>โรคประจำตัว:</strong> {{ patient.medical_history|default:"ไม่มี" }} &bull; 
+                                <strong>แพ้ยา:</strong> {{ patient.allergies|default:"ไม่มี" }} &bull;
+                                <strong>ยาประจำตัว:</strong> {{ patient.current_medications|default:"ไม่ได้ระบุ" }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resilience Index Score -->
+                <div class="col-12 col-md-7 col-lg-4">
+                    <div class="p-2.5 rounded-3 bg-light border">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-xs fw-bold text-secondary text-uppercase">
+                                <i class="fas fa-heart-pulse text-primary me-1"></i> ดัชนีความยืดหยุ่นสรีรวิทยา (Cellular Resilience):
+                            </span>
+                            <span class="fw-bold font-monospace" 
+                                  :class="simulatedResilience >= 70 ? 'text-success' : (simulatedResilience >= 50 ? 'text-warning-emphasis' : 'text-danger')"
+                                  style="font-size: 1.15rem;"
+                                  x-text="simulatedResilience + '%'"></span>
+                        </div>
+                        <div class="progress mb-1" style="height: 6px;">
+                            <div class="progress-bar" 
+                                 :class="simulatedResilience >= 70 ? 'bg-success' : (simulatedResilience >= 50 ? 'bg-warning' : 'bg-danger')"
+                                 role="progressbar" 
+                                 :style="'width: ' + simulatedResilience + '%;'"></div>
+                        </div>
+                        <div class="d-flex justify-content-between text-xs text-muted">
+                            <span x-text="simulatedResilience >= 70 ? 'สภาวะฟื้นตัวดีเยี่ยม (Optimal)' : (simulatedResilience >= 50 ? 'ความเครียดระดับปานกลาง' : 'ความเครียดสะสมสูง (Decompensated)')"></span>
+                            <span class="font-monospace">0-100%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prognosis Simulation Switch -->
+                <div class="col-12 col-md-5 col-lg-3">
+                    <div class="p-2.5 rounded-3 bg-light border d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="d-block text-dark small">จำลองฟื้นฟู 12 สัปดาห์:</strong>
+                            <small class="text-muted text-xs" x-text="simulationMode ? 'Active: พยากรณ์ตอบสนอง' : 'ปิด: แสดงผลปัจจุบัน'"></small>
+                        </div>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input fs-5" type="checkbox" id="simModeToggle" x-model="simulationMode" @change="toggleSimulation()">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Action Bar -->
+            <div class="d-flex align-items-center justify-content-between gap-2 pt-3 mt-3 border-top flex-wrap">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}&auto_ai=1" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-brain me-1"></i> ประเมิน 39 แกน
+                    </a>
+                    <a href="{% url 'patients:doctor_axes_mapping' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-vial me-1"></i> แมปแล็บ
+                    </a>
+                    <a href="{% url 'clinical:axis_graph' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-chart-pie me-1"></i> เรดาร์ชีวภาพ
+                    </a>
+                    <a href="{% url 'clinical:axis_timeline' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-history me-1"></i> ไทม์ไลน์
+                    </a>
+                    <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-folder-open me-1"></i> แฟ้มคนไข้
+                    </a>
+                </div>
+                <small class="text-muted text-xs font-monospace">
+                    <i class="fas fa-shield-alt text-primary me-1"></i> TSPI Mechanistic Digital Twin Hub
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Physiological Twin Canvas & Inspector -->
+    <div class="row g-4">
+        
+        <!-- Left Column: The 8 Organ-System Nodes (Bootstrap 5.3 Grid) -->
+        <div class="col-12 col-xl-7">
+            <div class="card border shadow-sm bg-white">
+                <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
+                    <span class="small fw-bold text-dark d-flex align-items-center gap-1.5">
+                        <i class="fas fa-network-wired text-primary"></i> ผังจุดเฝ้าระวัง 8 ระบบอวัยวะ (Physiological Systems Map):
+                    </span>
+                    <span class="badge bg-light text-muted border font-monospace text-xs">คลิกที่อวัยวะเพื่อเจาะลึก</span>
+                </div>
+                
+                <div class="card-body p-3">
+                    <div class="row g-3">
+                        <template x-for="sys in systems" :key="sys.id">
+                            <div class="col-12 col-sm-6">
+                                <div class="card h-100 border rounded-3 transition-all cursor-pointer bg-white"
+                                     :class="selectedSystem && selectedSystem.id === sys.id ? 'border-primary shadow-sm border-2' : 'border-secondary-subtle hover-shadow'"
+                                     @click="selectSystem(sys)">
+                                    <div class="card-body p-3">
+                                        <!-- Organ Title & Icon -->
+                                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                            <div class="d-flex align-items-center gap-2.5">
+                                                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                                     :class="getTierBgClass(sys)"
+                                                     style="width: 38px; height: 38px;">
+                                                    <i :class="sys.icon + ' ' + getTierTextClass(sys) + ' fs-5'"></i>
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <strong class="text-dark d-block text-truncate" style="font-size: 0.9rem;" x-text="sys.name_th"></strong>
+                                                    <small class="text-muted font-monospace text-xs" x-text="sys.name_en"></small>
+                                                </div>
+                                            </div>
+                                            <span class="badge font-monospace flex-shrink-0" :class="getTierBadgeClass(sys)" x-text="sys.currentScore + ' / 100'"></span>
+                                        </div>
+
+                                        <!-- Stress Progress Bar -->
+                                        <div class="progress mb-2" style="height: 5px;">
+                                            <div class="progress-bar" :class="getTierProgressBarClass(sys)" role="progressbar" :style="'width: ' + sys.currentScore + '%;'"></div>
+                                        </div>
+
+                                        <!-- Status line & Lab Triggers -->
+                                        <div class="d-flex justify-content-between align-items-center text-xs">
+                                            <span :class="getTierTextClass(sys) + ' fw-semibold'" x-text="getTierLabel(sys)"></span>
+                                            <template x-if="sys.lab_triggers && sys.lab_triggers.length > 0">
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle font-monospace text-xs" x-text="sys.lab_triggers.length + ' ผลแล็บเตือน'"></span>
+                                            </template>
+                                        </div>
+
+                                        <!-- Mini preview of axes with Bootstrap 5.3 subtle severity badges -->
+                                        <div class="mt-2 pt-2 border-top d-flex flex-wrap gap-1">
+                                            <template x-for="ax in sys.axes" :key="ax.id">
+                                                <span class="badge font-monospace text-xs" 
+                                                      :class="ax.score >= 75 ? 'bg-danger-subtle text-danger border border-danger-subtle' : (ax.score >= 60 ? 'bg-warning-subtle text-warning-emphasis border border-warning-subtle' : 'bg-light text-secondary border')" 
+                                                      x-text="'แกน ' + ax.id + ' (' + ax.score + ')'"></span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Deep-Dive Inspection Panel for Selected Organ -->
+        <div class="col-12 col-xl-5">
+            <div class="card border shadow-sm bg-white sticky-top" style="top: 80px;">
+                <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
+                    <span class="small fw-bold text-dark d-flex align-items-center gap-1.5">
+                        <i class="fas fa-stethoscope text-primary"></i> ผลตรวจเจาะลึกระบบอวัยวะ (System Inspector):
+                    </span>
+                    <template x-if="selectedSystem">
+                        <span class="badge font-monospace" :class="getTierBadgeClass(selectedSystem)" x-text="selectedSystem.name_th"></span>
+                    </template>
+                </div>
+
+                <div class="card-body p-3">
+                    <template x-if="!selectedSystem">
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-hand-pointer fs-1 text-secondary opacity-50 mb-3 d-block"></i>
+                            <h6 class="fw-bold text-dark">คลิกเลือกระบบอวัยวะทางด้านซ้าย</h6>
+                            <p class="small mb-0">เพื่อตรวจสอบรายละเอียดความผิดปกติของ 39 แกน, ตัวชี้วัดแล็บ, และสูตรสารอาหารบำบัดเป้าหมาย</p>
+                        </div>
+                    </template>
+
+                    <template x-if="selectedSystem">
+                        <div class="d-flex flex-column gap-3">
+                            <!-- System Overview Banner -->
+                            <div class="p-3 rounded-3 border bg-body-tertiary">
+                                <div class="d-flex align-items-center gap-2.5 mb-1.5">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" 
+                                         :class="getTierBgClass(selectedSystem)"
+                                         style="width: 36px; height: 36px;">
+                                        <i :class="selectedSystem.icon + ' ' + getTierTextClass(selectedSystem) + ' fs-5'"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-bold text-dark mb-0" x-text="selectedSystem.name_th"></h5>
+                                        <small class="text-muted font-monospace text-xs" x-text="selectedSystem.name_en"></small>
+                                    </div>
+                                </div>
+                                <p class="small text-muted mb-0 lh-sm" x-text="selectedSystem.description"></p>
+                            </div>
+
+                            <!-- Lab Triggers Section -->
+                            <div>
+                                <h6 class="text-xs fw-bold text-secondary text-uppercase mb-2">
+                                    <i class="fas fa-vial text-primary me-1"></i> ผลแล็บชีวเคมีที่ยืนยันความเสี่ยง (Lab Biomarkers):
+                                </h6>
+                                <template x-if="!selectedSystem.lab_triggers || selectedSystem.lab_triggers.length === 0">
+                                    <div class="p-2.5 rounded bg-light border text-muted small text-xs d-flex align-items-center gap-1.5">
+                                        <i class="fas fa-check-circle text-success"></i> ยังไม่พบค่าแล็บชีวเคมีที่ผิดปกติในกลุ่มนี้
+                                    </div>
+                                </template>
+                                <template x-if="selectedSystem.lab_triggers && selectedSystem.lab_triggers.length > 0">
+                                    <div class="d-flex flex-column gap-1.5">
+                                        <template x-for="t in selectedSystem.lab_triggers" :key="t.name">
+                                            <div class="p-2 rounded bg-danger-subtle border border-danger-subtle d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong class="text-danger small font-monospace" x-text="t.name"></strong>
+                                                    <small class="text-muted text-xs ms-1" x-text="'(' + t.unit + ')'"></small>
+                                                </div>
+                                                <span class="badge bg-danger text-white font-monospace" x-text="t.value"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- Mechanistic Axes Breakdown -->
+                            <div>
+                                <h6 class="text-xs fw-bold text-secondary text-uppercase mb-2">
+                                    <i class="fas fa-dna text-primary me-1"></i> แกนชีววิทยาที่ควบคุมระบบนี้ (Mechanistic Axes):
+                                </h6>
+                                <div class="d-flex flex-column gap-2">
+                                    <template x-for="ax in selectedSystem.axes" :key="ax.id">
+                                        <div class="p-2.5 rounded border bg-white shadow-xs">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="small fw-semibold text-dark" x-text="'Axis ' + ax.id + ' ' + ax.name"></span>
+                                                <span class="badge font-monospace text-xs"
+                                                      :class="ax.score >= 75 ? 'bg-danger text-white' : (ax.score >= 60 ? 'bg-warning text-dark' : 'bg-primary text-white')"
+                                                      x-text="ax.score + ' / 100'"></span>
+                                            </div>
+                                            <div class="progress" style="height: 4px;">
+                                                <div class="progress-bar"
+                                                     :class="ax.score >= 75 ? 'bg-danger' : (ax.score >= 60 ? 'bg-warning' : 'bg-primary')"
+                                                     role="progressbar"
+                                                     :style="'width: ' + ax.score + '%;'"></div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Recommended Phytochemical Modules -->
+                            <div>
+                                <h6 class="text-xs fw-bold text-secondary text-uppercase mb-2">
+                                    <i class="fas fa-seedling text-success me-1"></i> โมดูลสารอาหาร/สมุนไพรฟื้นฟูเป้าหมาย (Therapeutic Modules):
+                                </h6>
+                                <div class="d-flex flex-wrap gap-1.5">
+                                    <template x-for="m in selectedSystem.matched_modules" :key="m">
+                                        <a :href="'{% url 'clinical:therapeutic_matrix' %}?q=' + encodeURIComponent(m)"
+                                           class="badge bg-success-subtle text-success border border-success-subtle text-decoration-none py-1.5 px-2.5 font-monospace text-xs hover-shadow">
+                                            <i class="fas fa-capsules me-1"></i><span x-text="m"></span>
+                                        </a>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="card-footer bg-light p-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <small class="text-muted text-xs">
+                        <i class="fas fa-shield-alt text-primary me-1"></i> เชื่อมโยงกับเวชระเบียนและ 39 แกน
+                    </small>
+                    <a href="{% url 'clinical:therapeutic_matrix' %}{% if patient %}?patient_id={{ patient.pk }}{% endif %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-table-cells me-1"></i> สั่งการรักษาในเมทริกซ์
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% else %}
+    <!-- No patient state -->
+    <div class="card border shadow-sm p-5 text-center text-muted bg-white">
+        <i class="fas fa-user-slash fs-1 text-secondary opacity-50 mb-3 d-block"></i>
+        <h5 class="fw-bold text-dark">ยังไม่มีการเลือกผู้ป่วย</h5>
+        <p class="small mb-3">กรุณาพิมพ์ค้นหาชื่อคนไข้จากช่องค้นหาด้านบนเพื่อเปิดแบบจำลอง Digital Twin</p>
+        <div>
+            <a href="{% url 'patients:patient_list' %}" class="btn btn-primary btn-sm">
+                <i class="fas fa-user-friends me-1"></i> ไปที่หน้ารายชื่อคนไข้
             </a>
         </div>
     </div>
+    {% endif %}
 
 </div>
+
+<script>
+function digitalTwinHub() {
+    let hubData = { patient: null, organSystems: [], cellularResilience: 50 };
+    try {
+        const el = document.getElementById('digital-twin-data');
+        if (el && el.textContent) {
+            hubData = JSON.parse(el.textContent);
+        }
+    } catch(e) {
+        console.error("Failed parsing digital-twin-data:", e);
+    }
+
+    return {
+        patient: hubData.patient,
+        systems: hubData.organSystems.map(s => ({
+            ...s,
+            baselineScore: s.score,
+            currentScore: s.score,
+        })),
+        baseResilience: hubData.cellularResilience,
+        simulatedResilience: hubData.cellularResilience,
+        simulationMode: false,
+        selectedSystem: hubData.organSystems.length > 0 ? hubData.organSystems[0] : null,
+
+        selectSystem(sys) {
+            this.selectedSystem = sys;
+        },
+
+        toggleSimulation() {
+            if (this.simulationMode) {
+                this.systems.forEach(s => {
+                    if (s.baselineScore > 50) {
+                        s.currentScore = Math.max(35, Math.round(s.baselineScore * 0.72));
+                    } else {
+                        s.currentScore = s.baselineScore;
+                    }
+                });
+                this.simulatedResilience = Math.min(92, Math.round(this.baseResilience * 1.35));
+            } else {
+                this.systems.forEach(s => {
+                    s.currentScore = s.baselineScore;
+                });
+                this.simulatedResilience = this.baseResilience;
+            }
+        },
+
+        getTierLabel(sys) {
+            const sc = sys.currentScore;
+            if (sc >= 75) return 'พยาธิสภาพรุนแรง';
+            if (sc >= 60) return 'ความเสื่อมหน้าที่';
+            if (sc >= 40) return 'ความเครียดปานกลาง';
+            return 'สมบูรณ์ปกติ';
+        },
+
+        getTierBadgeClass(sys) {
+            const sc = sys.currentScore;
+            if (sc >= 75) return 'bg-danger text-white';
+            if (sc >= 60) return 'bg-warning-subtle text-warning-emphasis border border-warning-subtle';
+            if (sc >= 40) return 'bg-primary-subtle text-primary border border-primary-subtle';
+            return 'bg-success text-white';
+        },
+
+        getTierBgClass(sys) {
+            const sc = sys.currentScore;
+            if (sc >= 75) return 'bg-danger-subtle';
+            if (sc >= 60) return 'bg-warning-subtle';
+            if (sc >= 40) return 'bg-primary-subtle';
+            return 'bg-success-subtle';
+        },
+
+        getTierTextClass(sys) {
+            const sc = sys.currentScore;
+            if (sc >= 75) return 'text-danger';
+            if (sc >= 60) return 'text-warning-emphasis';
+            if (sc >= 40) return 'text-primary';
+            return 'text-success';
+        },
+
+        getTierProgressBarClass(sys) {
+            const sc = sys.currentScore;
+            if (sc >= 75) return 'bg-danger';
+            if (sc >= 60) return 'bg-warning';
+            if (sc >= 40) return 'bg-primary';
+            return 'bg-success';
+        }
+    };
+}
+
+// Client-side Patient Search & Autocomplete for Digital Twin
+(function() {
+    const searchInput = document.getElementById('twinPatientSearchInput');
+    const searchResults = document.getElementById('twinPatientSearchResults');
+    const searchResultsList = document.getElementById('twinPatientSearchResultsList');
+    const clearBtn = document.getElementById('twinPatientSearchClearBtn');
+
+    let searchTimeout = null;
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const q = this.value.trim();
+            if (clearBtn) {
+                if (q.length > 0) clearBtn.classList.remove('d-none');
+                else clearBtn.classList.add('d-none');
+            }
+
+            if (searchTimeout) clearTimeout(searchTimeout);
+            if (!q) {
+                searchResults.classList.add('d-none');
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                fetch('{% url 'patients:api_patient_search' %}?q=' + encodeURIComponent(q))
+                    .then(res => res.json())
+                    .then(data => {
+                        const list = (data && (data.patients || data.results)) ? (data.patients || data.results) : [];
+                        searchResultsList.innerHTML = '';
+                        if (list.length === 0) {
+                            searchResultsList.innerHTML = `
+                                <div class="p-3 text-center text-muted small">
+                                    <i class="fas fa-search me-1"></i> ไม่พบคนไข้ที่ตรงกับ "${q}"
+                                </div>
+                            `;
+                        } else {
+                            list.forEach(p => {
+                                const initial = (p.full_name || 'P').charAt(0);
+                                const item = document.createElement('a');
+                                item.href = '{% url 'patients:doctor_digital_twin' %}?patient_id=' + p.id;
+                                item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center rounded-3 px-3 py-2.5 border-0 mb-1';
+                                item.innerHTML = `
+                                    <div class="d-flex align-items-center gap-2.5 min-w-0">
+                                        <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; font-size: 0.875rem;">
+                                            ${initial}
+                                        </div>
+                                        <div class="text-truncate">
+                                            <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                                <span class="fw-bold text-dark small text-truncate">${p.full_name}</span>
+                                                <span class="badge bg-light text-secondary border font-monospace text-xs">HN: ${p.hn}</span>
+                                            </div>
+                                            <small class="text-muted d-block text-xs">${p.gender || 'ไม่ระบุเพศ'}${p.age ? ' • ' + p.age + ' ปี' : ''}</small>
+                                        </div>
+                                    </div>
+                                    <span class="btn btn-sm btn-outline-primary rounded-pill py-1 px-3 text-xs flex-shrink-0 ms-2">
+                                        เลือก <i class="fas fa-chevron-right ms-1"></i>
+                                    </span>
+                                `;
+                                searchResultsList.appendChild(item);
+                            });
+                        }
+                        searchResults.classList.remove('d-none');
+                    })
+                    .catch(() => {
+                        searchResults.classList.add('d-none');
+                    });
+            }, 250);
+        });
+
+        // Hide when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add('d-none');
+            }
+        });
+    }
+
+    window.clearTwinPatientSearch = function() {
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.focus();
+        }
+        if (clearBtn) clearBtn.classList.add('d-none');
+        if (searchResults) searchResults.classList.add('d-none');
+    };
+})();
+</script>
 {% endblock %}

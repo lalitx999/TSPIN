@@ -69,18 +69,14 @@
     </div>
 
     <!-- Filter Bar -->
-    <div class="card border-0 shadow-xs mb-4">
+    <div class="card border shadow-sm mb-4 bg-white">
         <div class="card-body p-3">
             <form method="get" action="{% url 'clinical:report_dashboard' %}" class="row g-2 align-items-center">
                 <div class="col-12 col-md-5">
-                    <select name="patient_id" class="form-select form-select-sm">
-                        <option value="">คนไข้ทั้งหมด (All Patients)</option>
-                        {% for pt in patients %}
-                        <option value="{{ pt.pk }}" {% if selected_patient_id == pt.pk|stringformat:"s" %}selected{% endif %}>
-                            {{ pt.full_name }} (HN: {{ pt.hn }})
-                        </option>
-                        {% endfor %}
-                    </select>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white text-muted"><i class="fas fa-search"></i></span>
+                        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="ค้นหาชื่อคนไข้, นามสกุล หรือ HN...">
+                    </div>
                 </div>
 
                 <div class="col-12 col-md-4">
@@ -97,7 +93,7 @@
                     <button type="submit" class="btn btn-sm btn-primary flex-grow-1">
                         <i class="fas fa-filter me-1"></i> กรองข้อมูล
                     </button>
-                    {% if selected_patient_id or status_filter != 'all' %}
+                    {% if q or selected_patient_id or status_filter != 'all' %}
                     <a href="{% url 'clinical:report_dashboard' %}" class="btn btn-sm btn-outline-secondary">
                         ล้าง
                     </a>
@@ -153,14 +149,29 @@
                                 {{ analysis.status_label }}
                             </span>
                         </td>
-                        <td class="text-end pe-3">
-                            <div class="btn-group btn-group-sm">
-                                <a href="{% url 'clinical:report_preview' analysis.pk %}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-eye text-primary me-1"></i> ดูรายงาน
-                                </a>
-                                <a href="{% url 'clinical:report_pdf' analysis.pk %}" target="_blank" class="btn btn-outline-danger">
-                                    <i class="fas fa-file-pdf me-1"></i> PDF
-                                </a>
+                        <td class="text-end pe-3 text-nowrap">
+                            <div class="d-inline-flex align-items-center gap-1 flex-wrap justify-content-end">
+                                <div class="btn-group btn-group-sm" role="group" aria-label="ดูรายงาน 3 ฉบับ">
+                                    <a href="{% url 'clinical:report_preview' analysis.pk %}?edition=physician" class="btn btn-outline-primary py-0.5 px-2 text-xs" title="ฉบับแพทย์ (Physician Edition)">
+                                        แพทย์
+                                    </a>
+                                    <a href="{% url 'clinical:report_preview' analysis.pk %}?edition=patient" class="btn btn-outline-success py-0.5 px-2 text-xs" title="ฉบับคนไข้ (Patient Edition)">
+                                        คนไข้
+                                    </a>
+                                    <a href="{% url 'clinical:report_preview' analysis.pk %}?edition=omics" class="btn btn-outline-secondary py-0.5 px-2 text-xs" title="ฉบับมัลติโอมิกส์ (Multi-Omics Edition)">
+                                        Omics
+                                    </a>
+                                </div>
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-danger dropdown-toggle py-0.5 px-2 text-xs" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-file-pdf me-1"></i> PDF
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm small">
+                                        <li><a class="dropdown-item" href="{% url 'clinical:report_pdf' analysis.pk %}?edition=physician" target="_blank"><i class="fas fa-user-md text-primary me-1.5"></i> PDF ฉบับแพทย์</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'clinical:report_pdf' analysis.pk %}?edition=patient" target="_blank"><i class="fas fa-heart text-success me-1.5"></i> PDF ฉบับคนไข้</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'clinical:report_pdf' analysis.pk %}?edition=omics" target="_blank"><i class="fas fa-dna text-secondary me-1.5"></i> PDF Multi-Omics</a></li>
+                                    </ul>
+                                </div>
                             </div>
                         </td>
                     </tr>

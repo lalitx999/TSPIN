@@ -27,78 +27,144 @@
         </div>
     </div>
 
-    <!-- Patient Context Banner (if active) -->
+    <!-- Patient Context Banner (Clean Bootstrap 5.3 Standard) -->
     {% if patient %}
-    <div class="card shadow-sm border border-primary-subtle bg-primary-subtle">
-        <div class="card-body p-4 d-flex flex-column gap-3">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div class="card shadow-sm border bg-white mb-3">
+        <div class="card-body p-3">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-circle bg-primary text-white fw-bold fs-4 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                    <div class="rounded-circle bg-primary text-white fw-bold fs-4 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
                         {{ patient.first_name|slice:":1" }}
                     </div>
                     <div>
-                        <div class="d-flex align-items-center gap-2 mb-1">
+                        <div class="d-flex align-items-center gap-2 mb-0.5 flex-wrap">
                             <h2 class="h5 fw-bold text-dark mb-0">{{ patient.full_name }}</h2>
-                            <span class="badge bg-white text-primary border border-primary-subtle font-monospace">
-                                HN: {{ patient.hn }}
+                            <span class="badge bg-light text-secondary border font-monospace">HN: {{ patient.hn }}</span>
+                            <span class="badge bg-light text-muted border font-monospace">
+                                {% if patient.age %}{{ patient.age }} ปี{% else %}ไม่ระบุอายุ{% endif %} &bull; {{ patient.get_gender_display }}
                             </span>
                             {% if latest_record and latest_record.is_baseline %}
                                 <span class="badge bg-primary text-white">Baseline</span>
                             {% endif %}
                         </div>
                         <small class="text-muted">
-                            ประเมินล่าสุด: {{ latest_record.record_date|date:"d M Y H:i"|default:"ยังไม่มีบันทึกคะแนน" }}
+                            <strong>ประเมินล่าสุด:</strong> {{ latest_record.record_date|date:"d M Y H:i"|default:"ยังไม่มีบันทึกคะแนน" }}
+                            {% if patient.medical_history %} &bull; <strong>โรคประจำตัว:</strong> {{ patient.medical_history }}{% endif %}
                         </small>
                     </div>
                 </div>
 
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{% url 'clinical:axis_graph' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-chart-pie me-1"></i> เรดาร์ 39 แกน
+                    </a>
+                    <a href="{% url 'patients:doctor_digital_twin' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-child me-1"></i> Digital Twin
+                    </a>
                     <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-folder-open me-1"></i> ดูแฟ้ม EMR
+                        <i class="fas fa-folder-open me-1"></i> แฟ้ม EMR
+                    </a>
+                    <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}&auto_ai=1" class="btn btn-sm btn-outline-primary" title="ให้ AI Copilot อ่าน SOAP และเสนอแนะคะแนน">
+                        <i class="fas fa-robot me-1"></i> ให้ AI ร่างคะแนน
                     </a>
                     <button type="submit" form="axes-score-form" class="btn btn-sm btn-primary">
-                        <i class="fas fa-save me-1"></i> บันทึกคะแนน 39 แกนทั้งหมด
+                        <i class="fas fa-save me-1"></i> บันทึกคะแนน
                     </button>
                 </div>
             </div>
-
-            <!-- Dysfunctional Axes Highlights -->
-            {% if dysfunctional_axes %}
-            <div class="p-3 rounded-3 bg-danger-subtle border border-danger-subtle">
-                <strong class="small text-danger d-block mb-1.5">
-                    <i class="fas fa-exclamation-circle me-1"></i> แกนชีวภาพที่มีความผิดปกติรุนแรง / เร่งด่วน (คะแนน &ge; 60):
-                </strong>
-                <div class="d-flex flex-wrap gap-1.5">
-                    {% for ax in dysfunctional_axes %}
-                        <span class="badge bg-danger text-white">
-                            <strong>Axis {{ ax.axis_id }}:</strong> {{ ax.name }} ({{ ax.score }}/100)
-                        </span>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Matched Recommendations -->
-            {% if recommendations %}
-            <div class="p-3 rounded-3 bg-success-subtle border border-success-subtle">
-                <strong class="small text-success d-block mb-2">
-                    <i class="fas fa-seedling me-1"></i> โมดูลสารอาหารและสารพฤกษเคมีบำบัดที่แนะนำ (Therapeutic Matching):
-                </strong>
-                <div class="row g-2">
-                    {% for mod in recommendations %}
-                    <div class="col-12 col-sm-6 col-md-3">
-                        <div class="card bg-white border p-2.5 h-100">
-                            <span class="font-monospace text-primary fw-bold small d-block">{{ mod.code|default:"MODULE" }}</span>
-                            <strong class="text-dark small d-block">{{ mod.name }}</strong>
-                            <small class="text-muted d-block text-truncate mt-0.5">{{ mod.description }}</small>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
         </div>
     </div>
+
+    <!-- AI Copilot & Dysfunctional Axes Summary (Compact Collapsible) -->
+    {% if dysfunctional_axes or ai_suggestions.success %}
+    <div class="card shadow-sm border border-danger-subtle mb-3 overflow-hidden">
+        <div class="card-header bg-danger-subtle border-bottom border-danger-subtle py-2.5 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-danger text-white rounded-pill px-2.5 py-1 font-monospace">Priority Alert</span>
+                <strong class="text-danger small">
+                    AI Copilot ตรวจพบความผิดปกติระดับเซลล์: {{ dysfunctional_axes|length }} แกนชีวภาพ (คะแนน &ge; 60)
+                </strong>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                {% if recommendations %}
+                <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace text-xs">
+                    {{ recommendations|length }} โมดูลแนะนำ
+                </span>
+                {% endif %}
+                <button class="btn btn-sm btn-light border py-0.5 px-2.5 text-xs text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#dysfunctionalAxesCollapse" aria-expanded="true">
+                    <i class="fas fa-chevron-down me-1"></i> ย่อ / ขยายรายละเอียด
+                </button>
+            </div>
+        </div>
+
+        <div class="collapse show" id="dysfunctionalAxesCollapse">
+            <div class="card-body p-3 bg-white">
+                {% if ai_suggestions.summary_insight %}
+                <div class="alert alert-light border small text-dark mb-3 p-2.5 d-flex gap-2 align-items-start">
+                    <i class="fas fa-magic text-primary mt-1"></i>
+                    <div>
+                        <strong class="d-block text-primary">สรุปภาพรวมทางคลินิก (Clinical Systems Insight):</strong>
+                        <span>{{ ai_suggestions.summary_insight }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Compact Scrollable Table for Dysfunctional Axes (No visual sprawl!) -->
+                <div class="table-responsive border rounded-3 mb-3" style="max-height: 280px; overflow-y: auto;">
+                    <table class="table table-hover table-sm align-middle mb-0" style="font-size: 0.8125rem;">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th class="ps-3 py-2" style="width: 100px;">แกน</th>
+                                <th class="py-2">ชื่อแกนชีววิทยา</th>
+                                <th class="py-2 text-center" style="width: 130px;">คะแนนประเมิน</th>
+                                <th class="py-2">เหตุผลทางพยาธิสรีรวิทยา (Clinical Rationale)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ax in dysfunctional_axes %}
+                            <tr>
+                                <td class="ps-3 font-monospace fw-bold {% if ax.score >= 75 %}text-danger{% else %}text-warning-emphasis{% endif %}">
+                                    Axis {{ ax.axis_id }}
+                                </td>
+                                <td class="fw-semibold text-dark">{{ ax.name }}</td>
+                                <td class="text-center">
+                                    <span class="badge {% if ax.score >= 75 %}bg-danger text-white{% else %}bg-warning-subtle text-warning-emphasis border border-warning-subtle{% endif %} font-monospace">
+                                        {{ ax.score }} / 100
+                                    </span>
+                                </td>
+                                <td class="text-muted small">
+                                    {% if ax.ai_rationale %}
+                                        {{ ax.ai_rationale }}
+                                    {% else %}
+                                        พบสัญญาณความผิดปกติจากอาการหรือผลแล็บของผู้ป่วย
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Matched Recommendations Bar -->
+                {% if recommendations %}
+                <div class="p-2.5 rounded-3 border border-success-subtle bg-success-subtle d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="badge bg-success text-white"><i class="fas fa-leaf me-1"></i> โมดูลบำบัดแนะนำ:</span>
+                        {% for mod in recommendations %}
+                        <a href="{% url 'patients:doctor_modules' %}" class="badge bg-white text-dark border border-success-subtle text-decoration-none py-1.5 px-2 shadow-xs">
+                            <span class="text-success fw-bold font-monospace">{{ mod.code }}</span>: {{ mod.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'clinical:therapeutic_matrix' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-success flex-shrink-0 text-xs">
+                        เปิดเมทริกซ์การรักษา <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
     {% endif %}
 
     <!-- Score Guide Legend -->
@@ -124,19 +190,35 @@
     <!-- Main Domains Grid -->
     <form id="axes-score-form" method="post" action="{% if patient %}{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}{% endif %}">
         {% csrf_token %}
+        {% if ai_suggestions and ai_suggestions.success %}
+            <input type="hidden" name="ai_assisted" value="1">
+        {% endif %}
 
         {% if form %}
             <div class="card shadow-sm border mb-4">
-                <div class="card-body p-3 d-flex flex-column flex-sm-row align-items-sm-center gap-3">
-                    <div class="form-check">
-                        {{ form.is_baseline }}
-                        <label class="form-check-label small fw-medium text-dark ms-1">
-                            ตั้งเป็นค่าพื้นฐาน (Baseline Assessment)
-                        </label>
+                <div class="card-body p-3 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                    <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+                        <div class="form-check">
+                            {{ form.is_baseline }}
+                            <label class="form-check-label small fw-medium text-dark ms-1" for="{{ form.is_baseline.id_for_label }}">
+                                ตั้งเป็นค่าพื้นฐาน (Baseline Assessment)
+                            </label>
+                        </div>
                     </div>
-                    <div class="flex-grow-1">
-                        {{ form.notes }}
+                    {% if patient %}
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetAllScores(50)">
+                            <i class="fas fa-undo me-1"></i> ตั้งเป็น 50 ทุกแกน
+                        </button>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fas fa-save me-1"></i> บันทึกผลการประเมิน
+                        </button>
                     </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-light p-3 border-top">
+                    <label class="form-label small fw-bold text-dark mb-1">บันทึกความเห็นทางคลินิก (Doctor's Notes):</label>
+                    {{ form.notes }}
                 </div>
             </div>
         {% endif %}
@@ -173,11 +255,18 @@
                                             </span>
                                             <h3 class="fs-6 fw-bold text-dark mb-0">{{ axis.name }}</h3>
                                         </div>
-                                        <small class="text-muted font-monospace">#{{ axis.axis_id }}</small>
+                                        <div class="d-flex align-items-center gap-1">
+                                            {% if axis.ai_rationale %}
+                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle" title="{{ axis.ai_rationale }}">
+                                                <i class="fas fa-magic me-1"></i> AI เสนอ
+                                            </span>
+                                            {% endif %}
+                                            <small class="text-muted font-monospace">#{{ axis.axis_id }}</small>
+                                        </div>
                                     </div>
 
                                     <!-- Sub-axes Descriptions -->
-                                    <div class="pt-2 border-top d-flex flex-column gap-1" style="font-size: 0.775rem;">
+                                    <div class="pt-2 border-top d-flex flex-column gap-1 mb-3" style="font-size: 0.775rem;">
                                         {% for sub_k, sub_v in axis.sub_axes.items %}
                                         <div class="text-muted">
                                             <strong class="text-primary font-monospace me-1">[{{ sub_k }}] {{ sub_v.name }}:</strong>
@@ -185,7 +274,37 @@
                                         </div>
                                         {% endfor %}
                                     </div>
+
+                                    {% if axis.ai_rationale %}
+                                    <div class="alert alert-warning py-1.5 px-2.5 small mb-3 border-warning-subtle">
+                                        <i class="fas fa-lightbulb text-warning-emphasis me-1"></i>
+                                        <strong>AI สังเกต:</strong> {{ axis.ai_rationale }}
+                                    </div>
+                                    {% endif %}
                                 </div>
+
+                                <!-- Score Input Controls -->
+                                {% if patient %}
+                                <div class="pt-2 border-top d-flex align-items-center justify-content-between gap-3 bg-white p-2 rounded-2 border">
+                                    <label class="small fw-bold text-dark mb-0 d-flex align-items-center gap-1">
+                                        <span>คะแนนความผิดปกติ:</span>
+                                    </label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        {% if axis.form_field %}
+                                            <div style="width: 85px;">
+                                                {{ axis.form_field }}
+                                            </div>
+                                        {% else %}
+                                            <input type="number" name="axis_{{ axis.axis_id }}" value="{{ axis.score|default:50 }}" min="0" max="100" class="form-control form-control-sm text-center fw-bold axis-score-input" style="width: 85px;">
+                                        {% endif %}
+                                        <span class="small text-muted">/ 100</span>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="pt-2 border-top text-end">
+                                    <span class="badge bg-secondary-subtle text-secondary font-monospace">ค่าปกติ: 50 / 100</span>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         {% endfor %}
@@ -203,6 +322,15 @@
         </div>
         {% endif %}
     </form>
+
+    <script>
+    function resetAllScores(val) {
+        document.querySelectorAll('.axis-score-input').forEach(function(input) {
+            input.value = val;
+            input.dispatchEvent(new Event('input'));
+        });
+    }
+    </script>
 
 </div>
 {% endblock %}

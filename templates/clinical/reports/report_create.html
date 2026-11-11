@@ -1,75 +1,136 @@
 {% extends 'layouts/doctor_base.html' %}
 {% load static %}
 
-{% block title %}สร้างรายงาน Precision Report: {{ patient.full_name }} | Dr. Patt EMR{% endblock %}
+{% block title %}สร้างรายงาน 3 ฉบับด้วย AI: {{ patient.full_name }} | Dr. Patt EMR{% endblock %}
 
 {% block content %}
-<div class="container py-2" style="max-width: 900px;">
+<div class="container py-2" style="max-width: 960px;">
     <!-- Header -->
     <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom">
         <div>
             <a href="{% url 'clinical:report_dashboard' %}" class="btn btn-sm btn-outline-secondary mb-2">
                 <i class="fas fa-arrow-left me-1"></i> ย้อนกลับศูนย์รายงาน
             </a>
-            <h1 class="h4 fw-bold text-dark mb-0">สร้างรายงานการแพทย์แม่นยำฉบับใหม่ (Create Precision Report)</h1>
+            <h1 class="h4 fw-bold text-dark mb-0">สร้างรายงานการแพทย์แม่นยำ 3 ฉบับ (AI Report Authoring)</h1>
+            <small class="text-muted">ดึงข้อมูลเวชระเบียนจริง &rarr; สร้าง ฉบับแพทย์, ฉบับคนไข้ และ Multi-Omics พร้อมกันจาก Snapshot เดียว</small>
         </div>
     </div>
 
-    <div class="card border-0 shadow-xs overflow-hidden">
+    <div class="card border shadow-sm overflow-hidden bg-white">
         <div class="card-header bg-light border-bottom py-2.5 px-3">
             <span class="small fw-bold text-uppercase text-dark">
-                <i class="fas fa-id-card-alt text-primary me-1"></i> ข้อมูลคนไข้และการแช่แข็งผลวิเคราะห์ (Immutable Snapshot)
+                <i class="fas fa-id-card-alt text-primary me-1"></i> ข้อมูลเวชระเบียนที่ใช้เขียนรายงาน (Auto-Populated Grounded Context)
             </span>
         </div>
 
         <div class="card-body p-4">
             <!-- Patient Summary -->
-            <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light border mb-4">
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fs-5 fw-bold" style="width: 50px; height: 50px;">
-                    {{ patient.first_name|slice:":1" }}
-                </div>
-                <div>
-                    <div class="d-flex align-items-center gap-2">
-                        <h5 class="fw-bold text-dark mb-0">{{ patient.full_name }}</h5>
-                        <span class="badge bg-primary-subtle text-primary font-monospace">
-                            HN: {{ patient.hn }}
-                        </span>
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 p-3 rounded-3 bg-light border mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fs-5 fw-bold flex-shrink-0" style="width: 50px; height: 50px;">
+                        {{ patient.first_name|slice:":1" }}
                     </div>
-                    <small class="text-muted d-block mt-1">
-                        อายุ: {{ patient.age|default:"-" }} ปี | กรุ๊ปเลือด: {{ patient.blood_type|default:"-" }}
-                    </small>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <h5 class="fw-bold text-dark mb-0">{{ patient.full_name }}</h5>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">HN: {{ patient.hn }}</span>
+                        </div>
+                        <small class="text-muted d-block mt-1">
+                            อายุ: {{ patient.age|default:"-" }} ปี &bull; เพศ: {{ patient.get_gender_display }} &bull; แพ้ยา: {{ patient.allergies|default:"ไม่มี" }}
+                        </small>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-1.5">
+                    <span class="badge bg-white text-dark border font-monospace">
+                        ประเมิน {{ snap.assessed_axes|length }}/39 แกน
+                    </span>
+                    <span class="badge {% if snap.dysfunctional_axes %}bg-danger-subtle text-danger border-danger-subtle{% else %}bg-success-subtle text-success border-success-subtle{% endif %} border font-monospace">
+                        ผิดปกติ {{ snap.dysfunctional_axes|length }} แกน
+                    </span>
+                    <span class="badge {% if snap.has_omics %}bg-info-subtle text-info-emphasis border-info-subtle{% else %}bg-secondary-subtle text-secondary{% endif %} border">
+                        {% if snap.has_omics %}Omics: พร้อมเต็มรูปแบบ{% else %}Omics: Readiness Mode{% endif %}
+                    </span>
                 </div>
             </div>
 
-            <form method="post">
+            <!-- Auto-Populated Clinical Overview -->
+            <div class="row g-3 mb-4 small">
+                <div class="col-12 col-md-6">
+                    <div class="p-3 rounded-3 border bg-white h-100">
+                        <div class="fw-bold text-dark mb-1.5"><i class="fas fa-notes-medical text-primary me-1"></i> ข้อมูลซักประวัติ (SOAP) และสัญญาณชีพ</div>
+                        <div class="text-muted mb-1">
+                            <strong>อาการล่าสุด:</strong> {{ snap.latest_soap.subjective|default:"ยังไม่มีบันทึก SOAP"|truncatechars:140 }}
+                        </div>
+                        <div class="text-muted">
+                            <strong>สัญญาณชีพ:</strong>
+                            {% if snap.vitals.bp_systolic %}
+                                BP {{ snap.vitals.bp_systolic }}/{{ snap.vitals.bp_diastolic }} mmHg
+                                {% if snap.vitals.pulse %}&bull; HR {{ snap.vitals.pulse }} bpm{% endif %}
+                            {% else %}
+                                ยังไม่ได้บันทึก
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="p-3 rounded-3 border bg-white h-100">
+                        <div class="fw-bold text-dark mb-1.5"><i class="fas fa-vials text-primary me-1"></i> ผลแล็บชีวเคมี &amp; โมดูลบำบัด</div>
+                        <div class="text-muted mb-1">
+                            <strong>ผลแล็บที่บันทึก:</strong> {{ snap.labs_list|length }} รายการ (ผิดปกติ {{ snap.abnormal_labs|length }} รายการ)
+                        </div>
+                        <div class="text-muted">
+                            <strong>โมดูลที่จับคู่ได้:</strong>
+                            {% if snap.matched_modules %}
+                                {% for m in snap.matched_modules|slice:":3" %}<span class="badge bg-success-subtle text-success border me-1">{{ m.code }}</span>{% endfor %}
+                            {% else %}
+                                ยังไม่มีรายการจับคู่
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" id="createReportForm">
                 {% csrf_token %}
+
+                <!-- AI Writer Switch -->
+                <div class="form-check form-switch p-3 rounded-3 bg-primary-subtle border border-primary-subtle d-flex align-items-center justify-content-between mb-3">
+                    <div>
+                        <label class="form-check-label fw-bold text-dark small d-block" for="useAiSwitch">
+                            <i class="fas fa-robot text-primary me-1"></i> ให้ AI เขียนเนื้อหารายงานทั้ง 3 ฉบับอัตโนมัติ (Physician, Patient, Multi-Omics)
+                        </label>
+                        <small class="text-muted text-xs">
+                            ระบบจะสร้างรายงาน 3 ฉบับแยกภาษาและบทวิเคราะห์ตาม Safety Rules (ฉบับแพทย์ 5 บท, ฉบับคนไข้ 7 บทภาษาสุภาพ, Multi-Omics พร้อม Omics Gate)
+                        </small>
+                    </div>
+                    <input class="form-check-input ms-3 fs-5" type="checkbox" role="switch" name="use_ai" value="1" id="useAiSwitch" checked>
+                </div>
 
                 <div class="mb-3">
                     <label class="form-label small fw-semibold text-dark">
                         สถานะเริ่มต้นของรายงาน:
                     </label>
                     <select name="status" class="form-select form-select-sm">
-                        <option value="draft">⏳ ฉบับร่างทางการแพทย์ (Draft - มีลายน้ำป้องกันการเผยแพร่)</option>
+                        <option value="draft">⏳ ฉบับร่างทางการแพทย์ (Draft - มีลายน้ำป้องกันการเผยแพร่ก่อนตรวจทาน)</option>
                         <option value="reviewed">🔍 ผ่านการตรวจทานแล้ว (Reviewed)</option>
                         <option value="approved">✅ แพทย์อนุมัติทันที (Approved - ลบลายน้ำ)</option>
                     </select>
-                    <small class="text-muted d-block mt-1">หากตั้งเป็น Draft เอกสาร PDF จะมีลายน้ำ "DRAFT" ปรากฏเพื่อความปลอดภัยตาม Pillar 15</small>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label small fw-semibold text-dark">
-                        บทสรุปทางการแพทย์และการประเมินของแพทย์ (Doctor's Summary):
+                        ความเห็นเพิ่มเติมของแพทย์ผู้ตรวจ (Doctor's Notes — AI จะนำไปเรียบเรียงร่วมด้วย):
                     </label>
                     <textarea name="doctor_summary" 
-                              rows="5" 
+                              rows="4" 
                               class="form-control form-control-sm" 
-                              placeholder="ระบุบทสรุปเชิงกลไก สมมติฐานโรค และเป้าหมายการบำบัดรักษาสำหรับรายงานฉบับนี้..."></textarea>
+                              placeholder="ระบุข้อสังเกตพิเศษ เป้าหมายการดูแล หรือข้อควรระวังเฉพาะราย..."></textarea>
                 </div>
 
-                <div class="alert alert-info border-0 d-flex align-items-start gap-2 mb-4 p-3">
+                <div class="alert alert-info border-info-subtle d-flex align-items-start gap-2 mb-4 p-3">
                     <i class="fas fa-lock fs-6 mt-1 text-primary"></i>
                     <div class="small">
-                        <strong>Pillar 8 & 15 Notice:</strong> เมื่อกดยืนยัน ระบบจะคัดลอกคะแนน 39 แกนชีวภาพล่าสุด (ประเมินเมื่อ {{ latest_bio.record_date|date:"d M Y H:i" }}) เข้าสู่ Snapshot ถาวร ซึ่งจะไม่เปลี่ยนแปลงแม้คะแนนในอนาคตจะเปลี่ยนไป
+                        <strong>One Snapshot &rarr; 3 Consistent Reports (Pillar 8 &amp; 15):</strong> ระบบจะแช่แข็งคะแนน 39 แกนล่าสุด (ประเมินเมื่อ {{ latest_bio.record_date|date:"d M Y H:i" }}) เพื่อให้ตัวเลขตรงกัน 100% ทั้ง 3 ฉบับ
                     </div>
                 </div>
 
@@ -77,12 +138,22 @@
                     <a href="{% url 'clinical:report_dashboard' %}" class="btn btn-sm btn-outline-secondary">
                         ยกเลิก
                     </a>
-                    <button type="submit" class="btn btn-sm btn-primary">
-                        <i class="fas fa-check me-1"></i> ยืนยันสร้าง Snapshot รายงาน
+                    <button type="submit" class="btn btn-sm btn-primary px-4 shadow-sm" id="createSubmitBtn">
+                        <i class="fas fa-magic me-1"></i> สร้าง Snapshot และเขียนรายงาน 3 ฉบับ
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('createReportForm')?.addEventListener('submit', function () {
+    const btn = document.getElementById('createSubmitBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> กำลังสร้าง Snapshot และเขียนรายงาน 3 ฉบับ...';
+    }
+});
+</script>
 {% endblock %}

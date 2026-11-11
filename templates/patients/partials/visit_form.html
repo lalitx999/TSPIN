@@ -1,0 +1,161 @@
+{% comment %}
+ฟอร์มบันทึกการตรวจ: สัญญาณชีพ (บังคับ) -> ซักประวัติ (พิมพ์ / ไมค์ / กล้อง / อัปโหลด) -> AI สรุป SOAP -> ตรวจทาน -> เวชระเบียน
+การทำงานอยู่ใน static/js/visit_form.js ค่าตั้งต้นและ URL ส่งผ่าน json_script ด้านล่าง
+{% endcomment %}
+{{ visit_state|json_script:"visit-state" }}
+{{ visit_ranges|json_script:"visit-ranges" }}
+<div id="new-soap" class="adm-card adm-visit" x-show="showNewSoap" x-cloak
+     x-data="visitForm({
+        state: JSON.parse(document.getElementById('visit-state').textContent),
+        ranges: JSON.parse(document.getElementById('visit-ranges').textContent),
+        patient: { id: {{ patient.pk }}, name: '{{ patient.full_name|escapejs }}', hn: '{{ patient.hn|escapejs }}' },
+        urls: {
+            save: '{% url 'patients:visit_save' patient.pk %}',
+            image: '{% url 'patients:visit_image_add' patient.pk %}',
+            imageRemove: '{% url 'patients:visit_image_remove' patient.pk %}',
+            summarize: '{% url 'patients:visit_summarize' patient.pk %}',
+            manual: '{% url 'patients:visit_manual' patient.pk %}',
+            commit: '{% url 'patients:visit_commit' patient.pk %}',
+            discard: '{% url 'patients:visit_discard' patient.pk %}'
+        }
+     })">
+    {% csrf_token %}
+
+    <div class="adm-card-head flex-wrap">
+        <div>
+            <h2 class="adm-card-title">บันทึกการตรวจ</h2>
+            <small class="text-muted" x-text="saveLabel" aria-live="polite"></small>
+        </div>
+        <button type="button" @click="showNewSoap = false" class="btn-close" aria-label="ซ่อนฟอร์ม (ร่างยังเก็บไว้)"></button>
+    </div>
+
+    {% if other_drafts %}
+    <div class="alert alert-warning py-2 mb-3">
+        <i class="fas fa-info-circle me-1"></i>
+        มีร่างของ{% for d in other_drafts %} {{ d.opened_by.get_full_name|default:d.opened_by.username }}{% if not forloop.last %},{% endif %}{% endfor %} ค้างอยู่
+        เปิดต่อได้ที่ <a href="{% url 'clinical:intake_detail' other_drafts.0.id %}">หน้าแชท</a> (ต้องปลดล็อกกล่อง)
+    </div>
+    {% endif %}
+
+    <!-- 1. สัญญาณชีพ -->
+    <section class="adm-visit-step" aria-labelledby="visit-step-1">
+        <h3 class="adm-visit-step-title" id="visit-step-1"><span class="adm-visit-num">1</span> สัญญาณชีพ <span class="text-danger">*</span></h3>
+        <div class="row g-3">
+            <template x-for="f in vitalFields" :key="f.name">
+                <div :class="f.col">
+                    <label class="form-label" :for="'v-' + f.name"><span x-text="f.label"></span> <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" :id="'v-' + f.name" :name="f.name" required inputmode="decimal"
+                               :step="f.step" :min="ranges[f.name][0]" :max="ranges[f.name][1]" :placeholder="f.example"
+                               x-model="vitals[f.name]" @input="touch(); invalid = invalid.filter(n => n !== f.name)"
+                               :class="{ 'is-invalid': invalid.includes(f.name) }">
+                        <span class="input-group-text" x-text="f.unit"></span>
+                    </div>
+                </div>
+            </template>
+            <div class="col-6 col-md-3">
+                <label class="form-label">BMI (คำนวณให้)</label>
+                <div class="adm-visit-bmi" x-text="bmi || '-'"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. ซักประวัติ -->
+    <section class="adm-visit-step" aria-labelledby="visit-step-2">
+        <h3 class="adm-visit-step-title" id="visit-step-2"><span class="adm-visit-num">2</span> ซักประวัติ</h3>
+        <p class="text-muted small mb-2">พิมพ์ กดไมค์แล้วพูด หรือแนบรูป (ถ่ายจากกล้องหรือเลือกจากเครื่อง) ใส่ทุกอย่างไว้ในช่องนี้ได้เลย</p>
+
+        <div class="adm-visit-box" :class="{ 'is-recording': recording }">
+            <div class="adm-visit-tools">
+                <button type="button" class="btn btn-sm" :class="recording ? 'btn-danger' : 'btn-light'" @click="toggleMic()"
+                        :disabled="!speechSupported" :title="speechSupported ? '' : 'เบราว์เซอร์นี้ไม่รองรับการพูดเป็นข้อความ ใช้ Chrome, Edge หรือ Safari'">
+                    <i class="fas" :class="recording ? 'fa-stop' : 'fa-microphone'"></i>
+                    <span x-text="recording ? 'หยุดฟัง' : 'พูด'"></span>
+                </button>
+                <button type="button" class="btn btn-sm btn-light" @click="openCamera()"><i class="fas fa-camera"></i> ถ่ายรูป</button>
+                <button type="button" class="btn btn-sm btn-light" @click="$refs.fileInput.click()"><i class="far fa-image"></i> อัปโหลดรูป</button>
+                <input type="file" x-ref="fileInput" class="d-none" accept="image/jpeg,image/png,image/webp" multiple @change="pickFiles($event)">
+                <input type="file" x-ref="captureInput" class="d-none" accept="image/*" capture="environment" @change="pickFiles($event)">
+                <span class="ms-auto small text-danger" x-show="recording" x-cloak><span class="adm-rec-dot"></span> กำลังฟัง…</span>
+            </div>
+            <textarea class="form-control adm-visit-text" rows="7" x-model="history" @input="touch()" aria-label="ข้อความซักประวัติ"
+                      placeholder="เช่น ปวดท้องด้านขวาล่าง 2 วัน ปวดมากขึ้นเวลาเดิน มีไข้ต่ำ ๆ ยังไม่ได้ทานยา แพ้ยาเพนิซิลลิน…"></textarea>
+            <div class="adm-visit-interim" x-show="interim" x-text="interim" x-cloak></div>
+
+            <div class="adm-visit-thumbs" x-show="images.length || uploading" x-cloak>
+                <template x-for="img in images" :key="img.media_id">
+                    <figure class="adm-visit-thumb">
+                        <a :href="img.url" target="_blank" rel="noopener"><img :src="img.url" alt="รูปประกอบการซักประวัติ"></a>
+                        <button type="button" class="adm-visit-thumb-del" @click="removeImage(img)" aria-label="ลบรูปนี้"><i class="fas fa-times"></i></button>
+                    </figure>
+                </template>
+                <div class="adm-visit-thumb is-loading" x-show="uploading"><i class="fas fa-spinner fa-spin"></i></div>
+            </div>
+            <div class="small text-muted mt-2"><span x-text="images.length"></span> / {{ 6 }} รูป &middot; รูปจะถูกลบตำแหน่ง GPS และเบลอใบหน้าก่อนส่งให้ AI</div>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+            <button type="button" class="btn btn-primary" @click="summarize()" :disabled="!!busy">
+                <i class="fas" :class="busy === 'summarize' ? 'fa-spinner fa-spin' : 'fa-magic'"></i>
+                <span x-text="soapSource === 'ai' ? 'ให้ AI สรุปใหม่' : 'ให้ AI สรุป SOAP'"></span>
+            </button>
+            <button type="button" class="btn btn-link btn-sm" x-show="canManual && soapSource === 'none'" x-cloak @click="manualSoap()">กรอก SOAP เอง</button>
+            <small class="text-muted">สรุปด้วย Gemini · AI ไม่วินิจฉัยโรค</small>
+        </div>
+    </section>
+
+    <!-- 3. SOAP: ปิดเทาจนกว่า AI จะสรุป -->
+    <section class="adm-visit-step" aria-labelledby="visit-step-3">
+        <h3 class="adm-visit-step-title" id="visit-step-3">
+            <span class="adm-visit-num">3</span> SOAP
+            <span class="badge bg-warning-subtle text-warning-emphasis ms-1" x-show="soapSource === 'ai'" x-cloak>AI ร่าง · ต้องตรวจทาน</span>
+            <span class="badge bg-light text-secondary ms-1" x-show="soapSource === 'manual'" x-cloak>กรอกเอง</span>
+        </h3>
+        <fieldset class="adm-visit-soap" :disabled="!soapUnlocked" :class="{ 'is-locked': !soapUnlocked }">
+            <div class="adm-visit-lock" x-show="!soapUnlocked">
+                <i class="fas fa-lock"></i> ช่องนี้จะเปิดให้ตรวจทานและแก้ไข หลังจาก AI สรุปแล้ว
+            </div>
+            <div class="row g-3">
+                <template x-for="f in soapFields" :key="f.name">
+                    <div class="col-md-6">
+                        <label class="form-label" :for="'s-' + f.name"><span class="adm-soap-tag" x-text="f.tag"></span> <span x-text="f.label"></span></label>
+                        <textarea class="form-control" rows="4" :id="'s-' + f.name" x-model="soap[f.name]" @input="touch()"></textarea>
+                    </div>
+                </template>
+            </div>
+        </fieldset>
+    </section>
+
+    <!-- ยืนยันและบันทึก -->
+    <div class="adm-visit-foot">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="visit-reviewed" x-model="reviewed" :disabled="!soapUnlocked">
+            <label class="form-check-label" for="visit-reviewed">ฉันตรวจทานสัญญาณชีพและ SOAP ทุกช่องแล้ว ข้อมูลถูกต้อง</label>
+        </div>
+        <div class="d-flex gap-2 ms-auto">
+            <button type="button" class="btn btn-light" @click="discard()" :disabled="!!busy || !boxId">ทิ้งร่าง</button>
+            <button type="button" class="btn btn-primary" @click="commit()" :disabled="!!busy || !soapUnlocked || !reviewed">
+                <i class="fas" :class="busy === 'commit' ? 'fa-spinner fa-spin' : 'fa-file-medical'"></i> บันทึกเข้าเวชระเบียน
+            </button>
+        </div>
+    </div>
+
+    <!-- กล้อง -->
+    <div class="modal fade" x-ref="cameraModal" tabindex="-1" aria-label="ถ่ายรูป" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h6">ถ่ายรูป</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+                </div>
+                <div class="modal-body p-0 bg-black">
+                    <video x-ref="video" class="adm-visit-video" autoplay playsinline muted></video>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-light" @click="switchCamera()" x-show="cameraCount > 1"><i class="fas fa-sync-alt"></i> สลับกล้อง</button>
+                    <button type="button" class="btn btn-primary ms-auto" @click="capture()"><i class="fas fa-camera"></i> ถ่าย</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

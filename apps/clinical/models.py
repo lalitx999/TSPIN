@@ -161,6 +161,11 @@ class AnalysisRecord(SoftDeleteModel):
     key_findings = models.JSONField(default=list, blank=True, help_text="สรุปพยาธิสภาพและกลไกหลักที่พบ")
     therapeutic_plan = models.JSONField(default=list, blank=True, help_text="แผนการบำบัดด้วยสารอาหารและสารพฤกษเคมี 200 โมดูล")
     doctor_summary = models.TextField(blank=True, help_text="บทสรุปทางการแพทย์ฉบับเต็มโดยแพทย์")
+    ai_editions_json = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="บทวิเคราะห์ 3 ฉบับที่ AI เขียนและแพทย์ตรวจทานแล้ว (physician, patient, multiomics)"
+    )
 
     approved_at = models.DateTimeField(null=True, blank=True)
     released_at = models.DateTimeField(null=True, blank=True)

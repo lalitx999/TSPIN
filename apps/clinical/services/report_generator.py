@@ -120,21 +120,39 @@ class ReportGeneratorService:
             dob=patient.birth_date.strftime("%Y-%m-%d") if getattr(patient, 'birth_date', None) else None,
         )
 
+        approved_mods: List[str] = []
+        extra = patient.extra_data if isinstance(getattr(patient, 'extra_data', None), dict) else {}
+        if isinstance(analysis.therapeutic_plan, list) and analysis.status in ('approved', 'released'):
+            for m in analysis.therapeutic_plan:
+                if isinstance(m, dict) and m.get('code'):
+                    approved_mods.append(str(m['code']))
+                elif isinstance(m, str):
+                    approved_mods.append(m)
+        elif isinstance(extra.get('approved_protocols'), list) and extra['approved_protocols']:
+            for proto in extra['approved_protocols'][:2]:
+                if isinstance(proto, dict):
+                    for code in proto.get('modules', []):
+                        if code and code not in approved_mods:
+                            approved_mods.append(str(code))
+
+        mod_reg = ModuleRegistryPayload(
+            approved_module_count=len(approved_mods),
+            approved_modules_whitelist=approved_mods,
+            is_hidden_in_clinical_report=(len(approved_mods) == 0),
+        )
+
         return CoreAnalysisPayload(
             analysis_id=analysis.pk,
             framework_version="TSPI-2026.1",
             approval_status=approval_status,
             identity=identity,
             safety_gates=SafetyGatesPayload(),
-            module_registry=ModuleRegistryPayload(
-                approved_module_count=0,
-                approved_modules_whitelist=[],
-                is_hidden_in_clinical_report=True,
-            ),
+            module_registry=mod_reg,
             axes=axes_payload,
             clinical_summary=analysis.doctor_summary or "การประเมินทางคลินิกเบื้องต้นตามเกณฑ์ TSPI",
             physician_notes=analysis.doctor_summary or "",
             certified_by_office_staff=False,
+            ai_editions=getattr(analysis, 'ai_editions_json', None) or {},
         )
 
     @classmethod
@@ -221,6 +239,17 @@ class ReportGeneratorService:
         # กฎข้อ 2: บังคับ sanitize_patient_prose ใน Service Layer เสมอ
         sanitized_prose = ClinicalInvariantValidator.sanitize_patient_prose(payload.clinical_summary)
 
+        editions_data = payload.ai_editions if isinstance(payload.ai_editions, dict) else {}
+        ai_physician_chapters = editions_data.get('physician') or []
+        ai_multiomics_chapters = editions_data.get('multiomics') or []
+        ai_patient_chapters = []
+        for ch in (editions_data.get('patient') or []):
+            if isinstance(ch, dict):
+                ai_patient_chapters.append({
+                    'title': ClinicalInvariantValidator.sanitize_patient_prose(str(ch.get('title', ''))),
+                    'content': ClinicalInvariantValidator.sanitize_patient_prose(str(ch.get('content', ''))),
+                })
+
         return {
             'analysis_id': payload.analysis_id,
             'framework_version': payload.framework_version,
@@ -237,8 +266,23 @@ class ReportGeneratorService:
             'scores_map': scores_map,
             'evidence_counts': evidence_counts,
             'domain_summaries': domain_summaries,
+            'ai_physician_chapters': ai_physician_chapters,
+            'ai_patient_chapters': ai_patient_chapters,
+            'ai_multiomics_chapters': ai_multiomics_chapters,
+            'omics_available': bool(editions_data.get('omics_available')),
             'generation_time': timezone.now(),
         }
+
+    @classmethod
+    def render_html_for_edition(cls, analysis, edition: str = 'physician') -> str:
+        """เรนเดอร์ HTML ฉบับจริงตรงกับ WeasyPrint PDF 100% สำหรับใช้ทั้ง Preview และ PDF"""
+        payload = cls.payload_from_analysis_record(analysis)
+        ed = (edition or 'physician').lower()
+        if ed == 'patient':
+            return cls.render_patient_report(payload)
+        if ed in ('omics', 'multiomics', 'multi_omics'):
+            return cls.render_multiomics_report(payload)
+        return cls.render_physician_report(payload)
 
     # =========================================================================
     # 1. PHYSICIAN REPORT (ฉบับแพทย์)

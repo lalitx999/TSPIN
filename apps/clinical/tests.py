@@ -124,9 +124,21 @@ class ClinicalAxesEngineTests(TestCase):
         self.assertContains(resp, "Systemic Inflammatory Load")
         self.assertContains(resp, "DNA Repair")
 
-        # เข้าหน้า Graph / Topology
+        # สร้าง BiologicalRecord ให้ self.patient
+        BiologicalRecord.objects.create(
+            patient=self.patient,
+            doctor=self.doctor,
+            is_baseline=True,
+            axis_1=75,
+            axis_2=45,
+            axis_3=60
+        )
+
+        # เข้าหน้า Graph / Topology (แบบระบุคนไข้)
         resp = self.client.get(reverse('clinical:axis_graph') + f'?patient_id={self.patient.pk}')
         self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.context['has_assessment'])
+        self.assertContains(resp, "TSPI Mechanistic Topology")
 
         # ตรวจสอบ AuditLog บันทึกการเข้าดู Graph
         audit = AuditLog.objects.filter(
@@ -134,6 +146,37 @@ class ClinicalAxesEngineTests(TestCase):
             user=self.doctor
         ).first()
         self.assertIsNotNone(audit)
+
+        # เข้าหน้า Graph / Topology (แบบไม่ระบุคนไข้ - หน้าจอเลือกคนไข้)
+        resp_no_patient = self.client.get(reverse('clinical:axis_graph'))
+        self.assertEqual(resp_no_patient.status_code, 200)
+        self.assertIsNone(resp_no_patient.context['patient'])
+        self.assertContains(resp_no_patient, "เลือกคนไข้เพื่อแสดงแผนผังเรดาร์ชีวภาพ")
+
+        # คนไข้ใหม่ที่ยังไม่มีการประเมิน (Actionable Empty State)
+        new_patient = Patient.objects.create(
+            first_name="ไม่มี",
+            last_name="ประเมิน",
+            hn="HN-EMPTY-001",
+            gender="M",
+            phone="0810000000",
+        )
+        resp_empty = self.client.get(reverse('clinical:axis_graph') + f'?patient_id={new_patient.pk}')
+        self.assertEqual(resp_empty.status_code, 200)
+        self.assertFalse(resp_empty.context['has_assessment'])
+        self.assertContains(resp_empty, "ยังไม่มีการประเมิน 39 แกนชีวภาพ")
+
+        # คนไข้ที่มี BiologicalRecord ว่างเปล่า (ทุกแกนเป็น None) - ตรวจสอบว่า axes_explorer ไม่แครช
+        empty_record_patient = Patient.objects.create(
+            first_name="ว่าง",
+            last_name="เปล่า",
+            hn="HN-NONE-001",
+            gender="F",
+            phone="0820000000",
+        )
+        BiologicalRecord.objects.create(patient=empty_record_patient, doctor=self.doctor)
+        resp_axes_none = self.client.get(reverse('clinical:axes_explorer') + f'?patient_id={empty_record_patient.pk}')
+        self.assertEqual(resp_axes_none.status_code, 200)
 
     def test_htmx_update_axis_score(self):
         """ทดสอบการอัปเดตคะแนนแกนรายตัวผ่าน HTMX endpoint"""
@@ -305,4 +348,65 @@ class PrecisionReportTests(TestCase):
 
         resp = self.client.get(reverse('clinical:report_dashboard'))
         self.assertEqual(resp.status_code, 403)
+
+    def test_ai_three_editions_authoring_sanitization_and_omics_gate(self):
+        """
+        EP6: ตรวจสอบการเขียนรายงาน 3 ฉบับ (Physician 5 บท, Patient 7 บท, Multi-Omics Gate)
+        - ฉบับคนไข้ต้องไม่มีแท็ก [MEASURED], AXIS_1 หรือคะแนน 85/100 หลุดออกมา
+        - ฉบับ Multi-Omics แสดง Readiness Mode เมื่อไม่มีข้อมูล Omics และแสดง Full Omics เมื่อมีข้อมูล
+        """
+        self.client.force_login(self.doctor)
+        create_url = reverse('clinical:report_create', args=[self.patient.pk])
+
+        # 1. สร้างรายงานพร้อม AI Authoring (ยังไม่มี Omics)
+        resp = self.client.post(create_url, data={
+            'status': 'draft',
+            'use_ai': '1',
+            'doctor_summary': '[MEASURED] AXIS_1 inflammation high 85/100',
+        })
+        self.assertEqual(resp.status_code, 302)
+        analysis = AnalysisRecord.objects.filter(patient=self.patient).first()
+        self.assertIsNotNone(analysis)
+        editions = analysis.ai_editions_json
+        self.assertEqual(len(editions.get('physician', [])), 5)
+        self.assertEqual(len(editions.get('patient', [])), 7)
+        self.assertEqual(len(editions.get('multiomics', [])), 3)
+        self.assertFalse(editions.get('omics_available'))
+
+        # 2. ตรวจสอบ Raw HTML ของทั้ง 3 ฉบับ (ตรงกับ WeasyPrint PDF 100%)
+        raw_url = reverse('clinical:report_raw_html', args=[analysis.pk])
+        r_phys = self.client.get(raw_url + '?edition=physician')
+        self.assertEqual(r_phys.status_code, 200)
+        self.assertContains(r_phys, 'Chapter 1 — TSPI Biological State Summary')
+
+        r_pat = self.client.get(raw_url + '?edition=patient')
+        self.assertEqual(r_pat.status_code, 200)
+        self.assertContains(r_pat, 'สิ่งที่เราทราบแน่ชัดเกี่ยวกับร่างกายของคุณ')
+        self.assertNotContains(r_pat, '[MEASURED]')
+        self.assertNotContains(r_pat, 'AXIS_1')
+        self.assertNotContains(r_pat, '85/100')
+
+        r_omics = self.client.get(raw_url + '?edition=omics')
+        self.assertEqual(r_omics.status_code, 200)
+        self.assertContains(r_omics, 'Omics Readiness')
+
+        # 3. หากผู้ป่วยมีข้อมูล Multi-Omics และกด Regenerate ต้องเปลี่ยนเป็น Full Omics
+        self.patient.extra_data = {'omics': {'microbiome': {'diversity': 'Low'}, 'genomics': {'MTHFR': 'C677T'}}}
+        self.patient.save(update_fields=['extra_data'])
+
+        regen_resp = self.client.post(reverse('clinical:report_ai_generate', args=[analysis.pk]), data={
+            'edition': 'omics',
+            'action': 'regenerate',
+        })
+        self.assertEqual(regen_resp.status_code, 302)
+        analysis.refresh_from_db()
+        self.assertTrue(analysis.ai_editions_json.get('omics_available'))
+        r_omics2 = self.client.get(raw_url + '?edition=omics')
+        self.assertContains(r_omics2, 'Full Omics Profile')
+
+        # 4. ตรวจสอบ PDF Binary Generation ทั้ง 3 ฉบับ (WeasyPrint)
+        for ed in ('physician', 'patient', 'omics'):
+            pdf_resp = self.client.get(reverse('clinical:report_pdf', args=[analysis.pk]) + f'?edition={ed}')
+            self.assertEqual(pdf_resp.status_code, 200)
+            self.assertTrue(pdf_resp.content.startswith(b'%PDF'))
 

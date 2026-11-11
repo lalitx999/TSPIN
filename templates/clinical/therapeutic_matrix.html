@@ -26,6 +26,56 @@
         </div>
     </div>
 
+    <!-- Patient Context Banner (Bootstrap 5.3 Cohesive Alert) -->
+    {% if patient %}
+    <div class="card border border-primary-subtle bg-primary-subtle shadow-xs mb-4">
+        <div class="card-body p-3">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px;">
+                        {{ patient.first_name|slice:":1" }}
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap mb-0.5">
+                            <h2 class="h6 fw-bold text-dark mb-0">{{ patient.full_name }}</h2>
+                            <span class="badge bg-white text-primary border border-primary-subtle font-monospace">HN: {{ patient.hn }}</span>
+                            {% if patient_dysfunctional_axes %}
+                            <span class="badge bg-danger text-white font-monospace">
+                                พบ {{ patient_dysfunctional_axes|length }} แกนผิดปกติ (คะแนน &ge; 60)
+                            </span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted d-block">
+                            เลือกคลิกแกนชีวภาพด้านล่างเพื่อกรองโมดูลที่ออกแบบมาเพื่อฟื้นฟูแกนนั้นโดยเฉพาะ
+                        </small>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}&auto_ai=1" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-brain me-1"></i> ประเมิน 39 แกน
+                    </a>
+                    <a href="{% url 'patients:doctor_digital_twin' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-child me-1"></i> Digital Twin
+                    </a>
+                </div>
+            </div>
+
+            {% if patient_dysfunctional_axes %}
+            <div class="d-flex align-items-center gap-1.5 flex-wrap mt-2.5 pt-2 border-top border-primary-subtle">
+                <span class="text-xs text-muted fw-bold me-1">แกนที่พบพยาธิสภาพ:</span>
+                {% for ax in patient_dysfunctional_axes %}
+                <a href="?patient_id={{ patient.pk }}&axis={{ ax.axis_id }}" 
+                   class="badge {% if selected_axis == ax.axis_id|stringformat:'s' %}bg-primary text-white{% else %}bg-white text-danger border border-danger-subtle{% endif %} text-decoration-none py-1 px-2 font-monospace text-xs shadow-xs">
+                    Axis {{ ax.axis_id }}: {{ ax.score }} คะแนน
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Search & Filter Card -->
     <div class="card border-0 shadow-xs mb-4">
         <div class="card-body p-3">

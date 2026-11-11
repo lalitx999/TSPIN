@@ -1,17 +1,41 @@
 {% extends 'layouts/doctor_base.html' %}
 {% load static %}
 
-{% block title %}เครือข่ายชีวภาพและเรดาร์ชาร์ต (Topology) | Dr. Patt EMR{% endblock %}
+{% block title %}เครือข่ายชีวภาพและเรดาร์ชาร์ต (Topology) | TSPI CLINIC{% endblock %}
 
 {% block extra_doctor_head %}
-<!-- Chart.js Plugin -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<!-- Chart.js Local Static Asset (CSP Self Compliant) -->
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+<style>
+    .patient-search-popover {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1050;
+        max-height: 320px;
+        overflow-y: auto;
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.12);
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .patient-search-item {
+        padding: 0.65rem 0.9rem;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f5f9;
+        transition: background-color 0.15s;
+    }
+    .patient-search-item:hover, .patient-search-item.active {
+        background-color: #f8fafc;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column gap-4">
+<div class="d-flex flex-column gap-4" x-data="axisTopology()">
 
-    <!-- Header -->
+    <!-- Header Section -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 pb-3 border-bottom">
         <div class="d-flex align-items-center gap-3">
             <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
@@ -27,77 +51,299 @@
                 <i class="fas fa-list-ul me-1"></i> นิยาม 39 แกน
             </a>
             {% if patient %}
-            <a href="{% url 'clinical:axis_timeline' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-primary">
-                <i class="fas fa-history me-1"></i> เส้นเวลาสุขภาพ (Timeline)
+            <a href="{% url 'clinical:axis_timeline' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-history me-1"></i> เส้นเวลาสุขภาพ
             </a>
             {% endif %}
         </div>
     </div>
 
-    <!-- Patient Header (if active) -->
-    {% if patient %}
-    <div class="card shadow-sm border border-primary-subtle bg-primary-subtle">
-        <div class="card-body p-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <div class="rounded-circle bg-primary text-white fw-bold fs-4 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
-                    {{ patient.first_name|slice:":1" }}
+    {% if not patient %}
+    <!-- Case A: No Patient Selected (Clean, Centered Search Hero) -->
+    <div class="card shadow-sm border py-5 text-center bg-light">
+        <div class="card-body p-4" style="max-width: 580px; margin: 0 auto;">
+            <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 68px; height: 68px;">
+                <i class="fas fa-network-wired fs-2"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-1">เลือกคนไข้เพื่อแสดงแผนผังเรดาร์ชีวภาพ</h5>
+            <p class="text-muted small mb-4">
+                พิมพ์ค้นหาด้วยชื่อ, นามสกุล, เลขประจำตัวผู้ป่วย (HN) หรือเบอร์โทรศัพท์ เพื่อเริ่มวิเคราะห์ระบบชีวภาพ 12 โดเมน
+            </p>
+
+            <!-- Search Input Box -->
+            <div class="position-relative text-start mb-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" 
+                           class="form-control form-control-lg fs-6 border-start-0" 
+                           placeholder="พิมพ์ชื่อ, HN หรือเบอร์โทรเพื่อค้นหาคนไข้..." 
+                           x-model="searchQuery" 
+                           @input.debounce.300ms="searchPatients()"
+                           @focus="if(searchResults.length) showResults = true"
+                           @keydown.escape="showResults = false"
+                           autofocus>
+                    <button class="btn btn-outline-secondary" type="button" x-show="searchQuery" @click="searchQuery = ''; searchResults = []; showResults = false;">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <div>
-                    <div class="d-flex align-items-center gap-2 mb-0.5">
-                        <strong class="text-dark fs-6">{{ patient.full_name }}</strong>
-                        <span class="badge bg-white text-primary border border-primary-subtle font-monospace">
-                            HN: {{ patient.hn }}
-                        </span>
-                    </div>
-                    <small class="text-muted">
-                        ผลตรวจล่าสุด: {{ latest_record.record_date|date:"d M Y H:i"|default:"ยังไม่มีบันทึก" }}
-                        {% if baseline_record %} &bull; เปรียบเทียบกับ Baseline{% endif %}
-                    </small>
+
+                <!-- Autocomplete Dropdown Popover -->
+                <div class="patient-search-popover shadow text-start" x-show="showResults && searchResults.length > 0" @click.outside="showResults = false" x-cloak>
+                    <template x-for="p in searchResults" :key="p.id">
+                        <a :href="'{% url 'clinical:axis_graph' %}?patient_id=' + p.id" class="d-block text-decoration-none text-dark patient-search-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-primary" x-text="p.full_name"></strong>
+                                    <span class="badge bg-light text-secondary border ms-1 font-monospace" x-text="'HN: ' + p.hn"></span>
+                                </div>
+                                <div class="small text-muted font-monospace" x-text="(p.gender || '') + ' ' + (p.age ? p.age + ' ปี' : '')"></div>
+                            </div>
+                            <div class="small text-muted mt-0.5" x-text="'โทร: ' + p.phone"></div>
+                        </a>
+                    </template>
                 </div>
             </div>
+
             <div>
-                <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-1"></i> กลับแฟ้มคนไข้
+                <a href="{% url 'patients:patient_list' %}" class="btn btn-outline-secondary btn-sm px-3">
+                    <i class="fas fa-users me-1"></i> ไปที่หน้ารายชื่อคนไข้ทั้งหมด
                 </a>
             </div>
         </div>
     </div>
-    {% endif %}
 
-    <!-- Radar Chart Area (Row 8/4) -->
-    <div class="row g-4">
-        <!-- Main Radar Canvas Card (8 cols) -->
-        <div class="col-12 col-lg-8">
-            <div class="card shadow-sm border h-100">
-                <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
-                    <span class="small fw-bold text-dark d-flex align-items-center gap-2">
-                        <i class="fas fa-chart-area text-primary"></i> แผนภูมิเรดาร์ชีววิทยา 12 โดเมนหลัก
-                    </span>
-                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">
-                        TSPI Mechanistic Topology
-                    </span>
+    {% else %}
+    <!-- Case B: Patient Selected -->
+    <div class="card shadow-sm border">
+        <div class="card-body p-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-primary text-white fw-bold fs-4 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 46px; height: 46px;">
+                        {{ patient.first_name|slice:":1" }}
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                            <strong class="text-dark fs-6">{{ patient.full_name }}</strong>
+                            <span class="badge bg-primary-subtle text-primary font-monospace">HN: {{ patient.hn }}</span>
+                            <span class="badge bg-light text-secondary border font-monospace">
+                                {% if patient.age %}{{ patient.age }} ปี{% else %}ไม่ระบุอายุ{% endif %} &bull; {{ patient.get_gender_display }}
+                            </span>
+                            {% if baseline_record %}
+                            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle font-monospace">มี Baseline</span>
+                            {% endif %}
+                        </div>
+                        <div class="small text-muted">
+                            ผลประเมินล่าสุด: 
+                            {% if latest_record %}
+                                <strong class="text-dark">{{ latest_record.record_date|date:"d M Y H:i" }}</strong> 
+                                (แพทย์: {% if latest_record.doctor %}{{ latest_record.doctor.get_full_name|default:latest_record.doctor.username }}{% else %}แพทย์ผู้รักษา{% endif %})
+                            {% else %}
+                                <span class="text-danger fw-medium">ยังไม่เคยมีบันทึกประเมิน</span>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body p-4">
-                    <div class="position-relative w-100" style="height: 480px;">
-                        <canvas id="domainRadarCanvas"></canvas>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="showSearch = !showSearch">
+                        <i class="fas fa-exchange-alt me-1"></i> <span x-text="showSearch ? 'ปิดค้นหา' : 'สลับคนไข้'">สลับคนไข้</span>
+                    </button>
+                    <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> กลับแฟ้มคนไข้
+                    </a>
+                    <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-edit me-1"></i> {% if latest_record %}แก้ไขคะแนน 39 แกน{% else %}เริ่มประเมิน 39 แกน{% endif %}
+                    </a>
+                </div>
+            </div>
+
+            <!-- Toggled Patient Search (Full-width clean bar) -->
+            <div class="position-relative mt-3 pt-3 border-top" x-show="showSearch" x-cloak>
+                <div class="position-relative" style="max-width: 600px;">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" 
+                               class="form-control border-start-0" 
+                               placeholder="พิมพ์ชื่อ, HN หรือเบอร์โทรเพื่อเปลี่ยนคนไข้..." 
+                               x-model="searchQuery" 
+                               @input.debounce.300ms="searchPatients()"
+                               @focus="if(searchResults.length) showResults = true"
+                               @keydown.escape="showResults = false">
+                        <button class="btn btn-outline-secondary" type="button" x-show="searchQuery" @click="searchQuery = ''; searchResults = []; showResults = false;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <!-- Popover Dropdown -->
+                    <div class="patient-search-popover shadow" x-show="showResults && searchResults.length > 0" @click.outside="showResults = false" x-cloak>
+                        <template x-for="p in searchResults" :key="p.id">
+                            <a :href="'{% url 'clinical:axis_graph' %}?patient_id=' + p.id" class="d-block text-decoration-none text-dark patient-search-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong class="text-primary" x-text="p.full_name"></strong>
+                                        <span class="badge bg-light text-secondary border ms-1 font-monospace" x-text="'HN: ' + p.hn"></span>
+                                    </div>
+                                    <div class="small text-muted font-monospace" x-text="(p.gender || '') + ' ' + (p.age ? p.age + ' ปี' : '')"></div>
+                                </div>
+                                <div class="small text-muted mt-0.5" x-text="'โทร: ' + p.phone"></div>
+                            </a>
+                        </template>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    {% if not has_assessment %}
+    <!-- Patient Selected but No Assessment (Actionable Empty State) -->
+    <div class="card shadow-sm border py-5 text-center bg-light">
+        <div class="card-body p-4" style="max-width: 650px; margin: 0 auto;">
+            <div class="rounded-circle bg-warning-subtle text-warning-emphasis d-inline-flex align-items-center justify-content-center mb-3" style="width: 72px; height: 72px;">
+                <i class="fas fa-dna fs-1"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">คนไข้ท่านนี้ยังไม่มีการประเมิน 39 แกนชีวภาพ</h5>
+            <p class="text-muted small mb-4">
+                ยังไม่พบข้อมูลคะแนนในเวชระเบียนของ <strong>{{ patient.full_name }} (HN: {{ patient.hn }})</strong><br>
+                เริ่มประเมินกลไกระดับเซลล์เพื่อพล็อตเรดาร์ชีวภาพ วิเคราะห์จุดเสียสมดุล และจัดสูตรการบำบัด
+            </p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}" class="btn btn-primary px-3">
+                    <i class="fas fa-stethoscope me-1"></i> เริ่มประเมิน 39 แกนชีววิทยา
+                </a>
+                <a href="{% url 'patients:doctor_lab_review' %}?patient_id={{ patient.pk }}&open_upload=1" class="btn btn-outline-secondary px-3">
+                    <i class="fas fa-file-medical-alt me-1"></i> อัปโหลดเอกสารผลแล็บ
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Active Visualizer & Topology Content -->
+    <div class="row g-4">
+        <!-- Main Radar Card & Analysis (8 cols) -->
+        <div class="col-12 col-lg-8 d-flex flex-column gap-4">
+            <div class="card shadow-sm border">
+                <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="small fw-bold text-dark d-flex align-items-center gap-1.5">
+                            <i class="fas fa-chart-area text-primary"></i> 
+                            <span x-text="activeView === '12' ? 'แผนภูมิเรดาร์ 12 โดเมนชีวภาพ' : 'แผนภูมิเรดาร์ 39 แกนกลไกชีววิทยา'">แผนภูมิเรดาร์ 12 โดเมนชีวภาพ</span>
+                        </span>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace d-none d-md-inline">
+                            TSPI Mechanistic Topology
+                        </span>
+                    </div>
+
+                    <!-- View Switcher & Baseline Toggle -->
+                    <div class="d-flex align-items-center gap-2">
+                        {% if baseline_record %}
+                        <div class="form-check form-switch m-0 me-2" title="เปรียบเทียบกับผลการประเมิน Baseline ครั้งแรก">
+                            <input class="form-check-input" type="checkbox" role="switch" id="toggleBaselineSwitch" x-model="showBaseline" @change="updateRadarChart()">
+                            <label class="form-check-label small text-muted" for="toggleBaselineSwitch">เทียบ Baseline</label>
+                        </div>
+                        {% endif %}
+
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" 
+                                    class="btn" 
+                                    :class="activeView === '12' ? 'btn-primary' : 'btn-outline-secondary'"
+                                    @click="switchView('12')">
+                                12 โดเมน
+                            </button>
+                            <button type="button" 
+                                    class="btn" 
+                                    :class="activeView === '39' ? 'btn-primary' : 'btn-outline-secondary'"
+                                    @click="switchView('39')">
+                                39 แกน
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-3 p-md-4">
+                    <div class="position-relative w-100" style="height: 480px;">
+                        <canvas id="topologyRadarCanvas"></canvas>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light py-2 px-3 border-top small text-muted d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <span class="badge bg-success-subtle text-success me-1">0-39 ปกติ</span>
+                        <span class="badge bg-warning-subtle text-warning-emphasis me-1">40-59 เฝ้าระวัง</span>
+                        <span class="badge bg-danger-subtle text-danger">60-100 วิกฤต/ผิดปกติ</span>
+                    </div>
+                    <div>
+                        <a href="{% url 'clinical:axis_timeline' %}?patient_id={{ patient.pk }}" class="text-decoration-none">
+                            <i class="fas fa-chart-line me-1"></i> ดูแนวโน้มตามเส้นเวลา (Timeline) &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Critical Dysfunctional Axes Alert Box -->
+            {% if dysfunctional_axes %}
+            <div class="card shadow-sm border border-danger-subtle">
+                <div class="card-header bg-danger-subtle py-2.5 px-3 border-bottom border-danger-subtle d-flex justify-content-between align-items-center">
+                    <span class="small fw-bold text-danger d-flex align-items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i> แกนชีวภาพที่พบความผิดปกติวิกฤต (คะแนน &ge; 60)
+                    </span>
+                    <span class="badge bg-danger text-white">{{ dysfunctional_axes|length }} แกน</span>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-2">
+                        {% for ax in dysfunctional_axes %}
+                        <div class="col-12 col-md-6">
+                            <div class="p-2.5 rounded-2 border bg-light d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-dark small d-block">Axis {{ ax.axis_id }}: {{ ax.name }}</strong>
+                                    <small class="text-muted">{{ ax.domain_title }}</small>
+                                </div>
+                                <span class="badge bg-danger fs-6 font-monospace">{{ ax.score }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if recommendations %}
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="small fw-bold text-dark mb-2 d-flex align-items-center gap-1.5">
+                            <i class="fas fa-seedling text-success"></i> โมดูลสารอาหารและการบำบัดที่แนะนำ (Therapeutic Modules):
+                        </div>
+                        <div class="row g-2">
+                            {% for rec in recommendations %}
+                            <div class="col-12 col-md-6">
+                                <div class="p-2.5 rounded-2 border bg-white small">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <strong class="text-primary">{{ rec.name }}</strong>
+                                        <span class="badge bg-primary-subtle text-primary font-monospace">{{ rec.code }}</span>
+                                    </div>
+                                    <p class="text-muted small mb-0">{{ rec.description|truncatechars:90 }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <!-- 12 Domains Breakdown Progress List (4 cols) -->
         <div class="col-12 col-lg-4">
             <div class="card shadow-sm border h-100 d-flex flex-column">
-                <div class="card-header bg-light py-2.5 px-3 border-bottom">
+                <div class="card-header bg-light py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
                     <span class="small fw-bold text-dark d-flex align-items-center gap-2">
                         <i class="fas fa-poll text-primary"></i> คะแนนเฉลี่ยรายโดเมน (0 - 100)
                     </span>
+                    <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}" class="small text-decoration-none">
+                        ปรับคะแนน
+                    </a>
                 </div>
-                <div class="card-body p-3 overflow-auto flex-grow-1 d-flex flex-column gap-2.5" style="max-height: 520px;">
+                <div class="card-body p-3 overflow-auto flex-grow-1 d-flex flex-column gap-2.5" style="max-height: 620px;">
                     {% for dom in domain_data %}
-                    <div>
+                    <div class="p-2 rounded-2 border-bottom">
                         <div class="d-flex justify-content-between align-items-center small mb-1">
-                            <span class="fw-medium text-dark" style="font-size: 0.8rem;">
+                            <span class="fw-medium text-dark" style="font-size: 0.82rem;">
                                 D{{ dom.domain_id }}: {{ dom.title }}
                             </span>
                             {% if dom.average_score is None %}
@@ -123,88 +369,167 @@
             </div>
         </div>
     </div>
+    {% endif %}
+    {% endif %}
 
 </div>
 
-<!-- Chart.js Scripts -->
+<!-- Topology Scripts -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const domainLabels = {{ domain_labels_json|safe }};
-    const domainScores = {{ domain_scores_json|safe }};
+function axisTopology() {
+    return {
+        searchQuery: '',
+        searchResults: [],
+        showResults: false,
+        showSearch: false,
+        activeView: '12',
+        showBaseline: true,
+        radarChart: null,
 
-    const ctx = document.getElementById('domainRadarCanvas').getContext('2d');
+        // Data from Django
+        domainLabels: {{ domain_labels_json|default:"[]"|safe }},
+        domainScores: {{ domain_scores_json|default:"[]"|safe }},
+        baselineDomainScores: {{ baseline_domain_scores_json|default:"[]"|safe }},
 
-    new Chart(ctx, {
-        type: 'radar',
-        data: {
-            labels: domainLabels,
-            datasets: [
-                {
-                    label: 'คะแนนการประเมินปัจจุบัน (Current Score)',
-                    data: domainScores,
-                    backgroundColor: 'rgba(104, 157, 75, 0.2)',
-                    borderColor: '#689D4B',
-                    borderWidth: 2,
-                    pointBackgroundColor: '#689D4B',
-                    pointBorderColor: '#ffffff',
-                    pointHoverBackgroundColor: '#ffffff',
-                    pointHoverBorderColor: '#689D4B',
-                    pointRadius: 4,
-                }
-            ]
+        axisLabels: {{ axis_labels_json|default:"[]"|safe }},
+        axisScores: {{ latest_scores_json|default:"[]"|safe }},
+        baselineAxisScores: {{ baseline_scores_json|default:"[]"|safe }},
+
+        hasBaseline: {% if baseline_record %}true{% else %}false{% endif %},
+
+        init() {
+            {% if has_assessment %}
+            this.$nextTick(() => {
+                this.renderChart();
+            });
+            {% endif %}
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                r: {
-                    angleLines: {
-                        color: 'rgba(0, 0, 0, 0.08)'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.08)'
-                    },
-                    pointLabels: {
-                        font: {
-                            family: 'THSarabunNew',
-                            size: 13,
-                            weight: 'bold'
-                        },
-                        color: '#374151'
-                    },
-                    suggestedMin: 0,
-                    suggestedMax: 100,
-                    ticks: {
-                        stepSize: 20,
-                        backdropColor: 'transparent',
-                        color: '#9ca3af'
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        font: {
-                            family: 'THSarabunNew',
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        color: '#111827'
-                    }
-                },
-                tooltip: {
-                    backgroundColor: '#ffffff',
-                    borderColor: '#e5e7eb',
-                    borderWidth: 1,
-                    titleColor: '#111827',
-                    bodyColor: '#4b5563',
-                    titleFont: { family: 'THSarabunNew', size: 14, weight: 'bold' },
-                    bodyFont: { family: 'THSarabunNew', size: 13 }
-                }
+
+        async searchPatients() {
+            const q = this.searchQuery.trim();
+            if (q.length < 2) {
+                this.searchResults = [];
+                this.showResults = false;
+                return;
             }
+            try {
+                const res = await fetch(`{% url 'patients:api_patient_search' %}?q=${encodeURIComponent(q)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    this.searchResults = data.patients || [];
+                    this.showResults = this.searchResults.length > 0;
+                }
+            } catch (err) {
+                console.error("Patient search error:", err);
+            }
+        },
+
+        switchView(mode) {
+            this.activeView = mode;
+            this.updateRadarChart();
+        },
+
+        renderChart() {
+            const canvas = document.getElementById('topologyRadarCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const is12 = this.activeView === '12';
+            const labels = is12 ? this.domainLabels : this.axisLabels;
+            const currentData = is12 ? this.domainScores : this.axisScores;
+            const baselineData = is12 ? this.baselineDomainScores : this.baselineAxisScores;
+
+            const datasets = [];
+
+            // Dataset 1: Baseline (if available and enabled)
+            if (this.hasBaseline && this.showBaseline) {
+                datasets.push({
+                    label: 'Baseline (ก่อนรักษา)',
+                    data: baselineData,
+                    backgroundColor: 'rgba(156, 163, 175, 0.15)',
+                    borderColor: '#9ca3af',
+                    borderWidth: 1.5,
+                    borderDash: [4, 4],
+                    pointBackgroundColor: '#9ca3af',
+                    pointBorderColor: '#ffffff',
+                    pointRadius: 3,
+                });
+            }
+
+            // Dataset 2: Latest Record
+            datasets.push({
+                label: 'คะแนนประเมินล่าสุด (Latest)',
+                data: currentData,
+                backgroundColor: 'rgba(165, 99, 58, 0.22)',
+                borderColor: '#A5633A',
+                borderWidth: 2,
+                pointBackgroundColor: '#A5633A',
+                pointBorderColor: '#ffffff',
+                pointHoverBackgroundColor: '#ffffff',
+                pointHoverBorderColor: '#A5633A',
+                pointRadius: is12 ? 4 : 2.5,
+            });
+
+            this.radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.08)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.08)' },
+                            pointLabels: {
+                                font: {
+                                    family: 'Sarabun, sans-serif',
+                                    size: is12 ? 12 : 10,
+                                    weight: 'bold'
+                                },
+                                color: '#374151'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: {
+                                stepSize: 20,
+                                backdropColor: 'transparent',
+                                color: '#9ca3af'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { family: 'Sarabun, sans-serif', size: 13, weight: 'bold' },
+                                color: '#111827'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#ffffff',
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1,
+                            titleColor: '#111827',
+                            bodyColor: '#4b5563',
+                            titleFont: { family: 'Sarabun, sans-serif', size: 13, weight: 'bold' },
+                            bodyFont: { family: 'Sarabun, sans-serif', size: 12 }
+                        }
+                    }
+                }
+            });
+        },
+
+        updateRadarChart() {
+            if (this.radarChart) {
+                this.radarChart.destroy();
+                this.radarChart = null;
+            }
+            this.renderChart();
         }
-    });
-});
+    };
+}
 </script>
 {% endblock %}

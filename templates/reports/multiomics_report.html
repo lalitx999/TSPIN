@@ -20,6 +20,16 @@
         </div>
     </div>
 
+    {% if ai_multiomics_chapters %}
+    <div class="section-bar">1B. บทวิเคราะห์ Multi-Omics และความพร้อมข้อมูลระดับโมเลกุล ({% if omics_available %}Full Omics Profile{% else %}Omics Readiness &amp; Preliminary Phenotype{% endif %})</div>
+    {% for ch in ai_multiomics_chapters %}
+    <div style="background: #FFFFFF; border: 1px solid #E9D5FF; border-left: 4px solid #7E22CE; padding: 8px 12px; border-radius: 4px; margin-bottom: 10px; page-break-inside: avoid;">
+        <div style="font-weight: 700; color: #6B21A8; font-size: 10.5pt; margin-bottom: 4px;">{{ ch.title }}</div>
+        <div style="font-size: 9.5pt; line-height: 1.5; color: #1E293B; white-space: pre-line;">{{ ch.content }}</div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
     <!-- Section 2: Uncertainty & Evidence Confidence Breakdown -->
     <div class="section-bar">2. ระดับความเชื่อมั่นของหลักฐานชีววิทยา (Evidence Confidence & Uncertainty Profile)</div>
     <table class="data-table">

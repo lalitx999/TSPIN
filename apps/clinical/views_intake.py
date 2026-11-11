@@ -37,18 +37,31 @@ def intake_list_view(request: HttpRequest) -> HttpResponse:
         tab = 'waiting'
     services_intake.close_idle_line_sessions()
     base = Box.objects.filter(source__in=INTAKE_SOURCES, patient__isnull=False)
-    boxes = (
-        base.filter(STATUS_TABS[tab][1]())
-        .select_related('patient')
-        .annotate(urgent_first=Case(When(contents__red_flag=True, then=Value(0)), default=Value(1), output_field=IntegerField()))
-        .order_by('urgent_first', '-last_activity_at', '-created_at')[:100]
-    )
+    boxes = _ordered(base.filter(STATUS_TABS[tab][1]()))[:100]
     counts = {key: base.filter(q()).count() for key, (_, q) in STATUS_TABS.items()}
     return render(request, 'clinical/intake/list.html', {
         'boxes': boxes,
         'tab': tab,
         'tabs': [(key, label, counts[key]) for key, (label, _) in STATUS_TABS.items()],
     })
+
+
+def _ordered(qs):
+    """ฉุกเฉินขึ้นก่อน แล้วเรียงตามข้อความล่าสุด"""
+    return (
+        qs.select_related('patient')
+        .annotate(urgent_first=Case(When(contents__red_flag=True, then=Value(0)), default=Value(1), output_field=IntegerField()))
+        .order_by('urgent_first', '-last_activity_at', '-created_at')
+    )
+
+
+def _inbox(current: Box) -> list:
+    """รายการแชทแผงซ้ายของหน้าอ่านแชท: เฉพาะชื่อ สถานะ และเวลา ไม่มีเนื้อหาข้อความ เพราะกล่องอื่นอาจยังล็อกอยู่"""
+    base = Box.objects.filter(source__in=INTAKE_SOURCES, patient__isnull=False).exclude(status=Box.Status.REVIEWED)
+    items = list(_ordered(base)[:30])
+    if all(b.pk != current.pk for b in items):
+        items.insert(0, current)
+    return items
 
 
 def _get_intake_box(box_id) -> Box:
@@ -62,6 +75,9 @@ def intake_detail_view(request: HttpRequest, box_id) -> HttpResponse:
     contents = box.contents or {}
     chat_messages = []
     if unlocked:
+        if contents.get('history_text'):  # ร่างซักประวัติที่คลินิก: ข้อความอยู่นอกรายการข้อความ
+            chat_messages.append({'sender': 'staff', 'kind': 'text', 'text': contents['history_text'],
+                                  'at_display': timezone.localtime(box.last_activity_at or box.created_at)})
         for m in contents.get('messages', []):
             at = parse_datetime(m.get('at') or '')
             chat_messages.append({**m, 'at_display': timezone.localtime(at) if at else None})
@@ -77,6 +93,7 @@ def intake_detail_view(request: HttpRequest, box_id) -> HttpResponse:
         'soap': (contents.get('committed_soap') or contents.get('soap') or {}) if unlocked else {},
         'soap_source': contents.get('soap_source', 'none'),
         'ai_meta': contents.get('ai_meta', {}),
+        'inbox': _inbox(box),
     })
 
 

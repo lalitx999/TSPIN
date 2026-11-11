@@ -3,317 +3,424 @@
 
 {% block title %}เวชระเบียน: {{ patient.full_name }} (HN: {{ patient.hn }}) | Dr. Patt EMR{% endblock %}
 
+{% block extra_doctor_head %}
+<script src="{% static 'js/visit_form.js' %}?v={{ ASSET_VERSION }}"></script>
+{% endblock %}
+
+{% block page_header %}
+<div class="adm-page-head">
+    <h1 class="adm-page-title">แฟ้มคนไข้</h1>
+    <ol class="adm-crumb" aria-label="ตำแหน่งหน้า">
+        <li><a href="{% url 'patients:dashboard' %}">TSPI</a></li>
+        <li><a href="{% url 'patients:patient_list' %}" class="text-reset">แฟ้มคนไข้</a></li>
+        <li aria-current="page">{{ patient.full_name }}</li>
+    </ol>
+</div>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex flex-column gap-4" x-data="{ showNewSoap: false }">
+<div class="d-flex flex-column gap-3" x-data="{ showNewSoap: {{ open_visit|yesno:'true,false' }} }"
+     x-init="if (showNewSoap && location.hash === '#new-soap') $nextTick(() => setTimeout(() => document.getElementById('new-soap').scrollIntoView({ behavior: 'smooth', block: 'start' }), 150))">
 
-    <!-- Breadcrumb & Top Bar -->
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 pb-3 border-bottom">
-        <div>
-            <a href="{% url 'patients:patient_list' %}" class="btn btn-sm btn-link text-decoration-none text-muted p-0 mb-1 d-inline-flex align-items-center gap-1.5" style="font-size: 0.775rem;">
-                <i class="fas fa-arrow-left"></i> กลับหน้ารายชื่อคนไข้
-            </a>
-            <h1 class="h4 fw-bold mb-0 text-dark">แฟ้มเวชระเบียนผู้ป่วย (Clinical Dossier)</h1>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <a href="{% url 'patients:patient_edit' patient.pk %}" class="btn btn-sm btn-outline-secondary">
-                <i class="fas fa-user-edit me-1"></i> แก้ไขข้อมูลคนไข้
-            </a>
-            <button type="button" @click="showNewSoap = !showNewSoap" class="btn btn-sm btn-primary">
-                <i class="fas fa-plus-circle me-1"></i> บันทึก SOAP Note ใหม่
-            </button>
-        </div>
-    </div>
-
-    <!-- Patient Header Master Card -->
-    <div class="card shadow-sm border">
-        <div class="card-body p-4">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
-                <!-- Patient Avatar & Basic Info -->
-                <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-3 flex-shrink-0" style="width: 58px; height: 58px;">
-                        {{ patient.first_name|slice:":1" }}
-                    </div>
-                    <div>
-                        <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
-                            <h2 class="h5 fw-bold text-dark mb-0">{{ patient.full_name }}</h2>
-                            {% if patient.nickname %}
-                                <small class="text-muted">(ชื่อเล่น: {{ patient.nickname }})</small>
-                            {% endif %}
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">
-                                HN: {{ patient.hn }}
-                            </span>
-                            {% if patient.status == 'urgent' %}
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="fas fa-fire me-1 small"></i>เคสด่วน</span>
-                            {% elif patient.status == 'medicine' %}
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle"><i class="fas fa-capsules me-1 small"></i>บำบัด/ยา</span>
-                            {% elif patient.status == 'completed' %}
-                                <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="fas fa-check-circle me-1 small"></i>เสร็จสิ้น</span>
-                            {% else %}
-                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="fas fa-clock me-1 small"></i>รอดำเนินการ</span>
-                            {% endif %}
-                        </div>
-                        <div class="d-flex flex-wrap gap-3 text-muted small" style="font-size: 0.775rem;">
-                            <span><i class="fas fa-venus-mars me-1 text-secondary"></i>{{ patient.get_gender_display }}</span>
-                            <span><i class="fas fa-birthday-cake me-1 text-secondary"></i>อายุ: <strong class="text-dark">{{ patient.age|default:"-" }}</strong> ปี</span>
-                            <span><i class="fas fa-tint me-1 text-danger"></i>กรุ๊ปเลือด: <strong class="text-dark">{{ patient.blood_type }}</strong></span>
-                            <span><i class="fas fa-phone me-1 text-secondary"></i>{{ patient.phone }}</span>
-                        </div>
+    <div class="row g-3">
+        <!-- ข้อมูลคนไข้ (การ์ด Details ในต้นแบบ) -->
+        <div class="col-12 col-lg-5 col-xxl-4">
+            <div class="adm-card h-100">
+                <div class="adm-card-head">
+                    <h2 class="adm-card-title">ข้อมูลคนไข้</h2>
+                    <div class="dropdown">
+                        <button class="adm-icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="เมนูคนไข้">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'patients:patient_edit' patient.pk %}"><i class="fas fa-pen me-2 text-muted"></i>แก้ไขข้อมูล</a></li>
+                            <li><a class="dropdown-item" href="/doctor/axes/?patient_id={{ patient.pk }}"><i class="fas fa-dna me-2 text-muted"></i>39 Biological Axes</a></li>
+                            <li><a class="dropdown-item" href="/doctor/ai-physician/?patient_id={{ patient.pk }}"><i class="fas fa-magic me-2 text-muted"></i>AI Physician</a></li>
+                            <li><a class="dropdown-item" href="/doctor/precision-report/?patient_id={{ patient.pk }}"><i class="far fa-file-alt me-2 text-muted"></i>Precision Report</a></li>
+                        </ul>
                     </div>
                 </div>
 
-                <!-- Precision Action Shortcuts -->
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="/doctor/axes/?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-project-diagram text-primary me-1"></i> 39 Biological Axes
-                    </a>
-                    <a href="/doctor/ai-physician/?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-brain me-1"></i> AI Physician
-                    </a>
-                    <a href="/doctor/precision-report/?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-warning text-dark">
-                        <i class="fas fa-file-pdf text-warning-emphasis me-1"></i> Precision Report
-                    </a>
+                <div class="adm-profile-photo">{{ patient.first_name|slice:":1" }}</div>
+                <div class="text-center mb-3">
+                    <div class="fw-bold fs-5 lh-sm">{{ patient.full_name }}</div>
+                    <div class="text-muted small mb-2">HN {{ patient.hn }}{% if patient.nickname %} &middot; ชื่อเล่น {{ patient.nickname }}{% endif %}</div>
+                    {% if patient.status == 'urgent' %}<span class="adm-status is-danger">เคสด่วน</span>
+                    {% elif patient.status == 'medicine' %}<span class="adm-status">รับการบำบัด</span>
+                    {% elif patient.status == 'completed' %}<span class="adm-status is-off">เสร็จสิ้น</span>
+                    {% else %}<span class="adm-status is-warn">รอดำเนินการ</span>{% endif %}
+                </div>
+
+                <dl class="adm-kv">
+                    <dt>เพศ</dt><dd>{{ patient.get_gender_display }}</dd>
+                    <dt>วันเกิด</dt><dd>{% if patient.birth_date %}{{ patient.birth_date|date:"j M Y" }}{% else %}-{% endif %}</dd>
+                    <dt>อายุ</dt><dd>{% if patient.age %}{{ patient.age }} ปี{% else %}-{% endif %}</dd>
+                    <dt>กรุ๊ปเลือด</dt><dd>{{ patient.blood_type|default:"-" }}</dd>
+                    <dt>เบอร์โทร</dt><dd class="font-monospace">{{ patient.phone|default:"-" }}</dd>
+                    <dt>อีเมล</dt><dd class="text-truncate">{{ patient.email|default:"-" }}</dd>
+                    <dt>LINE</dt><dd>{% if patient.line_user_id %}<span class="adm-status">เชื่อมแล้ว</span>{% else %}<span class="adm-status is-off">ยังไม่เชื่อม</span>{% endif %}</dd>
+                </dl>
+
+                <div class="d-grid gap-2 mt-3">
+                    <button type="button" @click="showNewSoap = true; $nextTick(() => document.getElementById('new-soap').scrollIntoView({behavior: 'smooth', block: 'start'}))" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> บันทึกการตรวจ
+                    </button>
+                    <a href="{% url 'patients:patient_edit' patient.pk %}" class="btn btn-light">แก้ไขข้อมูลคนไข้</a>
                 </div>
             </div>
+        </div>
 
-            <!-- Allergy Alert Banner -->
+        <div class="col-12 col-lg-7 col-xxl-8 d-flex flex-column gap-3">
             {% if patient.allergies %}
-            <div class="alert alert-danger d-flex align-items-center gap-2.5 mt-3 mb-0 py-2.5 px-3 shadow-xs border" role="alert">
-                <i class="fas fa-exclamation-triangle fs-5 flex-shrink-0"></i>
-                <div style="font-size: 0.8rem;">
-                    <strong>ข้อควรระวังทางการแพทย์: ประวัติการแพ้ยา / สารอาหาร:</strong> {{ patient.allergies }}
-                </div>
+            <div class="alert alert-danger d-flex align-items-start gap-3 mb-0" role="alert">
+                <i class="fas fa-exclamation-triangle fs-5 mt-1"></i>
+                <div><strong>ประวัติการแพ้ยา / อาหาร:</strong> {{ patient.allergies }}</div>
             </div>
             {% endif %}
 
-            <!-- Chief Complaint & Medical History Snippet -->
-            <div class="row g-3 pt-3 mt-2 border-top text-muted small" style="font-size: 0.8rem;">
-                <div class="col-12 col-md-6">
-                    <span class="fw-bold text-dark text-uppercase d-block mb-1" style="font-size: 0.725rem;">อาการสำคัญแรกรับ (Chief Complaint):</span>
-                    <p class="mb-0 text-secondary lh-base">{{ patient.chief_complaint|default:"- ไม่ได้ระบุ -" }}</p>
+            <!-- ประวัติโดยย่อ (การ์ด About ในต้นแบบ) -->
+            <div class="adm-card">
+                <div class="adm-card-head"><h2 class="adm-card-title">ประวัติโดยย่อ</h2></div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="adm-label">อาการสำคัญแรกรับ</div>
+                        <p class="mb-0" style="white-space: pre-line;">{{ patient.chief_complaint|default:"ไม่ได้ระบุ" }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="adm-label">โรคประจำตัว / ประวัติผ่าตัด</div>
+                        <p class="mb-0" style="white-space: pre-line;">{{ patient.medical_history|default:"ไม่ได้ระบุ" }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="adm-label">ยาประจำตัว / อาหารเสริม</div>
+                        <p class="mb-0" style="white-space: pre-line;">{{ patient.current_medications|default:"ไม่ได้ระบุ" }}</p>
+                    </div>
                 </div>
-                <div class="col-12 col-md-6">
-                    <span class="fw-bold text-dark text-uppercase d-block mb-1" style="font-size: 0.725rem;">โรคประจำตัว / ประวัติผ่าตัด (Medical History):</span>
-                    <p class="mb-0 text-secondary lh-base">{{ patient.medical_history|default:"- ไม่ได้ระบุ -" }}</p>
+            </div>
+
+            <!-- สัญญาณชีพล่าสุด (การ์ด General Report ในต้นแบบ) -->
+            <div class="adm-card flex-grow-1">
+                {% with latest=histories.first %}
+                <div class="adm-card-head">
+                    <h2 class="adm-card-title">สัญญาณชีพล่าสุด</h2>
+                    {% if latest and latest.vitals %}<small class="text-muted">วัดเมื่อ {{ latest.visit_date|date:"j M Y H:i" }}</small>{% endif %}
                 </div>
+                {% if latest and latest.vitals %}
+                <div class="row g-2">
+                    <div class="col-6 col-md-4">
+                        <div class="adm-vital"><span>ความดันโลหิต</span><strong>{{ latest.vitals.bp_systolic|default:"-" }}/{{ latest.vitals.bp_diastolic|default:"-" }}</strong><small>mmHg</small></div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="adm-vital"><span>ชีพจร</span><strong>{{ latest.vitals.pulse|default:"-" }}</strong><small>ครั้ง/นาที</small></div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="adm-vital"><span>อุณหภูมิ</span><strong>{{ latest.vitals.temperature|default:"-" }}</strong><small>°C</small></div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="adm-vital"><span>น้ำหนัก / ส่วนสูง</span><strong>{{ latest.vitals.weight_kg|default:"-" }} / {{ latest.vitals.height_cm|default:"-" }}</strong><small>กก. / ซม.</small></div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="adm-vital"><span>BMI</span><strong>{{ latest.vitals.bmi|default:"-" }}</strong><small>กก./ม²</small></div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="adm-vital"><span>ออกซิเจนปลายนิ้ว</span><strong>{{ latest.vitals.spo2|default:"-" }}</strong><small>% SpO2</small></div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4 mb-0">ยังไม่มีการบันทึกสัญญาณชีพ</p>
+                {% endif %}
+                {% endwith %}
             </div>
         </div>
     </div>
 
-    <!-- Main Content Area: Collapsible New SOAP Form & Timeline -->
-    <div class="row g-4">
-        <!-- Left Column: SOAP Visits Timeline (8 cols) -->
-        <div class="col-12 col-lg-8">
-            <!-- New SOAP Form (Collapsible via Alpine) -->
-            <div x-show="showNewSoap" x-cloak class="card shadow-sm border border-primary-subtle mb-4">
-                <div class="card-header bg-primary-subtle py-2.5 px-3 border-bottom border-primary-subtle d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-bold text-primary small d-flex align-items-center gap-2">
-                        <i class="fas fa-notes-medical"></i> บันทึกการตรวจรักษาใหม่ (SOAP Note Recording)
-                    </h6>
-                    <button type="button" @click="showNewSoap = false" class="btn-close btn-close-white" aria-label="Close"></button>
-                </div>
-                <div class="card-body p-4">
-                    <form method="post" 
-                          action="{% url 'patients:patient_add_soap' patient.pk %}"
-                          hx-post="{% url 'patients:patient_add_soap' patient.pk %}"
-                          hx-target="#soap-timeline"
-                          hx-swap="afterbegin"
-                          hx-indicator="#soap-spinner"
-                          hx-on::after-request="if(event.detail.successful){ this.reset(); showNewSoap = false; const emptyNotice = document.getElementById('empty-soap-notice'); if(emptyNotice) emptyNotice.style.display='none'; }">
-                        {% csrf_token %}
-
-                        <!-- Vitals Entry Card -->
-                        <div class="card bg-light border p-3 mb-3">
-                            <h6 class="small fw-bold text-dark text-uppercase mb-2.5 d-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
-                                <i class="fas fa-heartbeat text-primary"></i> บันทึกสัญญาณชีพ (Vital Signs)
-                            </h6>
-                            <div class="row g-2 small">
-                                <div class="col-6 col-md-3">
-                                    <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">ความดันบน (Systolic)</label>
-                                    {{ soap_form.bp_systolic }}
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">ความดันล่าง (Diastolic)</label>
-                                    {{ soap_form.bp_diastolic }}
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">ชีพจร (Pulse bpm)</label>
-                                    {{ soap_form.pulse }}
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">อุณหภูมิ (°C)</label>
-                                    {{ soap_form.temperature }}
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">น้ำหนัก (กก.)</label>
-                                    {{ soap_form.weight_kg }}
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">ส่วนสูง (ซม.)</label>
-                                    {{ soap_form.height_cm }}
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    <label class="form-label text-muted mb-1" style="font-size: 0.75rem;">ออกซิเจนปลายนิ้ว (% SpO2)</label>
-                                    {{ soap_form.spo2 }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- SOAP Framework Textareas -->
-                        <div class="d-flex flex-column gap-3 mb-3">
-                            <div>
-                                <label class="form-label fw-bold text-primary small mb-1 d-flex align-items-center gap-1.5">
-                                    <span class="badge bg-primary text-white" style="font-size: 0.65rem;">S</span> Subjective (อาการที่คนไข้บอกเล่า):
-                                </label>
-                                {{ soap_form.subjective }}
-                            </div>
-
-                            <div>
-                                <label class="form-label fw-bold text-warning-emphasis small mb-1 d-flex align-items-center gap-1.5">
-                                    <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">O</span> Objective (ผลตรวจร่างกาย / ผลแล็บที่พบ):
-                                </label>
-                                {{ soap_form.objective }}
-                            </div>
-
-                            <div>
-                                <label class="form-label fw-bold text-danger small mb-1 d-flex align-items-center gap-1.5">
-                                    <span class="badge bg-danger text-white" style="font-size: 0.65rem;">A</span> Assessment (การวินิจฉัย / แกนชีววิทยา 39 แกน):
-                                </label>
-                                {{ soap_form.assessment }}
-                            </div>
-
-                            <div>
-                                <label class="form-label fw-bold text-success small mb-1 d-flex align-items-center gap-1.5">
-                                    <span class="badge bg-success text-white" style="font-size: 0.65rem;">P</span> Plan (แผนการรักษา / อาหารบำบัด / นัดหมาย):
-                                </label>
-                                {{ soap_form.plan }}
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                            <button type="button" @click="showNewSoap = false" class="btn btn-sm btn-outline-secondary">
-                                ยกเลิก
-                            </button>
-                            <button type="submit" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5">
-                                <span id="soap-spinner" style="display: none;" class="me-1"><i class="fas fa-spinner fa-spin"></i></span>
-                                <i class="fas fa-save"></i> บันทึก SOAP เข้าเวชระเบียน
-                            </button>
-                        </div>
-                    </form>
-                </div>
+    <!-- ผลตรวจแล็บและตัวชี้วัด (Lab Biomarkers & Ontology Mapping) -->
+    <div class="adm-card">
+        <div class="adm-card-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+            <div>
+                <h2 class="adm-card-title mb-0">
+                    <i class="fas fa-vial text-primary me-1.5"></i> ผลตรวจแล็บและตัวชี้วัดชีวเคมี (Lab Biomarkers)
+                </h2>
+                {% if latest_lab_date %}
+                <small class="text-muted">บันทึกล่าสุดเมื่อ {{ latest_lab_date|date:"j M Y H:i" }}</small>
+                {% else %}
+                <small class="text-muted">สำหรับแมปเข้าสู่กลไก 39 แกนชีววิทยา</small>
+                {% endif %}
             </div>
-
-            <!-- SOAP Timeline Header -->
-            <div class="d-flex justify-content-between align-items-center pb-2 mb-2">
-                <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                    <i class="fas fa-stream text-primary"></i> ประวัติการตรวจรักษา (SOAP Clinical Timeline)
-                </h6>
-                <span class="badge bg-light text-dark border font-monospace">
-                    {{ histories.count }} บันทึก
-                </span>
-            </div>
-
-            <!-- Timeline Container -->
-            <div id="soap-timeline">
-                {% for history in histories %}
-                    {% include 'patients/partials/history_soap_card.html' with history=history %}
-                {% empty %}
-                    <div id="empty-soap-notice" class="card shadow-sm border border-dashed text-center p-5">
-                        <i class="fas fa-notes-medical fs-2 text-muted mb-2 d-block"></i>
-                        <h6 class="fw-bold text-dark mb-1">ยังไม่มีบันทึกการตรวจรักษา</h6>
-                        <p class="small text-muted mb-3">คลิกปุ่มด้านล่างเพื่อเริ่มบันทึก SOAP Note แรกสำหรับคนไข้รายนี้</p>
-                        <div>
-                            <button type="button" @click="showNewSoap = true" class="btn btn-sm btn-primary">
-                                <i class="fas fa-plus me-1"></i> เพิ่มบันทึก SOAP แรก
-                            </button>
-                        </div>
-                    </div>
-                {% endfor %}
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <a href="{% url 'patients:doctor_axes_mapping' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-sitemap me-1"></i> วิเคราะห์การแมป 39 แกน
+                </a>
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#recordLabModal">
+                    <i class="fas fa-plus me-1"></i> {% if patient_labs %}อัปเดตผลแล็บ{% else %}บันทึกผลแล็บ{% endif %}
+                </button>
             </div>
         </div>
 
-        <!-- Right Column: Clinical Status & Vitals (4 cols) -->
-        <div class="col-12 col-lg-4">
-            <div class="d-flex flex-column gap-3">
-                <!-- Vitals Summary Card -->
-                <div class="card shadow-sm border">
-                    <div class="card-header bg-light py-2.5 px-3 border-bottom">
-                        <span class="small fw-bold text-dark d-flex align-items-center gap-2">
-                            <i class="fas fa-chart-line text-primary"></i> ดัชนีชีวภาพล่าสุด
-                        </span>
-                    </div>
-                    <div class="card-body p-3">
-                        {% with latest=histories.first %}
-                            {% if latest and latest.vitals %}
-                                <div class="row g-2 text-center mb-2">
-                                    <div class="col-6">
-                                        <div class="p-2 rounded-3 bg-light border">
-                                            <span class="text-muted d-block" style="font-size: 0.7rem;">ความดันโลหิต</span>
-                                            <strong class="font-monospace text-dark d-block">
-                                                {{ latest.vitals.bp_systolic|default:"-" }}/{{ latest.vitals.bp_diastolic|default:"-" }}
-                                            </strong>
-                                            <small class="text-muted" style="font-size: 0.65rem;">mmHg</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="p-2 rounded-3 bg-light border">
-                                            <span class="text-muted d-block" style="font-size: 0.7rem;">อัตราชีพจร</span>
-                                            <strong class="font-monospace text-danger d-block">
-                                                {{ latest.vitals.pulse|default:"-" }}
-                                            </strong>
-                                            <small class="text-muted" style="font-size: 0.65rem;">bpm</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="p-2 rounded-3 bg-light border">
-                                            <span class="text-muted d-block" style="font-size: 0.7rem;">น้ำหนัก/ส่วนสูง</span>
-                                            <strong class="font-monospace text-dark d-block small">
-                                                {{ latest.vitals.weight_kg|default:"-" }}kg / {{ latest.vitals.height_cm|default:"-" }}cm
-                                            </strong>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="p-2 rounded-3 bg-light border">
-                                            <span class="text-muted d-block" style="font-size: 0.7rem;">ดัชนีมวลกาย BMI</span>
-                                            <strong class="font-monospace text-primary d-block">
-                                                {{ latest.vitals.bmi|default:"-" }}
-                                            </strong>
-                                        </div>
-                                    </div>
-                                </div>
-                                <small class="text-muted d-block text-end" style="font-size: 0.7rem;">
-                                    ตรวจวัดเมื่อ: {{ latest.visit_date|date:"d M Y H:i" }}
-                                </small>
-                            {% else %}
-                                <p class="small text-muted text-center py-3 mb-0">
-                                    ยังไม่มีข้อมูลบันทึกสัญญาณชีพล่าสุด
-                                </p>
-                            {% endif %}
-                        {% endwith %}
+        {% if patient_labs %}
+        <div class="p-3">
+            <!-- Abnormal Alert Callout if any -->
+            {% if abnormal_axes_from_labs %}
+            <div class="alert alert-warning border-warning-subtle py-2 px-3 mb-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                <div class="small">
+                    <strong class="text-warning-emphasis"><i class="fas fa-exclamation-triangle me-1"></i> ผลแล็บบ่งชี้ความผิดปกติในแกนชีวภาพ:</strong>
+                    <div class="d-flex flex-wrap gap-1 mt-1">
+                        {% for ax in abnormal_axes_from_labs %}
+                        <span class="badge bg-warning-subtle text-dark border border-warning-subtle font-monospace">{{ ax }}</span>
+                        {% endfor %}
                     </div>
                 </div>
+                <a href="{% url 'clinical:axes_explorer' %}?patient_id={{ patient.pk }}&auto_ai=1" class="btn btn-sm btn-warning text-dark fw-bold flex-shrink-0 shadow-xs">
+                    <i class="fas fa-brain me-1"></i> ส่งไปประเมิน 39 แกนทันที
+                </a>
+            </div>
+            {% endif %}
 
-                <!-- Clinical Security & PDPA Card -->
-                <div class="card shadow-sm border">
-                    <div class="card-header bg-light py-2.5 px-3 border-bottom">
-                        <span class="small fw-bold text-dark d-flex align-items-center gap-2">
-                            <i class="fas fa-shield-alt text-primary"></i> มาตรฐานความปลอดภัย EMR
-                        </span>
-                    </div>
-                    <div class="card-body p-3 small text-muted d-flex flex-column gap-2" style="font-size: 0.775rem;">
-                        <div class="d-flex align-items-start gap-2">
-                            <i class="fas fa-check-circle text-primary mt-1"></i>
-                            <span><strong>Pillar 2:</strong> RBAC Role-based Access จำกัดเฉพาะแพทย์และพยาบาล</span>
+            <!-- Lab Biomarkers Grid -->
+            <div class="row g-2">
+                {% for lab in patient_labs %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card p-2.5 h-100 border {% if lab.is_abnormal %}border-danger-subtle bg-danger-subtle{% else %}bg-light{% endif %}">
+                        <div class="d-flex justify-content-between align-items-start gap-1 mb-1">
+                            <span class="text-xs fw-bold font-monospace text-dark">{{ lab.name }}</span>
+                            {% if lab.is_abnormal %}
+                            <span class="badge bg-danger text-white text-xs">ผิดปกติ</span>
+                            {% else %}
+                            <span class="badge bg-success-subtle text-success text-xs">ปกติ</span>
+                            {% endif %}
                         </div>
-                        <div class="d-flex align-items-start gap-2">
-                            <i class="fas fa-check-circle text-primary mt-1"></i>
-                            <span><strong>Pillar 8:</strong> บันทึก AuditLog ทุกครั้งที่มีการเปิดอ่านหรือแก้ไข</span>
+                        <div class="d-flex align-items-baseline gap-1">
+                            <span class="fs-5 fw-bold font-monospace {% if lab.is_abnormal %}text-danger{% else %}text-dark{% endif %}">
+                                {{ lab.value }}
+                            </span>
+                            <small class="text-muted text-xs">{{ lab.unit }}</small>
                         </div>
-                        <div class="d-flex align-items-start gap-2">
-                            <i class="fas fa-check-circle text-primary mt-1"></i>
-                            <span><strong>PDPA:</strong> หมายเลขบัตรและข้อมูลสุขภาพเข้ารหัสปกป้องความเป็นส่วนตัว</span>
+                        {% if lab.target_axis %}
+                        <div class="mt-1 pt-1 border-top text-truncate" style="font-size: 0.7rem;">
+                            <span class="text-muted">&rarr; {{ lab.target_axis }}</span>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="p-4 text-center text-muted">
+            <i class="fas fa-vial fs-3 text-secondary opacity-50 mb-2 d-block"></i>
+            <p class="small mb-2">ยังไม่มีบันทึกผลแล็บชีวเคมีสำหรับคนไข้ท่านนี้</p>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#recordLabModal">
+                    <i class="fas fa-plus me-1"></i> กรอกค่าผลแล็บ
+                </button>
+                <a href="{% url 'patients:doctor_lab_review' %}?patient_id={{ patient.pk }}&open_upload=1" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-file-upload me-1"></i> อัปโหลดเอกสารใบแล็บ (PDF/รูป)
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- เอกสารผลแล็บที่แนบเก็บไว้ในเวชระเบียน (Encrypted Lab Documents) -->
+        {% if lab_documents %}
+        <div class="border-top bg-light p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small fw-bold text-dark">
+                    <i class="fas fa-folder-open text-primary me-1"></i> เอกสารผลแล็บต้นฉบับในเวชระเบียน ({{ lab_documents|length }} ไฟล์)
+                </span>
+                <a href="{% url 'patients:doctor_lab_review' %}?patient_id={{ patient.pk }}&open_upload=1" class="btn btn-sm btn-outline-primary py-0 px-2 text-xs">
+                    <i class="fas fa-plus me-1"></i> เพิ่มเอกสาร
+                </a>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                {% for doc in lab_documents %}
+                <a href="{% url 'patients:patient_lab_document' patient.pk doc.media_id %}" target="_blank"
+                   class="btn btn-sm bg-white border shadow-xs d-inline-flex align-items-center gap-1.5 text-dark">
+                    <i class="fas {% if 'pdf' in doc.content_type %}fa-file-pdf text-danger{% else %}fa-file-image text-info{% endif %}"></i>
+                    <span class="small">{{ doc.filename|default:"เอกสารผลแล็บ" }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ประวัติการตรวจ (ตาราง Doctor Visit ในต้นแบบ) -->
+    {% if histories %}
+    <div class="adm-card">
+        <div class="adm-card-head">
+            <h2 class="adm-card-title">ประวัติการตรวจ</h2>
+            <span class="text-muted small">{{ histories|length }} ครั้ง</span>
+        </div>
+        <div class="adm-table">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>ผู้ตรวจ</th><th>วันที่</th><th>ที่มา</th><th>อาการที่เล่า</th><th class="text-end"></th></tr></thead>
+                    <tbody>
+                        {% for h in histories|slice:":8" %}
+                        <tr>
+                            <td>
+                                <span class="d-flex align-items-center gap-2">
+                                    <span class="adm-avatar adm-avatar-sm"><i class="fas fa-user-md"></i></span>
+                                    {% if h.doctor %}{{ h.doctor.get_full_name|default:h.doctor.username }}{% else %}แพทย์ผู้ตรวจ{% endif %}
+                                </span>
+                            </td>
+                            <td class="text-nowrap">{{ h.visit_date|date:"j M Y H:i" }}</td>
+                            <td class="text-nowrap">{% if h.source_box.source == 'LINE' %}แชท LINE{% elif h.source_box.source == 'WEB' %}เว็บผู้ป่วย{% else %}บันทึกที่คลินิก{% endif %}</td>
+                            <td class="text-truncate" style="max-width: 280px;">{{ h.subjective|default:"-"|truncatechars:60 }}</td>
+                            <td class="text-end"><a href="#soap-{{ h.pk }}" class="btn btn-sm btn-light">ดู SOAP</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+    <!-- บันทึกการตรวจ: สัญญาณชีพ + ซักประวัติ + AI สรุป SOAP -->
+    {% include 'patients/partials/visit_form.html' %}
+
+    <!-- บันทึก SOAP ทั้งหมด -->
+    <div class="adm-page-head pt-2">
+        <h2 class="adm-card-title">บันทึกการตรวจรักษา (SOAP)</h2>
+        <span class="text-muted small">{{ histories|length }} บันทึก</span>
+    </div>
+    <div id="soap-timeline" class="d-flex flex-column gap-3">
+        {% for history in histories %}
+            {% include 'patients/partials/history_soap_card.html' with history=history %}
+        {% empty %}
+            <div id="empty-soap-notice" class="adm-card text-center py-5">
+                <i class="fas fa-notes-medical fs-2 text-muted mb-2 d-block"></i>
+                <div class="fw-semibold mb-1">ยังไม่มีบันทึกการตรวจรักษา</div>
+                <p class="small text-muted mb-3">เริ่มบันทึก SOAP แรกของคนไข้รายนี้</p>
+                <div><button type="button" @click="showNewSoap = true; $nextTick(() => document.getElementById('new-soap').scrollIntoView({behavior: 'smooth', block: 'start'}))" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i> บันทึกการตรวจครั้งแรก</button></div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Modal บันทึกผลตรวจแล็บและตัวชี้วัด (Record Lab Biomarkers Modal) -->
+    <div class="modal fade" id="recordLabModal" tabindex="-1" aria-labelledby="recordLabModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light py-2.5 px-3 border-bottom">
+                    <h5 class="modal-title fs-6 fw-bold text-dark d-flex align-items-center gap-2" id="recordLabModalLabel">
+                        <i class="fas fa-vial text-primary"></i> บันทึกผลตรวจแล็บ: {{ patient.full_name }} (HN {{ patient.hn }})
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'patients:patient_lab_save' patient.pk %}">
+                    {% csrf_token %}
+                    <div class="modal-body p-3 p-md-4">
+                        <p class="small text-muted mb-3">
+                            กรอกค่าผลการตรวจแล็บของคนไข้ (เฉพาะตัวเลข) ค่าที่ระบุจะถูกจัดเก็บเข้าเวชระเบียนและนำไปแมปเข้ากับ 39 แกนชีววิทยาโดยอัตโนมัติ
+                        </p>
+                        <div class="row g-3">
+                            <!-- 1. การอักเสบ -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small fw-medium text-dark mb-1">
+                                    hsCRP <span class="text-muted">(ปกติ &le; 1.0 mg/L)</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" name="hscrp" class="form-control" placeholder="เช่น 3.5">
+                                    <span class="input-group-text text-xs">mg/L</span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small fw-medium text-dark mb-1">
+                                    IL-6 <span class="text-muted">(ปกติ &le; 1.8 pg/mL)</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" name="il6" class="form-control" placeholder="เช่น 5.2">
+                                    <span class="input-group-text text-xs">pg/mL</span>
+                                </div>
+                            </div>
+
+                            <!-- 2. น้ำตาล & เมแทบอลิซึม -->
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-medium text-dark mb-1">
+                                    Fasting Insulin <span class="text-muted">(&le; 6.0)</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.1" name="insulin" class="form-control" placeholder="เช่น 12.0">
+                                    <span class="input-group-text text-xs">&mu;IU/mL</span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-medium text-dark mb-1">
+                                    HOMA-IR <span class="text-muted">(&le; 1.5)</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" name="homair" class="form-control" placeholder="เช่น 2.4">
+                                    <span class="input-group-text text-xs">Index</span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-medium text-dark mb-1">
+                                    HbA1c <span class="text-muted">(&lt; 5.7%)</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.1" name="hba1c" class="form-control" placeholder="เช่น 6.1">
+                                    <span class="input-group-text text-xs">%</span>
+                                </div>
+                            </div>
+
+                            <!-- 3. ไขมัน & ลำไส้ -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small fw-medium text-dark mb-1">
+                                    TG / HDL Ratio <span class="text-muted">(&le; 2.0)</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" name="tghdl" class="form-control" placeholder="เช่น 3.1">
+                                    <span class="input-group-text text-xs">Ratio</span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small fw-medium text-dark mb-1">
+                                    Zonulin <span class="text-muted">(&le; 30 ng/mL)</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.1" name="zonulin" class="form-control" placeholder="เช่น 42.5">
+                                    <span class="input-group-text text-xs">ng/mL</span>
+                                </div>
+                            </div>
+
+                            <!-- 4. ตับ & ดีเอ็นเอ -->
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-medium text-dark mb-1">
+                                    ALT / AST <span class="text-muted">(&le; 35 U/L)</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="1" name="alt" class="form-control" placeholder="เช่น 45">
+                                    <span class="input-group-text text-xs">U/L</span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-medium text-dark mb-1">
+                                    8-OHdG <span class="text-muted">(ปกติ &le; 3.5 ng/mg)</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.01" name="ohdg" class="form-control" placeholder="เช่น 5.8">
+                                    <span class="input-group-text text-xs">ng/mg</span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-medium text-dark mb-1">
+                                    eGFR <span class="text-muted">(&ge; 90 mL/min)</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.1" name="egfr" class="form-control" placeholder="เช่น 85">
+                                    <span class="input-group-text text-xs">mL/min</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light py-2 px-3 border-top d-flex justify-content-between">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-sm btn-primary px-3">
+                            <i class="fas fa-save me-1"></i> บันทึกผลแล็บเข้าเวชระเบียน
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

@@ -294,18 +294,24 @@ class ClinicalInvariantValidator:
         replacements = {
             r"\[MEASURED\]": "ผลตรวจทางห้องปฏิบัติการพบว่า",
             r"\[DERIVED\]": "จากการประเมินทางชีววิทยาพบว่า",
+            r"\[CLINICAL_INFERENCE\]": "จากการประเมินอาการทางคลินิกพบว่า",
             r"\[HYPOTHESIS\]": "ในเบื้องต้นมีข้อสังเกตว่า",
+            r"\[NOT_AVAILABLE\]": "ยังไม่มีข้อมูลการตรวจยืนยัน",
             r"\[PHYSICIAN_APPROVED_RECOMMENDATION\]": "แพทย์ผู้เชี่ยวชาญแนะนำว่า",
             r"\[CURRENT_PHYSICIAN_ORDER\]": "แผนการดูแลปัจจุบันกำหนดให้",
             r"\[AI_SUGGESTED_CONSIDERATION\]": "ประเด็นที่ควรปรึกษาแพทย์เพิ่มเติมคือ",
             r"\[STANDARD_CLINICAL\]": "",
             r"\[NOT_SCORED\]": "(รอตรวจยืนยันเพิ่มเติม)",
+            r"\bAXIS[_\s]*\d+\b": "ระบบชีวภาพที่เกี่ยวข้อง",
+            r"\bAxis\s*\d+\b": "ระบบชีวภาพที่เกี่ยวข้อง",
+            r"\b\d{1,3}\s*/\s*100\b": "",
+            r"for healthcare professionals only": "",
         }
 
         sanitized = text
         for tag_pattern, replacement in replacements.items():
-            sanitized = re.sub(tag_pattern, replacement, sanitized)
+            sanitized = re.sub(tag_pattern, replacement, sanitized, flags=re.IGNORECASE)
 
-        # จัดการช่องว่างซ้ำซ้อน
-        sanitized = re.sub(r"\s{2,}", " ", sanitized).strip()
+        # จัดการช่องว่างซ้ำซ้อน (คง line breaks ไว้)
+        sanitized = re.sub(r"[ \t]{2,}", " ", sanitized).strip()
         return sanitized

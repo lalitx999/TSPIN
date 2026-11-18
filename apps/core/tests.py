@@ -70,6 +70,38 @@ class CorePagesLayoutTests(TestCase):
         self.assertTemplateUsed(response, 'layouts/patient_base.html')
         self.assertContains(response, "TSPI Health")
 
+    # ---- หน้าบ้านใหม่ (front.css) ต้องแยกขาดจาก EMR (admin.css) ----
+    # แผน docs/UI_REDESIGN_FASTWORK_2026-11.md: เปลี่ยนเฉพาะหน้าบ้าน ห้ามกระทบ EMR ที่ใช้งานจริง
+
+    def test_public_pages_use_front_layout_not_emr_css(self):
+        for name in ('core:home', 'core:about', 'core:platform', 'core:privacy', 'accounts:patient_login'):
+            with self.subTest(page=name):
+                resp = self.client.get(reverse(name))
+                self.assertEqual(resp.status_code, 200)
+                self.assertTemplateUsed(resp, 'layouts/front_base.html')
+                self.assertContains(resp, 'css/front.css')
+                self.assertContains(resp, 'class="f-nav"')
+                self.assertNotContains(resp, 'css/admin.css')
+
+    def test_patient_portal_uses_front_layout_not_emr_base(self):
+        self.client.force_login(self.patient)
+        resp = self.client.get(reverse('portal_patient:dashboard'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'layouts/front_base.html')
+        self.assertTemplateNotUsed(resp, 'base.html')
+        self.assertContains(resp, 'css/front.css')
+        self.assertContains(resp, 'class="f-tabbar')
+        self.assertNotContains(resp, 'css/admin.css')
+
+    def test_emr_dashboard_does_not_load_front_css(self):
+        self.client.force_login(self.doctor)
+        resp = self.client.get(reverse('patients:dashboard'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'base.html')
+        self.assertTemplateNotUsed(resp, 'layouts/front_base.html')
+        self.assertContains(resp, 'css/admin.css')
+        self.assertNotContains(resp, 'css/front.css')
+
     def test_health_check_endpoint_returns_healthy(self):
         """Pillar 6: ตรวจสอบสถานะความพร้อมระบบผ่าน /health/ ต้องคืนค่า 200 และสถานะ healthy"""
         response = self.client.get(reverse('core:health'))

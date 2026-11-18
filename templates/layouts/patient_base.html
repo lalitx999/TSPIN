@@ -1,145 +1,100 @@
-{% extends 'base.html' %}
+{% extends 'layouts/front_base.html' %}
 {% load static %}
+{# portal คนไข้: แถบบนกระจก + เมนูล่างแบบเม็ดยาลอยบนมือถือ (ดีไซน์ใน static/css/front.css) #}
+{# เดิม extends base.html ของ EMR — แยกออกมาเพื่อให้ปรับหน้าบ้านได้โดยไม่แตะ EMR #}
 
-{% block extra_head %}
-<style>
-    /* Patient Portal Clean Styling (Bootstrap 5.3.8) */
-    .patient-navbar {
-        height: 65px;
-        background-color: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(8px);
-        border-bottom: 1px solid #CBD5E1;
-        position: sticky;
-        top: 0;
-        z-index: 1020;
-    }
-
-    .patient-nav-link {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #334155;
-        text-decoration: none;
-        padding: 0.5rem 0.85rem;
-        border-radius: 0.5rem;
-        transition: all 0.15s ease;
-    }
-
-    .patient-nav-link:hover {
-        color: #2E7D32;
-        background-color: rgba(46, 125, 50, 0.08);
-    }
-
-    .patient-nav-link.active {
-        color: #2E7D32;
-        font-weight: 700;
-        background-color: rgba(46, 125, 50, 0.14);
-    }
-
-    /* Mobile bottom bar */
-    .mobile-bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: #FFFFFF;
-        border-top: 1px solid #CBD5E1;
-        z-index: 1030;
-        display: flex;
-        justify-content: space-around;
-        padding: 0.5rem 0.25rem;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .mobile-bottom-nav a {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.2rem;
-        color: #64748B;
-        text-decoration: none;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-
-    .mobile-bottom-nav a.active, .mobile-bottom-nav a:hover {
-        color: #2E7D32;
-    }
-</style>
-{% block extra_patient_head %}{% endblock %}
+{% block front_head %}
+    <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.body.addEventListener('htmx:configRequest', function (evt) {
+                var csrfToken = '{{ csrf_token }}';
+                if (csrfToken) { evt.detail.headers['X-CSRFToken'] = csrfToken; }
+            });
+        });
+    </script>
 {% endblock %}
+
+{% block after_head %}{% block extra_patient_head %}{% endblock %}{% endblock %}
+
+{% block body_class %}portal has-tabbar{% endblock %}
 
 {% block layout %}
-<div class="d-flex flex-column min-vh-100 bg-body">
-    <!-- Top Patient Header -->
-    <header class="patient-navbar shadow-xs">
-        <div class="container-xl h-100 d-flex align-items-center justify-content-between px-3">
-            <!-- Brand -->
-            <a href="{% url 'portal_patient:dashboard' %}" class="d-flex align-items-center gap-2.5 text-decoration-none">
-                <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
-                    <i class="fas fa-heartbeat fs-5"></i>
-                </div>
-                <div>
-                    <div class="d-flex align-items-center gap-1 lh-1">
-                        <span class="fw-bold text-dark" style="font-size: 0.95rem;">TSPI</span>
-                        <span class="fw-bold text-primary" style="font-size: 0.95rem;">HEALTH</span>
-                    </div>
-                    <small class="text-muted d-block" style="font-size: 0.65rem;">พอร์ทัลสุขภาพคนไข้ส่วนบุคคล</small>
-                </div>
+{% with url_name=request.resolver_match.url_name first_name=request.user.first_name|default:request.user.username %}
+<header class="f-nav" aria-label="ส่วนหัว">
+    <div class="container-xl">
+        <div class="f-nav-bar">
+            <a class="f-brand" href="{% url 'portal_patient:dashboard' %}">
+                <span class="f-brand-mark" aria-hidden="true"><i class="fas fa-leaf"></i></span>
+                <span>TSPI Health<small>พอร์ทัลสุขภาพของคุณ</small></span>
             </a>
 
-            <!-- Desktop Nav -->
-            <nav class="d-none d-lg-flex align-items-center gap-2">
-                <a href="{% url 'portal_patient:dashboard' %}" class="patient-nav-link">แดชบอร์ด</a>
-                <a href="{% url 'portal_patient:assistant' %}" class="patient-nav-link">ผู้ช่วย AI</a>
-                <a href="{% url 'portal_patient:patient_axes_result' %}" class="patient-nav-link">ผล 39 แกน</a>
-                <a href="{% url 'portal_patient:patient_digital_twin' %}" class="patient-nav-link">Digital Twin</a>
-                <a href="{% url 'portal_patient:portal_appointments' %}" class="patient-nav-link">นัดหมาย</a>
-                <a href="{% url 'portal_patient:patient_history' %}" class="patient-nav-link">ประวัติการรักษา</a>
-                <a href="{% url 'portal_patient:patient_download' %}" class="patient-nav-link">ดาวน์โหลดรายงาน</a>
+            <nav class="d-none d-lg-block mx-auto" aria-label="เมนู portal">
+                <ul class="f-links">
+                    <li><a class="{% if url_name == 'dashboard' %}active{% endif %}" href="{% url 'portal_patient:dashboard' %}">หน้าหลัก</a></li>
+                    <li><a class="{% if url_name == 'assistant' %}active{% endif %}" href="{% url 'portal_patient:assistant' %}">ผู้ช่วย AI</a></li>
+                    <li><a class="{% if url_name == 'patient_axes_result' %}active{% endif %}" href="{% url 'portal_patient:patient_axes_result' %}">ผล 39 แกน</a></li>
+                    <li><a class="{% if url_name == 'portal_appointments' %}active{% endif %}" href="{% url 'portal_patient:portal_appointments' %}">นัดหมาย</a></li>
+                    <li><a class="{% if url_name == 'patient_history' %}active{% endif %}" href="{% url 'portal_patient:patient_history' %}">ประวัติ</a></li>
+                    <li class="dropdown">
+                        <a class="nav-link {% if url_name in 'patient_digital_twin patient_download' %}active{% endif %}" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">อื่น ๆ <i class="fas fa-chevron-down small" aria-hidden="true"></i></a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'portal_patient:patient_digital_twin' %}">Digital Twin</a></li>
+                            <li><a class="dropdown-item" href="{% url 'portal_patient:patient_download' %}">ดาวน์โหลดรายงาน</a></li>
+                        </ul>
+                    </li>
+                </ul>
             </nav>
 
-            <!-- Patient Profile & Logout -->
-            <div class="d-flex align-items-center gap-2">
-                <span class="d-none d-sm-inline-block small text-muted">
-                    คุณ {{ request.user.first_name|default:request.user.username }}
-                </span>
-                <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                        <i class="fas fa-sign-out-alt me-1"></i> ออกจากระบบ
+            <div class="f-actions ms-auto ms-lg-0">
+                <div class="dropdown">
+                    <button class="btn btn-link f-user px-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="เมนูบัญชี">
+                        <span class="f-avatar" aria-hidden="true">{{ first_name|slice:":1"|upper }}</span>
+                        <span class="d-none d-sm-inline">คุณ{{ first_name }}</span>
+                        <i class="fas fa-chevron-down small" aria-hidden="true"></i>
                     </button>
-                </form>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li class="d-lg-none"><a class="dropdown-item" href="{% url 'portal_patient:patient_digital_twin' %}">Digital Twin</a></li>
+                        <li class="d-lg-none"><a class="dropdown-item" href="{% url 'portal_patient:patient_download' %}">ดาวน์โหลดรายงาน</a></li>
+                        <li><a class="dropdown-item" href="{% url 'portal_patient:patient_settings' %}"><i class="fas fa-cog me-2" aria-hidden="true"></i>ตั้งค่าบัญชี</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2" aria-hidden="true"></i>ออกจากระบบ</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </header>
+    </div>
+</header>
 
-    <!-- Main Content -->
-    <main class="flex-grow-1 container-xl py-4 px-3 mb-5 mb-lg-0">
-        {% block content %}{% endblock %}
-    </main>
-
-    <!-- Mobile Bottom Navigation Bar -->
-    <nav class="mobile-bottom-nav d-lg-none">
-        <a href="{% url 'portal_patient:dashboard' %}">
-            <i class="fas fa-home fs-6"></i>
-            <span>หน้าหลัก</span>
-        </a>
-        <a href="{% url 'portal_patient:assistant' %}">
-            <i class="fas fa-comment-medical fs-6"></i>
-            <span>ปรึกษา AI</span>
-        </a>
-        <a href="{% url 'portal_patient:patient_axes_result' %}">
-            <i class="fas fa-chart-pie fs-6"></i>
-            <span>39 แกน</span>
-        </a>
-        <a href="{% url 'portal_patient:portal_appointments' %}">
-            <i class="fas fa-calendar-alt fs-6"></i>
-            <span>นัดหมาย</span>
-        </a>
-        <a href="{% url 'portal_patient:patient_history' %}">
-            <i class="fas fa-history fs-6"></i>
-            <span>ประวัติ</span>
-        </a>
-    </nav>
+{% block messages %}
+{% if messages %}
+<div class="container-xl pt-3 f-messages">
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show mb-2" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="ปิด"></button>
+        </div>
+    {% endfor %}
 </div>
-{% endblock %}
+{% endif %}
+{% endblock messages %}
+
+<main class="container-xl py-4">
+    {% block content %}{% endblock %}
+</main>
+
+<nav class="f-tabbar d-lg-none" aria-label="เมนูหลัก portal">
+    <a class="{% if url_name == 'dashboard' %}active{% endif %}" href="{% url 'portal_patient:dashboard' %}" {% if url_name == 'dashboard' %}aria-current="page"{% endif %}><i class="fas fa-home" aria-hidden="true"></i><span>หน้าหลัก</span></a>
+    <a class="{% if url_name == 'assistant' %}active{% endif %}" href="{% url 'portal_patient:assistant' %}"><i class="fas fa-comment-medical" aria-hidden="true"></i><span>ผู้ช่วย AI</span></a>
+    <a class="{% if url_name == 'patient_axes_result' %}active{% endif %}" href="{% url 'portal_patient:patient_axes_result' %}"><i class="fas fa-chart-pie" aria-hidden="true"></i><span>39 แกน</span></a>
+    <a class="{% if url_name == 'portal_appointments' %}active{% endif %}" href="{% url 'portal_patient:portal_appointments' %}"><i class="fas fa-calendar-alt" aria-hidden="true"></i><span>นัดหมาย</span></a>
+    <a class="{% if url_name == 'patient_history' %}active{% endif %}" href="{% url 'portal_patient:patient_history' %}"><i class="fas fa-history" aria-hidden="true"></i><span>ประวัติ</span></a>
+</nav>
+{% endwith %}
+{% endblock layout %}

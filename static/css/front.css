@@ -1,0 +1,586 @@
+/* ==========================================================================
+   TSPI หน้าบ้าน 2026 — ระบบดีไซน์กลางของหน้าเว็บสาธารณะและ portal คนไข้
+   แนวคิดจาก fastwork.com/th/selling (ขาว · หมึก · เทา, ปุ่มแคปซูล, การ์ดมุมโค้งเงานุ่ม, แถบบนกระจก)
+   ปรับมาจากดีไซน์ "Frosted mono" ของโปรเจกต์ letmehelp (ของเราเอง) ไม่ได้คัดลอกโค้ด/รูปของ Fastwork
+
+   โหลดเฉพาะ layouts/front_base.html (หน้าบ้าน) — ห้ามโหลดในหน้า EMR
+   ทุกกฎอยู่ใต้ body.front เพื่อชนะ theme.css / site.css ที่โหลดก่อนหน้า
+   แผน: docs/UI_REDESIGN_FASTWORK_2026-11.md
+   ========================================================================== */
+
+@font-face { font-family: "IBM Plex Sans Thai"; font-weight: 400; font-display: swap; src: url("../fonts/IBMPlexSansThai-Regular.ttf") format("truetype"); }
+@font-face { font-family: "IBM Plex Sans Thai"; font-weight: 500; font-display: swap; src: url("../fonts/IBMPlexSansThai-Medium.ttf") format("truetype"); }
+@font-face { font-family: "IBM Plex Sans Thai"; font-weight: 600; font-display: swap; src: url("../fonts/IBMPlexSansThai-SemiBold.ttf") format("truetype"); }
+@font-face { font-family: "IBM Plex Sans Thai"; font-weight: 700; font-display: swap; src: url("../fonts/IBMPlexSansThai-Bold.ttf") format("truetype"); }
+
+/* ---- Tokens -------------------------------------------------------------- */
+body.front {
+    /* หมึกและเทา */
+    --f-ink: #15171a;
+    --f-ink-2: #3a3d44;
+    --f-muted: #5f636b;          /* 5.9:1 บนขาว */
+    --f-faint: #868a92;          /* ใช้กับหัวข้อตัวใหญ่เท่านั้น (≥ 3:1) */
+    --f-line: #e7e8eb;
+    --f-line-strong: #d3d5da;
+    --f-paper: #ffffff;
+    --f-panel: #f2f3f5;
+    --f-canvas: #f7f7f5;
+    --f-night: #121417;
+    --f-night-2: #1c1f23;
+
+    /* สีแบรนด์คลินิก (เขียวเดิม) ใช้เป็นสีเน้น ไม่ใช้เป็นพื้นใหญ่ */
+    --f-accent: #4a7a06;          /* 5.2:1 บนขาว */
+    --f-accent-ink: #3d6505;
+    --f-accent-soft: #eef5e3;
+    --f-accent-glow: #8bc34a;
+    --f-teal-glow: #4fb3a9;
+
+    /* สถานะแบบพื้นอ่อน */
+    --f-ok-bg: #e4f5ea;   --f-ok: #1d6b3a;
+    --f-warn-bg: #fdf1dc; --f-warn: #8a5300;
+    --f-bad-bg: #fdecea;  --f-bad: #b3261e;
+    --f-info-bg: #e6eef8; --f-info: #1f4f8a;
+
+    /* กระจก เงา มุม การเคลื่อนไหว */
+    --f-glass: rgba(255, 255, 255, .66);
+    --f-glass-strong: rgba(255, 255, 255, .86);
+    --f-glass-line: rgba(255, 255, 255, .7);
+    --f-blur: saturate(160%) blur(18px);
+    --f-shadow-sm: 0 1px 2px rgba(16, 17, 20, .04), 0 4px 14px rgba(16, 17, 20, .05);
+    --f-shadow-md: 0 2px 6px rgba(16, 17, 20, .04), 0 18px 44px rgba(16, 17, 20, .09);
+    --f-shadow-lg: 0 30px 80px rgba(16, 17, 20, .16);
+    --f-r-sm: 14px;
+    --f-r-md: 20px;
+    --f-r-lg: 28px;
+    --f-ease: cubic-bezier(.22, .8, .3, 1);
+    --f-font: "IBM Plex Sans Thai", "Sarabun", "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    /* ชื่อตัวแปรเดิมของ theme.css / site.css ให้หน้าเดิมเปลี่ยนตาม */
+    --tspi-ink: var(--f-ink);
+    --tspi-muted: var(--f-muted);
+    --tspi-line: var(--f-line);
+    --tspi-green-600: var(--f-accent);
+    --tspi-green-700: var(--f-accent-ink);
+    --tspi-green-100: #dfeccb;
+    --tspi-green-50: var(--f-accent-soft);
+    --site-ink: var(--f-ink);
+    --site-ink-2: var(--f-ink-2);
+    --site-muted: var(--f-muted);
+    --site-alt: var(--f-canvas);
+    --site-field: var(--f-paper);
+    --site-line: var(--f-line);
+    --site-dark: var(--f-night);
+    --site-radius: var(--f-r-sm);
+
+    /* Bootstrap */
+    --bs-body-font-family: var(--f-font);
+    --bs-body-font-size: 1.0625rem;
+    --bs-body-line-height: 1.7;
+    --bs-body-color: var(--f-ink);
+    --bs-body-bg: var(--f-paper);
+    --bs-secondary-color: var(--f-muted);
+    --bs-border-color: var(--f-line);
+    --bs-border-radius: var(--f-r-sm);
+    --bs-border-radius-lg: var(--f-r-md);
+    --bs-border-radius-xl: var(--f-r-lg);
+    --bs-primary: var(--f-ink);
+    --bs-primary-rgb: 21, 23, 26;
+    --bs-link-color: var(--f-ink);
+    --bs-link-color-rgb: 21, 23, 26;
+    --bs-link-hover-color: var(--f-accent-ink);
+    --bs-link-hover-color-rgb: 61, 101, 5;
+    --bs-heading-color: var(--f-ink);
+    --bs-focus-ring-color: rgba(21, 23, 26, .14);
+
+    font-family: var(--f-font) !important;
+    color: var(--f-ink);
+    background: var(--f-paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+}
+
+/* ---- ตัวอักษร ----------------------------------------------------------- */
+/* ภาษาไทยมีสระบน/ล่าง: line-height หัวข้อไม่ต่ำกว่า 1.3 กันสระถูกตัด */
+.front h1, .front h2, .front h3, .front h4, .front h5, .front h6,
+.front .h1, .front .h2, .front .h3, .front .h4, .front .h5, .front .h6 {
+    font-family: var(--f-font) !important;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -.01em;
+    color: var(--f-ink);
+    text-wrap: balance;
+}
+.front .display-1, .front .display-2, .front .display-3, .front .display-4, .front .display-5, .front .display-6 { font-weight: 600; line-height: 1.25; }
+.front p { text-wrap: pretty; }
+.front .lead { color: var(--f-muted); font-weight: 400; }
+.front .text-muted, .front .text-secondary { color: var(--f-muted) !important; }
+.front .fw-bold, .front strong, .front b { font-weight: 600; }
+.front .text-primary { color: var(--f-ink) !important; }
+.front .text-success, .front .text-primary-clinic { color: var(--f-accent-ink) !important; }
+.front a { text-underline-offset: .22em; }
+.front ::selection { background: var(--f-accent-soft); }
+.front :focus-visible { outline: 2px solid var(--f-ink); outline-offset: 3px; }
+/* หัวข้อสองโทน: <h2 class="f-title"><span class="soft">บรรทัดเทา</span> บรรทัดดำ</h2> */
+.front .soft { color: var(--f-faint); }
+.front .f-title { font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 600; line-height: 1.25; }
+.front .f-title .soft { display: block; }
+.front .f-accent { background: linear-gradient(92deg, var(--f-accent) 10%, #2f9d8f 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ---- ปุ่ม: แคปซูล ปุ่มหลักสีหมึก ปุ่มรองเส้นบาง ---------------------------------- */
+.front .btn {
+    --bs-btn-font-family: var(--f-font);
+    --bs-btn-font-weight: 500;
+    --bs-btn-padding-x: 1.35rem;
+    --bs-btn-padding-y: .6rem;
+    --bs-btn-border-width: 1px;
+    --bs-btn-focus-shadow-rgb: 21, 23, 26;
+    border-radius: 999px !important;
+    font-weight: 500;
+    min-height: 46px;
+    padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+    letter-spacing: 0;
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    box-shadow: none;
+    transition: background-color .2s, border-color .2s, color .2s, transform .25s var(--f-ease), box-shadow .25s;
+}
+.front .btn:active { transform: scale(.98); }
+.front .btn-lg, .front .btn-xl { min-height: 54px !important; --bs-btn-padding-x: 1.7rem; --bs-btn-padding-y: .75rem; font-size: 1.0625rem; }
+.front .btn-sm { min-height: 38px; --bs-btn-padding-x: 1rem; --bs-btn-padding-y: .32rem; font-size: .95rem; }
+.front .btn-primary, .front .btn-dark {
+    --bs-btn-color: #fff; --bs-btn-bg: var(--f-ink); --bs-btn-border-color: var(--f-ink);
+    --bs-btn-hover-color: #fff; --bs-btn-hover-bg: #000; --bs-btn-hover-border-color: #000;
+    --bs-btn-active-color: #fff; --bs-btn-active-bg: #000; --bs-btn-active-border-color: #000;
+    --bs-btn-disabled-color: #fff; --bs-btn-disabled-bg: #8b909a; --bs-btn-disabled-border-color: #8b909a;
+}
+.front .btn-primary:hover, .front .btn-dark:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(16, 17, 20, .18); }
+.front .btn-success {
+    --bs-btn-color: #fff; --bs-btn-bg: var(--f-accent); --bs-btn-border-color: var(--f-accent);
+    --bs-btn-hover-color: #fff; --bs-btn-hover-bg: var(--f-accent-ink); --bs-btn-hover-border-color: var(--f-accent-ink);
+    --bs-btn-active-color: #fff; --bs-btn-active-bg: var(--f-accent-ink); --bs-btn-active-border-color: var(--f-accent-ink);
+}
+.front .btn-outline-primary, .front .btn-outline-dark, .front .btn-outline-secondary, .front .btn-light, .front .btn-outline-success {
+    --bs-btn-color: var(--f-ink); --bs-btn-bg: var(--f-paper); --bs-btn-border-color: var(--f-line-strong);
+    --bs-btn-hover-color: var(--f-ink); --bs-btn-hover-bg: var(--f-panel); --bs-btn-hover-border-color: var(--f-ink);
+    --bs-btn-active-color: var(--f-ink); --bs-btn-active-bg: var(--f-line); --bs-btn-active-border-color: var(--f-ink);
+    --bs-btn-disabled-color: var(--f-muted); --bs-btn-disabled-bg: var(--f-paper); --bs-btn-disabled-border-color: var(--f-line);
+}
+.front .btn-outline-danger {
+    --bs-btn-color: var(--f-bad); --bs-btn-bg: transparent; --bs-btn-border-color: rgba(179, 38, 30, .35);
+    --bs-btn-hover-color: var(--f-bad); --bs-btn-hover-bg: var(--f-bad-bg); --bs-btn-hover-border-color: var(--f-bad);
+    --bs-btn-active-color: var(--f-bad); --bs-btn-active-bg: #fad9d6; --bs-btn-active-border-color: var(--f-bad);
+}
+.front .btn-white {
+    --bs-btn-color: var(--f-ink); --bs-btn-bg: #fff; --bs-btn-border-color: #fff;
+    --bs-btn-hover-color: var(--f-ink); --bs-btn-hover-bg: #ececee; --bs-btn-hover-border-color: #ececee;
+    --bs-btn-active-color: var(--f-ink); --bs-btn-active-bg: #e2e2e5; --bs-btn-active-border-color: #e2e2e5;
+}
+.front .btn-ghost-light {
+    --bs-btn-color: #fff; --bs-btn-bg: rgba(255, 255, 255, .06); --bs-btn-border-color: rgba(255, 255, 255, .24);
+    --bs-btn-hover-color: #fff; --bs-btn-hover-bg: rgba(255, 255, 255, .14); --bs-btn-hover-border-color: rgba(255, 255, 255, .55);
+    --bs-btn-active-color: #fff; --bs-btn-active-bg: rgba(255, 255, 255, .18); --bs-btn-active-border-color: rgba(255, 255, 255, .55);
+}
+.front .btn-glass {
+    --bs-btn-color: var(--f-ink); --bs-btn-bg: var(--f-glass-strong); --bs-btn-border-color: var(--f-line-strong);
+    --bs-btn-hover-color: var(--f-ink); --bs-btn-hover-bg: #fff; --bs-btn-hover-border-color: var(--f-ink);
+    backdrop-filter: var(--f-blur); -webkit-backdrop-filter: var(--f-blur);
+}
+.front .btn-link { --bs-btn-color: var(--f-ink-2); --bs-btn-hover-color: var(--f-ink); text-decoration: none; min-height: 0; }
+.front .btn .fa-arrow-right { transition: transform .25s var(--f-ease); }
+.front .btn:hover .fa-arrow-right { transform: translateX(3px); }
+
+/* ---- พื้นผิว: การ์ด กล่อง ป้าย ---------------------------------------------------- */
+.front .card {
+    --bs-card-border-color: var(--f-line);
+    --bs-card-border-radius: var(--f-r-md);
+    --bs-card-inner-border-radius: calc(var(--f-r-md) - 1px);
+    --bs-card-cap-bg: transparent;
+    border-radius: var(--f-r-md) !important;
+    border: 1px solid var(--f-line);
+    box-shadow: var(--f-shadow-sm);
+    background: var(--f-paper);
+}
+.front .card-header { border-bottom-color: var(--f-line); }
+.front .card-hover { transition: transform .45s var(--f-ease), box-shadow .35s, border-color .25s; }
+.front .card-hover:hover { transform: translateY(-4px); box-shadow: var(--f-shadow-md); border-color: var(--f-line-strong); }
+.front .rounded, .front .rounded-3 { border-radius: var(--f-r-sm) !important; }
+.front .rounded-4 { border-radius: var(--f-r-md) !important; }
+.front .rounded-5 { border-radius: var(--f-r-lg) !important; }
+.front .rounded-pill:not(.badge) { border-radius: 999px !important; }
+.front .shadow-sm { box-shadow: var(--f-shadow-sm) !important; }
+.front .shadow { box-shadow: var(--f-shadow-md) !important; }
+.front .shadow-lg { box-shadow: var(--f-shadow-lg) !important; }
+.front .bg-light { background-color: var(--f-canvas) !important; }
+
+.f-surface { background: var(--f-paper); border: 1px solid var(--f-line); border-radius: var(--f-r-md); box-shadow: var(--f-shadow-sm); }
+.f-panel { background: var(--f-panel); border-radius: var(--f-r-lg); }
+.f-glass { background: var(--f-glass); border: 1px solid var(--f-glass-line); backdrop-filter: var(--f-blur); -webkit-backdrop-filter: var(--f-blur); box-shadow: var(--f-shadow-md); }
+
+/* ป้ายเม็ดยาจุดสี: <span class="f-pill">ข้อความ</span> */
+.f-pill { display: inline-flex; align-items: center; gap: .5rem; width: fit-content; padding: .3rem .9rem .3rem .75rem; border-radius: 999px;
+    font-size: .875rem; font-weight: 500; color: var(--f-ink-2); background: var(--f-glass-strong); border: 1px solid var(--f-line); box-shadow: var(--f-shadow-sm); }
+.f-pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--f-accent); flex: none; }
+
+.front .badge { font-weight: 500; letter-spacing: 0; border-radius: 999px; padding: .35em .75em; }
+.front .badge.bg-primary { background: var(--f-ink) !important; }
+.front .badge.bg-success { background: var(--f-ok-bg) !important; color: var(--f-ok) !important; }
+.front .badge.bg-warning { background: var(--f-warn-bg) !important; color: var(--f-warn) !important; }
+.front .badge.bg-danger { background: var(--f-bad-bg) !important; color: var(--f-bad) !important; }
+.front .badge.bg-info { background: var(--f-info-bg) !important; color: var(--f-info) !important; }
+.front .badge.bg-secondary, .front .badge.bg-light { background: var(--f-panel) !important; color: var(--f-ink-2) !important; }
+.front .badge-subtle-primary, .front .badge-primary-soft {
+    display: inline-flex; align-items: center; gap: .4rem; background: var(--f-accent-soft); color: var(--f-accent-ink);
+    border: 1px solid #dfeccb; font-weight: 500; font-size: .875rem; padding: .3rem .85rem; border-radius: 999px;
+}
+
+/* ---- ฟอร์ม --------------------------------------------------------------- */
+.front .form-control, .front .form-select {
+    min-height: 50px; font-size: 1.0625rem; border-radius: var(--f-r-sm) !important;
+    border: 1px solid var(--f-line-strong); background-color: var(--f-paper); padding: .65rem 1rem;
+    transition: border-color .15s, box-shadow .15s;
+}
+.front textarea.form-control { min-height: 96px; }
+.front .form-control::placeholder { color: #9a9ea6; }
+.front .form-control:focus, .front .form-select:focus { border-color: var(--f-ink); background-color: var(--f-paper); box-shadow: 0 0 0 .22rem rgba(21, 23, 26, .08); }
+/* ช่องแบบ floating label ต้องคืนระยะของ Bootstrap ไม่งั้นป้ายทับ placeholder */
+.front .form-floating > .form-control, .front .form-floating > .form-select { height: calc(3.5rem + 2px); min-height: calc(3.5rem + 2px); padding: 1rem .95rem; line-height: 1.25; }
+.front .form-floating > .form-control:focus, .front .form-floating > .form-control:not(:placeholder-shown),
+.front .form-floating > .form-select { padding-top: 1.625rem; padding-bottom: .625rem; }
+.front .form-floating > .form-control::placeholder { color: transparent; }
+.front .form-floating > label { color: var(--f-muted); padding: 1rem .95rem; line-height: 1.25; }
+.front .form-floating > .form-control:focus ~ label, .front .form-floating > .form-control:not(:placeholder-shown) ~ label,
+.front .form-floating > .form-select ~ label { transform: scale(.82) translateY(-.6rem) translateX(.15rem); }
+.front .form-label { font-weight: 500; font-size: .95rem; color: var(--f-ink-2); margin-bottom: .4rem; }
+.front .form-text { color: var(--f-muted); }
+.front .form-check-input:checked { background-color: var(--f-ink); border-color: var(--f-ink); }
+.front .form-check-input:focus { border-color: var(--f-ink); box-shadow: 0 0 0 .2rem rgba(21, 23, 26, .1); }
+.front .input-group-text { background: var(--f-paper); border-color: var(--f-line-strong); color: var(--f-muted); border-radius: var(--f-r-sm); }
+.front .input-group > .form-control:not(:first-child), .front .input-group > .btn:not(:first-child) { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+.front .input-group > .form-control:not(:last-child), .front .input-group > .input-group-text:not(:last-child) { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+
+/* ---- เมนูย่อย กล่องข้อความ แผงข้าง ------------------------------------------------ */
+.front .dropdown-menu { border: 1px solid var(--f-line); border-radius: 18px; box-shadow: 0 18px 50px rgba(20, 24, 31, .12); padding: .4rem; }
+.front .dropdown-item { border-radius: 12px; padding: .55rem .8rem; font-weight: 500; }
+.front .dropdown-item:hover, .front .dropdown-item:focus { background: var(--f-panel); color: var(--f-ink); }
+.front .dropdown-item:active { background: var(--f-line); color: var(--f-ink); }
+.front .alert { border-radius: var(--f-r-sm); border: 1px solid transparent; }
+.front .alert-success { background: var(--f-ok-bg); color: var(--f-ok); }
+.front .alert-warning { background: var(--f-warn-bg); color: var(--f-warn); }
+.front .alert-danger { background: var(--f-bad-bg); color: var(--f-bad); }
+.front .alert-info { background: var(--f-info-bg); color: var(--f-info); }
+.front .modal-content { border: 0; border-radius: var(--f-r-lg); box-shadow: var(--f-shadow-lg); }
+.front .offcanvas { border: 0; }
+.front .accordion { --bs-accordion-border-color: var(--f-line); --bs-accordion-border-radius: var(--f-r-md); --bs-accordion-inner-border-radius: calc(var(--f-r-md) - 1px);
+    --bs-accordion-active-bg: var(--f-canvas); --bs-accordion-active-color: var(--f-ink); --bs-accordion-btn-focus-box-shadow: 0 0 0 .2rem rgba(21, 23, 26, .08); }
+.front .nav-pills .nav-link { border-radius: 999px; color: var(--f-ink-2); font-weight: 500; }
+.front .nav-pills .nav-link.active { background: var(--f-ink); color: #fff; }
+.front .nav-tabs { border-bottom: 1px solid var(--f-line); gap: 1.25rem; }
+.front .nav-tabs .nav-link { border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: .6rem 0; color: var(--f-muted); font-weight: 500; background: none; }
+.front .nav-tabs .nav-link.active { color: var(--f-ink); border-bottom-color: var(--f-ink); }
+.front .table { --bs-table-border-color: var(--f-line); }
+.front .table > thead th { color: var(--f-muted); font-weight: 500; font-size: .9rem; background: var(--f-canvas); }
+.front .progress { border-radius: 999px; background: var(--f-panel); }
+.front .progress-bar { background: var(--f-ink); }
+.front hr { border-color: var(--f-line); opacity: 1; }
+
+/* ---- Alpine (คัดลอกจาก theme.css ให้หน้าบ้านไม่ต้องพึ่งไฟล์ EMR) ---------------------- */
+.front [x-cloak] { display: none !important; }
+.front [x-show][style*="display: none"] { display: none !important; }
+.front .min-w-0 { min-width: 0; }
+
+/* ==========================================================================
+   แถบบน: เม็ดยากระจกลอย (ใช้ทั้งหน้าเว็บสาธารณะและ portal)
+   เบลออยู่ที่ ::before — ห้ามใส่ backdrop-filter ที่ตัวแถบ เพราะจะขัง dropdown/offcanvas (position: fixed)
+   ========================================================================== */
+.f-nav { position: sticky; top: 0; z-index: 1030; padding: .75rem 0 0; pointer-events: none; }
+.f-nav-bar { position: relative; pointer-events: auto; display: flex; align-items: center; gap: .75rem; min-height: 60px;
+    padding: .45rem .5rem .45rem 1rem; border-radius: 999px; transition: box-shadow .35s var(--f-ease); }
+.f-nav-bar::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--f-glass);
+    border: 1px solid var(--f-line); backdrop-filter: var(--f-blur); -webkit-backdrop-filter: var(--f-blur); transition: background-color .35s, border-color .35s; }
+.f-nav.is-stuck .f-nav-bar { box-shadow: var(--f-shadow-md); }
+.f-nav.is-stuck .f-nav-bar::before { background: var(--f-glass-strong); border-color: var(--f-glass-line); }
+@media (max-width: 575.98px) { .f-nav { padding-top: .5rem; } .f-nav > .container-xl { padding-inline: .5rem; } }
+
+.f-brand { display: inline-flex; align-items: center; gap: .55rem; color: var(--f-ink); text-decoration: none; font-weight: 600; font-size: 1.12rem; letter-spacing: -.01em; white-space: nowrap; }
+.f-brand:hover { color: var(--f-ink); }
+.f-brand-mark { width: 34px; height: 34px; border-radius: 11px; background: var(--f-ink); color: #fff; display: inline-grid; place-items: center; font-size: .95rem; flex: none; }
+.f-brand-mark i { color: #b7e07a; }
+.f-brand small { display: block; font-size: .72rem; font-weight: 400; color: var(--f-muted); letter-spacing: 0; line-height: 1.1; }
+
+.f-links { display: flex; align-items: center; gap: .15rem; list-style: none; margin: 0 auto; padding: 0; }
+.f-links .nav-link, .f-links > li > a { display: inline-flex; align-items: center; gap: .35rem; padding: .45rem .9rem; color: var(--f-ink-2);
+    font-weight: 500; font-size: .97rem; border-radius: 999px; text-decoration: none; transition: background-color .2s, color .2s; }
+.f-links .nav-link:hover, .f-links > li > a:hover { background: var(--f-panel); color: var(--f-ink); }
+.f-links .nav-link.active, .f-links > li > a.active { background: var(--f-ink); color: #fff; }
+.f-links .dropdown-menu { min-width: 300px; margin-top: .6rem !important; }
+.f-links .dropdown-item { white-space: normal; display: block; }
+.f-links .dropdown-item small { display: block; font-weight: 400; color: var(--f-muted); font-size: .85rem; }
+.f-actions { display: flex; align-items: center; gap: .35rem; margin-left: auto; }
+@media (min-width: 992px) { .f-links.d-lg-flex + .f-actions { margin-left: 0; } }
+
+.f-menu-btn { width: 46px; height: 46px; border-radius: 50%; border: 0; background: transparent; display: inline-grid; place-items: center; color: var(--f-ink); position: relative; flex: none; }
+.f-menu-btn:hover { background: var(--f-panel); }
+.f-menu-btn::before, .f-menu-btn::after { content: ""; position: absolute; width: 20px; height: 1.6px; background: currentColor; border-radius: 2px; }
+.f-menu-btn::before { transform: translateY(-4px); }
+.f-menu-btn::after { transform: translateY(4px); }
+
+/* เมนูมือถือ (offcanvas ของ Bootstrap) */
+.f-sheet.offcanvas { --bs-offcanvas-width: min(360px, 88vw); border-radius: var(--f-r-lg) 0 0 var(--f-r-lg); }
+.f-sheet .offcanvas-header { padding: 1.25rem 1.25rem .5rem; }
+.f-sheet .offcanvas-body { display: flex; flex-direction: column; padding: .5rem 1.25rem 1.5rem; }
+.f-sheet-links { list-style: none; padding: 0; margin: 0; }
+.f-sheet-links a { display: flex; align-items: center; justify-content: space-between; padding: .85rem .25rem; font-size: 1.2rem; font-weight: 500;
+    color: var(--f-ink); text-decoration: none; border-bottom: 1px solid var(--f-line); }
+.f-sheet-links a small { display: block; font-size: .85rem; font-weight: 400; color: var(--f-muted); }
+.f-sheet-links a.active { color: var(--f-accent-ink); }
+.f-sheet-links a i { color: var(--f-faint); font-size: .9rem; }
+.f-sheet-foot { margin-top: auto; padding-top: 1.5rem; display: grid; gap: .6rem; }
+
+/* ==========================================================================
+   ส่วนท้าย: แถบชวนเริ่ม (พื้นเข้ม) + ลิงก์ + ลิขสิทธิ์
+   ========================================================================== */
+.f-cta { position: relative; isolation: isolate; overflow: clip; margin-top: clamp(3rem, 7vw, 6rem); padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 5vw, 4rem);
+    border-radius: var(--f-r-lg); background: var(--f-night); color: #fff; text-align: center; }
+.f-cta::before, .f-cta::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+.f-cta::before { width: 380px; height: 380px; left: -120px; top: -180px; background: var(--f-accent-glow); opacity: .35; }
+.f-cta::after { width: 340px; height: 340px; right: -110px; bottom: -190px; background: var(--f-teal-glow); opacity: .32; }
+.f-cta h2 { color: #fff; font-size: clamp(1.6rem, 3.6vw, 2.5rem); margin-bottom: .6rem; }
+.f-cta h2 .soft { color: rgba(255, 255, 255, .55); display: block; }
+.f-cta p { color: rgba(255, 255, 255, .72); max-width: 34rem; margin: 0 auto 1.75rem; }
+
+.f-footer { margin: 1.25rem clamp(.5rem, 1.5vw, 1.25rem) clamp(.5rem, 1.5vw, 1.25rem); padding: clamp(2.2rem, 5vw, 3.5rem) 0 1.4rem;
+    background: var(--f-canvas); border: 1px solid var(--f-line); border-radius: var(--f-r-lg); color: var(--f-ink-2); font-size: .97rem; }
+.f-footer h2 { font-size: .9rem; font-weight: 500; color: var(--f-muted); margin-bottom: .9rem; letter-spacing: 0; }
+.f-footer ul { list-style: none; padding: 0; margin: 0; }
+.f-footer li { margin-bottom: .5rem; }
+.f-footer a:not(.btn) { color: var(--f-ink); text-decoration: none; }
+.f-footer a:not(.btn):hover { color: var(--f-accent-ink); text-decoration: underline; }
+.f-footer .f-about { max-width: 24rem; }
+.f-footer .f-hours { display: grid; gap: .35rem; margin-bottom: 1rem; }
+.f-footer .f-hours div { display: flex; justify-content: space-between; gap: 1rem; padding-bottom: .35rem; border-bottom: 1px dashed var(--f-line-strong); }
+.f-footer .f-sos { display: inline-flex; align-items: center; gap: .55rem; padding: .45rem .95rem; border-radius: 999px; background: var(--f-bad-bg); color: var(--f-bad) !important; font-weight: 500; }
+.f-footer .f-sos:hover { text-decoration: none !important; filter: brightness(.97); }
+.f-footer .f-bar { display: flex; flex-direction: column; gap: .4rem; justify-content: space-between; margin-top: 2.25rem; padding-top: 1.1rem;
+    border-top: 1px solid var(--f-line); font-size: .87rem; color: var(--f-muted); }
+.f-footer .f-bar a:not(.btn) { color: var(--f-muted); }
+.f-footer .f-bar .sep { margin: 0 .5rem; color: var(--f-line-strong); }
+@media (min-width: 768px) { .f-footer .f-bar { flex-direction: row; align-items: center; } }
+
+/* ปุ่มถาม AI ลอยมุมขวาล่าง */
+.f-fab { position: fixed; right: 1.1rem; bottom: calc(1.1rem + env(safe-area-inset-bottom)); z-index: 1035; height: 54px; padding: 0 1.3rem 0 1.05rem;
+    border-radius: 999px; background: var(--f-ink); color: #fff; display: inline-flex; align-items: center; gap: .6rem; font-weight: 500; text-decoration: none;
+    box-shadow: 0 14px 40px rgba(20, 24, 31, .25); transition: transform .3s var(--f-ease), box-shadow .3s, opacity .3s; }
+.f-fab:hover { color: #fff; transform: translateY(-3px); box-shadow: 0 18px 46px rgba(20, 24, 31, .32); }
+/* ซ่อนเมื่อแถบชวนเริ่ม/ส่วนท้ายอยู่ในจอ (มีปุ่ม AI อยู่แล้ว และไม่ให้บังลิงก์ส่วนท้าย) */
+.f-fab.is-hidden { opacity: 0; transform: translateY(12px); pointer-events: none; }
+.f-fab i { color: #b7e07a; font-size: 1.1rem; }
+@media (max-width: 575.98px) { .f-fab { right: .9rem; width: 54px; padding: 0; justify-content: center; } .f-fab span { display: none; } }
+
+/* ==========================================================================
+   Portal คนไข้: เมนูล่างแบบเม็ดยาลอย (มือถือ)
+   ========================================================================== */
+.f-tabbar { position: fixed; z-index: 1030; left: 50%; bottom: calc(.75rem + env(safe-area-inset-bottom)); transform: translateX(-50%);
+    width: min(440px, calc(100% - 1.5rem)); height: 66px; display: grid; grid-template-columns: repeat(5, 1fr); gap: .2rem; padding: .35rem;
+    border-radius: 999px; background: rgba(255, 255, 255, .9); border: 1px solid rgba(22, 23, 26, .06);
+    backdrop-filter: var(--f-blur); -webkit-backdrop-filter: var(--f-blur);
+    box-shadow: 0 10px 30px rgba(16, 17, 20, .12), 0 2px 6px rgba(16, 17, 20, .06); }
+.f-tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; border-radius: 999px;
+    font-size: .75rem; font-weight: 500; line-height: 1.15; color: var(--f-muted); text-decoration: none; -webkit-tap-highlight-color: transparent;
+    transition: background-color .3s var(--f-ease), color .2s; }
+.f-tabbar a i { font-size: 1.15rem; }
+.f-tabbar a.active { background: var(--f-panel); color: var(--f-ink); font-weight: 600; }
+@media (max-width: 991.98px) { body.has-tabbar { padding-bottom: calc(66px + 1.75rem + env(safe-area-inset-bottom)); } }
+
+.f-user { display: inline-flex; align-items: center; gap: .55rem; color: var(--f-ink-2); font-size: .95rem; }
+.f-avatar { width: 38px; height: 38px; border-radius: 50%; display: inline-grid; place-items: center; font-weight: 600; background: var(--f-accent-soft); color: var(--f-accent-ink); flex: none; }
+
+/* ---- ข้อความแจ้งเตือน (Django messages) -------------------------------------- */
+.f-messages .alert { box-shadow: var(--f-shadow-sm); }
+
+/* ---- การเคลื่อนไหว: ปิดเมื่อผู้ใช้ตั้งค่าลดการเคลื่อนไหว ---------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .front *, .front *::before, .front *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+
+/* ==========================================================================
+   ปรับคลาสเดิมของ site.css (หน้าเว็บสาธารณะ) ให้เข้าชุดใหม่ระหว่างรอทำหน้าใหม่ในเฟส 2–4
+   ========================================================================== */
+.front.site .btn { border-radius: 999px !important; font-weight: 500; }
+.front.site .card, .front.site .form-control, .front.site .form-select { border-radius: var(--f-r-md) !important; }
+.front.site .form-control, .front.site .form-select { border-radius: var(--f-r-sm) !important; background-color: var(--f-paper); border-color: var(--f-line-strong); }
+.front.site .rounded-4, .front.site .rounded-pill:not(.badge):not(.chat-avatar) { border-radius: var(--f-r-md) !important; }
+.front.site .rounded-pill:not(.badge):not(.chat-avatar).btn { border-radius: 999px !important; }
+.front .site-section.alt { background: var(--f-canvas); }
+.front .site-eyebrow { color: var(--f-accent-ink); font-weight: 500; }
+/* หัวข้อเดิม "คำบาง <b>คำเน้น</b>" → สองโทน เทา → หมึก */
+.front .site-title { font-weight: 600; color: var(--f-faint); letter-spacing: -.01em; }
+.front .site-title b, .front .site-title strong { font-weight: 600; color: var(--f-ink); }
+.front .site-lead { color: var(--f-muted); }
+.front .site-more { font-weight: 500; color: var(--f-ink); }
+.front .site-more:hover { color: var(--f-accent-ink); }
+
+/* ==========================================================================
+   ส่วนประกอบหน้าเนื้อหา (เฟส 2: หน้าแรก — ใช้ต่อในหน้าอื่นเฟส 3)
+   ========================================================================== */
+.f-section { padding-block: clamp(3.5rem, 8vw, 6.5rem); position: relative; }
+.f-section.is-canvas { background: var(--f-canvas); }
+.f-head { max-width: 760px; margin-bottom: clamp(2rem, 4vw, 3rem); }
+.f-head.is-center { margin-inline: auto; text-align: center; }
+.f-head.is-center .f-pill { margin-inline: auto; }
+.f-head .f-title { margin: 1rem 0 .75rem; }
+.f-head p { color: var(--f-muted); font-size: 1.1rem; margin: 0; }
+.f-head-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem 2rem; margin-bottom: clamp(2rem, 4vw, 3rem); }
+.f-head-row .f-head { margin-bottom: 0; }
+.f-link { display: inline-flex; align-items: center; gap: .5rem; font-weight: 500; color: var(--f-ink); text-decoration: none; padding-bottom: .2rem; border-bottom: 1.5px solid var(--f-ink); }
+.f-link:hover { color: var(--f-accent-ink); border-color: var(--f-accent-ink); }
+.f-link i { transition: transform .25s var(--f-ease); font-size: .85em; }
+.f-link:hover i { transform: translateX(3px); }
+
+/* แสงฟุ้ง (ฉากหลัง) */
+.f-glow { position: absolute; z-index: -1; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+.f-glow.green { background: var(--f-accent-glow); opacity: .28; }
+.f-glow.teal { background: var(--f-teal-glow); opacity: .22; }
+.f-glow.gray { background: #cfd2d8; opacity: .6; }
+
+/* ---- Hero: หัวข้อกลางจอ + การ์ดลอยรอบ ๆ (จอใหญ่) -------------------------------- */
+/* ชั้นแสงฟุ้งของ hero: ไล่จางที่ขอบล่าง ไม่ให้แสงถูกตัดเป็นเส้น (ไม่กระทบเนื้อหา) */
+.f-hero-bg { position: absolute; inset: 0; z-index: -2; overflow: clip; pointer-events: none;
+    -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
+.f-hero-bg .f-glow { z-index: 0; }
+.f-hero { position: relative; isolation: isolate; overflow: clip; padding: clamp(3.5rem, 9vw, 7.5rem) 0 clamp(2.5rem, 5vw, 4rem); text-align: center; }
+.f-hero h1 { font-size: clamp(2.25rem, 6vw, 4rem); font-weight: 600; line-height: 1.22; letter-spacing: -.02em; margin: 1.25rem auto 1.1rem; max-width: 15ch; }
+.f-hero h1 .soft { display: block; font-weight: 500; }
+.f-hero .f-lead { font-size: clamp(1.05rem, 1.6vw, 1.2rem); color: var(--f-muted); max-width: 36rem; margin: 0 auto 2rem; }
+.f-hero-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; }
+.f-checks { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem 1.4rem; list-style: none; padding: 0; margin: 1.6rem 0 0; color: var(--f-muted); font-size: .95rem; }
+.f-checks i { color: var(--f-accent); margin-right: .4rem; }
+.f-floaters { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.f-floater { position: absolute; pointer-events: auto; width: 250px; padding: .9rem 1rem; border-radius: var(--f-r-md); text-align: left; text-decoration: none; color: var(--f-ink);
+    background: var(--f-glass-strong); border: 1px solid var(--f-line); box-shadow: var(--f-shadow-md); backdrop-filter: var(--f-blur); -webkit-backdrop-filter: var(--f-blur);
+    transition: transform .5s var(--f-ease), box-shadow .3s; font-size: .92rem; line-height: 1.5; }
+.f-floater:hover { color: var(--f-ink); box-shadow: var(--f-shadow-lg); }
+.f-floater .k { display: flex; align-items: center; gap: .45rem; font-size: .78rem; color: var(--f-muted); margin-bottom: .35rem; }
+.f-floater .k i { color: var(--f-accent); }
+.f-floater .q { font-weight: 500; }
+.f-floater .bubble { display: inline-block; padding: .45rem .8rem; border-radius: 16px 16px 16px 6px; background: var(--f-ink); color: #fff; font-weight: 500; }
+.f-floater .cite { display: inline-grid; place-items: center; min-width: 1.4rem; height: 1.4rem; padding: 0 .3rem; border-radius: 6px; background: var(--f-accent-soft); color: var(--f-accent-ink); font-size: .75rem; font-weight: 600; margin-left: .2rem; }
+.f-floater.f1 { left: 2%; top: 16%; transform: rotate(-5deg); }
+.f-floater.f2 { right: 2%; top: 12%; transform: rotate(4deg); }
+.f-floater.f3 { left: 6%; bottom: 10%; transform: rotate(3deg); width: 230px; }
+.f-floater.f4 { right: 5%; bottom: 14%; transform: rotate(-4deg); width: 240px; }
+.f-floater:hover { transform: rotate(0) translateY(-4px); }
+@media (max-width: 1199.98px) { .f-floaters { display: none; } }
+
+/* ---- แถวข้อเท็จจริง (ตัวเลขของหลักสูตร ไม่ใช่สถิติผู้ใช้) ------------------------- */
+.f-facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: .75rem; max-width: 880px; margin: 0 auto; }
+.f-fact { padding: 1rem 1.1rem; border-radius: var(--f-r-md); background: var(--f-paper); border: 1px solid var(--f-line); box-shadow: var(--f-shadow-sm); text-align: center; }
+.f-fact b { display: block; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 600; line-height: 1.2; letter-spacing: -.02em; }
+.f-fact span { color: var(--f-muted); font-size: .9rem; }
+@media (max-width: 767.98px) { .f-facts { grid-template-columns: repeat(2, 1fr); } }
+
+/* ---- ประโยคเปิดตัวใหญ่สองโทน ---------------------------------------------------- */
+.f-statement { font-size: clamp(1.4rem, 3.2vw, 2.25rem); font-weight: 500; line-height: 1.5; letter-spacing: -.01em; color: var(--f-ink); max-width: 30em; margin: 0 auto; text-align: center; text-wrap: balance; }
+.f-statement .soft { color: var(--f-faint); }
+
+/* ---- ส่วนพื้นเข้ม + แผ่นขาวซ้อน ---------------------------------------------------- */
+.f-night { position: relative; isolation: isolate; overflow: clip; background: var(--f-night); color: #fff; border-radius: var(--f-r-lg);
+    margin-inline: clamp(.5rem, 1.5vw, 1.25rem); padding-block: clamp(3.5rem, 8vw, 6rem); }
+.f-night .f-title, .f-night h2, .f-night h3 { color: #fff; }
+.f-night .f-title .soft { color: rgba(255, 255, 255, .5); }
+.f-night .f-head p { color: rgba(255, 255, 255, .68); }
+.f-night .f-pill { background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .14); color: rgba(255, 255, 255, .86); box-shadow: none; }
+.f-night .f-link { color: #fff; border-color: rgba(255, 255, 255, .6); }
+.f-night .f-link:hover { color: #b7e07a; border-color: #b7e07a; }
+
+/* bento: ใบไม้ 39 เส้น + โดเมน */
+.f-bento { display: grid; grid-template-columns: repeat(4, 1fr); gap: .9rem; }
+.f-bento .tile { position: relative; padding: 1.4rem; border-radius: var(--f-r-md); background: var(--f-night-2); border: 1px solid rgba(255, 255, 255, .08);
+    color: #fff; text-decoration: none; transition: transform .45s var(--f-ease), background-color .3s, border-color .3s; }
+.f-bento a.tile:hover { transform: translateY(-4px); background: #23272c; border-color: rgba(255, 255, 255, .18); color: #fff; }
+.f-bento .tile i.ico { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: rgba(183, 224, 122, .12); color: #b7e07a; font-size: 1.15rem; margin-bottom: 1rem; }
+.f-bento .tile h3 { font-size: 1.08rem; font-weight: 500; margin: 0 0 .3rem; }
+.f-bento .tile p { color: rgba(255, 255, 255, .6); font-size: .92rem; margin: 0; }
+.f-bento .tile.leaf { grid-column: span 2; grid-row: span 3; background: var(--f-paper); color: var(--f-ink); display: flex; flex-direction: column; padding: 1rem; }
+.f-bento .tile.leaf canvas { display: block; width: 100%; flex: 1; min-height: 280px; max-height: 420px; aspect-ratio: 1 / 1; margin: 0 auto; cursor: grab; }
+.f-bento .tile.leaf .cap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .5rem .5rem 0; font-size: .95rem; color: var(--f-ink-2); }
+.f-bento .tile.leaf .cap b { font-weight: 600; color: var(--f-ink); }
+@media (max-width: 991.98px) { .f-bento { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 575.98px) {
+    /* มือถือ: ใบไม้เต็มแถว โดเมน 2 คอลัมน์แบบกะทัดรัด */
+    .f-bento { grid-template-columns: 1fr 1fr; gap: .6rem; }
+    .f-bento .tile { padding: 1rem; }
+    .f-bento .tile.leaf { grid-column: span 2; grid-row: auto; }
+    .f-bento .tile.leaf canvas { min-height: 240px; }
+    .f-bento .tile i.ico { width: 38px; height: 38px; border-radius: 12px; margin-bottom: .7rem; font-size: 1rem; }
+    .f-bento .tile h3 { font-size: .98rem; margin: 0; }
+    .f-bento .tile p { display: none; }
+}
+
+/* ---- ขั้นตอน ------------------------------------------------------------------ */
+.f-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; counter-reset: step; }
+.f-step { position: relative; padding: 1.6rem 1.5rem 1.5rem; border-radius: var(--f-r-md); background: var(--f-paper); border: 1px solid var(--f-line); box-shadow: var(--f-shadow-sm); }
+.f-step .n { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--f-ink); color: #fff; font-weight: 600; margin-bottom: 1.1rem; }
+.f-step h3 { font-size: 1.2rem; margin-bottom: .4rem; }
+.f-step p { color: var(--f-muted); margin: 0; }
+.f-step:not(:last-child)::after { content: ""; position: absolute; top: 2.85rem; right: -1rem; width: 1rem; height: 1.5px; background: var(--f-line-strong); }
+@media (max-width: 767.98px) { .f-steps { grid-template-columns: 1fr; } .f-step:not(:last-child)::after { display: none; } }
+
+/* ---- การ์ดคำถามตัวอย่าง -------------------------------------------------------- */
+.f-ask { display: flex; flex-direction: column; height: 100%; padding: 1.4rem; border-radius: var(--f-r-md); background: var(--f-paper); border: 1px solid var(--f-line);
+    box-shadow: var(--f-shadow-sm); text-decoration: none; color: var(--f-ink); transition: transform .45s var(--f-ease), box-shadow .35s, border-color .25s; }
+.f-ask:hover { transform: translateY(-4px); box-shadow: var(--f-shadow-md); border-color: var(--f-line-strong); color: var(--f-ink); }
+.f-ask .ico { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--f-panel); color: var(--f-ink); font-size: 1.1rem; margin-bottom: 1rem; transition: transform .35s var(--f-ease); }
+.f-ask:hover .ico { transform: rotate(-8deg) scale(1.06); }
+.f-ask .q { font-size: 1.08rem; font-weight: 500; margin-bottom: .35rem; }
+.f-ask .hint { color: var(--f-muted); font-size: .93rem; margin-bottom: 1.2rem; }
+.f-ask .go { margin-top: auto; display: inline-flex; align-items: center; gap: .4rem; font-weight: 500; font-size: .95rem; }
+.f-ask .go i { transition: transform .25s var(--f-ease); font-size: .85em; }
+.f-ask:hover .go i { transform: translateX(3px); }
+@media (max-width: 575.98px) {
+    /* มือถือ: การ์ดคำถามเป็นแถวกะทัดรัด ไอคอนซ้าย ข้อความขวา */
+    .f-ask { display: grid; grid-template-columns: auto 1fr auto; align-items: center; column-gap: .9rem; padding: .95rem 1rem; }
+    .f-ask .ico { margin: 0; grid-row: span 2; }
+    .f-ask .q { margin: 0; font-size: 1rem; }
+    .f-ask .hint { margin: 0; grid-column: 2; font-size: .88rem; }
+    .f-ask .go { grid-column: 3; grid-row: 1 / span 2; margin: 0; font-size: 0; }
+    .f-ask .go i { font-size: .95rem; color: var(--f-muted); }
+    .f-step { padding: 1.2rem 1.2rem 1.25rem; display: grid; grid-template-columns: auto 1fr; column-gap: 1rem; }
+    .f-step .n { margin: 0; grid-row: span 2; }
+    .f-step h3 { margin: .35rem 0 .2rem; font-size: 1.1rem; }
+}
+
+/* แถบ LINE / แถบแจ้งเตือนฉุกเฉิน */
+.f-band { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem 2rem; padding: clamp(1.4rem, 3vw, 2rem); border-radius: var(--f-r-lg); }
+.f-band.is-line { background: linear-gradient(120deg, #eaf6e4, #e5f3f1); border: 1px solid #d6ead0; }
+.f-band .ico { display: inline-grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; background: #06c755; color: #fff; font-size: 1.6rem; flex: none; }
+.f-band h3 { font-size: 1.2rem; margin: 0 0 .25rem; }
+.f-band p { color: var(--f-ink-2); margin: 0; max-width: 40rem; }
+.f-sos-band { display: flex; align-items: center; gap: .9rem; padding: .9rem 1.2rem; border-radius: var(--f-r-md); background: var(--f-bad-bg); color: #7a1a14; font-size: .97rem; }
+.f-sos-band i { color: var(--f-bad); font-size: 1.15rem; }
+.f-sos-band a { color: var(--f-bad); font-weight: 600; white-space: nowrap; }
+
+/* ---- accordion แบบการ์ดแยก -------------------------------------------------------- */
+.front .accordion.is-cards { --bs-accordion-border-width: 0; display: grid; gap: .65rem; }
+.front .accordion.is-cards .accordion-item { border: 1px solid var(--f-line); border-radius: var(--f-r-md) !important; overflow: hidden; background: var(--f-paper); box-shadow: var(--f-shadow-sm); }
+.front .accordion.is-cards .accordion-button { font-weight: 500; font-size: 1.05rem; padding: 1.1rem 1.3rem; background: var(--f-paper); color: var(--f-ink); box-shadow: none; gap: .75rem; }
+.front .accordion.is-cards .accordion-button:not(.collapsed) { background: var(--f-paper); }
+.front .accordion.is-cards .accordion-body { padding: 0 1.3rem 1.3rem; color: var(--f-ink-2); }
+.f-phase-tag { display: inline-flex; padding: .15rem .65rem; border-radius: 999px; background: var(--f-accent-soft); color: var(--f-accent-ink); font-size: .8rem; font-weight: 500; white-space: nowrap; }
+.f-substeps { list-style: none; padding: 0; margin: .75rem 0 0; display: grid; gap: .5rem; counter-reset: sub; }
+.f-substeps li { display: flex; gap: .8rem; padding: .75rem .9rem; border-radius: var(--f-r-sm); background: var(--f-canvas); }
+.f-substeps li::before { counter-increment: sub; content: counter(sub); display: inline-grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--f-paper); border: 1px solid var(--f-line-strong); font-size: .82rem; font-weight: 600; }
+.f-substeps b { display: block; font-weight: 500; }
+.f-substeps span { color: var(--f-muted); font-size: .93rem; }
+
+/* ---- การ์ดบทความ ------------------------------------------------------------------ */
+.f-post { display: flex; flex-direction: column; height: 100%; border-radius: var(--f-r-md); overflow: hidden; background: var(--f-paper); border: 1px solid var(--f-line);
+    box-shadow: var(--f-shadow-sm); text-decoration: none; color: var(--f-ink); transition: transform .45s var(--f-ease), box-shadow .35s; }
+.f-post:hover { transform: translateY(-4px); box-shadow: var(--f-shadow-md); color: var(--f-ink); }
+.f-post .thumb { aspect-ratio: 16 / 10; background: var(--f-panel) center / cover no-repeat; display: grid; place-items: center; color: var(--f-faint); font-size: 2rem; }
+.f-post .body { padding: 1.1rem 1.2rem 1.3rem; }
+.f-post .meta { font-size: .85rem; color: var(--f-muted); margin-bottom: .35rem; }
+.f-post h3 { font-size: 1.05rem; font-weight: 500; line-height: 1.45; margin: 0; }
+
+/* ---- เผยเนื้อหาตอนเลื่อน (เปิดเฉพาะเมื่อมี JS และผู้ใช้ไม่ได้ตั้งลดการเคลื่อนไหว) ------------- */
+.f-reveal-on .rv { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--f-ease), transform .7s var(--f-ease); transition-delay: calc(var(--d, 0) * 80ms); }
+.f-reveal-on .rv.is-in { opacity: 1; transform: none; }

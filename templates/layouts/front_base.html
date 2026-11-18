@@ -1,0 +1,53 @@
+{% load static %}<!DOCTYPE html>
+{# โครงหน้าบ้าน (หน้าเว็บสาธารณะ + portal คนไข้) — ไม่ใช้ base.html ของ EMR และไม่โหลด admin.css #}
+{# แผน: docs/UI_REDESIGN_FASTWORK_2026-11.md #}
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <title>{% block title %}TSPI CLINIC — ดูแลสุขภาพเชิงระบบ 39 แกนชีววิทยา{% endblock %}</title>
+
+    <link rel="preload" href="{% static 'fonts/IBMPlexSansThai-Regular.ttf' %}" as="font" type="font/ttf" crossorigin>
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/adminlte/plugins/fontawesome-free/css/all.min.css' %}">
+    {# theme.css เป็นไฟล์ร่วมกับ EMR: โหลดแบบอ่านอย่างเดียวเพราะเนื้อหาหน้าเดิมยังใช้คลาสในนั้น ห้ามแก้ไฟล์นี้เพื่อหน้าบ้าน #}
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}?v={{ ASSET_VERSION }}">
+    {% block group_css %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/front.css' %}?v={{ ASSET_VERSION }}">
+    {% block front_head %}{% endblock %}
+    <script defer src="{% static 'vendor/alpine/alpine.min.js' %}"></script>
+    {% block extra_head %}{% endblock %}
+    {% block after_head %}{% endblock %}
+</head>
+<body class="front {% block body_class %}{% endblock %}">
+    {% block layout %}{% block content %}{% endblock %}{% endblock %}
+
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+    (function () {
+        /* แถบบนมีเงาเมื่อเลื่อนลง */
+        var nav = document.querySelector('.f-nav');
+        if (!nav) return;
+        function onScroll() { nav.classList.toggle('is-stuck', window.scrollY > 24); }
+        window.addEventListener('scroll', onScroll, {passive: true});
+        onScroll();
+    })();
+    (function () {
+        /* เผยเนื้อหา .rv ตอนเลื่อนถึง — ไม่มี JS / ตั้งลดการเคลื่อนไหว = แสดงทันที */
+        var items = document.querySelectorAll('.rv');
+        if (!items.length || !('IntersectionObserver' in window)) return;
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        document.body.classList.add('f-reveal-on');
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+            });
+        }, {rootMargin: '0px 0px -8% 0px', threshold: 0.08});
+        items.forEach(function (el) { io.observe(el); });
+    })();
+    </script>
+    {% block front_scripts %}{% endblock %}
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,199 +1,176 @@
+{% extends 'layouts/front_base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}TSPI CLINIC — ระบบเวชระเบียนและความฉลาดทางการแพทย์ 39 แกนชีววิทยา (12 โดเมน){% endblock %}</title>
+{# หน้าเว็บสาธารณะ: แถบบนกระจก + เนื้อหา + แถบชวนเริ่ม + ส่วนท้าย (ดีไซน์ใน static/css/front.css) #}
 
-    <!-- Bootstrap 5.3.8 CSS (Local Static — No CDN / No npm) -->
-    <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
-
-    <!-- FontAwesome Free Icons (Local Static) -->
-    <link rel="stylesheet" href="{% static 'vendor/adminlte/plugins/fontawesome-free/css/all.min.css' %}">
-
-    <!-- ธีมกลาง (สี ตัวอักษร ปุ่ม แชท) + สไตล์หน้าเว็บสาธารณะ -->
-    <link rel="stylesheet" href="{% static 'css/theme.css' %}?v={{ ASSET_VERSION }}">
+{% block group_css %}
+    {# site.css = คลาสเนื้อหาของหน้าเดิม ใช้ระหว่างรอทำหน้าใหม่ในเฟส 2–4 (front.css ทับให้เข้าชุด) #}
     <link rel="stylesheet" href="{% static 'css/site.css' %}?v={{ ASSET_VERSION }}">
-    <script defer src="{% static 'vendor/alpine/alpine.min.js' %}"></script>
-    {% block extra_head %}{% endblock %}
-    {% block extra_public_head %}{% endblock %}
-</head>
-<body class="site">
+{% endblock %}
 
-    {% with url_name=request.resolver_match.url_name %}
-    {% block site_header %}
-    <!-- แถบข้อมูลบนสุด (ซ่อนบนมือถือ) -->
-    <div class="site-topbar d-none d-md-block">
-        <div class="container-xl">
-            <div class="d-flex align-items-center gap-3">
-                <span><i class="fas fa-map-marker-alt"></i>ศูนย์การแพทย์และการฟื้นฟูสุขภาพ TSPI</span>
-                <span class="sep"></span>
-                <span><i class="far fa-clock"></i>จันทร์ – เสาร์ 09:00 – 18:00 น.</span>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <span><i class="fab fa-line"></i>{{ LINE_OA_ID }}</span>
-                <span class="sep"></span>
-                <a href="tel:1669"><i class="fas fa-ambulance"></i>ฉุกเฉิน <strong>1669</strong></a>
-            </div>
-        </div>
-    </div>
+{% block after_head %}{% block extra_public_head %}{% endblock %}{% endblock %}
 
-    <!-- ส่วนหัว: Navbar + Offcanvas (มือถือเปิดเป็นแผงด้านข้าง ตัวใหญ่กดง่าย) -->
-    <nav class="navbar navbar-expand-lg site-nav sticky-top py-0" id="siteNav" aria-label="เมนูหลัก">
-        <div class="container-xl">
-            <a class="navbar-brand" href="{% url 'core:home' %}">
-                <span class="site-logo"><i class="fas fa-leaf"></i></span>
-                <span>TSPI CLINIC<span class="dot">.</span></span>
+{% block body_class %}site{% endblock %}
+
+{% block layout %}
+{% with url_name=request.resolver_match.url_name %}
+{% block site_header %}
+<header class="f-nav" aria-label="ส่วนหัว">
+    <div class="container-xl">
+        <nav class="f-nav-bar" aria-label="เมนูหลัก">
+            <a class="f-brand" href="{% url 'core:home' %}">
+                <span class="f-brand-mark" aria-hidden="true"><i class="fas fa-leaf"></i></span>
+                <span>TSPI Clinic</span>
             </a>
 
-            <div class="d-flex align-items-center gap-1 order-lg-last">
-                <a href="{% url 'core:article_list' %}" class="nav-icon d-none d-lg-inline-flex" aria-label="สาระสุขภาพ"><i class="fas fa-search"></i></a>
-                <a href="{% url 'core:assistant' %}" class="btn btn-primary btn-sm px-3 d-none d-sm-inline-flex ms-1">
-                    <i class="fas fa-comment-medical"></i> คุยกับ AI
-                </a>
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#siteMenu"
-                        aria-controls="siteMenu" aria-label="เปิดเมนู">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-            </div>
-
-            <div class="offcanvas offcanvas-end" tabindex="-1" id="siteMenu" aria-labelledby="siteMenuLabel">
-                <div class="offcanvas-header border-bottom">
-                    <h2 class="offcanvas-title h5" id="siteMenuLabel">เมนู</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="ปิด"></button>
-                </div>
-                <div class="offcanvas-body align-items-lg-center">
-                    <ul class="navbar-nav mx-lg-auto gap-lg-1">
-                        <li class="nav-item">
-                            <a class="nav-link {% if url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}"
-                               {% if url_name == 'home' %}aria-current="page"{% endif %}>หน้าแรก</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {% if url_name in 'platform protocol research' %}active{% endif %}" href="#"
-                               role="button" data-bs-toggle="dropdown" aria-expanded="false">การรักษาของเรา</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'core:platform' %}"><strong>39 แกนชีววิทยา</strong><small>ดูร่างกายเป็นระบบ 12 โดเมน</small></a></li>
-                                <li><a class="dropdown-item" href="{% url 'core:protocol' %}"><strong>แผนฟื้นฟู 9 ขั้นตอน</strong><small>จากตรวจประเมินถึงดูแลระยะยาว</small></a></li>
-                                <li><a class="dropdown-item" href="{% url 'core:research' %}"><strong>งานวิจัยและเคสจริง</strong><small>ผลการดูแลผู้ป่วยของคลินิก</small></a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if 'article' in url_name %}active{% endif %}" href="{% url 'core:article_list' %}">สาระสุขภาพ</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">เกี่ยวกับคลินิก</a>
-                        </li>
-                        <li class="nav-item d-sm-none">
-                            <a class="nav-link {% if url_name == 'assistant' %}active{% endif %}" href="{% url 'core:assistant' %}">คุยกับ AI</a>
-                        </li>
+            <ul class="f-links d-none d-lg-flex">
+                <li><a class="{% if url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}" {% if url_name == 'home' %}aria-current="page"{% endif %}>หน้าแรก</a></li>
+                <li class="dropdown">
+                    <a class="nav-link {% if url_name in 'platform protocol research' %}active{% endif %}" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">การรักษาของเรา <i class="fas fa-chevron-down small" aria-hidden="true"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'core:platform' %}">39 แกนชีววิทยา<small>ดูร่างกายเป็นระบบ 12 โดเมน</small></a></li>
+                        <li><a class="dropdown-item" href="{% url 'core:protocol' %}">แผนฟื้นฟู 9 ขั้นตอน<small>จากตรวจประเมินถึงดูแลระยะยาว</small></a></li>
+                        <li><a class="dropdown-item" href="{% url 'core:research' %}">งานวิจัยและเคสจริง<small>ผลการดูแลผู้ป่วยของคลินิก</small></a></li>
                     </ul>
-                    <hr class="d-lg-none">
-                    <div class="d-flex flex-column flex-lg-row gap-2">
-                        <a href="{% url 'accounts:patient_login' %}" class="btn btn-link text-body fw-semibold text-decoration-none">เข้าสู่ระบบ</a>
-                        <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-outline-primary btn-sm px-3">ลงทะเบียน</a>
-                    </div>
-                </div>
+                </li>
+                <li><a class="{% if 'article' in url_name %}active{% endif %}" href="{% url 'core:article_list' %}">สาระสุขภาพ</a></li>
+                <li><a class="{% if url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">เกี่ยวกับคลินิก</a></li>
+            </ul>
+
+            <div class="f-actions">
+                {% if request.user.is_authenticated and request.user.role == 'patient' %}
+                    <a href="{% url 'portal_patient:dashboard' %}" class="btn btn-link d-none d-md-inline-flex">พอร์ทัลของฉัน</a>
+                {% else %}
+                    <a href="{% url 'accounts:patient_login' %}" class="btn btn-link d-none d-md-inline-flex">เข้าสู่ระบบ</a>
+                {% endif %}
+                <a href="{% url 'core:assistant' %}" class="btn btn-primary d-none d-sm-inline-flex">
+                    คุยกับ AI <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </a>
+                <button class="f-menu-btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#frontMenu"
+                        aria-controls="frontMenu" aria-label="เปิดเมนู"></button>
             </div>
+        </nav>
+    </div>
+</header>
+
+{# เมนูมือถือ: อยู่นอกแถบบนเพื่อไม่ให้ถูกขังใน containing block ของแถบ #}
+<div class="offcanvas offcanvas-end f-sheet" tabindex="-1" id="frontMenu" aria-labelledby="frontMenuLabel">
+    <div class="offcanvas-header">
+        <span class="f-brand" id="frontMenuLabel"><span class="f-brand-mark" aria-hidden="true"><i class="fas fa-leaf"></i></span>TSPI Clinic</span>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="ปิดเมนู"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="f-sheet-links">
+            <li><a class="{% if url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">หน้าแรก <i class="fas fa-arrow-right"></i></a></li>
+            <li><a class="{% if url_name == 'platform' %}active{% endif %}" href="{% url 'core:platform' %}"><span>39 แกนชีววิทยา<small>ดูร่างกายเป็นระบบ 12 โดเมน</small></span><i class="fas fa-arrow-right"></i></a></li>
+            <li><a class="{% if url_name == 'protocol' %}active{% endif %}" href="{% url 'core:protocol' %}"><span>แผนฟื้นฟู 9 ขั้นตอน<small>จากตรวจประเมินถึงดูแลระยะยาว</small></span><i class="fas fa-arrow-right"></i></a></li>
+            <li><a class="{% if url_name == 'research' %}active{% endif %}" href="{% url 'core:research' %}"><span>งานวิจัยและเคสจริง<small>ผลการดูแลผู้ป่วยของคลินิก</small></span><i class="fas fa-arrow-right"></i></a></li>
+            <li><a class="{% if 'article' in url_name %}active{% endif %}" href="{% url 'core:article_list' %}">สาระสุขภาพ <i class="fas fa-arrow-right"></i></a></li>
+            <li><a class="{% if url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">เกี่ยวกับคลินิก <i class="fas fa-arrow-right"></i></a></li>
+        </ul>
+        <div class="f-sheet-foot">
+            <a href="{% url 'core:assistant' %}" class="btn btn-primary btn-lg"><i class="fas fa-comment-medical" aria-hidden="true"></i> คุยกับ AI</a>
+            {% if request.user.is_authenticated and request.user.role == 'patient' %}
+                <a href="{% url 'portal_patient:dashboard' %}" class="btn btn-outline-secondary btn-lg">พอร์ทัลของฉัน</a>
+            {% else %}
+                <div class="d-grid gap-2" style="grid-template-columns: 1fr 1fr;">
+                    <a href="{% url 'accounts:patient_login' %}" class="btn btn-outline-secondary">เข้าสู่ระบบ</a>
+                    <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-outline-secondary">ลงทะเบียน</a>
+                </div>
+            {% endif %}
+            <a href="tel:1669" class="btn btn-outline-danger"><i class="fas fa-phone" aria-hidden="true"></i> เหตุฉุกเฉิน โทร 1669</a>
         </div>
-    </nav>
-    {% endblock site_header %}
-    {% endwith %}
+    </div>
+</div>
+{% endblock site_header %}
+{% endwith %}
 
-    <!-- Main Content Block -->
-    <main class="flex-grow-1">
-        {% block content %}{% endblock %}
-    </main>
+<main class="flex-grow-1">
+    {% block content %}{% endblock %}
+</main>
 
-    <!-- ส่วนท้าย (หน้าแชทซ่อนได้ด้วย block footer) -->
-    {% block footer %}
-    <!-- แถบติดต่อ -->
-    <section class="site-contact" aria-label="ช่องทางติดต่อ">
-        <div class="container-xl">
-            <div class="row g-4">
-                <div class="col-6 col-lg-3">
-                    <a href="tel:1669" class="site-contact-item"><i class="fas fa-phone-volume"></i><span>เหตุฉุกเฉิน<br><strong>โทร 1669</strong></span></a>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="site-contact-item"><i class="fas fa-map-marker-alt"></i><span>ศูนย์การแพทย์และ<br>การฟื้นฟูสุขภาพ TSPI</span></div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    {% if LINE_BOT_URL %}<a href="{{ LINE_BOT_URL }}" class="site-contact-item">{% else %}<div class="site-contact-item">{% endif %}
-                        <i class="fab fa-line"></i><span>LINE ของคลินิก<br><strong>{{ LINE_OA_ID }}</strong></span>
-                    {% if LINE_BOT_URL %}</a>{% else %}</div>{% endif %}
-                </div>
-                <div class="col-6 col-lg-3">
-                    <a href="{% url 'portal_patient:onboarding' %}" class="site-contact-item"><i class="far fa-calendar-check"></i><span>ลงทะเบียน<br>นัดพบแพทย์</span></a>
-                </div>
-            </div>
+{# ส่วนท้าย (หน้าแชทและหน้าลงทะเบียน LINE ซ่อนได้ด้วย block footer) #}
+{% block footer %}
+<div class="container-xl">
+    <section class="f-cta" aria-labelledby="ctaTitle">
+        <h2 id="ctaTitle"><span class="soft">สงสัยเรื่องสุขภาพ</span>เริ่มคุยกับเราได้เลย</h2>
+        <p>ถามผู้ช่วย AI ได้ทันทีโดยไม่ต้องลงทะเบียน คำตอบอ้างอิงจากเอกสารของคลินิก หรือทัก LINE ของคลินิกเพื่อคุยกับทีมงาน</p>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a href="{% url 'core:assistant' %}" class="btn btn-white btn-lg">คุยกับ AI <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            {% if LINE_BOT_URL %}
+                <a href="{{ LINE_BOT_URL }}" class="btn btn-ghost-light btn-lg"><i class="fab fa-line" aria-hidden="true"></i> ทัก LINE คลินิก</a>
+            {% else %}
+                <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-ghost-light btn-lg">ลงทะเบียนพบแพทย์</a>
+            {% endif %}
         </div>
     </section>
+</div>
 
-    <footer class="site-footer">
-        <div class="container-xl">
-            <div class="row g-4 g-lg-5">
-                <div class="col-lg-4">
-                    <h2>เกี่ยวกับเรา</h2>
-                    <p class="mb-3">ดูแลสุขภาพเชิงระบบด้วย 39 แกนชีววิทยา โดยทีมแพทย์ของคลินิก ข้อมูลสุขภาพของคุณได้รับการคุ้มครองตาม PDPA</p>
-                    <a href="{% url 'core:assistant' %}" class="btn btn-primary btn-sm px-3"><i class="fas fa-comment-medical"></i> คุยกับ AI</a>
-                </div>
-                <div class="col-6 col-lg-2">
-                    <h2>การรักษา</h2>
-                    <ul class="list-unstyled mb-0">
-                        <li><a href="{% url 'core:platform' %}">39 แกนชีววิทยา</a></li>
-                        <li><a href="{% url 'core:protocol' %}">แผนฟื้นฟู 9 ขั้นตอน</a></li>
-                        <li><a href="{% url 'core:research' %}">งานวิจัยและเคสจริง</a></li>
-                        <li><a href="{% url 'core:article_list' %}">สาระสุขภาพ</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 col-lg-2">
-                    <h2>ผู้รับบริการ</h2>
-                    <ul class="list-unstyled mb-0">
-                        <li><a href="{% url 'portal_patient:onboarding' %}">ลงทะเบียน</a></li>
-                        <li><a href="{% url 'accounts:patient_login' %}">เข้าสู่ระบบ</a></li>
-                        <li><a href="{% url 'core:guide' %}">วิธีใช้งาน</a></li>
-                        <li><a href="{% url 'core:about' %}">เกี่ยวกับคลินิก</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-4">
-                    <h2>เวลาทำการ</h2>
-                    <ul class="site-hours mb-3">
-                        <li><span>จันทร์ – เสาร์</span><span>09:00 – 18:00</span></li>
-                        <li><span>อาทิตย์และวันหยุด</span><span>ปิด</span></li>
-                    </ul>
-                    {% if LINE_BOT_URL %}<a href="{{ LINE_BOT_URL }}"><i class="fab fa-line me-2"></i>เปิดบอทคลินิกใน LINE</a>{% endif %}
-                </div>
+<footer class="f-footer">
+    <div class="container-xl">
+        <div class="row g-4 g-lg-5">
+            <div class="col-lg-4">
+                <a class="f-brand mb-3" href="{% url 'core:home' %}">
+                    <span class="f-brand-mark" aria-hidden="true"><i class="fas fa-leaf"></i></span>
+                    <span>TSPI Clinic<small>ศูนย์การแพทย์และการฟื้นฟูสุขภาพ</small></span>
+                </a>
+                <p class="f-about">ดูแลสุขภาพเชิงระบบด้วย 39 แกนชีววิทยา โดยทีมแพทย์ของคลินิก ข้อมูลสุขภาพของคุณได้รับการคุ้มครองตาม PDPA</p>
+                <a href="tel:1669" class="f-sos"><i class="fas fa-phone" aria-hidden="true"></i> เหตุฉุกเฉิน โทร 1669</a>
             </div>
-            <div class="site-footer-bar d-flex flex-column flex-md-row justify-content-between gap-2">
-                <span>&copy; {% now "Y" %} <strong>TSPI Clinic.</strong> สงวนลิขสิทธิ์</span>
-                <span>
-                    <a href="{% url 'core:privacy' %}">นโยบายความเป็นส่วนตัว</a><span class="sep">/</span>
-                    <a href="{% url 'core:terms' %}">ข้อกำหนดการใช้งาน</a><span class="sep">/</span>
-                    <a href="{% url 'accounts:doctor_login' %}">สำหรับบุคลากร</a>
-                </span>
+            <div class="col-6 col-lg-2">
+                <h2>การรักษา</h2>
+                <ul>
+                    <li><a href="{% url 'core:platform' %}">39 แกนชีววิทยา</a></li>
+                    <li><a href="{% url 'core:protocol' %}">แผนฟื้นฟู 9 ขั้นตอน</a></li>
+                    <li><a href="{% url 'core:research' %}">งานวิจัยและเคสจริง</a></li>
+                    <li><a href="{% url 'core:article_list' %}">สาระสุขภาพ</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h2>ผู้รับบริการ</h2>
+                <ul>
+                    <li><a href="{% url 'portal_patient:onboarding' %}">ลงทะเบียน</a></li>
+                    <li><a href="{% url 'accounts:patient_login' %}">เข้าสู่ระบบ</a></li>
+                    <li><a href="{% url 'core:guide' %}">วิธีใช้งาน</a></li>
+                    <li><a href="{% url 'core:about' %}">เกี่ยวกับคลินิก</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <h2>เวลาทำการ</h2>
+                <div class="f-hours">
+                    <div><span>จันทร์ – เสาร์</span><span>09:00 – 18:00</span></div>
+                    <div><span>อาทิตย์และวันหยุด</span><span>ปิด</span></div>
+                </div>
+                {% if LINE_BOT_URL %}
+                    <a href="{{ LINE_BOT_URL }}"><i class="fab fa-line me-2" aria-hidden="true"></i>LINE ของคลินิก {{ LINE_OA_ID }}</a>
+                {% else %}
+                    <span><i class="fab fa-line me-2" aria-hidden="true"></i>LINE ของคลินิก {{ LINE_OA_ID }}</span>
+                {% endif %}
             </div>
         </div>
-    </footer>
+        <div class="f-bar">
+            <span>&copy; {% now "Y" %} TSPI Clinic สงวนลิขสิทธิ์</span>
+            <span>
+                <a href="{% url 'core:privacy' %}">นโยบายความเป็นส่วนตัว</a><span class="sep">·</span>
+                <a href="{% url 'core:terms' %}">ข้อกำหนดการใช้งาน</a><span class="sep">·</span>
+                <a href="{% url 'accounts:doctor_login' %}">สำหรับบุคลากร</a>
+            </span>
+        </div>
+    </div>
+</footer>
 
-    <button type="button" class="site-totop" id="siteTotop" aria-label="กลับขึ้นบนสุด"><i class="fas fa-caret-up"></i></button>
-    {% endblock %}
-
-    <!-- Bootstrap 5.3.8 Bundle JS (Includes Popper.js — Local Static) -->
-    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-
-    <script>
-    (function () {
-        var nav = document.getElementById('siteNav'), top = document.getElementById('siteTotop');
-        function onScroll() {
-            var y = window.scrollY;
-            if (nav) nav.classList.toggle('is-stuck', y > 40);
-            if (top) top.classList.toggle('show', y > 600);
-        }
-        window.addEventListener('scroll', onScroll, {passive: true});
-        onScroll();
-        if (top) top.addEventListener('click', function () { window.scrollTo({top: 0, behavior: 'smooth'}); });
-    })();
-    </script>
-    {% block extra_scripts %}{% endblock %}
-</body>
-</html>
+<a href="{% url 'core:assistant' %}" class="f-fab" id="frontFab" aria-label="ถามผู้ช่วย AI"><i class="fas fa-comment-medical" aria-hidden="true"></i><span>ถาม AI</span></a>
+<script>
+(function () {
+    var fab = document.getElementById('frontFab');
+    if (!fab || !('IntersectionObserver' in window)) return;
+    var seen = new Set();
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { e.isIntersecting ? seen.add(e.target) : seen.delete(e.target); });
+        fab.classList.toggle('is-hidden', seen.size > 0);
+    });
+    document.querySelectorAll('.f-cta, .f-footer').forEach(function (el) { io.observe(el); });
+})();
+</script>
+{% endblock footer %}
+{% endblock layout %}

@@ -1,110 +1,119 @@
 {% extends 'layouts/public_base.html' %}
+{% load i18n %}
 
-{% block title %}ลงทะเบียนผู้รับบริการ | TSPI Clinic{% endblock %}
+{% block title %}{% translate "ลงทะเบียนผู้รับบริการ — TSPI Clinic" %}{% endblock %}
 
 {% block content %}
-<section class="auth-wrap">
-    <div class="auth-card auth-card-wide">
-        <div class="text-center mb-4">
-            <span class="site-logo auth-logo"><i class="fas fa-user-plus"></i></span>
-            <h1 class="h3 mt-3 mb-1">ลงทะเบียนผู้รับบริการ</h1>
-            <p class="text-muted mb-0">สร้างบัญชีครั้งเดียว ทีมแพทย์จะติดต่อกลับเพื่อนัดประเมินสุขภาพ</p>
-        </div>
+<section class="f-auth">
+    <div class="container-xl">
+        <div class="f-auth-grid">
+            <div class="f-auth-card">
+                <div class="f-auth-head">
+                    <span class="f-brand-mark" aria-hidden="true"><i class="fas fa-leaf"></i></span>
+                    <h1>{% translate "ลงทะเบียนผู้รับบริการ" %}</h1>
+                    <p>{% translate "สร้างบัญชีครั้งเดียว ทีมแพทย์จะติดต่อกลับเพื่อนัดประเมินสุขภาพ" %}</p>
+                </div>
 
-        {% if form.non_field_errors %}
-            <div class="alert alert-danger" role="alert">
-                {% for error in form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'accounts:patient_register' %}" novalidate>
+                    {% csrf_token %}
+                    <p class="f-auth-step"><span>1</span>{% translate "ข้อมูลส่วนตัว" %}</p>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="form-floating">
+                                <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}" required autocomplete="given-name"
+                                       value="{{ form.first_name.value|default:'' }}" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" placeholder="{% translate "ชื่อจริง" %}">
+                                <label for="{{ form.first_name.id_for_label }}">{% translate "ชื่อจริง" %}</label>
+                                {% if form.first_name.errors %}<div class="invalid-feedback">{{ form.first_name.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating">
+                                <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}" required autocomplete="family-name"
+                                       value="{{ form.last_name.value|default:'' }}" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" placeholder="{% translate "นามสกุล" %}">
+                                <label for="{{ form.last_name.id_for_label }}">{% translate "นามสกุล" %}</label>
+                                {% if form.last_name.errors %}<div class="invalid-feedback">{{ form.last_name.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <input type="text" name="{{ form.id_card.name }}" id="{{ form.id_card.id_for_label }}" required inputmode="numeric" maxlength="17"
+                                       value="{{ form.id_card.value|default:'' }}" class="form-control {% if form.id_card.errors %}is-invalid{% endif %}" placeholder="{% translate "เลขบัตรประชาชน" %}">
+                                <label for="{{ form.id_card.id_for_label }}">{% translate "เลขบัตรประชาชน 13 หลัก" %}</label>
+                                {% if form.id_card.errors %}<div class="invalid-feedback">{{ form.id_card.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="f-auth-step"><span>2</span>{% translate "ช่องทางติดต่อ" %}</p>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="form-floating">
+                                <input type="tel" name="{{ form.phone.name }}" id="{{ form.phone.id_for_label }}" required inputmode="tel" autocomplete="tel"
+                                       value="{{ form.phone.value|default:'' }}" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" placeholder="{% translate "เบอร์โทร" %}">
+                                <label for="{{ form.phone.id_for_label }}">{% translate "เบอร์โทรศัพท์มือถือ" %}</label>
+                                {% if form.phone.errors %}<div class="invalid-feedback">{{ form.phone.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating">
+                                <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" required autocomplete="email"
+                                       value="{{ form.email.value|default:'' }}" class="form-control {% if form.email.errors %}is-invalid{% endif %}" placeholder="{% translate "อีเมล" %}">
+                                <label for="{{ form.email.id_for_label }}">{% translate "อีเมล" %}</label>
+                                {% if form.email.errors %}<div class="invalid-feedback">{{ form.email.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="f-auth-step"><span>3</span>{% translate "ตั้งรหัสผ่าน" %}</p>
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6">
+                            <div class="form-floating f-pw">
+                                <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" required autocomplete="new-password"
+                                       class="form-control {% if form.password.errors %}is-invalid{% endif %}" placeholder="{% translate "รหัสผ่าน" %}" aria-describedby="pwHelp">
+                                <label for="{{ form.password.id_for_label }}">{% translate "รหัสผ่าน" %}</label>
+                                <button type="button" class="f-pw-toggle" aria-label="{% translate "แสดงรหัสผ่าน" %}" aria-pressed="false"><i class="far fa-eye" aria-hidden="true"></i></button>
+                                {% if form.password.errors %}<div class="invalid-feedback">{{ form.password.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div id="pwHelp" class="form-text">{% translate "อย่างน้อย 8 ตัวอักษร" %}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating f-pw">
+                                <input type="password" name="{{ form.confirm_password.name }}" id="{{ form.confirm_password.id_for_label }}" required autocomplete="new-password"
+                                       class="form-control {% if form.confirm_password.errors %}is-invalid{% endif %}" placeholder="{% translate "ยืนยันรหัสผ่าน" %}">
+                                <label for="{{ form.confirm_password.id_for_label }}">{% translate "ยืนยันรหัสผ่าน" %}</label>
+                                <button type="button" class="f-pw-toggle" aria-label="{% translate "แสดงรหัสผ่าน" %}" aria-pressed="false"><i class="far fa-eye" aria-hidden="true"></i></button>
+                                {% if form.confirm_password.errors %}<div class="invalid-feedback">{{ form.confirm_password.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="f-consent mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input {% if form.pdpa_accepted.errors %}is-invalid{% endif %}" type="checkbox"
+                                   name="{{ form.pdpa_accepted.name }}" id="{{ form.pdpa_accepted.id_for_label }}" required>
+                            <label class="form-check-label" for="{{ form.pdpa_accepted.id_for_label }}">
+                                {% translate "ยินยอมให้ TSPI Clinic เก็บและใช้ข้อมูลสุขภาพเพื่อการดูแลรักษา ตาม" %}
+                                <a href="{% url 'core:privacy' %}" target="_blank" rel="noopener">{% translate "นโยบายความเป็นส่วนตัว" %}</a>
+                            </label>
+                            {% if form.pdpa_accepted.errors %}<div class="invalid-feedback d-block">{{ form.pdpa_accepted.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100">{% translate "ลงทะเบียน" %}</button>
+                </form>
+
+                <div class="f-auth-alt">
+                    <p class="mb-0">{% translate "มีบัญชีอยู่แล้ว?" %} <a href="{% url 'accounts:patient_login' %}">{% translate "เข้าสู่ระบบ" %}</a></p>
+                </div>
             </div>
-        {% endif %}
-
-        <form method="post" action="{% url 'accounts:patient_register' %}" novalidate>
-            {% csrf_token %}
-            <p class="auth-step">1. ข้อมูลส่วนตัว</p>
-            <div class="row g-3 mb-3">
-                <div class="col-sm-6">
-                    <div class="form-floating">
-                        <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}" required autocomplete="given-name"
-                               value="{{ form.first_name.value|default:'' }}" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" placeholder="ชื่อจริง">
-                        <label for="{{ form.first_name.id_for_label }}">ชื่อจริง</label>
-                        {% if form.first_name.errors %}<div class="invalid-feedback">{{ form.first_name.errors.0 }}</div>{% endif %}
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-floating">
-                        <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}" required autocomplete="family-name"
-                               value="{{ form.last_name.value|default:'' }}" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" placeholder="นามสกุล">
-                        <label for="{{ form.last_name.id_for_label }}">นามสกุล</label>
-                        {% if form.last_name.errors %}<div class="invalid-feedback">{{ form.last_name.errors.0 }}</div>{% endif %}
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="form-floating">
-                        <input type="text" name="{{ form.id_card.name }}" id="{{ form.id_card.id_for_label }}" required inputmode="numeric" maxlength="17"
-                               value="{{ form.id_card.value|default:'' }}" class="form-control {% if form.id_card.errors %}is-invalid{% endif %}" placeholder="เลขบัตรประชาชน">
-                        <label for="{{ form.id_card.id_for_label }}">เลขบัตรประชาชน 13 หลัก</label>
-                        {% if form.id_card.errors %}<div class="invalid-feedback">{{ form.id_card.errors.0 }}</div>{% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <p class="auth-step">2. ช่องทางติดต่อ</p>
-            <div class="row g-3 mb-3">
-                <div class="col-sm-6">
-                    <div class="form-floating">
-                        <input type="tel" name="{{ form.phone.name }}" id="{{ form.phone.id_for_label }}" required inputmode="tel" autocomplete="tel"
-                               value="{{ form.phone.value|default:'' }}" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" placeholder="เบอร์โทร">
-                        <label for="{{ form.phone.id_for_label }}">เบอร์โทรศัพท์มือถือ</label>
-                        {% if form.phone.errors %}<div class="invalid-feedback">{{ form.phone.errors.0 }}</div>{% endif %}
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-floating">
-                        <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" required autocomplete="email"
-                               value="{{ form.email.value|default:'' }}" class="form-control {% if form.email.errors %}is-invalid{% endif %}" placeholder="อีเมล">
-                        <label for="{{ form.email.id_for_label }}">อีเมล</label>
-                        {% if form.email.errors %}<div class="invalid-feedback">{{ form.email.errors.0 }}</div>{% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <p class="auth-step">3. ตั้งรหัสผ่าน</p>
-            <div class="row g-3 mb-4">
-                <div class="col-sm-6">
-                    <div class="form-floating">
-                        <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" required autocomplete="new-password"
-                               class="form-control {% if form.password.errors %}is-invalid{% endif %}" placeholder="รหัสผ่าน" aria-describedby="pwHelp">
-                        <label for="{{ form.password.id_for_label }}">รหัสผ่าน</label>
-                        {% if form.password.errors %}<div class="invalid-feedback">{{ form.password.errors.0 }}</div>{% endif %}
-                    </div>
-                    <div id="pwHelp" class="form-text">อย่างน้อย 8 ตัวอักษร</div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-floating">
-                        <input type="password" name="{{ form.confirm_password.name }}" id="{{ form.confirm_password.id_for_label }}" required autocomplete="new-password"
-                               class="form-control {% if form.confirm_password.errors %}is-invalid{% endif %}" placeholder="ยืนยันรหัสผ่าน">
-                        <label for="{{ form.confirm_password.id_for_label }}">ยืนยันรหัสผ่าน</label>
-                        {% if form.confirm_password.errors %}<div class="invalid-feedback">{{ form.confirm_password.errors.0 }}</div>{% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <div class="auth-consent mb-4">
-                <div class="form-check">
-                    <input class="form-check-input {% if form.pdpa_accepted.errors %}is-invalid{% endif %}" type="checkbox"
-                           name="{{ form.pdpa_accepted.name }}" id="{{ form.pdpa_accepted.id_for_label }}" required>
-                    <label class="form-check-label" for="{{ form.pdpa_accepted.id_for_label }}">
-                        ยินยอมให้ TSPI Clinic เก็บและใช้ข้อมูลสุขภาพเพื่อการดูแลรักษา ตาม
-                        <a href="{% url 'core:privacy' %}" target="_blank" rel="noopener">นโยบายความเป็นส่วนตัว</a>
-                    </label>
-                    {% if form.pdpa_accepted.errors %}<div class="invalid-feedback d-block">{{ form.pdpa_accepted.errors.0 }}</div>{% endif %}
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill">ลงทะเบียน</button>
-        </form>
-
-        <div class="auth-alt">
-            <p class="mb-0">มีบัญชีอยู่แล้ว? <a href="{% url 'accounts:patient_login' %}" class="fw-semibold">เข้าสู่ระบบ</a></p>
+            {% translate "ลงทะเบียนครั้งเดียว" as side_kicker %}{% translate "ใช้เวลาไม่กี่นาที" as side_soft %}{% translate "แล้วดูแลสุขภาพต่อเนื่อง" as side_title %}
+            {% include 'layouts/_front_auth_side.html' with kicker=side_kicker soft=side_soft title=side_title %}
         </div>
     </div>
 </section>

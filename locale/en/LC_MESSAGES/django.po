@@ -1,0 +1,3704 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-18 23:04+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/accounts/forms.py:93 templates/accounts/patient_login.html:32
+#: templates/portal_patient/line_liff_binding.html:53
+msgid "เลขบัตรประชาชน 13 หลัก หรือ HN"
+msgstr "13-digit ID card number or HN"
+
+#: apps/accounts/forms.py:97
+msgid "ระบุเลขบัตรประชาชน 13 หลัก หรือ หมายเลข HN"
+msgstr "Enter your 13-digit ID card number or HN"
+
+#: apps/accounts/forms.py:103 templates/accounts/patient_login.html:37
+#: templates/accounts/patient_login.html:38
+#: templates/accounts/patient_register.html:78
+#: templates/accounts/patient_register.html:79
+msgid "รหัสผ่าน"
+msgstr "Password"
+
+#: apps/accounts/forms.py:106
+msgid "รหัสผ่านของคุณ"
+msgstr "Your password"
+
+#: apps/accounts/forms.py:154
+msgid "ข้อมูลประจำตัวหรือรหัสผ่านไม่ถูกต้อง"
+msgstr "Incorrect ID or password"
+
+#: apps/accounts/forms.py:157
+msgid "บัญชีผู้ป่วยถูกปิดการใช้งาน กรุณาติดต่อคลินิก"
+msgstr "This patient account is disabled. Please contact the clinic."
+
+#: apps/accounts/forms.py:161
+msgid "บัญชีเจ้าหน้าที่กรุณาเข้าสู่ระบบผ่านช่องทางแพทย์"
+msgstr "Staff accounts must sign in through the staff login."
+
+#: apps/accounts/forms.py:172
+#: templates/portal_patient/onboarding/wizard.html:97
+#: templates/portal_patient/onboarding/wizard.html:334
+#: templates/portal_patient/onboarding/wizard.html:336
+msgid "เลขประจำตัวประชาชน 13 หลัก"
+msgstr "13-digit national ID number"
+
+#: apps/accounts/forms.py:181 templates/accounts/patient_register.html:59
+msgid "เบอร์โทรศัพท์มือถือ"
+msgstr "Mobile phone number"
+
+#: apps/accounts/forms.py:190
+msgid "กำหนดรหัสผ่าน (ขั้นต่ำ 8 ตัวอักษร)"
+msgstr "Set a password (at least 8 characters)"
+
+#: apps/accounts/forms.py:193
+msgid "ความยาวอย่างน้อย 8 ตัวอักษร"
+msgstr "At least 8 characters"
+
+#: apps/accounts/forms.py:199
+msgid "ยืนยันรหัสผ่านอีกครั้ง"
+msgstr "Confirm password"
+
+#: apps/accounts/forms.py:202
+msgid "ยืนยันรหัสผ่านเดิม"
+msgstr "Re-enter your password"
+
+#: apps/accounts/forms.py:208
+msgid "ข้าพเจ้ายินยอมให้นำข้อมูลสุขภาพไปใช้ในการวิเคราะห์ทางการแพทย์ตามนโยบาย PDPA"
+msgstr ""
+"I consent to my health data being used for medical analysis under the PDPA "
+"policy."
+
+#: apps/accounts/forms.py:225
+msgid "กรุณาระบุเลขประจำตัวประชาชน 13 หลัก (ตัวเลขล้วน)"
+msgstr "Please enter a 13-digit national ID number (digits only)."
+
+#: apps/accounts/forms.py:230
+msgid "เลขประจำตัวประชาชน 13 หลักไม่ถูกต้องตามสูตรคำนวณมาตรฐาน"
+msgstr "This national ID number is not valid."
+
+#: apps/accounts/forms.py:234
+msgid "เลขบัตรประชาชนนี้ได้ลงทะเบียนไว้ในระบบแล้ว กรุณาเข้าสู่ระบบ"
+msgstr "This ID number is already registered. Please sign in."
+
+#: apps/accounts/forms.py:241
+msgid "กรุณาระบุหมายเลขโทรศัพท์มือถือไทยที่ถูกต้อง (เช่น 0812345678)"
+msgstr "Please enter a valid Thai mobile number (e.g. 0812345678)."
+
+#: apps/accounts/forms.py:247
+msgid "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร"
+msgstr "Password must be at least 8 characters long."
+
+#: apps/accounts/forms.py:255
+msgid "รหัสผ่านทั้งสองช่องไม่ตรงกัน"
+msgstr "The two passwords do not match."
+
+#: apps/accounts/views.py:120
+#, python-format
+msgid "ยินดีต้อนรับ คุณ%(name)s"
+msgstr "Welcome, %(name)s"
+
+#: apps/core/content.py:9 apps/core/views.py:39
+msgid "ภูมิคุ้มกันและการติดเชื้อ"
+msgstr "Immunity & infection"
+
+#: apps/core/content.py:9
+msgid "แกนที่ 1 - 4"
+msgstr "Axes 1 - 4"
+
+#: apps/core/content.py:14 apps/core/views.py:39
+msgid "การเผาผลาญและพลังงาน"
+msgstr "Metabolism & energy"
+
+#: apps/core/content.py:14
+msgid "แกนที่ 5 - 10"
+msgstr "Axes 5 - 10"
+
+#: apps/core/content.py:21 apps/core/views.py:41
+msgid "พันธุกรรมและการซ่อมแซม"
+msgstr "Genetics & repair"
+
+#: apps/core/content.py:21
+msgid "แกนที่ 11 - 14"
+msgstr "Axes 11 - 14"
+
+#: apps/core/content.py:26
+msgid "การล้างพิษและกำจัดของเสีย"
+msgstr "Detoxification & clearance"
+
+#: apps/core/content.py:26
+msgid "แกนที่ 15"
+msgstr "Axis 15"
+
+#: apps/core/content.py:30 apps/core/views.py:40
+msgid "ลำไส้และจุลินทรีย์"
+msgstr "Gut & microbiome"
+
+#: apps/core/content.py:30
+msgid "แกนที่ 16 - 19"
+msgstr "Axes 16 - 19"
+
+#: apps/core/content.py:35 apps/core/views.py:40
+msgid "หลอดเลือดและการไหลเวียน"
+msgstr "Blood vessels & circulation"
+
+#: apps/core/content.py:35
+msgid "แกนที่ 20 - 23"
+msgstr "Axes 20 - 23"
+
+#: apps/core/content.py:40
+msgid "การซ่อมแซมและฟื้นฟูเนื้อเยื่อ"
+msgstr "Tissue repair & regeneration"
+
+#: apps/core/content.py:40
+msgid "แกนที่ 24 - 27"
+msgstr "Axes 24 - 27"
+
+#: apps/core/content.py:45
+msgid "กล้ามเนื้อ กระดูก และโครงสร้าง"
+msgstr "Muscles, bones & structure"
+
+#: apps/core/content.py:45
+msgid "แกนที่ 28 - 30"
+msgstr "Axes 28 - 30"
+
+#: apps/core/content.py:49
+msgid "ฮอร์โมนและต่อมไร้ท่อ"
+msgstr "Hormones & endocrine system"
+
+#: apps/core/content.py:49
+msgid "แกนที่ 31 - 33"
+msgstr "Axes 31 - 33"
+
+#: apps/core/content.py:53
+msgid "ระบบประสาท การนอน และความเครียด"
+msgstr "Nervous system, sleep & stress"
+
+#: apps/core/content.py:53
+msgid "แกนที่ 34"
+msgstr "Axis 34"
+
+#: apps/core/content.py:57
+msgid "ความแข็งแรงของอวัยวะ"
+msgstr "Organ resilience"
+
+#: apps/core/content.py:57
+msgid "แกนที่ 35 - 36"
+msgstr "Axes 35 - 36"
+
+#: apps/core/content.py:58
+msgid "Organ Resilience & Functional Reserve (ตับ, ไต, หัวใจ)"
+msgstr "Organ Resilience & Functional Reserve (liver, kidneys, heart)"
+
+#: apps/core/content.py:59
+msgid "Local Organ & Tissue Interface (ตา, ไซนัส, มดลูก)"
+msgstr "Local Organ & Tissue Interface (eyes, sinuses, uterus)"
+
+#: apps/core/content.py:61
+msgid "การควบคุมเซลล์และระดับระบบ"
+msgstr "Cell regulation & system level"
+
+#: apps/core/content.py:61
+msgid "แกนที่ 37 - 39"
+msgstr "Axes 37 - 39"
+
+#: apps/core/content.py:69
+msgid "สัปดาห์ที่ 1 - 8"
+msgstr "Weeks 1 - 8"
+
+#: apps/core/content.py:69
+msgid "6-8 สัปดาห์"
+msgstr "6-8 weeks"
+
+#: apps/core/content.py:70
+msgid "ประเมินเชิงลึก กำจัดภาระสารพิษตับ และฟื้นฟูเกราะป้องกันลำไส้"
+msgstr ""
+"In-depth assessment, reducing the liver's toxic load and restoring the gut "
+"barrier"
+
+#: apps/core/content.py:72
+msgid ""
+"วิเคราะห์ข้อมูลสุขภาพ 39 แกนชีววิทยา (12 โดเมน) ด้วย AI ประเมินชีวเคมีเลือด "
+"สัญญาณการอักเสบ และตรวจคัดกรอง Leaky Gut"
+msgstr ""
+"Analyses your health data across the 39 biological axes (12 domains) with "
+"AI, assessing blood chemistry, inflammation markers and screening for leaky "
+"gut"
+
+#: apps/core/content.py:74
+msgid ""
+"กระตุ้นเอนไซม์ Cytochrome P450 และ Conjugation ในตับ ขับสารพิษสะสม โลหะหนัก "
+"และลดภาระตับคั่งไขมัน"
+msgstr ""
+"Activates liver Cytochrome P450 and conjugation enzymes to clear accumulated "
+"toxins and heavy metals and reduce fatty-liver load"
+
+#: apps/core/content.py:76
+msgid ""
+"ซ่อมแซม Tight Junctions ที่ผนังลำไส้ ลดการรั่วไหลของ Endotoxin สู่กระแสเลือด "
+"และปรับสมดุล Microbiome"
+msgstr ""
+"Repairs the tight junctions of the gut wall, reduces endotoxin leakage into "
+"the bloodstream and rebalances the microbiome"
+
+#: apps/core/content.py:79
+msgid "สัปดาห์ที่ 9 - 16"
+msgstr "Weeks 9 - 16"
+
+#: apps/core/content.py:79
+msgid "8 สัปดาห์"
+msgstr "8 weeks"
+
+#: apps/core/content.py:80
+msgid "ปรับสมดุลการเผาผลาญ ฟื้นฟูต่อมไร้ท่อ และควบคุมการอักเสบระดับเซลล์"
+msgstr ""
+"Rebalancing metabolism, restoring the endocrine system and controlling "
+"cellular inflammation"
+
+#: apps/core/content.py:82
+msgid ""
+"ปรับปรุงความไวของตัวรับอินซูลิน ลดภาวะไขมันพอกตับ และเพิ่มความยืดหยุ่นในการสลับแหล่งพลังงาน "
+"(Metabolic Flexibility)"
+msgstr ""
+"Improves insulin receptor sensitivity, reduces fatty liver and increases the "
+"ability to switch energy sources (metabolic flexibility)"
+
+#: apps/core/content.py:84
+msgid ""
+"ปรับจังหวะการหลั่งคอร์ติซอล ฟื้นฟูต่อมหมวกไตล้า สมดุลฮอร์โมนไทรอยด์ "
+"และสร้างเสถียรภาพแก่ฮอร์โมนเพศ"
+msgstr ""
+"Regulates cortisol rhythm, supports fatigued adrenals, balances thyroid "
+"hormones and stabilises sex hormones"
+
+#: apps/core/content.py:86
+msgid ""
+"กดการส่งสัญญาณ NF-κB, ปรับสัดส่วน Th1/Th2 และ M1/M2 Macrophages "
+"เพื่อหยุดวงจรการโจมตีเนื้อเยื่อตนเอง"
+msgstr ""
+"Dampens NF-κB signalling and rebalances Th1/Th2 and M1/M2 macrophages to "
+"stop the cycle of the body attacking its own tissue"
+
+#: apps/core/content.py:89
+msgid "สัปดาห์ที่ 17+"
+msgstr "Week 17+"
+
+#: apps/core/content.py:89
+msgid "ต่อเนื่องระยะยาว"
+msgstr "Ongoing, long term"
+
+#: apps/core/content.py:90
+msgid "กระตุ้นการซ่อมแซมดีเอ็นเอ ยืดความยาวเทโลเมียร์ และคงสภาพเซลล์อ่อนเยาว์"
+msgstr ""
+"Stimulating DNA repair, supporting telomere length and keeping cells young"
+
+#: apps/core/content.py:92
+msgid ""
+"เร่งการกำจัดเซลล์ชราภาพ (Senescent Cells) ผ่านกระบวนการ Autophagy "
+"และกระตุ้นเอนไซม์ซ่อมแซมรหัสพันธุกรรม PARP"
+msgstr ""
+"Speeds up clearance of senescent cells through autophagy and activates the "
+"PARP DNA-repair enzymes"
+
+#: apps/core/content.py:94
+msgid ""
+"ส่งเสริมการสร้างเซลล์ประสาทใหม่ (BDNF) ฟื้นฟูไมอีลิน "
+"และเพิ่มประสิทธิภาพการชะล้างของเสียสมองช่วงหลับลึก"
+msgstr ""
+"Supports the growth of new nerve cells (BDNF), restores myelin and improves "
+"the brain's waste clearance during deep sleep"
+
+#: apps/core/content.py:96
+msgid ""
+"ออกแบบโปรแกรมบำรุงรักษาสุขภาพเฉพาะบุคคล เพื่อป้องกันการเกิดโรคซ้ำ "
+"และคงสภาวะความอ่อนเยาว์ในระดับโมเลกุล"
+msgstr ""
+"Designs a personalised maintenance programme to prevent relapse and keep the "
+"body young at the molecular level"
+
+#: apps/core/content.py:118
+msgid "ลงทะเบียนเข้าสู่ระบบคนไข้"
+msgstr "Register as a patient"
+
+#: apps/core/content.py:119
+msgid ""
+"สมัครสมาชิกด้วยเลขบัตรประชาชน ชื่อ-นามสกุล และเบอร์โทรศัพท์ "
+"ระบบจะออกหมายเลขประจำตัวผู้ป่วย (HN) อัตโนมัติ"
+msgstr ""
+"Sign up with your national ID number, full name and phone number. The system "
+"issues your hospital number (HN) automatically."
+
+#: apps/core/content.py:120
+msgid "ซักประวัติอาการล่วงหน้ากับ AI"
+msgstr "Pre-visit symptom interview with AI"
+
+#: apps/core/content.py:121
+msgid ""
+"ตอบคำถามอาการที่รู้สึก อาหารการกิน และอัปโหลดผลตรวจเลือดที่มี AI จะประมวลผลจัดกลุ่มเข้าสู่ 39 "
+"แกนชีววิทยา (12 โดเมน)"
+msgstr ""
+"Answer questions about your symptoms and diet, and upload any blood test "
+"results. AI groups the information into the 39 biological axes (12 domains)."
+
+#: apps/core/content.py:122
+msgid "รับผลวิเคราะห์ 39 แกนชีววิทยา (12 โดเมน)"
+msgstr "Get your 39-axis analysis (12 domains)"
+
+#: apps/core/content.py:123
+msgid ""
+"ดูภาพรวมสุขภาพผ่านกราฟ Digital Twin จุดใดที่ร่างกายกำลังส่งสัญญาณเตือน "
+"พร้อมคำอธิบายภาษาไทยที่เข้าใจง่าย"
+msgstr ""
+"See your overall health on the Digital Twin chart, which points out where "
+"your body is sending warning signals, with plain-language explanations."
+
+#: apps/core/content.py:124
+msgid "เข้าพบแพทย์และรับแผนบำบัดฟื้นฟู 9 ขั้นตอน"
+msgstr "See a doctor and get your 9-step recovery plan"
+
+#: apps/core/content.py:125
+msgid ""
+"ปรึกษาแพทย์เฉพาะทาง ออกแบบการบำบัดด้วยสูตรสารสกัดไฟโตเคมีคอล 200 โมดูล พร้อมติดตามผลทุก "
+"4 สัปดาห์"
+msgstr ""
+"Consult a specialist doctor, get a treatment plan using 200 standardised "
+"phytochemical modules, with follow-up every 4 weeks."
+
+#: apps/core/content.py:131
+msgid "เปิดเว็บไซต์ด้วย Safari"
+msgstr "Open the website in Safari"
+
+#: apps/core/content.py:131
+#, python-brace-format
+msgid "เข้าสู่เว็บไซต์ {host} ด้วยเบราว์เซอร์ Safari บน iPhone หรือ iPad ของท่าน"
+msgstr "Go to {host} in Safari on your iPhone or iPad"
+
+#: apps/core/content.py:132
+msgid "กดปุ่มแชร์ (Share Icon)"
+msgstr "Tap the Share button"
+
+#: apps/core/content.py:132
+msgid "กดที่ปุ่มแชร์รูปสี่เหลี่ยมที่มีลูกศรชี้ขึ้น ที่แถบด้านล่างของหน้าจอ Safari"
+msgstr ""
+"Tap the share button (a square with an arrow pointing up) in the bar at the "
+"bottom of Safari"
+
+#: apps/core/content.py:133
+msgid "เลือก \"เพิ่มไปยังหน้าจอโฮม\" (Add to Home Screen)"
+msgstr "Choose \"Add to Home Screen\""
+
+#: apps/core/content.py:133
+msgid "เลื่อนลงมาในเมนูแชร์ และกดเลือก \"เพิ่มไปยังหน้าจอโฮม\" แล้วกดปุ่ม \"เพิ่ม\" (Add)"
+msgstr ""
+"Scroll down in the share menu, tap \"Add to Home Screen\", then tap \"Add\""
+
+#: apps/core/content.py:136
+msgid "เปิดเว็บไซต์ด้วย Google Chrome"
+msgstr "Open the website in Google Chrome"
+
+#: apps/core/content.py:136
+#, python-brace-format
+msgid "เข้าสู่เว็บไซต์ {host} ด้วยเบราว์เซอร์ Chrome บนสมาร์ตโฟน Android ของท่าน"
+msgstr "Go to {host} in Chrome on your Android phone"
+
+#: apps/core/content.py:137
+msgid "กดปุ่มเมนู 3 จุด"
+msgstr "Tap the three-dot menu"
+
+#: apps/core/content.py:137
+msgid "กดที่จุด 3 จุดมุมบนขวาของเบราว์เซอร์ Chrome"
+msgstr "Tap the three dots in the top-right corner of Chrome"
+
+#: apps/core/content.py:138
+msgid "เลือก \"ติดตั้งแอป\" (Install App)"
+msgstr "Choose \"Install app\""
+
+#: apps/core/content.py:138
+msgid "กดเลือก \"ติดตั้งแอป\" หรือ \"เพิ่มลงในหน้าจอหลัก\" แล้วกดยืนยันการติดตั้ง"
+msgstr "Tap \"Install app\" or \"Add to Home screen\", then confirm"
+
+#: apps/core/models.py:148
+msgid "39 แกนชีววิทยา & เวชศาสตร์แม่นยำ"
+msgstr "39 biological axes & precision medicine"
+
+#: apps/core/models.py:149
+msgid "ภูมิคุ้มกันบำบัด & การอักเสบระดับเซลล์"
+msgstr "Immunotherapy & cellular inflammation"
+
+#: apps/core/models.py:150
+msgid "เมตาบอลิซึม & ชะลอวัยระดับเซลล์"
+msgstr "Metabolism & cellular anti-ageing"
+
+#: apps/core/models.py:151
+msgid "ระบบทางเดินอาหาร & ไมโครไบโอม"
+msgstr "Digestive system & microbiome"
+
+#: apps/core/models.py:152
+msgid "ข่าวสารคลินิก & นวัตกรรมการแพทย์"
+msgstr "Clinic news & medical innovation"
+
+#: apps/core/views.py:14 templates/core/assistant.html:323
+#: templates/core/home.html:24 templates/portal_patient/assistant.html:387
+msgid "ลำไส้รั่วคืออะไร รักษาอย่างไร"
+msgstr "What is leaky gut and how is it treated?"
+
+#: apps/core/views.py:14
+msgid "อาการท้องอืด ภูมิแพ้ และการดูแลลำไส้"
+msgstr "Bloating, allergies and gut care"
+
+#: apps/core/views.py:15 templates/core/assistant.html:324
+#: templates/portal_patient/assistant.html:388
+msgid "อ่อนเพลียบ่อย เกี่ยวกับระบบไหน"
+msgstr "I'm often tired — which system is involved?"
+
+#: apps/core/views.py:15
+msgid "พลังงาน ฮอร์โมน และการนอน"
+msgstr "Energy, hormones and sleep"
+
+#: apps/core/views.py:16 templates/core/assistant.html:325
+#: templates/portal_patient/assistant.html:389
+msgid "สะเก็ดเงินดูแลตัวเองอย่างไร"
+msgstr "How do I look after psoriasis myself?"
+
+#: apps/core/views.py:16
+msgid "การอักเสบเรื้อรังและผิวหนัง"
+msgstr "Chronic inflammation and skin"
+
+#: apps/core/views.py:17 templates/core/assistant.html:326
+#: templates/portal_patient/assistant.html:390
+msgid "นัดหมายคลินิกได้อย่างไร"
+msgstr "How do I book an appointment?"
+
+#: apps/core/views.py:17
+msgid "ขั้นตอนลงทะเบียนและพบแพทย์"
+msgstr "Registering and seeing a doctor"
+
+#: apps/core/views.py:20 templates/core/platform.html:55
+#: templates/layouts/public_base.html:165
+msgid "ถาม AI"
+msgstr "Ask AI"
+
+#: apps/core/views.py:20
+msgid "เล่าอาการหรือถามเรื่องที่สงสัย ได้คำตอบจากเอกสารของคลินิกทันที ไม่ต้องลงทะเบียน"
+msgstr ""
+"Describe your symptoms or ask anything. Get answers from the clinic's "
+"documents instantly, no sign-up needed."
+
+#: apps/core/views.py:21 templates/accounts/patient_register.html:108
+#: templates/layouts/public_base.html:81 templates/layouts/public_base.html:135
+msgid "ลงทะเบียน"
+msgstr "Register"
+
+#: apps/core/views.py:21
+msgid "กรอกชื่อและเบอร์โทร ยินยอมการใช้ข้อมูล ใช้เวลาไม่ถึง 2 นาที"
+msgstr ""
+"Enter your name and phone number and give consent. It takes less than 2 "
+"minutes."
+
+#: apps/core/views.py:22
+msgid "พบแพทย์"
+msgstr "See a doctor"
+
+#: apps/core/views.py:22
+msgid "แพทย์ประเมิน 39 แกนชีววิทยา และวางแผนการดูแลเฉพาะคุณ"
+msgstr "A doctor assesses your 39 biological axes and plans care just for you."
+
+#: apps/core/views.py:25
+msgid "ตรวจประเมินและล้างของเสีย"
+msgstr "Assessment & cleansing"
+
+#: apps/core/views.py:25
+msgid "ประเมินร่างกายเชิงลึกและเคลียร์ของเสียสะสมระดับเซลล์"
+msgstr "In-depth assessment and clearing waste built up at the cellular level"
+
+#: apps/core/views.py:26
+msgid "ตรวจประเมินเชิงลึก"
+msgstr "In-depth assessment"
+
+#: apps/core/views.py:26
+msgid "วิเคราะห์ 39 แกนชีววิทยา ซักประวัติอาหารและผลแล็บ"
+msgstr "Analysis of the 39 biological axes, diet history and lab results"
+
+#: apps/core/views.py:27
+msgid "ขับสารพิษ"
+msgstr "Detoxification"
+
+#: apps/core/views.py:27
+msgid "กำจัดสารพิษและโลหะหนัก ฟื้นฟูการทำงานของตับ"
+msgstr "Removing toxins and heavy metals, restoring liver function"
+
+#: apps/core/views.py:28
+msgid "ฟื้นฟูลำไส้"
+msgstr "Gut restoration"
+
+#: apps/core/views.py:28
+msgid "ฟื้นฟูเยื่อบุทางเดินอาหาร ดูแลภาวะลำไส้รั่ว"
+msgstr "Restoring the gut lining and treating leaky gut"
+
+#: apps/core/views.py:29
+msgid "ปรับสมดุลระบบหลัก"
+msgstr "Rebalancing core systems"
+
+#: apps/core/views.py:29
+msgid "ปรับสมดุลการเผาผลาญ ฮอร์โมน และระบบภูมิคุ้มกัน"
+msgstr "Rebalancing metabolism, hormones and the immune system"
+
+#: apps/core/views.py:30
+msgid "ปรับการเผาผลาญ"
+msgstr "Metabolic reset"
+
+#: apps/core/views.py:30
+msgid "แก้ภาวะดื้ออินซูลิน ฟื้นฟูการสร้างพลังงานของเซลล์"
+msgstr "Correcting insulin resistance and restoring cellular energy production"
+
+#: apps/core/views.py:31
+msgid "สมดุลฮอร์โมน"
+msgstr "Hormone balance"
+
+#: apps/core/views.py:31
+msgid "ปรับฮอร์โมนความเครียด คอร์ติซอล และไทรอยด์"
+msgstr "Balancing stress hormones, cortisol and thyroid"
+
+#: apps/core/views.py:32
+msgid "ปรับภูมิคุ้มกัน"
+msgstr "Immune modulation"
+
+#: apps/core/views.py:32
+msgid "ลดการอักเสบเรื้อรังและภูมิไวเกิน"
+msgstr "Reducing chronic inflammation and hypersensitivity"
+
+#: apps/core/views.py:33
+msgid "ซ่อมแซมและดูแลระยะยาว"
+msgstr "Repair & long-term care"
+
+#: apps/core/views.py:33
+msgid "ซ่อมแซมเซลล์ ชะลอวัย และเสริมความแข็งแรงระยะยาว"
+msgstr "Cell repair, slowing ageing and building long-term resilience"
+
+#: apps/core/views.py:34
+msgid "ซ่อมแซมเซลล์"
+msgstr "Cell repair"
+
+#: apps/core/views.py:34
+msgid "กระตุ้นการเก็บกวาดและซ่อมแซมภายในเซลล์"
+msgstr "Stimulating clean-up and repair inside the cells"
+
+#: apps/core/views.py:35
+msgid "ฟื้นฟูระบบประสาท"
+msgstr "Nervous system recovery"
+
+#: apps/core/views.py:35
+msgid "ดูแลสมองและระบบประสาท"
+msgstr "Caring for the brain and nervous system"
+
+#: apps/core/views.py:36
+msgid "ดูแลระยะยาว"
+msgstr "Long-term care"
+
+#: apps/core/views.py:36
+msgid "แผนสุขภาพต่อเนื่องเพื่อชะลอวัยและป้องกันโรคเรื้อรัง"
+msgstr "An ongoing health plan to slow ageing and prevent chronic disease"
+
+#: apps/core/views.py:41
+msgid "ระบบประสาทและฮอร์โมน"
+msgstr "Nervous system & hormones"
+
+#: apps/core/views.py:44
+msgid "ผู้ช่วย AI ตอบจากข้อมูลอะไร"
+msgstr "What information does the AI assistant use?"
+
+#: apps/core/views.py:44
+msgid ""
+"ตอบจากเอกสารความรู้ของ TSPI Clinic ก่อนเสมอ พร้อมเลขอ้างอิง "
+"ถ้าเอกสารไม่ครอบคลุมจะเสริมด้วยความรู้ทางการแพทย์ทั่วไป และแยกกรอบบอกชัดเจน"
+msgstr ""
+"It always answers from TSPI Clinic's own knowledge documents first, with "
+"reference numbers. If the documents don't cover it, it adds general medical "
+"knowledge in a clearly separate box."
+
+#: apps/core/views.py:45
+msgid "ต้องลงทะเบียนก่อนถาม AI ไหม"
+msgstr "Do I need to register before asking the AI?"
+
+#: apps/core/views.py:45
+msgid "ไม่ต้อง ถามได้ทันทีและไม่ต้องใส่ชื่อหรือเบอร์โทร ประวัติแชทเก็บไว้ในเครื่องของคุณเท่านั้น"
+msgstr ""
+"No. Ask right away without giving your name or phone number. Your chat "
+"history is stored only on your device."
+
+#: apps/core/views.py:46
+msgid "AI วินิจฉัยโรคแทนแพทย์ได้ไหม"
+msgstr "Can the AI diagnose instead of a doctor?"
+
+#: apps/core/views.py:46
+msgid ""
+"ไม่ได้ ผู้ช่วยให้ข้อมูลเบื้องต้นเท่านั้น การวินิจฉัยและการเลือกการรักษาต้องผ่านแพทย์ของคลินิก "
+"ถ้ามีอาการฉุกเฉินให้โทร 1669 ทันที"
+msgstr ""
+"No. The assistant only gives general information. Diagnosis and treatment "
+"decisions are made by the clinic's doctors. In an emergency, call 1669 "
+"immediately."
+
+#: apps/core/views.py:47
+msgid "ลงทะเบียนแล้วเกิดอะไรต่อ"
+msgstr "What happens after I register?"
+
+#: apps/core/views.py:47
+msgid ""
+"ทีมคลินิกจะติดต่อกลับเพื่อนัดประเมินสุขภาพ และคุณจะเข้าดูประวัติ ผลประเมิน และแชทกับผู้ช่วย AI "
+"ในบัญชีของคุณได้"
+msgstr ""
+"The clinic team will contact you to book a health assessment, and you can "
+"view your history, results and chat with the AI assistant in your account."
+
+#: apps/patients/views_line_register.py:29
+msgid "กรุณากรอกชื่อ-นามสกุล"
+msgstr "Please enter your full name"
+
+#: apps/patients/views_line_register.py:30
+msgid "กรุณากรอกเบอร์โทรศัพท์"
+msgstr "Please enter your phone number"
+
+#: apps/patients/views_line_register.py:31
+msgid "กรุณากดยอมรับก่อนส่งข้อมูล"
+msgstr "Please accept before submitting"
+
+#: apps/patients/views_line_register.py:36
+msgid "เบอร์โทรศัพท์ไม่ถูกต้อง"
+msgstr "Invalid phone number"
+
+#: apps/patients/views_line_register.py:110
+msgid "ส่งข้อมูลบ่อยเกินไป กรุณารอสักครู่แล้วลองใหม่"
+msgstr "Too many attempts. Please wait a moment and try again."
+
+#: apps/portal_patient/views.py:213
+msgid ""
+"ภาระการอักเสบระดับเซลล์ (hs-CRP, IL-6, TNF-a) ควบคุมด้วยสารต้านอนุมูลอิสระและปรับอาหาร"
+msgstr ""
+"Cellular inflammatory load (hs-CRP, IL-6, TNF-a), managed with antioxidants "
+"and diet changes"
+
+#: apps/portal_patient/views.py:214
+msgid ""
+"ความสมดุลของระบบภูมิคุ้มกันแต่กำเนิดและภูมิคุ้มกันจำเพาะ (Innate & Adaptive Immunity)"
+msgstr "Balance of innate and adaptive immunity"
+
+#: apps/portal_patient/views.py:215
+msgid "ความไวต่ออินซูลินและสมดุลน้ำตาล (HOMA-IR, HbA1c) ควบคุมคาร์โบไฮเดรตเชิงเดี่ยว"
+msgstr ""
+"Insulin sensitivity and blood sugar balance (HOMA-IR, HbA1c), managed by "
+"limiting simple carbohydrates"
+
+#: apps/portal_patient/views.py:216
+msgid "ประสิทธิภาพการสร้างพลังงาน ATP และสุขภาพไมโทคอนเดรีย (Mitochondrial Network)"
+msgstr "ATP energy production and mitochondrial health (mitochondrial network)"
+
+#: apps/portal_patient/views.py:217
+msgid "ประสิทธิภาพการขับสารพิษของตับ Phase 1 & Phase 2 (Detoxification Capacity)"
+msgstr "Liver detoxification capacity, phase 1 & phase 2"
+
+#: apps/portal_patient/views.py:218
+msgid "ประสิทธิภาพการย่อยและดูดซึมสารอาหารของกระเพาะและลำไส้ส่วนบน"
+msgstr "Digestion and nutrient absorption in the stomach and upper intestine"
+
+#: apps/portal_patient/views.py:219
+msgid "ความสมบูรณ์ของเยื่อบุทางเดินอาหาร (Zonulin, Intestinal Barrier Permeability)"
+msgstr "Integrity of the gut lining (zonulin, intestinal barrier permeability)"
+
+#: apps/portal_patient/views.py:220
+msgid "ความหลากหลายของจุลินทรีย์ไมโครไบโอมในลำไส้ (Microbiome Diversity)"
+msgstr "Diversity of the gut microbiome"
+
+#: apps/portal_patient/views.py:221
+msgid "การเชื่อมโยงระบบทางเดินอาหาร ภูมิคุ้มกัน และการอักเสบทั้งระบบ"
+msgstr ""
+"Links between the digestive system, immunity and whole-body inflammation"
+
+#: apps/portal_patient/views.py:222
+msgid "วงจรการนอนหลับ สมดุลความเครียด และการกำจัดของเสียในสมอง (Glymphatic System)"
+msgstr ""
+"Sleep cycle, stress balance and brain waste clearance (glymphatic system)"
+
+#: apps/portal_patient/views.py:230
+#, python-format
+msgid "การประเมินการทำงานของแกนชีวภาพ %(name)s ตามมาตรฐาน TSPI Systems Biology"
+msgstr ""
+"Assessment of the %(name)s biological axis using the TSPI Systems Biology "
+"standard"
+
+#: apps/portal_patient/views.py:271
+msgid "ตับและระบบขจัดสารพิษ (Liver & Detoxification)"
+msgstr "Liver & detoxification"
+
+#: apps/portal_patient/views.py:274
+msgid "ภาระการทำงานขับสารพิษสูง ควรเสริมสารสกัดปกป้องเซลล์ตับตามคำแนะนำแพทย์"
+msgstr ""
+"High detox workload. Liver-protecting supplements may help, as advised by "
+"your doctor."
+
+#: apps/portal_patient/views.py:278
+msgid "ระบบทางเดินอาหารและเยื่อบุลำไส้ (Gut Barrier)"
+msgstr "Digestive system & gut barrier"
+
+#: apps/portal_patient/views.py:281
+msgid "พบภาวะเยื่อบุลำไส้ซึมผ่านง่าย (Leaky Gut) อยู่ระหว่างโปรโตคอลฟื้นฟูเยื่อบุ"
+msgstr ""
+"Signs of a leaky gut lining; currently on the gut-lining recovery protocol."
+
+#: apps/portal_patient/views.py:285
+msgid "ระบบภูมิคุ้มกันและการอักเสบ (Immune Load)"
+msgstr "Immune system & inflammation"
+
+#: apps/portal_patient/views.py:288
+msgid "พบภาวะการอักเสบเรื้อรังระดับเซลล์ ควรหลีกเลี่ยงสารกระตุ้นการแพ้"
+msgstr "Signs of chronic cellular inflammation; avoid known allergy triggers."
+
+#: apps/portal_patient/views_onboarding.py:41
+msgid "กรุณากำหนดรหัสผ่าน"
+msgstr "Please set a password"
+
+#: apps/portal_patient/views_onboarding.py:99
+msgid "คุณทำรายการเกินจำนวนครั้งที่กำหนด กรุณารอ 1 นาทีแล้วลองใหม่อีกครั้ง"
+msgstr "Too many attempts. Please wait 1 minute and try again."
+
+#: apps/portal_patient/views_onboarding.py:111
+msgid "กรุณาระบุเลขประจำตัวประชาชนหรือหมายเลขพาสปอร์ต"
+msgstr "Please enter your national ID or passport number"
+
+#: apps/portal_patient/views_onboarding.py:137
+msgid ""
+"ไม่พบข้อมูลประวัติเวชระเบียน กรุณาติดต่อเจ้าหน้าที่คลินิก หรือเลือก \"เป็นคนไข้ใหม่\" "
+"เพื่อเริ่มต้นลงทะเบียน"
+msgstr ""
+"No medical record found. Please contact clinic staff, or choose \"I'm a new "
+"patient\" to register."
+
+#: apps/portal_patient/views_onboarding.py:162
+msgid "ไม่พบรหัสอ้างอิงคนไข้"
+msgstr "Patient reference not found"
+
+#: apps/portal_patient/views_onboarding.py:166
+msgid "ไม่พบข้อมูลในระบบ"
+msgstr "No matching record found"
+
+#: apps/portal_patient/views_onboarding.py:172
+msgid "เวชระเบียนนี้มีบัญชีผู้ใช้อยู่แล้ว กรุณาเข้าสู่ระบบ หรือติดต่อเจ้าหน้าที่หากลืมรหัสผ่าน"
+msgstr ""
+"This medical record already has an account. Please sign in, or contact staff "
+"if you forgot your password."
+
+#: apps/portal_patient/views_onboarding.py:182
+msgid "ยืนยันตัวตนไม่สำเร็จหลายครั้ง กรุณารอ 15 นาที หรือติดต่อเจ้าหน้าที่คลินิก"
+msgstr ""
+"Too many failed verification attempts. Please wait 15 minutes or contact "
+"clinic staff."
+
+#: apps/portal_patient/views_onboarding.py:193
+msgid "เบอร์โทรศัพท์ 4 ตัวท้ายไม่ตรงกับข้อมูลในระบบ กรุณาตรวจสอบอีกครั้ง"
+msgstr ""
+"The last 4 digits of the phone number don't match our records. Please check "
+"again."
+
+#: apps/portal_patient/views_onboarding.py:262
+msgid "กรุณากรอกชื่อ นามสกุล และเบอร์โทรศัพท์ให้ครบถ้วน"
+msgstr "Please fill in your first name, last name and phone number"
+
+#: templates/accounts/patient_login.html:4
+msgid "เข้าสู่ระบบ — TSPI Clinic"
+msgstr "Sign in — TSPI Clinic"
+
+#: templates/accounts/patient_login.html:13
+msgid "ยินดีต้อนรับกลับมา"
+msgstr "Welcome back"
+
+#: templates/accounts/patient_login.html:14
+msgid "เข้าสู่ระบบเพื่อดูผลประเมิน 39 แกน ใบนัด และประวัติแชทของคุณ"
+msgstr "Sign in to see your 39-axis results, appointments and chat history"
+
+#: templates/accounts/patient_login.html:30
+msgid "เลขบัตรประชาชน หรือ HN"
+msgstr "ID card number or HN"
+
+#: templates/accounts/patient_login.html:39
+#: templates/accounts/patient_register.html:80
+#: templates/accounts/patient_register.html:90
+#: templates/layouts/front_base.html:58
+msgid "แสดงรหัสผ่าน"
+msgstr "Show password"
+
+#: templates/accounts/patient_login.html:42
+#: templates/accounts/patient_register.html:112
+#: templates/core/assistant.html:119 templates/layouts/public_base.html:46
+#: templates/layouts/public_base.html:80 templates/layouts/public_base.html:136
+msgid "เข้าสู่ระบบ"
+msgstr "Sign in"
+
+#: templates/accounts/patient_login.html:46
+msgid "ยังไม่มีบัญชี?"
+msgstr "Don't have an account?"
+
+#: templates/accounts/patient_login.html:46
+msgid "ลงทะเบียนครั้งแรก"
+msgstr "Register for the first time"
+
+#: templates/accounts/patient_login.html:47
+msgid "ยังไม่พร้อมลงทะเบียน?"
+msgstr "Not ready to register?"
+
+#: templates/accounts/patient_login.html:47
+msgid "ถามผู้ช่วย AI ได้เลย"
+msgstr "Ask the AI assistant now"
+
+#: templates/accounts/patient_register.html:4
+msgid "ลงทะเบียนผู้รับบริการ — TSPI Clinic"
+msgstr "Patient registration — TSPI Clinic"
+
+#: templates/accounts/patient_register.html:13
+msgid "ลงทะเบียนผู้รับบริการ"
+msgstr "Patient registration"
+
+#: templates/accounts/patient_register.html:14
+msgid "สร้างบัญชีครั้งเดียว ทีมแพทย์จะติดต่อกลับเพื่อนัดประเมินสุขภาพ"
+msgstr ""
+"Create your account once. The medical team will contact you to book a health "
+"assessment."
+
+#: templates/accounts/patient_register.html:25
+msgid "ข้อมูลส่วนตัว"
+msgstr "Personal details"
+
+#: templates/accounts/patient_register.html:30
+#: templates/accounts/patient_register.html:31
+#: templates/portal_patient/onboarding/wizard.html:200
+msgid "ชื่อจริง"
+msgstr "First name"
+
+#: templates/accounts/patient_register.html:38
+#: templates/accounts/patient_register.html:39
+#: templates/portal_patient/line_liff_binding.html:96
+#: templates/portal_patient/onboarding/wizard.html:204
+msgid "นามสกุล"
+msgstr "Last name"
+
+#: templates/accounts/patient_register.html:46
+msgid "เลขบัตรประชาชน"
+msgstr "National ID number"
+
+#: templates/accounts/patient_register.html:47
+#: templates/portal_patient/line_liff_binding.html:97
+msgid "เลขบัตรประชาชน 13 หลัก"
+msgstr "13-digit national ID number"
+
+#: templates/accounts/patient_register.html:53
+msgid "ช่องทางติดต่อ"
+msgstr "Contact details"
+
+#: templates/accounts/patient_register.html:58
+msgid "เบอร์โทร"
+msgstr "Phone number"
+
+#: templates/accounts/patient_register.html:66
+#: templates/accounts/patient_register.html:67
+#: templates/portal_patient/line_liff_binding.html:99
+#: templates/portal_patient/settings.html:25
+msgid "อีเมล"
+msgstr "Email"
+
+#: templates/accounts/patient_register.html:73
+msgid "ตั้งรหัสผ่าน"
+msgstr "Set a password"
+
+#: templates/accounts/patient_register.html:83
+msgid "อย่างน้อย 8 ตัวอักษร"
+msgstr "At least 8 characters"
+
+#: templates/accounts/patient_register.html:88
+#: templates/accounts/patient_register.html:89
+msgid "ยืนยันรหัสผ่าน"
+msgstr "Confirm password"
+
+#: templates/accounts/patient_register.html:101
+msgid "ยินยอมให้ TSPI Clinic เก็บและใช้ข้อมูลสุขภาพเพื่อการดูแลรักษา ตาม"
+msgstr ""
+"I consent to TSPI Clinic collecting and using my health data for my care, "
+"under the"
+
+#: templates/accounts/patient_register.html:102
+#: templates/layouts/public_base.html:157
+#: templates/patients/line_register.html:42
+msgid "นโยบายความเป็นส่วนตัว"
+msgstr "privacy policy"
+
+#: templates/accounts/patient_register.html:112
+msgid "มีบัญชีอยู่แล้ว?"
+msgstr "Already have an account?"
+
+#: templates/accounts/patient_register.html:115
+msgid "ลงทะเบียนครั้งเดียว"
+msgstr "Register once"
+
+#: templates/accounts/patient_register.html:115
+msgid "ใช้เวลาไม่กี่นาที"
+msgstr "It only takes a few minutes"
+
+#: templates/accounts/patient_register.html:115
+msgid "แล้วดูแลสุขภาพต่อเนื่อง"
+msgstr "then keep caring for your health"
+
+#: templates/core/about.html:5
+msgid "เกี่ยวกับ TSPI Clinic — การแพทย์เชิงกลไก 39 แกนชีววิทยา"
+msgstr "About TSPI Clinic — mechanistic medicine across 39 biological axes"
+
+#: templates/core/about.html:13 templates/layouts/public_base.html:38
+#: templates/layouts/public_base.html:71 templates/layouts/public_base.html:138
+msgid "เกี่ยวกับคลินิก"
+msgstr "About the clinic"
+
+#: templates/core/about.html:14
+msgid "มองร่างกายเป็นระบบเดียว"
+msgstr "Seeing the body as one system"
+
+#: templates/core/about.html:15
+msgid ""
+"การแพทย์เชิงกลไก (Mechanistic Medicine) ที่มองร่างกายเป็นเครือข่ายชีวภาพที่เชื่อมโยงกัน "
+"ไม่แยกดูทีละอวัยวะ"
+msgstr ""
+"Mechanistic medicine that views the body as a connected biological network, "
+"not one organ at a time"
+
+#: templates/core/about.html:25
+msgid "เป็นผู้นำด้านการแพทย์เชิงกลไก (Mechanistic Medicine) ที่มองร่างกายมนุษย์ในฐานะ"
+msgstr "is a leader in mechanistic medicine, viewing the human body as an"
+
+#: templates/core/about.html:26
+msgid ""
+"“ระบบเครือข่ายชีวภาพที่เชื่อมโยงถึงกันอย่างสมบูรณ์ (Interconnected Biological Network)”"
+msgstr "“interconnected biological network”"
+
+#: templates/core/about.html:26
+msgid "มิใช่การมองแยกส่วนตามอวัยวะเดี่ยว"
+msgstr "rather than looking at single organs in isolation."
+
+#: templates/core/about.html:28
+msgid "ปรัชญาการรักษา: 3 Keys &amp; 9-Step Restoration Ladder"
+msgstr "Our philosophy: 3 Keys &amp; 9-Step Restoration Ladder"
+
+#: templates/core/about.html:30
+msgid ""
+"เราไม่ได้มุ่งเน้นเพียงแค่การใช้ยาเพื่อกดอาการที่ปลายเหตุ "
+"แต่ใช้ปัญญาประดิษฐ์และความฉลาดทางการแพทย์ในการตรวจวิเคราะห์หาจุดติดขัด (Bottleneck) "
+"หรือความผิดปกติในระดับไมโทคอนเดรีย ดีท็อกซิฟิเคชัน การอักเสบระดับเซลล์ "
+"และแกนประสาทต่อมไร้ท่อ เพื่อฟื้นฟูกลไกธรรมชาติของร่างกายให้กลับมาทำงานได้อย่างเต็มประสิทธิภาพ"
+msgstr ""
+"We don't just use medicine to suppress symptoms. We use AI and medical "
+"intelligence to find the bottlenecks or dysfunctions in the mitochondria, "
+"detoxification, cellular inflammation and the neuro-endocrine axis, so the "
+"body's natural mechanisms can work at full capacity again."
+
+#: templates/core/about.html:32
+msgid ""
+"“AI เป็นเครื่องมือเสริมพลังแพทย์ ไม่ใช่ผู้ตัดสินใจแทนแพทย์ผู้เชี่ยวชาญ "
+"ทุกคำแนะนำต้องผ่านการตรวจสอบจากแพทย์ผู้รักษาตัวจริงเสมอ”"
+msgstr ""
+"“AI empowers doctors; it never replaces their judgement. Every "
+"recommendation is always reviewed by the treating doctor.”"
+
+#: templates/core/about.html:33
+msgid "มาตรฐานและการกำกับดูแลตามกฎหมาย"
+msgstr "Standards and legal compliance"
+
+#: templates/core/about.html:35
+msgid ""
+"ระบบของเราจัดเก็บข้อมูลตามมาตรฐาน PDPA ของประเทศไทย "
+"พร้อมโครงข่ายความปลอดภัยระดับสากล "
+"ให้ความสำคัญกับความเป็นส่วนตัวของผู้ป่วยและความถูกต้องของประวัติการรักษาเป็นลำดับสูงสุด"
+msgstr ""
+"Our system stores data in line with Thailand's PDPA, with international-"
+"grade security. Patient privacy and the accuracy of medical records are our "
+"top priorities."
+
+#: templates/core/about.html:43 templates/core/platform.html:14
+#: templates/layouts/public_base.html:32 templates/layouts/public_base.html:67
+#: templates/layouts/public_base.html:126
+msgid "39 แกนชีววิทยา"
+msgstr "39 biological axes"
+
+#: templates/core/about.html:44
+msgid "ประเมินร่างกาย 12 โดเมนร่วมกัน เพื่อหาต้นเหตุของอาการ"
+msgstr "Assessing 12 body domains together to find the root cause of symptoms"
+
+#: templates/core/about.html:45
+msgid "ดู 39 แกน"
+msgstr "See the 39 axes"
+
+#: templates/core/about.html:49 templates/layouts/public_base.html:33
+#: templates/layouts/public_base.html:68 templates/layouts/public_base.html:127
+msgid "แผนฟื้นฟู 9 ขั้นตอน"
+msgstr "9-step recovery plan"
+
+#: templates/core/about.html:50
+msgid "จากตรวจประเมิน ล้างของเสีย ปรับสมดุล ถึงดูแลระยะยาว"
+msgstr "From assessment and cleansing to rebalancing and long-term care"
+
+#: templates/core/about.html:51
+msgid "ดูแผนฟื้นฟู"
+msgstr "See the recovery plan"
+
+#: templates/core/about.html:55
+msgid "ข้อมูลของคุณปลอดภัย"
+msgstr "Your data is safe"
+
+#: templates/core/about.html:56
+msgid "จัดเก็บตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล"
+msgstr "Stored under Thailand's Personal Data Protection Act"
+
+#: templates/core/about.html:57
+msgid "อ่านนโยบาย"
+msgstr "Read the policy"
+
+#: templates/core/article_detail.html:27
+msgid "ตำแหน่งหน้า"
+msgstr "Breadcrumb"
+
+#: templates/core/article_detail.html:28 templates/layouts/public_base.html:27
+#: templates/layouts/public_base.html:66
+msgid "หน้าแรก"
+msgstr "Home"
+
+#: templates/core/article_detail.html:29 templates/core/article_list.html:12
+#: templates/core/home.html:220 templates/layouts/public_base.html:37
+#: templates/layouts/public_base.html:70 templates/layouts/public_base.html:129
+msgid "สาระสุขภาพ"
+msgstr "Health articles"
+
+#: templates/core/article_detail.html:39
+msgid "อ่าน"
+msgstr "Read"
+
+#: templates/core/article_detail.html:39 templates/core/article_detail.html:95
+#: templates/core/article_list.html:38 templates/core/home.html:233
+msgid "นาที"
+msgstr "min"
+
+#: templates/core/article_detail.html:60
+msgid "แชร์บทความ"
+msgstr "Share this article"
+
+#: templates/core/article_detail.html:61
+msgid "แชร์ทาง LINE"
+msgstr "Share on LINE"
+
+#: templates/core/article_detail.html:62
+msgid "แชร์ทาง Facebook"
+msgstr "Share on Facebook"
+
+#: templates/core/article_detail.html:63
+msgid "คัดลอกลิงก์"
+msgstr "Copy link"
+
+#: templates/core/article_detail.html:66
+msgid "สงสัยเรื่องนี้? ถาม AI"
+msgstr "Questions about this? Ask AI"
+
+#: templates/core/article_detail.html:71
+msgid "ประเมินสุขภาพ 39 แกนชีววิทยา"
+msgstr "39-axis health assessment"
+
+#: templates/core/article_detail.html:72
+msgid "ลงทะเบียนครั้งเดียว ทีมแพทย์จะติดต่อกลับเพื่อนัดประเมินหาสาเหตุเชิงลึก"
+msgstr ""
+"Register once and the medical team will contact you to book an in-depth "
+"assessment"
+
+#: templates/core/article_detail.html:74
+msgid "เริ่มประเมินสุขภาพ"
+msgstr "Start your assessment"
+
+#: templates/core/article_detail.html:84
+msgid "อ่านต่อ"
+msgstr "Read next"
+
+#: templates/core/article_detail.html:84
+msgid "บทความที่เกี่ยวข้อง"
+msgstr "Related articles"
+
+#: templates/core/article_detail.html:85
+msgid "ดูทั้งหมด"
+msgstr "See all"
+
+#: templates/core/article_detail.html:95 templates/core/article_list.html:38
+#: templates/core/home.html:233
+msgid "· อ่าน"
+msgstr "· Read"
+
+#: templates/core/article_list.html:4
+msgid "สาระสุขภาพและบทความทางการแพทย์ — TSPI Clinic"
+msgstr "Health articles — TSPI Clinic"
+
+#: templates/core/article_list.html:13 templates/core/home.html:221
+msgid "อ่านก่อนมาคลินิก"
+msgstr "Read before your visit"
+
+#: templates/core/article_list.html:13
+msgid "บทความจากทีมแพทย์"
+msgstr "Articles from our medical team"
+
+#: templates/core/article_list.html:14
+msgid ""
+"รวมบทความ งานวิจัยทางคลินิก และความรู้เชิงลึกเกี่ยวกับ 39 แกนชีววิทยา การฟื้นฟูระดับเซลล์ "
+"และโปรโตคอลการดูแลสุขภาพแบบองค์รวม"
+msgstr ""
+"Articles, clinical research and in-depth knowledge about the 39 biological "
+"axes, cellular recovery and whole-person care protocols"
+
+#: templates/core/article_list.html:21
+msgid "หมวดบทความ"
+msgstr "Article categories"
+
+#: templates/core/article_list.html:22
+msgid "ทั้งหมด"
+msgstr "All"
+
+#: templates/core/article_list.html:48
+msgid "ยังไม่มีบทความในหมวดนี้"
+msgstr "No articles in this category yet"
+
+#: templates/core/article_list.html:49
+msgid "ลองเลือกหมวดอื่น หรือดูบทความทั้งหมด"
+msgstr "Try another category or see all articles"
+
+#: templates/core/article_list.html:50 templates/core/home.html:223
+msgid "ดูบทความทั้งหมด"
+msgstr "See all articles"
+
+#: templates/core/assistant.html:5
+msgid "คุยกับ AI | TSPI Clinic"
+msgstr "Chat with AI | TSPI Clinic"
+
+#: templates/core/assistant.html:26
+msgid "แถบนำทางผู้ช่วย AI"
+msgstr "AI assistant navigation"
+
+#: templates/core/assistant.html:35 templates/core/assistant.html:109
+#: templates/portal_patient/assistant.html:34
+#: templates/portal_patient/assistant.html:131
+msgid "แชทใหม่"
+msgstr "New chat"
+
+#: templates/core/assistant.html:39
+msgid "หน้าแรกคลินิก"
+msgstr "Clinic home page"
+
+#: templates/core/assistant.html:43
+msgid "ระบบ 39 แกนชีววิทยา"
+msgstr "The 39 biological axes"
+
+#: templates/core/assistant.html:48
+msgid "แชทคนไข้ (ไม่จำกัด)"
+msgstr "Patient chat (unlimited)"
+
+#: templates/core/assistant.html:55
+msgid "ค้นหาแชทในเครื่อง..."
+msgstr "Search chats on this device..."
+
+#: templates/core/assistant.html:58
+msgid "แชทล่าสุด (ในเครื่องนี้เท่านั้น)"
+msgstr "Recent chats (this device only)"
+
+#: templates/core/assistant.html:65
+msgid "ลบแชทนี้"
+msgstr "Delete this chat"
+
+#: templates/core/assistant.html:71 templates/portal_patient/assistant.html:76
+msgid "ยังไม่มีประวัติแชท"
+msgstr "No chat history yet"
+
+#: templates/core/assistant.html:77
+msgid "เข้าสู่แชทผู้ป่วย"
+msgstr "Go to patient chat"
+
+#: templates/core/assistant.html:82
+msgid "เข้าสู่ระบบ (คุยไม่จำกัด)"
+msgstr "Sign in (unlimited chat)"
+
+#: templates/core/assistant.html:85
+msgid "ลงทะเบียนผู้ป่วยใหม่"
+msgstr "Register as a new patient"
+
+#: templates/core/assistant.html:96 templates/portal_patient/assistant.html:103
+msgid "พับ/เปิดแถบข้าง"
+msgstr "Collapse/expand sidebar"
+
+#: templates/core/assistant.html:99
+msgid "เปิดเมนูแชท"
+msgstr "Open chat menu"
+
+#: templates/core/assistant.html:104
+msgid "ฟรี "
+msgstr "Free "
+
+#: templates/core/assistant.html:113
+msgid "ไปยังแชทคนไข้เต็มรูปแบบ"
+msgstr "Go to the full patient chat"
+
+#: templates/core/assistant.html:129
+msgid "วันนี้ให้ TSPI AI ช่วยเรื่องอะไรดีคะ"
+msgstr "What can TSPI AI help you with today?"
+
+#: templates/core/assistant.html:130
+msgid "ถามข้อมูลสุขภาพ 39 แกน หรืออาการเบื้องต้นได้เลย (ทดลองฟรี 5 ครั้ง ไม่เก็บข้อมูล)"
+msgstr ""
+"Ask about your health, the 39 axes or early symptoms (5 free questions, "
+"nothing is stored)"
+
+#: templates/core/assistant.html:153
+#: templates/portal_patient/assistant.html:184
+msgid "อาจเป็นภาวะฉุกเฉิน"
+msgstr "This may be an emergency"
+
+#: templates/core/assistant.html:156 templates/core/home.html:130
+#: templates/portal_patient/assistant.html:187
+#: templates/portal_patient/dashboard.html:87
+msgid "โทร 1669"
+msgstr "call 1669"
+
+#: templates/core/assistant.html:173
+#: templates/portal_patient/assistant.html:204
+msgid "ความรู้ทั่วไปจาก AI"
+msgstr "General knowledge from AI"
+
+#: templates/core/assistant.html:173
+#: templates/portal_patient/assistant.html:204
+msgid "· ไม่ใช่เอกสารของคลินิก"
+msgstr "· not from clinic documents"
+
+#: templates/core/assistant.html:185
+#: templates/portal_patient/assistant.html:216
+msgid "อ้างอิงเอกสาร TSPI "
+msgstr "TSPI sources: "
+
+#: templates/core/assistant.html:185
+#: templates/portal_patient/assistant.html:216
+msgid " รายการ"
+msgstr " item(s)"
+
+#: templates/core/assistant.html:196
+#: templates/portal_patient/assistant.html:227
+msgid "คัดลอกแล้ว"
+msgstr "Copied"
+
+#: templates/core/assistant.html:196
+#: templates/portal_patient/assistant.html:227
+msgid "คัดลอก"
+msgstr "Copy"
+
+#: templates/core/assistant.html:202
+#: templates/portal_patient/assistant.html:231
+msgid "อธิบายง่ายขึ้น"
+msgstr "Explain more simply"
+
+#: templates/core/assistant.html:205
+msgid "ให้แพทย์ดูต่อ"
+msgstr "Have a doctor follow up"
+
+#: templates/core/assistant.html:233
+msgid "โหมดคำถาม"
+msgstr "Question mode"
+
+#: templates/core/assistant.html:234
+msgid "ถามข้อมูล"
+msgstr "Ask for information"
+
+#: templates/core/assistant.html:235
+#: templates/portal_patient/assistant.html:260
+msgid "เล่าอาการ"
+msgstr "Describe symptoms"
+
+#: templates/core/assistant.html:243
+msgid "เข้าสู่ระบบเพื่อแนบรูปภาพและคลิปเสียง"
+msgstr "Sign in to attach photos and voice clips"
+
+#: templates/core/assistant.html:246
+msgid "คำถามถึงผู้ช่วย"
+msgstr "Your question to the assistant"
+
+#: templates/core/assistant.html:248
+#: templates/portal_patient/assistant.html:307
+msgid "เล่าอาการที่เป็นอยู่ได้เลย..."
+msgstr "Describe your symptoms..."
+
+#: templates/core/assistant.html:248
+msgid "ถาม TSPI AI..."
+msgstr "Ask TSPI AI..."
+
+#: templates/core/assistant.html:255
+msgid "พูดด้วยเสียงภาษาไทย"
+msgstr "Speak (Thai voice input)"
+
+#: templates/core/assistant.html:258
+msgid "ส่งคำถาม"
+msgstr "Send question"
+
+#: templates/core/assistant.html:267
+msgid "ครบสิทธิ์ทดลองคุยฟรี 5 ครั้งแล้ว"
+msgstr "You've used all 5 free questions"
+
+#: templates/core/assistant.html:268
+msgid "เข้าสู่ระบบหรือลงทะเบียนผู้ป่วย เพื่อคุยต่อไม่จำกัด พร้อมส่งรูปภาพและคลิปเสียงให้แพทย์ตรวจ"
+msgstr ""
+"Sign in or register as a patient to keep chatting without limits and send "
+"photos and voice clips for a doctor to review"
+
+#: templates/core/assistant.html:271
+msgid "เข้าสู่ระบบเพื่อคุยต่อ"
+msgstr "Sign in to keep chatting"
+
+#: templates/core/assistant.html:274
+msgid "ลงทะเบียนใหม่"
+msgstr "Register"
+
+#: templates/core/assistant.html:281
+msgid "ไม่ใช่การวินิจฉัยของแพทย์ &middot; ไม่เก็บข้อมูลบนเซิร์ฟเวอร์ &middot; ฉุกเฉิน"
+msgstr ""
+"Not a medical diagnosis &middot; nothing is stored on the server &middot; "
+"emergency"
+
+#: templates/core/assistant.html:300
+msgid "แชทเดิม"
+msgstr "Previous chat"
+
+#: templates/core/assistant.html:425
+msgid "ส่งคำถามไม่สำเร็จ กรุณาลองใหม่"
+msgstr "Couldn't send your question. Please try again."
+
+#: templates/core/assistant.html:428
+msgid "เชื่อมต่อไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่"
+msgstr "Couldn't connect. Please check your internet connection and try again."
+
+#: templates/core/guide.html:4
+msgid "คู่มือการใช้งานและเตรียมตัวก่อนพบแพทย์ — TSPI Clinic"
+msgstr "User guide and preparing for your visit — TSPI Clinic"
+
+#: templates/core/guide.html:12 templates/core/home.html:126
+#: templates/layouts/public_base.html:137
+msgid "วิธีใช้งาน"
+msgstr "How it works"
+
+#: templates/core/guide.html:13
+msgid "คู่มือรับบริการ"
+msgstr "Patient guide"
+
+#: templates/core/guide.html:13
+msgid "ตั้งแต่ลงทะเบียนถึงพบแพทย์"
+msgstr "from registration to seeing a doctor"
+
+#: templates/core/guide.html:14
+msgid ""
+"ขั้นตอนการลงทะเบียน ซักประวัติอาการกับ AI การอ่านผล 39 แกน (12 โดเมน) และการเข้าพบแพทย์"
+msgstr ""
+"How to register, share your symptoms with AI, read your 39-axis (12-domain) "
+"results and see a doctor"
+
+#: templates/core/guide.html:28
+msgid "ลงทะเบียนทันที"
+msgstr "Register now"
+
+#: templates/core/guide.html:37
+msgid "อยากใช้เหมือนแอปบนมือถือ?"
+msgstr "Want it like an app on your phone?"
+
+#: templates/core/guide.html:38
+msgid "เพิ่ม TSPI ไว้ที่หน้าจอโฮม เปิดได้ในแตะเดียว"
+msgstr "Add TSPI to your home screen and open it with one tap"
+
+#: templates/core/guide.html:40
+msgid "วิธีติดตั้งแอป"
+msgstr "How to install the app"
+
+#: templates/core/home.html:6
+msgid "TSPI Clinic — ดูแลสุขภาพเชิงระบบ 39 แกนชีววิทยา"
+msgstr "TSPI Clinic — whole-body care across 39 biological axes"
+
+#: templates/core/home.html:23
+msgid "ตัวอย่างคำถาม"
+msgstr "Example question"
+
+#: templates/core/home.html:27
+msgid "คำตอบมีที่มา"
+msgstr "Answers with sources"
+
+#: templates/core/home.html:28
+msgid "อ้างอิงเอกสารของคลินิก"
+msgstr "Based on the clinic's documents"
+
+#: templates/core/home.html:31
+msgid "12 โดเมน"
+msgstr "12 domains"
+
+#: templates/core/home.html:32
+msgid "ลำไส้ · ฮอร์โมน · ภูมิคุ้มกัน · การเผาผลาญ"
+msgstr "Gut · hormones · immunity · metabolism"
+
+#: templates/core/home.html:35 templates/portal_patient/_appointment_row.html:6
+msgid "แพทย์ของคลินิก"
+msgstr "The clinic's doctors"
+
+#: templates/core/home.html:36
+msgid "AI ให้ข้อมูลเบื้องต้น การวินิจฉัยเป็นของแพทย์"
+msgstr "AI gives general information; diagnosis is by doctors"
+
+#: templates/core/home.html:41 templates/core/platform.html:13
+msgid "12 โดเมน · 39 แกนชีววิทยา"
+msgstr "12 domains · 39 biological axes"
+
+#: templates/core/home.html:42
+msgid "สุขภาพดีเริ่มจาก"
+msgstr "Good health starts with"
+
+#: templates/core/home.html:42
+msgid "เข้าใจร่างกาย"
+msgstr "understanding your body"
+
+#: templates/core/home.html:42
+msgid "ทั้งระบบ"
+msgstr " as a whole"
+
+#: templates/core/home.html:43
+msgid ""
+"สงสัยเรื่องโรค อาการ หรือการรักษา ถามผู้ช่วย AI ของ TSPI Clinic ได้ทันที "
+"คำตอบอ้างอิงจากเอกสารของคลินิก"
+msgstr ""
+"Questions about a disease, symptom or treatment? Ask TSPI Clinic's AI "
+"assistant now. Answers are based on the clinic's documents."
+
+#: templates/core/home.html:45
+msgid "คุยกับ AI ตอนนี้"
+msgstr "Chat with AI now"
+
+#: templates/core/home.html:46 templates/core/home.html:125
+#: templates/layouts/public_base.html:106
+msgid "ลงทะเบียนพบแพทย์"
+msgstr "Register to see a doctor"
+
+#: templates/core/home.html:49
+msgid "ฟรี ไม่ต้องลงทะเบียน"
+msgstr "Free, no sign-up needed"
+
+#: templates/core/home.html:50
+msgid "อ้างอิงเอกสารคลินิก"
+msgstr "Based on clinic documents"
+
+#: templates/core/home.html:51 templates/layouts/_front_auth_side.html:11
+msgid "คุ้มครองข้อมูลตาม PDPA"
+msgstr "Data protected under PDPA"
+
+#: templates/core/home.html:57
+msgid "แนวทางการดูแลของคลินิก"
+msgstr "The clinic's approach to care"
+
+#: templates/core/home.html:60
+msgid "แกนชีววิทยา"
+msgstr "biological axes"
+
+#: templates/core/home.html:61
+msgid "โดเมนของร่างกาย"
+msgstr "body domains"
+
+#: templates/core/home.html:62
+msgid "ขั้นตอนแผนฟื้นฟู"
+msgstr "recovery plan steps"
+
+#: templates/core/home.html:63
+msgid "24 ชม."
+msgstr "24 hrs"
+
+#: templates/core/home.html:63 templates/layouts/patient_base.html:37
+#: templates/layouts/patient_base.html:97
+#: templates/portal_patient/axes_result.html:44
+msgid "ผู้ช่วย AI"
+msgstr "AI assistant"
+
+#: templates/core/home.html:72
+msgid "อาการหนึ่งอาจมีต้นเหตุจากหลายระบบที่เชื่อมกัน เช่น ลำไส้ ฮอร์โมน และการอักเสบ"
+msgstr ""
+"One symptom can have causes in several connected systems, such as the gut, "
+"hormones and inflammation."
+
+#: templates/core/home.html:73
+msgid "แพทย์ของ TSPI จึงประเมินทั้ง 39 แกน เพื่อหาต้นตอ แทนการรักษาแค่ปลายเหตุ"
+msgstr ""
+"That's why TSPI doctors assess all 39 axes to find the root cause, instead "
+"of only treating the symptoms."
+
+#: templates/core/home.html:85
+msgid "มองร่างกายเป็นระบบ"
+msgstr "Seeing the body as a system"
+
+#: templates/core/home.html:86
+msgid "ไม่ได้ดูแค่อาการเดียว"
+msgstr "Not just one symptom"
+
+#: templates/core/home.html:86
+msgid "แพทย์ประเมินให้ทั้งระบบ"
+msgstr "doctors assess the whole system"
+
+#: templates/core/home.html:87
+msgid "ร่างกายแบ่งเป็น 12 โดเมนที่เชื่อมโยงกัน แพทย์ดูทุกแกนร่วมกันเพื่อหาต้นเหตุของอาการ"
+msgstr ""
+"The body has 12 connected domains. Doctors look at every axis together to "
+"find the root cause of your symptoms."
+
+#: templates/core/home.html:89
+msgid "ดู 39 แกนทั้งหมด"
+msgstr "See all 39 axes"
+
+#: templates/core/home.html:94
+msgid "ภาพใบไม้ที่มีเส้นใบ 39 เส้น แทน 39 แกนชีววิทยา ลากเพื่อหมุนได้"
+msgstr ""
+"A leaf with 39 veins representing the 39 biological axes; drag to rotate"
+
+#: templates/core/home.html:95
+msgid "39 เส้นใบ = 39 แกนชีววิทยา"
+msgstr "39 veins = 39 biological axes"
+
+#: templates/core/home.html:95
+msgid "ลากเพื่อหมุน"
+msgstr "Drag to rotate"
+
+#: templates/core/home.html:101
+msgid "ดูร่วมกับแกนอื่นเพื่อหาต้นเหตุ"
+msgstr "Viewed together with other axes to find the cause"
+
+#: templates/core/home.html:112
+msgid "เริ่มใช้บริการ"
+msgstr "Getting started"
+
+#: templates/core/home.html:113
+msgid "เริ่มต้นง่าย ๆ"
+msgstr "Simple to start"
+
+#: templates/core/home.html:113
+msgid "ใน 3 ขั้นตอน"
+msgstr "in 3 steps"
+
+#: templates/core/home.html:130
+msgid "แน่นหน้าอก หายใจลำบาก หมดสติ หรือแขนขาอ่อนแรง อย่ารอถาม AI ให้"
+msgstr ""
+"Chest tightness, difficulty breathing, fainting or weakness in an arm or "
+"leg? Don't wait to ask the AI —"
+
+#: templates/core/home.html:130
+msgid "หรือไปโรงพยาบาลใกล้บ้านทันที"
+msgstr "or go to the nearest hospital right away."
+
+#: templates/core/home.html:140 templates/layouts/_front_auth_side.html:10
+msgid "ผู้ช่วย AI ของคลินิก"
+msgstr "The clinic's AI assistant"
+
+#: templates/core/home.html:141
+msgid "สงสัยอะไร"
+msgstr "Have a question?"
+
+#: templates/core/home.html:141
+msgid "ถามได้ตลอด 24 ชั่วโมง"
+msgstr "Ask any time, 24 hours a day"
+
+#: templates/core/home.html:142
+msgid "ตอบจากเอกสารของคลินิกพร้อมเลขอ้างอิง ไม่ต้องใส่ชื่อหรือเบอร์โทร"
+msgstr ""
+"Answers come from the clinic's documents with reference numbers. No name or "
+"phone number needed."
+
+#: templates/core/home.html:144
+msgid "เปิดหน้าคุยกับ AI"
+msgstr "Open the AI chat"
+
+#: templates/core/home.html:153
+msgid "ถามเลย"
+msgstr "Ask now"
+
+#: templates/core/home.html:163
+msgid "เป็นคนไข้ของคลินิก คุยกับบอทผ่าน LINE ได้"
+msgstr "Clinic patients can chat with our bot on LINE"
+
+#: templates/core/home.html:164
+msgid ""
+"เล่าอาการ ถามเรื่องสุขภาพ ดูใบนัดและผลตรวจได้ในแชท กดปุ่มแล้ว LINE จะพิมพ์คำว่า "
+"&ldquo;เปิดบอท&rdquo; ไว้ให้ แค่กดส่ง"
+msgstr ""
+"Describe symptoms, ask health questions, and see appointments and results in "
+"the chat. Tap the button and LINE will type &ldquo;เปิดบอท&rdquo; (turn on "
+"bot) for you — just press send."
+
+#: templates/core/home.html:167 templates/portal_patient/settings.html:39
+msgid "เปิดบอทใน LINE"
+msgstr "Open the bot in LINE"
+
+#: templates/core/home.html:179
+msgid "แนวทางการรักษา"
+msgstr "Treatment approach"
+
+#: templates/core/home.html:180 templates/core/protocol.html:13
+msgid "แผนฟื้นฟู"
+msgstr "Recovery plan"
+
+#: templates/core/home.html:180 templates/core/protocol.html:13
+msgid "9 ขั้นตอน 3 ระยะ"
+msgstr "9 steps in 3 phases"
+
+#: templates/core/home.html:181
+msgid ""
+"เริ่มจากตรวจประเมินและล้างของเสีย ปรับสมดุลระบบหลัก แล้วซ่อมแซมระยะยาว "
+"แพทย์จะเลือกขั้นตอนให้เหมาะกับแต่ละคน"
+msgstr ""
+"Starting with assessment and cleansing, then rebalancing core systems and "
+"long-term repair. Doctors choose the steps that fit each person."
+
+#: templates/core/home.html:183
+msgid "ดูรายละเอียดทั้งหมด"
+msgstr "See full details"
+
+#: templates/core/home.html:193 templates/core/protocol.html:18
+#: templates/core/protocol.html:29
+msgid "ระยะ"
+msgstr "Phase"
+
+#: templates/core/home.html:221
+msgid "บทความล่าสุด"
+msgstr "Latest articles"
+
+#: templates/core/home.html:250
+msgid "คำถามที่พบบ่อย"
+msgstr "Frequently asked questions"
+
+#: templates/core/home.html:251
+msgid "ก่อนเริ่มใช้"
+msgstr "Before you start"
+
+#: templates/core/home.html:251
+msgid "มีคำถามไหม"
+msgstr "Any questions?"
+
+#: templates/core/home.html:252
+msgid "ไม่พบคำตอบ?"
+msgstr "Can't find an answer?"
+
+#: templates/core/home.html:252 templates/layouts/public_base.html:165
+msgid "ถามผู้ช่วย AI"
+msgstr "Ask the AI assistant"
+
+#: templates/core/home.html:252
+msgid "หรือทักเจ้าหน้าที่ทาง LINE"
+msgstr "or message our staff on LINE"
+
+#: templates/core/install.html:4
+msgid "ติดตั้งแอป TSPI บนมือถือ — TSPI Clinic"
+msgstr "Install the TSPI app on your phone — TSPI Clinic"
+
+#: templates/core/install.html:12
+msgid "ติดตั้งบนมือถือ"
+msgstr "Install on your phone"
+
+#: templates/core/install.html:13
+msgid "ใช้ TSPI"
+msgstr "Use TSPI"
+
+#: templates/core/install.html:13
+msgid "เหมือนแอปบนมือถือ"
+msgstr "like an app on your phone"
+
+#: templates/core/install.html:14
+msgid "เปิดได้จากหน้าจอโฮม รับการแจ้งเตือนผลตรวจ และไม่ต้องเปลืองพื้นที่ดาวน์โหลด"
+msgstr ""
+"Open it from your home screen, get notified about results, and no download "
+"space needed"
+
+#: templates/core/install.html:21
+msgid "เลือกระบบของมือถือ"
+msgstr "Choose your phone's system"
+
+#: templates/core/platform.html:4
+msgid "39 แกนชีววิทยา 12 โดเมน — TSPI Clinic"
+msgstr "39 biological axes, 12 domains — TSPI Clinic"
+
+#: templates/core/platform.html:14
+msgid "มองร่างกายเป็นเครือข่าย"
+msgstr "Seeing the body as a network"
+
+#: templates/core/platform.html:16
+msgid ""
+"เปลี่ยนผ่านจากการรักษาตามอาการ สู่การวิเคราะห์ความเชื่อมโยงระดับเครือข่ายชีวโมเลกุล "
+"(Mechanistic Biological Networks) ครอบคลุมครบทั้ง 12 โดเมน และ 39 "
+"แกนกลไกชีวภาพของมนุษย์ เพื่อการฟื้นฟูสุขภาพตรงจุดระดับเซลล์"
+msgstr ""
+"Moving from symptom-based treatment to analysing connections across "
+"biomolecular networks (Mechanistic Biological Networks), covering all 12 "
+"domains and 39 human biological axes for targeted recovery at the cellular "
+"level"
+
+#: templates/core/platform.html:23
+msgid "ไปยังโดเมน"
+msgstr "Jump to a domain"
+
+#: templates/core/platform.html:41
+msgid "แกน"
+msgstr "Axis"
+
+#: templates/core/platform.html:51
+msgid "อยากรู้ว่าอาการของคุณเกี่ยวกับแกนไหน?"
+msgstr "Wondering which axes relate to your symptoms?"
+
+#: templates/core/platform.html:52
+msgid "เล่าอาการให้ผู้ช่วย AI ฟังได้เลย หรือดูว่าแพทย์ใช้ 39 แกนวางแผนฟื้นฟูอย่างไร"
+msgstr ""
+"Describe your symptoms to the AI assistant, or see how doctors use the 39 "
+"axes to plan recovery"
+
+#: templates/core/platform.html:56
+msgid "ดูแผน 9 ขั้นตอน"
+msgstr "See the 9-step plan"
+
+#: templates/core/platform.html:59
+msgid "สำหรับแพทย์: ดูเครื่องมือ 39 Biological Axes Explorer ได้ใน"
+msgstr "For doctors: the 39 Biological Axes Explorer is available in the"
+
+#: templates/core/platform.html:59 templates/core/research.html:81
+msgid "ระบบ EMR"
+msgstr "EMR system"
+
+#: templates/core/privacy.html:4
+msgid "นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA) — TSPI Clinic"
+msgstr "Personal data protection policy (PDPA) — TSPI Clinic"
+
+#: templates/core/privacy.html:9
+msgid "พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562"
+msgstr "Personal Data Protection Act B.E. 2562 (2019)"
+
+#: templates/core/privacy.html:10
+msgid "นโยบายการคุ้มครอง"
+msgstr "Protection policy for"
+
+#: templates/core/privacy.html:10
+msgid "ข้อมูลส่วนบุคคลและข้อมูลสุขภาพ"
+msgstr "personal and health data"
+
+#: templates/core/privacy.html:19
+msgid ""
+"TSPI Clinic ให้ความสำคัญสูงสุดต่อการรักษาความปลอดภัยของข้อมูลส่วนบุคคล (Personal Data) "
+"และข้อมูลสุขภาพที่มีความอ่อนไหวสูง (Sensitive Health Data) ของผู้รับบริการทุกท่าน "
+"ตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562"
+msgstr ""
+"TSPI Clinic places the highest priority on protecting the personal data and "
+"highly sensitive health data of everyone who uses our services, in "
+"accordance with the Personal Data Protection Act B.E. 2562 (2019)."
+
+#: templates/core/privacy.html:22
+msgid "1. ข้อมูลที่เราจัดเก็บและประมวลผล"
+msgstr "1. Data we collect and process"
+
+#: templates/core/privacy.html:24
+msgid ""
+"ข้อมูลระบุตัวตน: ชื่อ, นามสกุล, หมายเลขประจำตัวประชาชน (จัดเก็บในรูปแบบการเข้ารหัสปลอดภัย)"
+msgstr ""
+"Identity data: first name, last name, national ID number (stored securely "
+"encrypted)"
+
+#: templates/core/privacy.html:25
+msgid "ข้อมูลติดต่อ: เบอร์โทรศัพท์มือถือ, อีเมล"
+msgstr "Contact data: mobile phone number, email"
+
+#: templates/core/privacy.html:26
+msgid ""
+"ข้อมูลสุขภาพ: ผลการตรวจวิเคราะห์ทางห้องปฏิบัติการ (Labs), อาการสำคัญ (Symptoms), "
+"คะแนนทางชีววิทยา 39 แกน (12 โดเมน)"
+msgstr ""
+"Health data: laboratory results (labs), main symptoms, and 39-axis (12-"
+"domain) biological scores"
+
+#: templates/core/privacy.html:29
+msgid "2. วัตถุประสงค์ในการนำข้อมูลไปใช้"
+msgstr "2. Purposes of use"
+
+#: templates/core/privacy.html:31
+msgid ""
+"เราใช้ข้อมูลสุขภาพเพื่อวัตถุประสงค์ในการตรวจวินิจฉัย การวางแผนบำบัดรักษาฟื้นฟูโดยแพทย์ผู้รักษา "
+"และการประมวลผลคะแนนชีวภาพผ่านระบบ AI ปัญญาประดิษฐ์ทางการแพทย์ที่ผ่านการรับรอง "
+"โดยไม่มีการนำข้อมูลไปจำหน่ายหรือส่งต่อให้บุคคลภายนอกโดยไม่ได้รับความยินยอมเป็นลายลักษณ์อักษร"
+msgstr ""
+"We use health data for diagnosis, for treatment and recovery planning by the "
+"treating doctor, and for processing biological scores through a certified "
+"medical AI system. We do not sell data or share it with third parties "
+"without written consent."
+
+#: templates/core/privacy.html:34
+msgid "3. มาตรการรักษาความปลอดภัยข้อมูล"
+msgstr "3. Data security measures"
+
+#: templates/core/privacy.html:36
+msgid ""
+"ระบบทำงานภายใต้สถาปัตยกรรมความปลอดภัยระดับสูง การแฮชรหัสผ่านด้วย Argon2, "
+"การควบคุมสิทธิ์แบบเข้มงวด (Role-Based Access Control), การจัดเก็บประวัติการเข้าถึงข้อมูล "
+"(Audit Logging), และการหมดอายุเซสชันอัตโนมัติ (Idle Session Timeout)"
+msgstr ""
+"The system runs on a high-security architecture: password hashing with "
+"Argon2, strict role-based access control, audit logging of data access, and "
+"automatic idle session timeout."
+
+#: templates/core/privacy.html:40 templates/core/terms.html:33
+msgid "อ่านเพิ่ม:"
+msgstr "Read more:"
+
+#: templates/core/privacy.html:40
+msgid "ข้อตกลงและเงื่อนไขการใช้บริการ"
+msgstr "Terms and conditions of service"
+
+#: templates/core/protocol.html:4
+msgid "แผนฟื้นฟู 9 ขั้นตอน (9-Step Recovery Protocol) — TSPI Clinic"
+msgstr "9-step recovery plan (9-Step Recovery Protocol) — TSPI Clinic"
+
+#: templates/core/protocol.html:15
+msgid ""
+"ลำดับขั้นการฟื้นฟูสุขภาพที่ออกแบบตามหลักสรีรวิทยาเชิงกลไก โดยเน้นการขจัดสารพิษและรักษาลำไส้ก่อน "
+"เพื่อเปิดทางให้การฟื้นฟูระบบเผาผลาญและระดับเซลล์ทำงานได้อย่างมีประสิทธิภาพสูงสุด"
+msgstr ""
+"A staged health recovery sequence based on mechanistic physiology, focusing "
+"on detoxification and gut repair first so that metabolic and cellular "
+"recovery can work as effectively as possible"
+
+#: templates/core/protocol.html:17
+msgid "ไปยังระยะ"
+msgstr "Jump to a phase"
+
+#: templates/core/protocol.html:33
+msgid "ระยะเวลา:"
+msgstr "Duration:"
+
+#: templates/core/protocol.html:39
+msgid "ขั้นตอนที่"
+msgstr "Step"
+
+#: templates/core/protocol.html:42
+msgid "โมดูลที่ใช้"
+msgstr "Modules used"
+
+#: templates/core/protocol.html:52
+msgid "แพทย์จะเลือกขั้นตอนและโมดูลให้เหมาะกับผลประเมินของแต่ละคน"
+msgstr ""
+"Doctors choose the steps and modules that fit each person's assessment "
+"results"
+
+#: templates/core/protocol.html:60
+msgid "เริ่มต้นโปรโตคอลการรักษากับแพทย์ผู้เชี่ยวชาญ"
+msgstr "Start the treatment protocol with a specialist doctor"
+
+#: templates/core/protocol.html:61
+msgid "รับการประเมิน 39 แกนชีววิทยา เพื่อเลือกบันไดการฟื้นฟูสุขภาพที่ตรงกับสภาพร่างกายของคุณที่สุด"
+msgstr ""
+"Get a 39-axis assessment to choose the recovery ladder that best fits your "
+"body"
+
+#: templates/core/protocol.html:64
+msgid "ลงทะเบียนรับคำปรึกษา"
+msgstr "Register for a consultation"
+
+#: templates/core/protocol.html:65
+msgid "เข้าสู่ระบบคนไข้"
+msgstr "Patient sign in"
+
+#: templates/core/research.html:4
+msgid "งานวิจัยทางคลินิกและข้อมูลเชิงประจักษ์ — TSPI Clinic"
+msgstr "Clinical research and evidence — TSPI Clinic"
+
+#: templates/core/research.html:12
+msgid "งานวิจัยและเคสจริง"
+msgstr "Research and real cases"
+
+#: templates/core/research.html:12 templates/layouts/public_base.html:34
+#: templates/layouts/public_base.html:69 templates/layouts/public_base.html:128
+msgid "งานวิจัย"
+msgstr "Research"
+
+#: templates/core/research.html:13
+msgid "หลักฐานเชิงประจักษ์"
+msgstr "Evidence base"
+
+#: templates/core/research.html:13
+msgid "งานวิจัยทางคลินิก"
+msgstr "Clinical research"
+
+#: templates/core/research.html:15
+msgid ""
+"รวบรวมหลักฐานทางวิทยาศาสตร์ การศึกษาไฟโตเคมีคอลมาตรฐาน 200 โมดูล "
+"และผลการทดสอบทางคลินิกในผู้ป่วยจริง เพื่อยืนยันประสิทธิผลของการรักษาด้วย 39 แกนชีววิทยา"
+msgstr ""
+"A collection of scientific evidence, studies of 200 standardised "
+"phytochemical modules and clinical results in real patients, supporting "
+"treatment with the 39 biological axes"
+
+#: templates/core/research.html:27
+msgid "กรณีศึกษา"
+msgstr "Case study"
+
+#: templates/core/research.html:28
+msgid "กรณีศึกษาผู้ป่วยสะเก็ดเงินรุนแรง (เคสคุณนิคม)"
+msgstr "Case study: severe psoriasis (Mr Nikom's case)"
+
+#: templates/core/research.html:29
+msgid "ผลการฟื้นฟูด้วย TSPI 9-Step Mechanistic Protocol ระยะเวลา 16 สัปดาห์"
+msgstr ""
+"Recovery results with the TSPI 9-Step Mechanistic Protocol over 16 weeks"
+
+#: templates/core/research.html:32
+msgid "PASI Score ลดลง"
+msgstr "Reduction in PASI score"
+
+#: templates/core/research.html:33
+msgid "การใช้ยาสเตียรอยด์ (หยุดใช้)"
+msgstr "Steroid use (stopped)"
+
+#: templates/core/research.html:39
+msgid "ก่อนการรักษา (Baseline)"
+msgstr "Before treatment (baseline)"
+
+#: templates/core/research.html:40
+msgid "ระยะเริ่มต้น"
+msgstr "Starting point"
+
+#: templates/core/research.html:41
+msgid ""
+"มีผื่นสะเก็ดเงินหนากระจายทั่วลำตัว ข้อศอก และศีรษะ ค่าการอักเสบ hsCRP 8.4 mg/L "
+"มีอาการคันและแสบผิวหนังรุนแรง ส่งผลกระทบต่อการนอนหลับและการใช้ชีวิตประจำวัน"
+msgstr ""
+"Thick psoriasis plaques across the trunk, elbows and scalp, hsCRP 8.4 mg/L, "
+"with severe itching and burning that affected sleep and daily life"
+
+#: templates/core/research.html:46
+msgid "โปรโตคอล"
+msgstr "Protocol"
+
+#: templates/core/research.html:47
+msgid "การฟื้นฟูด้วย 39 แกน"
+msgstr "Recovery with the 39 axes"
+
+#: templates/core/research.html:48
+msgid ""
+"ได้รับโมดูล KERRA, MINOZA เพื่อลด NF-κB และไซโตไคน์อักเสบ ร่วมกับ CINNARA "
+"เพื่อฟื้นฟูเยื่อบุลำไส้รั่ว (Leaky Gut) พร้อมปรับสมดุลอาหารบำบัดเฉพาะบุคคล"
+msgstr ""
+"Received KERRA and MINOZA modules to lower NF-κB and inflammatory cytokines, "
+"together with CINNARA to restore the leaky gut lining, plus a personalised "
+"therapeutic diet"
+
+#: templates/core/research.html:53
+msgid "ผลลัพธ์"
+msgstr "Results"
+
+#: templates/core/research.html:54
+msgid "หลังผ่าน 16 สัปดาห์"
+msgstr "After 16 weeks"
+
+#: templates/core/research.html:55
+msgid ""
+"ผื่นสะเก็ดเงินยุบตัวลงอย่างชัดเจน ผิวหนังฟื้นฟูกลับสู่สภาพปกติ ค่า hsCRP ลดลงเหลือ 1.1 mg/L "
+"สุขภาพจิต ระดับพลังงาน และคุณภาพชีวิตดีขึ้นอย่างสมบูรณ์"
+msgstr ""
+"Psoriasis plaques clearly subsided, the skin returned to normal, hsCRP fell "
+"to 1.1 mg/L, and mental health, energy and quality of life improved fully"
+
+#: templates/core/research.html:66
+msgid "สิ่งที่ใช้ติดตามผล"
+msgstr "What we use to track progress"
+
+#: templates/core/research.html:66
+msgid "ตัวชี้วัดชีวภาพหลัก"
+msgstr "Key biomarkers"
+
+#: templates/core/research.html:67
+msgid "สารบ่งชี้ระดับโมเลกุลที่ระบบ AI นำมาตรวจติดตามผลลัพธ์"
+msgstr "Molecular markers the AI system uses to track outcomes"
+
+#: templates/core/research.html:69
+msgid "6 ตัวชี้วัดสำคัญ"
+msgstr "6 key markers"
+
+#: templates/core/research.html:81
+msgid "แพทย์ดูรายละเอียดผลแล็บ กราฟชีวภาพ และคำนวณสูตรการรักษาเฉพาะบุคคลได้ใน"
+msgstr ""
+"Doctors can see detailed lab results, biological charts and personalised "
+"treatment formulas in the"
+
+#: templates/core/terms.html:4
+msgid "ข้อตกลงและเงื่อนไขการใช้บริการ — TSPI Clinic"
+msgstr "Terms and conditions of service — TSPI Clinic"
+
+#: templates/core/terms.html:9 templates/layouts/public_base.html:158
+msgid "ข้อกำหนดการใช้งาน"
+msgstr "Terms of use"
+
+#: templates/core/terms.html:10
+msgid "ข้อตกลงและเงื่อนไข"
+msgstr "Terms and conditions"
+
+#: templates/core/terms.html:10
+msgid "การใช้บริการ"
+msgstr "of service"
+
+#: templates/core/terms.html:19
+msgid ""
+"ยินดีต้อนรับสู่ระบบ TSPI Clinic EMR &amp; Clinical Intelligence Platform "
+"การเข้าใช้งานระบบนี้ถือว่าท่านได้รับทราบและยอมรับข้อตกลงและเงื่อนไขดังต่อไปนี้:"
+msgstr ""
+"Welcome to the TSPI Clinic EMR &amp; Clinical Intelligence Platform. By "
+"using this system you acknowledge and accept the following terms and "
+"conditions:"
+
+#: templates/core/terms.html:22
+msgid "1. ขอบเขตการให้บริการของระบบปัญญาประดิษฐ์"
+msgstr "1. Scope of the AI service"
+
+#: templates/core/terms.html:24
+msgid ""
+"รายงานผลและการวิเคราะห์ทางชีววิทยาที่เกิดจากระบบปัญญาประดิษฐ์ "
+"มีวัตถุประสงค์เพื่อเป็นข้อมูลสนับสนุนการตัดสินใจของแพทย์ผู้รักษา (Clinical Decision Support) "
+"เท่านั้น ไม่ถือเป็นการวินิจฉัยโรคขั้นสุดท้ายโดยปราศจากการตรวจสอบและลงนามจากแพทย์ผู้เชี่ยวชาญ"
+msgstr ""
+"Reports and biological analyses produced by the AI system are intended only "
+"as information to support the treating doctor's decisions (Clinical Decision "
+"Support). They are not a final diagnosis without review and sign-off by a "
+"specialist doctor."
+
+#: templates/core/terms.html:27
+msgid "2. การรักษาความปลอดภัยบัญชีผู้ใช้งาน"
+msgstr "2. Account security"
+
+#: templates/core/terms.html:29
+msgid ""
+"ผู้ใช้งานมีหน้าที่รักษาความลับของรหัสผ่านและข้อมูลประจำตัว "
+"ห้ามส่งต่อหรือเปิดเผยให้บุคคลอื่นเข้าถึงบัญชีของตนเอง หากตรวจพบการพยายามเจาะระบบหรือสวมสิทธิ์ "
+"ระบบจะทำการระงับการเข้าใช้งานทันทีและดำเนินการตามกฎหมาย"
+msgstr ""
+"Users must keep their password and credentials confidential and must not "
+"share them or let anyone else access their account. If attempts to break "
+"into the system or impersonate a user are detected, access will be suspended "
+"immediately and legal action taken."
+
+#: templates/core/terms.html:33
+msgid "นโยบายคุ้มครองข้อมูลส่วนบุคคล"
+msgstr "Personal data protection policy"
+
+#: templates/layouts/_front_auth_side.html:2
+msgid "สิ่งที่คุณจะได้รับ"
+msgstr "What you get"
+
+#: templates/layouts/_front_auth_side.html:4
+msgid "บัญชีผู้รับบริการ"
+msgstr "Patient account"
+
+#: templates/layouts/_front_auth_side.html:5
+msgid "ข้อมูลสุขภาพของคุณ"
+msgstr "All your health information"
+
+#: templates/layouts/_front_auth_side.html:5
+msgid "อยู่ในที่เดียว"
+msgstr "in one place"
+
+#: templates/layouts/_front_auth_side.html:8
+msgid "ผลประเมิน 39 แกน"
+msgstr "39-axis results"
+
+#: templates/layouts/_front_auth_side.html:8
+msgid "ดูภาพรวมความสมดุลของร่างกายคุณ"
+msgstr "See an overview of your body's balance"
+
+#: templates/layouts/_front_auth_side.html:9
+msgid "ใบนัดและประวัติการรักษา"
+msgstr "Appointments and treatment history"
+
+#: templates/layouts/_front_auth_side.html:9
+msgid "เปิดดูได้ทุกเมื่อจากมือถือ"
+msgstr "Open them any time on your phone"
+
+#: templates/layouts/_front_auth_side.html:10
+msgid "ถามเรื่องสุขภาพ คำตอบอ้างอิงเอกสารคลินิก"
+msgstr "Ask health questions; answers cite clinic documents"
+
+#: templates/layouts/_front_auth_side.html:11
+msgid "ข้อมูลของคุณใช้เพื่อการดูแลรักษาเท่านั้น"
+msgstr "Your data is used only for your care"
+
+#: templates/layouts/_lang_switch.html:3
+msgid "เลือกภาษา"
+msgstr "Choose language"
+
+#: templates/layouts/front_base.html:9
+msgid "TSPI CLINIC — ดูแลสุขภาพเชิงระบบ 39 แกนชีววิทยา"
+msgstr "TSPI CLINIC — whole-body care across 39 biological axes"
+
+#: templates/layouts/front_base.html:58
+msgid "ซ่อนรหัสผ่าน"
+msgstr "Hide password"
+
+#: templates/layouts/patient_base.html:24
+msgid "คนไข้"
+msgstr "Patient"
+
+#: templates/layouts/patient_base.html:26 templates/layouts/public_base.html:18
+msgid "ส่วนหัว"
+msgstr "Header"
+
+#: templates/layouts/patient_base.html:31
+msgid "พอร์ทัลสุขภาพของคุณ"
+msgstr "Your health portal"
+
+#: templates/layouts/patient_base.html:34
+msgid "เมนู portal"
+msgstr "Portal menu"
+
+#: templates/layouts/patient_base.html:36
+#: templates/layouts/patient_base.html:96
+msgid "หน้าหลัก"
+msgstr "Home"
+
+#: templates/layouts/patient_base.html:38
+#: templates/portal_patient/assistant.html:42
+#: templates/portal_patient/dashboard.html:76
+msgid "ผล 39 แกน"
+msgstr "39-axis results"
+
+#: templates/layouts/patient_base.html:39
+#: templates/layouts/patient_base.html:99
+#: templates/portal_patient/appointments.html:10
+#: templates/portal_patient/dashboard.html:77
+msgid "นัดหมาย"
+msgstr "Appointments"
+
+#: templates/layouts/patient_base.html:40
+#: templates/layouts/patient_base.html:100
+#: templates/portal_patient/history.html:10
+msgid "ประวัติ"
+msgstr "History"
+
+#: templates/layouts/patient_base.html:43
+msgid "อื่น ๆ"
+msgstr "More"
+
+#: templates/layouts/patient_base.html:46
+#: templates/layouts/patient_base.html:62
+msgid "ดาวน์โหลดรายงาน"
+msgstr "Download reports"
+
+#: templates/layouts/patient_base.html:55
+msgid "เมนูบัญชี"
+msgstr "Account menu"
+
+#: templates/layouts/patient_base.html:57
+msgid "คุณ"
+msgstr " "
+
+#: templates/layouts/patient_base.html:63
+msgid "ตั้งค่าบัญชี"
+msgstr "Account settings"
+
+#: templates/layouts/patient_base.html:68
+#: templates/portal_patient/assistant.html:90
+msgid "ออกจากระบบ"
+msgstr "Sign out"
+
+#: templates/layouts/patient_base.html:84
+#: templates/layouts/public_base.html:145
+#: templates/portal_patient/ai_intake.html:53
+msgid "ปิด"
+msgstr "Close"
+
+#: templates/layouts/patient_base.html:95
+msgid "เมนูหลัก portal"
+msgstr "Main portal menu"
+
+#: templates/layouts/patient_base.html:98
+msgid "39 แกน"
+msgstr "39 axes"
+
+#: templates/layouts/public_base.html:20
+msgid "เมนูหลัก"
+msgstr "Main menu"
+
+#: templates/layouts/public_base.html:30
+msgid "การรักษาของเรา"
+msgstr "Our treatments"
+
+#: templates/layouts/public_base.html:32 templates/layouts/public_base.html:67
+msgid "ดูร่างกายเป็นระบบ 12 โดเมน"
+msgstr "Seeing the body as 12 connected domains"
+
+#: templates/layouts/public_base.html:33 templates/layouts/public_base.html:68
+msgid "จากตรวจประเมินถึงดูแลระยะยาว"
+msgstr "From assessment to long-term care"
+
+#: templates/layouts/public_base.html:34 templates/layouts/public_base.html:69
+msgid "หลักฐานและตัวชี้วัดที่ใช้ติดตามผล"
+msgstr "Evidence and the markers we track"
+
+#: templates/layouts/public_base.html:44 templates/layouts/public_base.html:77
+msgid "พอร์ทัลของฉัน"
+msgstr "My portal"
+
+#: templates/layouts/public_base.html:49 templates/layouts/public_base.html:75
+#: templates/layouts/public_base.html:102
+msgid "คุยกับ AI"
+msgstr "Chat with AI"
+
+#: templates/layouts/public_base.html:52
+msgid "เปิดเมนู"
+msgstr "Open menu"
+
+#: templates/layouts/public_base.html:62
+msgid "ปิดเมนู"
+msgstr "Close menu"
+
+#: templates/layouts/public_base.html:84 templates/layouts/public_base.html:121
+msgid "เหตุฉุกเฉิน โทร 1669"
+msgstr "Emergency: call 1669"
+
+#: templates/layouts/public_base.html:99
+msgid "สงสัยเรื่องสุขภาพ"
+msgstr "Questions about your health?"
+
+#: templates/layouts/public_base.html:99
+msgid "เริ่มคุยกับเราได้เลย"
+msgstr "Start chatting with us"
+
+#: templates/layouts/public_base.html:100
+msgid ""
+"ถามผู้ช่วย AI ได้ทันทีโดยไม่ต้องลงทะเบียน คำตอบอ้างอิงจากเอกสารของคลินิก หรือทัก LINE "
+"ของคลินิกเพื่อคุยกับทีมงาน"
+msgstr ""
+"Ask the AI assistant right away without registering. Answers are based on "
+"the clinic's documents. Or message the clinic on LINE to talk with our team."
+
+#: templates/layouts/public_base.html:104
+msgid "ทัก LINE คลินิก"
+msgstr "Message the clinic on LINE"
+
+#: templates/layouts/public_base.html:118
+msgid "ศูนย์การแพทย์และการฟื้นฟูสุขภาพ"
+msgstr "Medical and health recovery centre"
+
+#: templates/layouts/public_base.html:120
+msgid ""
+"ดูแลสุขภาพเชิงระบบด้วย 39 แกนชีววิทยา โดยทีมแพทย์ของคลินิก "
+"ข้อมูลสุขภาพของคุณได้รับการคุ้มครองตาม PDPA"
+msgstr ""
+"Whole-body care across 39 biological axes by the clinic's medical team. Your "
+"health data is protected under the PDPA."
+
+#: templates/layouts/public_base.html:124
+msgid "การรักษา"
+msgstr "Treatments"
+
+#: templates/layouts/public_base.html:133
+msgid "ผู้รับบริการ"
+msgstr "For patients"
+
+#: templates/layouts/public_base.html:142
+msgid "เวลาทำการ"
+msgstr "Opening hours"
+
+#: templates/layouts/public_base.html:144
+msgid "จันทร์ – เสาร์"
+msgstr "Monday – Saturday"
+
+#: templates/layouts/public_base.html:145
+msgid "อาทิตย์และวันหยุด"
+msgstr "Sundays and public holidays"
+
+#: templates/layouts/public_base.html:148
+#: templates/layouts/public_base.html:150
+#: templates/portal_patient/appointments.html:46
+#: templates/portal_patient/settings.html:32
+msgid "LINE ของคลินิก"
+msgstr "Clinic LINE"
+
+#: templates/layouts/public_base.html:155
+msgid "TSPI Clinic สงวนลิขสิทธิ์"
+msgstr "TSPI Clinic. All rights reserved."
+
+#: templates/layouts/public_base.html:159
+msgid "สำหรับบุคลากร"
+msgstr "For staff"
+
+#: templates/patients/line_register.html:4
+msgid "เชื่อมบัญชี LINE — TSPI Clinic"
+msgstr "Link your LINE account — TSPI Clinic"
+
+#: templates/patients/line_register.html:16
+msgid "เชื่อมบัญชี LINE"
+msgstr "Link your LINE account"
+
+#: templates/patients/line_register.html:17
+msgid "กรอกชื่อกับเบอร์โทร แล้วกดส่งได้เลย"
+msgstr "Enter your name and phone number, then submit"
+
+#: templates/patients/line_register.html:28
+#: templates/patients/line_register.html:29
+#: templates/portal_patient/settings.html:22
+msgid "ชื่อ-นามสกุล"
+msgstr "Full name"
+
+#: templates/patients/line_register.html:34
+#: templates/patients/line_register.html:35
+#: templates/portal_patient/line_liff_binding.html:98
+#: templates/portal_patient/settings.html:24
+msgid "เบอร์โทรศัพท์"
+msgstr "Phone number"
+
+#: templates/patients/line_register.html:42
+msgid "ยอมรับให้ TSPI Clinic เก็บและใช้ข้อมูลสุขภาพเพื่อการดูแลรักษา ตาม"
+msgstr ""
+"I agree to TSPI Clinic collecting and using my health data for my care, "
+"under the"
+
+#: templates/patients/line_register.html:47
+msgid "ส่งข้อมูล"
+msgstr "Submit"
+
+#: templates/patients/line_register.html:49
+msgid "ใช้ข้อมูลนี้เพื่อเชื่อมแชท LINE กับคลินิกเท่านั้น"
+msgstr "This information is only used to link your LINE chat with the clinic"
+
+#: templates/patients/line_register.html:54
+msgid "ลงทะเบียนเรียบร้อย"
+msgstr "Registration complete"
+
+#: templates/patients/line_register.html:55
+msgid "กดปิดหน้านี้ แล้วกลับไปที่แชท LINE บอททักทายและพร้อมใช้งานแล้ว"
+msgstr ""
+"Close this page and go back to the LINE chat. The bot has said hello and is "
+"ready to use."
+
+#: templates/patients/line_register.html:57
+msgid "กลับไปที่แชท LINE"
+msgstr "Back to the LINE chat"
+
+#: templates/patients/line_register.html:62
+msgid "ลิงก์นี้ใช้ไม่ได้แล้ว"
+msgstr "This link no longer works"
+
+#: templates/patients/line_register.html:63
+msgid "กลับไปที่แชท LINE แล้วพิมพ์ว่า &ldquo;เปิดบอท&rdquo; เพื่อรับลิงก์ใหม่"
+msgstr ""
+"Go back to the LINE chat and type &ldquo;เปิดบอท&rdquo; (turn on bot) to get "
+"a new link"
+
+#: templates/portal_patient/_appointment_row.html:5
+#: templates/portal_patient/dashboard.html:31
+msgid "น."
+msgstr "h"
+
+#: templates/portal_patient/_appointment_row.html:9
+msgid "รอยืนยัน"
+msgstr "Awaiting confirmation"
+
+#: templates/portal_patient/_appointment_row.html:10
+msgid "ยืนยันแล้ว"
+msgstr "Confirmed"
+
+#: templates/portal_patient/_appointment_row.html:11
+msgid "พบแพทย์แล้ว"
+msgstr "Visited"
+
+#: templates/portal_patient/_appointment_row.html:12
+#: templates/portal_patient/assistant.html:644
+#: templates/portal_patient/assistant.html:666
+#: templates/portal_patient/assistant.html:685
+msgid "ยกเลิก"
+msgstr "Cancelled"
+
+#: templates/portal_patient/ai_intake.html:5
+msgid "ซักประวัติอาการกับ AI (AI Clinical Intake) | TSPI Health"
+msgstr "Symptom interview with AI (AI Clinical Intake) | TSPI Health"
+
+#: templates/portal_patient/ai_intake.html:12
+msgid "ซักประวัติล่วงหน้า"
+msgstr "Pre-visit interview"
+
+#: templates/portal_patient/ai_intake.html:13
+msgid "เล่าอาการให้ AI ช่วยจดก่อนพบแพทย์"
+msgstr "Tell the AI your symptoms before your visit"
+
+#: templates/portal_patient/ai_intake.html:14
+msgid "ข้อมูลอาการจะถูกบันทึกลงในเวชระเบียนจริงของท่าน และจัดระเบียบให้แพทย์วิเคราะห์ล่วงหน้า"
+msgstr ""
+"Your symptoms are saved to your actual medical record and organised for the "
+"doctor to review in advance"
+
+#: templates/portal_patient/ai_intake.html:27
+msgid "บันทึกข้อมูลอาการเข้าสู่เวชระเบียนเรียบร้อยแล้ว"
+msgstr "Your symptoms have been saved to your medical record"
+
+#: templates/portal_patient/ai_intake.html:28
+msgid "ระบบได้แมปอาการเบื้องต้นกับแกนชีววิทยาที่เกี่ยวข้องเรียบร้อยแล้ว"
+msgstr "Your initial symptoms have been mapped to the related biological axes"
+
+#: templates/portal_patient/ai_intake.html:32
+msgid "ดูผลวิเคราะห์คะแนน 39 แกน &rarr;"
+msgstr "See your 39-axis results &rarr;"
+
+#: templates/portal_patient/ai_intake.html:44
+msgid "AI ตอบช้ากว่าปกติ"
+msgstr "The AI is responding slower than usual"
+
+#: templates/portal_patient/ai_intake.html:45
+msgid "ท่านสามารถใช้แบบฟอร์มด้านล่างเพื่อพิมพ์อาการและส่งตรงถึงคณะแพทย์ได้ทันที"
+msgstr ""
+"You can use the form below to type your symptoms and send them straight to "
+"the medical team"
+
+#: templates/portal_patient/ai_intake.html:50
+msgid "ระบุอาการสำคัญของคุณ เช่น มีผื่นคัน, ท้องอืด, เหนื่อยล้า..."
+msgstr "Describe your main symptoms, e.g. itchy rash, bloating, fatigue..."
+
+#: templates/portal_patient/ai_intake.html:56
+msgid "ส่งข้อมูลให้แพทย์โดยตรง"
+msgstr "Send directly to the doctor"
+
+#: templates/portal_patient/ai_intake.html:84
+msgid "AI กำลังพิมพ์..."
+msgstr "AI is typing..."
+
+#: templates/portal_patient/ai_intake.html:94
+msgid "พิมพ์บอกเล่าอาการของคุณที่นี่... (เช่น มีผื่นคัน, แน่นท้อง, อ่อนเพลีย)"
+msgstr ""
+"Describe your symptoms here... (e.g. itchy rash, stomach tightness, fatigue)"
+
+#: templates/portal_patient/ai_intake.html:97
+#: templates/portal_patient/assistant.html:326
+msgid "ส่งข้อความ"
+msgstr "Send"
+
+#: templates/portal_patient/ai_intake.html:100
+msgid "สลับเป็นฟอร์มกรอกอาการเอง"
+msgstr "Switch to typing symptoms in a form"
+
+#: templates/portal_patient/appointments.html:4
+msgid "นัดหมาย — TSPI Health"
+msgstr "Appointments — TSPI Health"
+
+#: templates/portal_patient/appointments.html:11
+msgid "นัดพบแพทย์ของคุณ"
+msgstr "Your doctor appointments"
+
+#: templates/portal_patient/appointments.html:12
+msgid "นัดที่แพทย์และเจ้าหน้าที่ลงไว้ในระบบของคลินิก"
+msgstr "Appointments entered by doctors and staff in the clinic's system"
+
+#: templates/portal_patient/appointments.html:19
+#: templates/portal_patient/history.html:37
+msgid "บัญชียังไม่ได้เชื่อมเวชระเบียน"
+msgstr "Account not linked to a medical record yet"
+
+#: templates/portal_patient/appointments.html:20
+msgid "กรุณาติดต่อเจ้าหน้าที่เพื่อเชื่อมข้อมูล แล้วนัดหมายจะแสดงที่นี่"
+msgstr ""
+"Please contact staff to link your record; your appointments will then appear "
+"here"
+
+#: templates/portal_patient/appointments.html:23
+msgid "นัดที่กำลังจะถึง"
+msgstr "Upcoming appointments"
+
+#: templates/portal_patient/appointments.html:30
+#: templates/portal_patient/dashboard.html:66
+msgid "ยังไม่มีนัดที่กำลังจะถึง"
+msgstr "No upcoming appointments"
+
+#: templates/portal_patient/appointments.html:31
+msgid "เมื่อแพทย์นัดคุณ วันเวลานัดจะแสดงที่นี่"
+msgstr "When a doctor books you in, the date and time will appear here"
+
+#: templates/portal_patient/appointments.html:37
+msgid "นัดที่ผ่านมา"
+msgstr "Past appointments"
+
+#: templates/portal_patient/appointments.html:46
+msgid "ต้องการเลื่อนนัด กรุณาแจ้งเจ้าหน้าที่ล่วงหน้าอย่างน้อย 1 วัน"
+msgstr "To reschedule, please tell our staff at least 1 day in advance"
+
+#: templates/portal_patient/appointments.html:46
+msgid "ทาง"
+msgstr "via"
+
+#: templates/portal_patient/assistant.html:6
+msgid "ผู้ช่วย AI | TSPI Health"
+msgstr "AI assistant | TSPI Health"
+
+#: templates/portal_patient/assistant.html:25
+msgid "เมนูผู้ช่วย AI ของคนไข้"
+msgstr "Patient AI assistant menu"
+
+#: templates/portal_patient/assistant.html:38
+msgid "แดชบอร์ดคนไข้"
+msgstr "Patient dashboard"
+
+#: templates/portal_patient/assistant.html:46
+msgid "นัดหมายพบแพทย์"
+msgstr "Doctor appointments"
+
+#: templates/portal_patient/assistant.html:50
+#: templates/portal_patient/dashboard.html:78
+msgid "ประวัติการรักษา"
+msgstr "Treatment history"
+
+#: templates/portal_patient/assistant.html:56
+msgid "ค้นหาแชท..."
+msgstr "Search chats..."
+
+#: templates/portal_patient/assistant.html:59
+msgid "แชทล่าสุด"
+msgstr "Recent chats"
+
+#: templates/portal_patient/assistant.html:65
+msgid "ส่งให้ทีมแพทย์แล้ว"
+msgstr "Sent to the medical team"
+
+#: templates/portal_patient/assistant.html:67
+msgid "เปลี่ยนชื่อ"
+msgstr "Rename"
+
+#: templates/portal_patient/assistant.html:70
+msgid "ลบ/ซ่อนแชท"
+msgstr "Delete/hide chat"
+
+#: templates/portal_patient/assistant.html:85
+msgid "บัญชีผู้ป่วย"
+msgstr "Patient account"
+
+#: templates/portal_patient/assistant.html:106
+msgid "เปิดรายการแชท"
+msgstr "Open chat list"
+
+#: templates/portal_patient/assistant.html:111
+msgid "· ผู้ช่วยสุขภาพ"
+msgstr "· Health assistant"
+
+#: templates/portal_patient/assistant.html:120
+msgid "ส่งแพทย์แล้ว"
+msgstr "Sent to doctor"
+
+#: templates/portal_patient/assistant.html:126
+msgid "ส่งแพทย์"
+msgstr "Send to doctor"
+
+#: templates/portal_patient/assistant.html:134
+msgid "กลับแดชบอร์ดคนไข้"
+msgstr "Back to patient dashboard"
+
+#: templates/portal_patient/assistant.html:148
+msgid "สวัสดี, คุณ"
+msgstr "Hello, "
+
+#: templates/portal_patient/assistant.html:149
+msgid "เราควรดูแลสุขภาพเรื่องอะไรดี พิมพ์ถาม แนบรูป หรืออัดเสียงส่งมาได้เลย"
+msgstr ""
+"What would you like help with today? Type a question, attach a photo or "
+"record a voice clip."
+
+#: templates/portal_patient/assistant.html:168
+msgid "ภาพแนบจากคนไข้"
+msgstr "Photo attached by patient"
+
+#: templates/portal_patient/assistant.html:258
+msgid "โหมดใช้งาน"
+msgstr "Mode"
+
+#: templates/portal_patient/assistant.html:259
+msgid "แชท"
+msgstr "Chat"
+
+#: templates/portal_patient/assistant.html:269
+msgid "ภาพแนบ"
+msgstr "Attached photo"
+
+#: templates/portal_patient/assistant.html:270
+msgid "ลบรูป"
+msgstr "Remove photo"
+
+#: templates/portal_patient/assistant.html:279
+msgid "ลบคลิปเสียง"
+msgstr "Remove voice clip"
+
+#: templates/portal_patient/assistant.html:288
+msgid "แนบรูปภาพหรือไฟล์เสียง"
+msgstr "Attach a photo or audio file"
+
+#: templates/portal_patient/assistant.html:294
+msgid "แนบรูปภาพ (สูงสุด 3 รูป)"
+msgstr "Attach photos (up to 3)"
+
+#: templates/portal_patient/assistant.html:299
+msgid "อัปโหลดไฟล์เสียง"
+msgstr "Upload an audio file"
+
+#: templates/portal_patient/assistant.html:305
+msgid "พิมพ์ข้อความถึงผู้ช่วย"
+msgstr "Type a message to the assistant"
+
+#: templates/portal_patient/assistant.html:307
+msgid "ขอความช่วยเหลือจาก TSPI AI..."
+msgstr "Ask TSPI AI for help..."
+
+#: templates/portal_patient/assistant.html:315
+msgid "พูดด้วยเสียงเพื่อพิมพ์"
+msgstr "Speak to type"
+
+#: templates/portal_patient/assistant.html:322
+msgid "อัดคลิปเสียงส่งให้ AI และทีมแพทย์"
+msgstr "Record a voice clip for the AI and medical team"
+
+#: templates/portal_patient/assistant.html:324
+msgid "พูด"
+msgstr "Speak"
+
+#: templates/portal_patient/assistant.html:333
+msgid "ไม่ใช่การวินิจฉัยของแพทย์ &middot; รูป/เสียงเข้ารหัสในระบบ &middot; ฉุกเฉิน"
+msgstr ""
+"Not a medical diagnosis &middot; photos/voice are encrypted &middot; "
+"emergency"
+
+#: templates/portal_patient/assistant.html:343
+msgid "ภาพขยาย"
+msgstr "Enlarged image"
+
+#: templates/portal_patient/assistant.html:344
+msgid "ปิดรูป"
+msgstr "Close image"
+
+#: templates/portal_patient/assistant.html:443
+msgid "ยังไม่รองรับการส่งวิดีโอ กรุณาส่งเป็นข้อความ รูปภาพ หรือคลิปเสียง"
+msgstr "Video isn't supported yet. Please send text, photos or a voice clip."
+
+#: templates/portal_patient/assistant.html:447
+msgid "รองรับเฉพาะรูปภาพ JPG, PNG หรือ WEBP"
+msgstr "Only JPG, PNG or WEBP images are supported"
+
+#: templates/portal_patient/assistant.html:451
+msgid "รูปภาพแต่ละรูปต้องมีขนาดไม่เกิน 5 MB"
+msgstr "Each image must be 5 MB or smaller"
+
+#: templates/portal_patient/assistant.html:455
+msgid "ส่งรูปได้สูงสุด 3 รูปต่อครั้ง"
+msgstr "You can send up to 3 photos at a time"
+
+#: templates/portal_patient/assistant.html:476
+msgid "ยังไม่รองรับการส่งวิดีโอ กรุณาส่งเป็นไฟล์เสียงหรือรูปภาพ"
+msgstr "Video isn't supported yet. Please send an audio file or photos."
+
+#: templates/portal_patient/assistant.html:480
+msgid "ไฟล์เสียงต้องมีขนาดไม่เกิน 10 MB"
+msgstr "Audio files must be 10 MB or smaller"
+
+#: templates/portal_patient/assistant.html:483
+msgid "ไฟล์เสียง"
+msgstr "Audio file"
+
+#: templates/portal_patient/assistant.html:497
+msgid "เบราว์เซอร์นี้ไม่รองรับการอัดเสียงโดยตรง ลองกด + แล้วเลือกอัปโหลดไฟล์เสียงแทนได้ครับ"
+msgstr ""
+"This browser can't record audio directly. Tap + and choose \"Upload an audio "
+"file\" instead."
+
+#: templates/portal_patient/assistant.html:521
+msgid "คลิปเสียง ("
+msgstr "Voice clip ("
+
+#: templates/portal_patient/assistant.html:533
+msgid "ไม่สามารถเปิดไมโครโฟนได้ กรุณาตรวจสอบสิทธิ์ไมโครโฟน"
+msgstr "Couldn't open the microphone. Please check microphone permissions."
+
+#: templates/portal_patient/assistant.html:574
+msgid "ไม่สามารถสร้างห้องแชทได้ กรุณาลองใหม่"
+msgstr "Couldn't create a chat. Please try again."
+
+#: templates/portal_patient/assistant.html:585
+msgid "[กำลังถอดความคลิปเสียง…]"
+msgstr "[Transcribing voice clip…]"
+
+#: templates/portal_patient/assistant.html:585
+msgid "[ส่งรูปภาพ]"
+msgstr "[Photo sent]"
+
+#: templates/portal_patient/assistant.html:621
+msgid "ส่งข้อความไม่สำเร็จ"
+msgstr "Couldn't send the message"
+
+#: templates/portal_patient/assistant.html:626
+msgid "เชื่อมต่อไม่สำเร็จ กรุณาลองใหม่"
+msgstr "Couldn't connect. Please try again."
+
+#: templates/portal_patient/assistant.html:639
+msgid "ตั้งชื่อแชทใหม่"
+msgstr "Rename chat"
+
+#: templates/portal_patient/assistant.html:643
+msgid "บันทึก"
+msgstr "Save"
+
+#: templates/portal_patient/assistant.html:659
+msgid "ซ่อนแชทนี้?"
+msgstr "Hide this chat?"
+
+#: templates/portal_patient/assistant.html:659
+msgid "ลบแชทนี้ถาวร?"
+msgstr "Delete this chat permanently?"
+
+#: templates/portal_patient/assistant.html:661
+msgid "แชทนี้ส่งให้คลินิกแล้ว จะซ่อนจากรายการของคุณเท่านั้น (คลินิกยังเก็บไว้ในเวชระเบียน)"
+msgstr ""
+"This chat has been sent to the clinic. It will only be hidden from your list "
+"(the clinic keeps it in your medical record)."
+
+#: templates/portal_patient/assistant.html:662
+msgid "ข้อความและไฟล์แนบทั้งหมดในแชทนี้จะถูกลบออก"
+msgstr "All messages and attachments in this chat will be deleted."
+
+#: templates/portal_patient/assistant.html:665
+msgid "ซ่อนแชท"
+msgstr "Hide chat"
+
+#: templates/portal_patient/assistant.html:665
+msgid "ลบถาวร"
+msgstr "Delete permanently"
+
+#: templates/portal_patient/assistant.html:680
+msgid "ส่งแชทให้ทีมแพทย์ตรวจ?"
+msgstr "Send this chat to the medical team?"
+
+#: templates/portal_patient/assistant.html:681
+msgid "ข้อความ รูปภาพ และคลิปเสียงในแชทนี้จะถูกส่งเข้าคิวซักถามของคลินิก TSPI"
+msgstr ""
+"The messages, photos and voice clips in this chat will be sent to TSPI "
+"Clinic's intake queue."
+
+#: templates/portal_patient/assistant.html:684
+msgid "ส่งให้ทีมแพทย์"
+msgstr "Send to the medical team"
+
+#: templates/portal_patient/assistant.html:693
+msgid "ส่งให้คลินิกเรียบร้อยแล้ว"
+msgstr "Sent to the clinic"
+
+#: templates/portal_patient/assistant.html:695
+msgid "ส่งไม่สำเร็จ"
+msgstr "Couldn't send"
+
+#: templates/portal_patient/axes_result.html:4
+msgid "ผล 39 แกนชีววิทยา — TSPI Health"
+msgstr "39 biological axis results — TSPI Health"
+
+#: templates/portal_patient/axes_result.html:10
+msgid "ผลประเมิน"
+msgstr "Results"
+
+#: templates/portal_patient/axes_result.html:11
+msgid "ผล 39 แกนชีววิทยาของคุณ"
+msgstr "Your 39 biological axis results"
+
+#: templates/portal_patient/axes_result.html:12
+msgid "ผลประเมินล่าสุด"
+msgstr "Latest assessment"
+
+#: templates/portal_patient/axes_result.html:12
+msgid "คะแนนยิ่งสูงยิ่งควรเฝ้าระวัง"
+msgstr "The higher the score, the more it needs watching"
+
+#: templates/portal_patient/axes_result.html:12
+msgid "ยังไม่มีผลประเมิน 39 แกน ผลจะแสดงที่นี่หลังแพทย์ประเมินแล้ว"
+msgstr ""
+"No 39-axis results yet. They will appear here once a doctor has assessed you."
+
+#: templates/portal_patient/axes_result.html:14
+msgid "รายงานฉบับเต็ม"
+msgstr "Full report"
+
+#: templates/portal_patient/axes_result.html:18
+msgid "สรุปผล"
+msgstr "Summary"
+
+#: templates/portal_patient/axes_result.html:19
+msgid "ควรเฝ้าระวังมาก"
+msgstr "Needs close attention"
+
+#: templates/portal_patient/axes_result.html:20
+#: templates/portal_patient/axes_result.html:38
+msgid "ควรติดตาม"
+msgstr "Monitor"
+
+#: templates/portal_patient/axes_result.html:21
+#: templates/portal_patient/axes_result.html:38
+msgid "สมดุลดี"
+msgstr "Well balanced"
+
+#: templates/portal_patient/axes_result.html:22
+#: templates/portal_patient/axes_result.html:36
+msgid "ยังไม่ประเมิน"
+msgstr "Not assessed"
+
+#: templates/portal_patient/axes_result.html:38
+msgid "เฝ้าระวังมาก"
+msgstr "Close attention"
+
+#: templates/portal_patient/axes_result.html:44
+msgid "คะแนนเป็นข้อมูลประกอบการดูแลของแพทย์ ไม่ใช่การวินิจฉัยโรค สงสัยตรงไหนถามแพทย์หรือ"
+msgstr ""
+"Scores support your doctor's care and are not a diagnosis. Questions? Ask "
+"your doctor or the"
+
+#: templates/portal_patient/axes_result.html:44
+msgid "ได้"
+msgstr "."
+
+#: templates/portal_patient/checkin.html:4
+msgid "เช็คอินพบแพทย์ — TSPI Health"
+msgstr "Check in for your visit — TSPI Health"
+
+#: templates/portal_patient/checkin.html:10
+msgid "เช็คอินเข้าพบแพทย์"
+msgstr "Check in for your visit"
+
+#: templates/portal_patient/checkin.html:11
+msgid "เช็คอินออนไลน์ยังไม่เปิดให้บริการ เมื่อมาถึงคลินิก กรุณาแจ้งเจ้าหน้าที่ที่เคาน์เตอร์"
+msgstr ""
+"Online check-in is not available yet. When you arrive, please let the front "
+"desk know."
+
+#: templates/portal_patient/checkin.html:13
+msgid "ดูนัดหมายของฉัน"
+msgstr "See my appointments"
+
+#: templates/portal_patient/consent.html:4
+msgid "ความยินยอมและ PDPA — TSPI Health"
+msgstr "Consent and PDPA — TSPI Health"
+
+#: templates/portal_patient/consent.html:11
+msgid "ความยินยอม"
+msgstr "Consent"
+
+#: templates/portal_patient/consent.html:12
+msgid "หนังสือยินยอมรับการรักษาและนโยบายความเป็นส่วนตัว"
+msgstr "Consent to treatment and privacy policy"
+
+#: templates/portal_patient/consent.html:13
+msgid "ยินยอมให้ประมวลผลข้อมูลสุขภาพและข้อมูลทางพันธุศาสตร์/ผลแล็บตามมาตรฐาน PDPA"
+msgstr ""
+"Consent to processing of health data and genetic data / lab results under "
+"the PDPA"
+
+#: templates/portal_patient/consent.html:19
+msgid "1. การยินยอมรับการประเมินและการรักษา"
+msgstr "1. Consent to assessment and treatment"
+
+#: templates/portal_patient/consent.html:21
+msgid ""
+"ข้าพเจ้ายินยอมให้ทีมแพทย์ TSPI Clinic และระบบ AI Clinical Engine วิเคราะห์ข้อมูลสุขภาพ "
+"ผลการตรวจเลือด สัญญาณชีพ และประวัติครอบครัว "
+"เพื่อการวางแผนบำบัดฟื้นฟูด้วยไฟโตเคมีคอลมาตรฐาน 200 โมดูล"
+msgstr ""
+"I consent to the TSPI Clinic medical team and the AI Clinical Engine "
+"analysing my health data, blood test results, vital signs and family history "
+"to plan recovery treatment with 200 standardised phytochemical modules."
+
+#: templates/portal_patient/consent.html:25
+msgid "2. การคุ้มครองข้อมูลส่วนบุคคล (PDPA)"
+msgstr "2. Personal data protection (PDPA)"
+
+#: templates/portal_patient/consent.html:27
+msgid ""
+"ข้อมูลของท่านจะได้รับการเข้ารหัสตามมาตรฐานความปลอดภัยสูง "
+"และใช้เพื่อวัตถุประสงค์ในการดูแลรักษาเฉพาะบุคคลเท่านั้น "
+"ท่านสามารถเพิกถอนความยินยอมหรือขอตรวจสอบประวัติการเข้าถึงข้อมูลได้ตลอดเวลา"
+msgstr ""
+"Your data is encrypted to high security standards and used only for your "
+"personal care. You can withdraw your consent or ask to see the record of who "
+"accessed your data at any time."
+
+#: templates/portal_patient/consent.html:31
+msgid "ต้องการเพิกถอนความยินยอมหรือขอดูประวัติการเข้าถึงข้อมูล แจ้งเจ้าหน้าที่ของคลินิกได้"
+msgstr ""
+"To withdraw consent or see the record of access to your data, please tell "
+"the clinic's staff"
+
+#: templates/portal_patient/consent.html:32
+msgid "อ่านนโยบายฉบับเต็ม"
+msgstr "Read the full policy"
+
+#: templates/portal_patient/dashboard.html:4
+msgid "หน้าหลัก — TSPI Health"
+msgstr "Home — TSPI Health"
+
+#: templates/portal_patient/dashboard.html:16
+msgid "ปรึกษาผู้ช่วย AI"
+msgstr "Ask the AI assistant"
+
+#: templates/portal_patient/dashboard.html:18
+msgid "สวัสดีคุณ"
+msgstr "Hello, "
+
+#: templates/portal_patient/dashboard.html:23
+msgid "เข้าสู่ระบบล่าสุด"
+msgstr "Last signed in"
+
+#: templates/portal_patient/dashboard.html:23
+msgid "ครั้งแรก"
+msgstr "First time"
+
+#: templates/portal_patient/dashboard.html:29
+msgid "นัดครั้งถัดไป"
+msgstr "Next appointment"
+
+#: templates/portal_patient/dashboard.html:33
+msgid "ยังไม่มีนัด"
+msgstr "No appointment"
+
+#: templates/portal_patient/dashboard.html:37
+msgid "พบแพทย์ครั้งล่าสุด"
+msgstr "Last doctor visit"
+
+#: templates/portal_patient/dashboard.html:38
+msgid "ยังไม่มีบันทึก"
+msgstr "No record yet"
+
+#: templates/portal_patient/dashboard.html:41
+msgid "รายงานที่แพทย์อนุมัติ"
+msgstr "Doctor-approved reports"
+
+#: templates/portal_patient/dashboard.html:42
+msgid "ฉบับ"
+msgstr "report(s)"
+
+#: templates/portal_patient/dashboard.html:42
+msgid "ยังไม่มี"
+msgstr "None yet"
+
+#: templates/portal_patient/dashboard.html:48
+msgid "บัญชีนี้ยังไม่ได้เชื่อมกับเวชระเบียนของคลินิก กรุณาติดต่อเจ้าหน้าที่เพื่อเชื่อมข้อมูล"
+msgstr ""
+"This account isn't linked to a clinic medical record yet. Please contact "
+"staff to link your record."
+
+#: templates/portal_patient/dashboard.html:57
+msgid "นัดหมายจากแพทย์"
+msgstr "Appointments from your doctor"
+
+#: templates/portal_patient/dashboard.html:58
+msgid "ดูนัดทั้งหมด"
+msgstr "See all appointments"
+
+#: templates/portal_patient/dashboard.html:66
+msgid "เมื่อแพทย์นัดคุณ จะแสดงที่นี่ทันที"
+msgstr "When a doctor books you in, it will show here right away"
+
+#: templates/portal_patient/dashboard.html:74
+msgid "เมนูของคุณ"
+msgstr "Your menu"
+
+#: templates/portal_patient/dashboard.html:76
+msgid "คะแนนสมดุลของร่างกาย"
+msgstr "Your body's balance scores"
+
+#: templates/portal_patient/dashboard.html:77
+msgid "วันเวลานัดพบแพทย์"
+msgstr "Your appointment dates and times"
+
+#: templates/portal_patient/dashboard.html:78
+msgid "บันทึกการพบแพทย์"
+msgstr "Records of your doctor visits"
+
+#: templates/portal_patient/dashboard.html:79
+msgid "รายงานสุขภาพ"
+msgstr "Health reports"
+
+#: templates/portal_patient/dashboard.html:79
+#: templates/portal_patient/download.html:24
+msgid "ดาวน์โหลด PDF"
+msgstr "Download PDF"
+
+#: templates/portal_patient/dashboard.html:80
+msgid "จุดที่ควรเฝ้าระวัง"
+msgstr "Areas to watch"
+
+#: templates/portal_patient/dashboard.html:81
+msgid "ข้อมูลของฉัน"
+msgstr "My details"
+
+#: templates/portal_patient/dashboard.html:81
+msgid "ช่องทางติดต่อ · LINE"
+msgstr "Contact details · LINE"
+
+#: templates/portal_patient/dashboard.html:87
+msgid "มีอาการฉุกเฉิน เช่น แน่นหน้าอก หายใจลำบาก หมดสติ"
+msgstr ""
+"In an emergency, such as chest tightness, difficulty breathing or fainting,"
+
+#: templates/portal_patient/dashboard.html:87
+msgid "ทันที"
+msgstr "right away"
+
+#: templates/portal_patient/digital_twin.html:11
+msgid "จุดที่ร่างกายควรเฝ้าระวัง"
+msgstr "Areas of your body to watch"
+
+#: templates/portal_patient/digital_twin.html:12
+msgid "แสดงอวัยวะที่คะแนนตั้งแต่ 60 ขึ้นไป จากผลประเมิน 39 แกนล่าสุด"
+msgstr "Shows organs scoring 60 or more in your latest 39-axis assessment"
+
+#: templates/portal_patient/digital_twin.html:14
+msgid "ดูผล 39 แกน"
+msgstr "See 39-axis results"
+
+#: templates/portal_patient/digital_twin.html:31
+msgid "ภูมิคุ้มกันและการอักเสบ"
+msgstr "Immunity and inflammation"
+
+#: templates/portal_patient/digital_twin.html:34
+msgid "ตับและการขับสารพิษ"
+msgstr "Liver and detoxification"
+
+#: templates/portal_patient/digital_twin.html:37
+msgid "เยื่อบุลำไส้"
+msgstr "Gut lining"
+
+#: templates/portal_patient/digital_twin.html:57
+msgid "ยังไม่พบจุดที่ต้องเฝ้าระวัง"
+msgstr "No areas to watch found"
+
+#: templates/portal_patient/digital_twin.html:58
+msgid "จากผลประเมินล่าสุด ไม่มีอวัยวะที่คะแนนถึงเกณฑ์เฝ้าระวัง"
+msgstr ""
+"Based on your latest assessment, no organ has reached the watch threshold"
+
+#: templates/portal_patient/digital_twin.html:60
+msgid "ยังไม่มีผลประเมิน 39 แกน"
+msgstr "No 39-axis results yet"
+
+#: templates/portal_patient/digital_twin.html:61
+msgid "แบบจำลองจะแสดงผลหลังแพทย์ประเมินแล้ว"
+msgstr "The model will show results after a doctor has assessed you"
+
+#: templates/portal_patient/download.html:4
+msgid "รายงานสุขภาพ — TSPI Health"
+msgstr "Health reports — TSPI Health"
+
+#: templates/portal_patient/download.html:10
+msgid "รายงาน"
+msgstr "Reports"
+
+#: templates/portal_patient/download.html:11
+msgid "รายงานสุขภาพของคุณ"
+msgstr "Your health reports"
+
+#: templates/portal_patient/download.html:12
+msgid "รายงานผลการวิเคราะห์ที่แพทย์ตรวจทานและอนุมัติแล้วเท่านั้น"
+msgstr "Only analysis reports reviewed and approved by a doctor"
+
+#: templates/portal_patient/download.html:21
+msgid "รายงานสุขภาพ #"
+msgstr "Health report #"
+
+#: templates/portal_patient/download.html:22
+msgid "น. · แพทย์อนุมัติแล้ว"
+msgstr "h · approved by a doctor"
+
+#: templates/portal_patient/download.html:29
+msgid "ยังไม่มีรายงาน"
+msgstr "No reports yet"
+
+#: templates/portal_patient/download.html:30
+msgid "เมื่อแพทย์อนุมัติรายงานแล้ว จะดาวน์โหลดได้ที่นี่ทันที"
+msgstr "Once a doctor approves a report, you can download it here right away"
+
+#: templates/portal_patient/history.html:4
+msgid "ประวัติการรักษา — TSPI Health"
+msgstr "Treatment history — TSPI Health"
+
+#: templates/portal_patient/history.html:11
+msgid "ประวัติการรักษาของคุณ"
+msgstr "Your treatment history"
+
+#: templates/portal_patient/history.html:12
+msgid "บันทึกการพบแพทย์และแผนการดูแลจากเวชระเบียนของคลินิก"
+msgstr "Doctor visits and care plans from the clinic's medical records"
+
+#: templates/portal_patient/history.html:25
+msgid "อาการ:"
+msgstr "Symptoms:"
+
+#: templates/portal_patient/history.html:26
+msgid "แผนการดูแล:"
+msgstr "Care plan:"
+
+#: templates/portal_patient/history.html:34
+msgid "ยังไม่มีบันทึกการตรวจรักษา"
+msgstr "No treatment records yet"
+
+#: templates/portal_patient/history.html:35
+msgid "เมื่อแพทย์บันทึกผลการตรวจจะแสดงที่นี่"
+msgstr "Records will appear here once a doctor saves your visit"
+
+#: templates/portal_patient/history.html:38
+msgid "กรุณาติดต่อเจ้าหน้าที่เพื่อเชื่อมข้อมูล"
+msgstr "Please contact staff to link your record"
+
+#: templates/portal_patient/line_liff_binding.html:5
+msgid "ยืนยันตัวตนและเชื่อมต่อบัญชี LINE OA | TSPI Clinic"
+msgstr "Verify identity and link your LINE account | TSPI Clinic"
+
+#: templates/portal_patient/line_liff_binding.html:15
+msgid "เชื่อมต่อ LINE OA กับเวชระเบียน"
+msgstr "Link LINE OA to your medical record"
+
+#: templates/portal_patient/line_liff_binding.html:16
+msgid "ยืนยันตัวตนเพื่อเชื่อมแชทกับข้อมูลของคุณ"
+msgstr "Verify your identity to link the chat with your data"
+
+#: templates/portal_patient/line_liff_binding.html:28
+msgid "ข้อมูลผู้ป่วย"
+msgstr "Patient details"
+
+#: templates/portal_patient/line_liff_binding.html:33
+msgid "ยืนยัน OTP"
+msgstr "Verify OTP"
+
+#: templates/portal_patient/line_liff_binding.html:38
+msgid "สำเร็จ"
+msgstr "Done"
+
+#: templates/portal_patient/line_liff_binding.html:56
+msgid "เช่น 1-1004-00123-45-6 หรือ HN-2026-0001"
+msgstr "e.g. 1-1004-00123-45-6 or HN-2026-0001"
+
+#: templates/portal_patient/line_liff_binding.html:58
+msgid "ระบบจะส่งรหัส OTP ไปที่อีเมลที่ลงทะเบียนไว้กับคลินิก"
+msgstr "We'll send an OTP code to the email registered with the clinic"
+
+#: templates/portal_patient/line_liff_binding.html:64
+msgid "ความสัมพันธ์กับผู้ป่วย (Caregiver Role)"
+msgstr "Relationship to the patient (caregiver role)"
+
+#: templates/portal_patient/line_liff_binding.html:72
+msgid "รองรับผู้ดูแล 1 ท่าน ดูแลผู้ป่วยได้หลายรายโดยไม่ปะปนข้อมูล"
+msgstr ""
+"One caregiver can look after several patients without mixing up their data"
+
+#: templates/portal_patient/line_liff_binding.html:81
+msgid "โหมดจำลอง Dev"
+msgstr "Dev simulation mode"
+
+#: templates/portal_patient/line_liff_binding.html:83
+msgid "พร้อมผูกบัญชี"
+msgstr "Ready to link"
+
+#: templates/portal_patient/line_liff_binding.html:87
+msgid "ขอรหัส OTP ยืนยันตัวตน"
+msgstr "Request an OTP code"
+
+#: templates/portal_patient/line_liff_binding.html:88
+msgid "กำลังตรวจสอบข้อมูล..."
+msgstr "Checking details..."
+
+#: templates/portal_patient/line_liff_binding.html:94
+msgid "ไม่พบเวชระเบียน กรุณากรอกข้อมูลเพื่อลงทะเบียน ระบบจะส่งรหัส OTP ไปยืนยันอีเมล"
+msgstr ""
+"No medical record found. Please fill in your details to register and we'll "
+"send an OTP to verify your email."
+
+#: templates/portal_patient/line_liff_binding.html:95
+msgid "ชื่อ"
+msgstr "First name"
+
+#: templates/portal_patient/line_liff_binding.html:102
+msgid "ยินยอมให้คลินิกเก็บและใช้ข้อมูลสุขภาพเพื่อการรักษา ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล"
+msgstr ""
+"I consent to the clinic collecting and using my health data for treatment "
+"under the Personal Data Protection Act"
+
+#: templates/portal_patient/line_liff_binding.html:104
+msgid "ลงทะเบียนและรับรหัส OTP"
+msgstr "Register and get an OTP code"
+
+#: templates/portal_patient/line_liff_binding.html:105
+#: templates/portal_patient/line_liff_binding.html:115
+msgid "ย้อนกลับ"
+msgstr "Back"
+
+#: templates/portal_patient/line_liff_binding.html:113
+msgid "ขอให้เจ้าหน้าที่ยืนยันตัวตน"
+msgstr "Ask staff to verify my identity"
+
+#: templates/portal_patient/line_liff_binding.html:121
+msgid "รหัสยืนยันถูกส่งไปที่อีเมล"
+msgstr "The verification code was sent to"
+
+#: templates/portal_patient/line_liff_binding.html:123
+msgid "รหัสมีอายุ 10 นาที หากไม่พบ ให้ดูในกล่องจดหมายขยะ"
+msgstr ""
+"The code is valid for 10 minutes. If you can't find it, check your spam "
+"folder."
+
+#: templates/portal_patient/line_liff_binding.html:128
+msgid "ระบุรหัส OTP 6 หลัก"
+msgstr "Enter the 6-digit OTP code"
+
+#: templates/portal_patient/line_liff_binding.html:135
+msgid "ยืนยันและเชื่อมต่อบัญชี"
+msgstr "Verify and link account"
+
+#: templates/portal_patient/line_liff_binding.html:136
+msgid "กำลังตรวจสอบ OTP..."
+msgstr "Checking OTP..."
+
+#: templates/portal_patient/line_liff_binding.html:140
+msgid "ย้อนกลับไปแก้ไขข้อมูล"
+msgstr "Go back and edit details"
+
+#: templates/portal_patient/line_liff_binding.html:146
+msgid "ไม่ได้รับอีเมล?"
+msgstr "Didn't get the email?"
+
+#: templates/portal_patient/line_liff_binding.html:150
+msgid "ขอให้พยาบาลยืนยัน (Staff-Assisted Fallback)"
+msgstr "Ask a nurse to verify (staff-assisted)"
+
+#: templates/portal_patient/line_liff_binding.html:160
+msgid "เชื่อมต่อบัญชีสำเร็จ!"
+msgstr "Account linked!"
+
+#: templates/portal_patient/line_liff_binding.html:165
+msgid "ชื่อผู้ป่วย:"
+msgstr "Patient name:"
+
+#: templates/portal_patient/line_liff_binding.html:169
+msgid "รหัส HN:"
+msgstr "HN:"
+
+#: templates/portal_patient/line_liff_binding.html:173
+msgid "บทบาทผู้ติดต่อ:"
+msgstr "Contact role:"
+
+#: templates/portal_patient/line_liff_binding.html:180
+msgid "กลับไปยังหน้าแชท LINE"
+msgstr "Back to the LINE chat"
+
+#: templates/portal_patient/line_liff_binding.html:189
+msgid "คุ้มครองความปลอดภัยตามมาตรฐาน PDPA & JCI Scope of Practice"
+msgstr "Protected under PDPA & JCI Scope of Practice standards"
+
+#: templates/portal_patient/line_liff_binding.html:190
+msgid "รหัสการเชื่อมโยงถูกเข้ารหัสแบบความปลอดภัยสูง ห้ามส่งต่อรหัส OTP ให้ผู้อื่น"
+msgstr ""
+"Your link code is securely encrypted. Never share your OTP code with anyone."
+
+#: templates/portal_patient/line_liff_binding.html:206
+msgid "ผู้ติดต่อ LINE"
+msgstr "LINE contact"
+
+#: templates/portal_patient/line_liff_binding.html:260
+#: templates/portal_patient/line_liff_binding.html:295
+msgid "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง"
+msgstr "Couldn't connect to the server. Please try again."
+
+#: templates/portal_patient/line_liff_binding.html:278
+msgid "เกิดข้อผิดพลาดในการตรวจสอบข้อมูล"
+msgstr "Something went wrong while checking your details"
+
+#: templates/portal_patient/line_liff_binding.html:325
+msgid "รหัส OTP ไม่ถูกต้อง"
+msgstr "Incorrect OTP code"
+
+#: templates/portal_patient/line_liff_binding.html:330
+msgid "ไม่สามารถตรวจสอบ OTP ได้ กรุณาลองใหม่อีกครั้ง"
+msgstr "Couldn't verify the OTP. Please try again."
+
+#: templates/portal_patient/line_liff_binding.html:335
+msgid "ต้องการส่งคำขอนี้ให้พยาบาลที่เคาน์เตอร์คลินิกตรวจสอบและยืนยันหรือไม่?"
+msgstr ""
+"Send this request to the nurse at the clinic counter to check and confirm?"
+
+#: templates/portal_patient/line_liff_binding.html:358
+msgid "รอการยืนยันจากพยาบาลที่เคาน์เตอร์"
+msgstr "Waiting for confirmation from the nurse at the counter"
+
+#: templates/portal_patient/line_liff_binding.html:360
+msgid "รอตรวจสอบ"
+msgstr "Pending review"
+
+#: templates/portal_patient/line_liff_binding.html:364
+msgid "เกิดข้อผิดพลาดในการส่งคำขอ"
+msgstr "Something went wrong while sending the request"
+
+#: templates/portal_patient/line_liff_binding.html:369
+msgid "ไม่สามารถส่งคำขอได้ กรุณาลองใหม่อีกครั้ง"
+msgstr "Couldn't send the request. Please try again."
+
+#: templates/portal_patient/onboarding/wizard.html:5
+msgid "เริ่มต้นใช้งาน — ระบบประเมินสุขภาพ 39 แกนชีววิทยา | TSPI CLINIC"
+msgstr "Get started — 39-axis health assessment | TSPI CLINIC"
+
+#: templates/portal_patient/onboarding/wizard.html:15
+#: templates/portal_patient/onboarding/wizard.html:312
+msgid "ยินดีต้อนรับสู่ TSPI CLINIC"
+msgstr "Welcome to TSPI CLINIC"
+
+#: templates/portal_patient/onboarding/wizard.html:16
+msgid "ลงทะเบียนครั้งเดียว แล้วเริ่มประเมินสุขภาพ 39 แกนชีววิทยา"
+msgstr "Register once, then start your 39-axis health assessment"
+
+#: templates/portal_patient/onboarding/wizard.html:19
+msgid "ขั้นตอน"
+msgstr "Steps"
+
+#: templates/portal_patient/onboarding/wizard.html:20
+msgid "สัญชาติ"
+msgstr "Nationality"
+
+#: templates/portal_patient/onboarding/wizard.html:22
+msgid "ประวัติบริการ"
+msgstr "Visit history"
+
+#: templates/portal_patient/onboarding/wizard.html:24
+msgid "ยืนยันตัวตน"
+msgstr "Verify identity"
+
+#: templates/portal_patient/onboarding/wizard.html:34
+msgid "กรุณาเลือกสัญชาติของคุณ (Nationality)"
+msgstr "Please choose your nationality"
+
+#: templates/portal_patient/onboarding/wizard.html:39
+msgid "สัญชาติไทย"
+msgstr "Thai national"
+
+#: templates/portal_patient/onboarding/wizard.html:40
+msgid "มีเลขประจำตัวประชาชน 13 หลัก"
+msgstr "Has a 13-digit Thai ID number"
+
+#: templates/portal_patient/onboarding/wizard.html:57
+msgid "ท่านเคยรับบริการหรือมีประวัติกับ TSPI Clinic หรือไม่?"
+msgstr "Have you used TSPI Clinic's services before?"
+
+#: templates/portal_patient/onboarding/wizard.html:58
+msgid "ระบบจะทำการค้นหาข้อมูลเวชระเบียนเดิมเพื่อนำมาเชื่อมต่ออย่างปลอดภัย"
+msgstr "We'll look up your existing medical record and link it securely"
+
+#: templates/portal_patient/onboarding/wizard.html:64
+msgid "เคยรับการตรวจหรือมีประวัติกับคลินิกแล้ว"
+msgstr "I've been examined or have a record at the clinic"
+
+#: templates/portal_patient/onboarding/wizard.html:65
+msgid "ค้นหาประวัติเดิมด้วยเลขบัตรประชาชน / Passport เพื่อดูผลตรวจและเริ่มใช้ AI"
+msgstr ""
+"Find your existing record with your ID card / passport number to see results "
+"and start using AI"
+
+#: templates/portal_patient/onboarding/wizard.html:74
+msgid "เป็นคนไข้ใหม่ (ยังไม่เคยมีประวัติ)"
+msgstr "I'm a new patient (no record yet)"
+
+#: templates/portal_patient/onboarding/wizard.html:75
+msgid "กรอกข้อมูลเบื้องต้นสั้นๆ เพื่อลงทะเบียนและเริ่มทำแบบประเมินสุขภาพ AI ทันที"
+msgstr ""
+"Fill in a short form to register and start your AI health assessment right "
+"away"
+
+#: templates/portal_patient/onboarding/wizard.html:82
+msgid "&larr; ย้อนกลับไปเลือกสัญชาติ"
+msgstr "&larr; Back to nationality"
+
+#: templates/portal_patient/onboarding/wizard.html:90
+msgid "ค้นหาประวัติเวชระเบียนเดิม"
+msgstr "Find your existing medical record"
+
+#: templates/portal_patient/onboarding/wizard.html:91
+msgid "กรุณาระบุเลขประจำตัวเพื่อตรวจสอบประวัติสุขภาพที่บันทึกไว้ในคลินิก"
+msgstr "Enter your ID number to check the health records saved at the clinic"
+
+#: templates/portal_patient/onboarding/wizard.html:104
+msgid "ข้อมูลได้รับการเข้ารหัส AES-256 ตามมาตรฐานการคุ้มครองข้อมูลส่วนบุคคล PDPA"
+msgstr "Your data is encrypted with AES-256 in line with the PDPA"
+
+#: templates/portal_patient/onboarding/wizard.html:110
+#: templates/portal_patient/onboarding/wizard.html:255
+msgid "&larr; ย้อนกลับ"
+msgstr "&larr; Back"
+
+#: templates/portal_patient/onboarding/wizard.html:114
+msgid "ตรวจสอบประวัติ &rarr;"
+msgstr "Check my record &rarr;"
+
+#: templates/portal_patient/onboarding/wizard.html:130
+msgid "พบข้อมูลเวชระเบียนในระบบ TSPI"
+msgstr "Medical record found in TSPI"
+
+#: templates/portal_patient/onboarding/wizard.html:131
+msgid "กรุณายืนยันตัวตนเพื่อเข้าถึงข้อมูลสุขภาพส่วนบุคคล"
+msgstr "Please verify your identity to access your personal health data"
+
+#: templates/portal_patient/onboarding/wizard.html:138
+msgid "ชื่อ-นามสกุล:"
+msgstr "Full name:"
+
+#: templates/portal_patient/onboarding/wizard.html:139
+msgid "คุณ ส*** สุข***"
+msgstr "S*** S***"
+
+#: templates/portal_patient/onboarding/wizard.html:142
+msgid "รหัสเวชระเบียน (HN):"
+msgstr "Medical record number (HN):"
+
+#: templates/portal_patient/onboarding/wizard.html:146
+msgid "เลขประจำตัว:"
+msgstr "ID number:"
+
+#: templates/portal_patient/onboarding/wizard.html:150
+msgid "เบอร์โทรศัพท์ที่บันทึกไว้:"
+msgstr "Phone number on file:"
+
+#: templates/portal_patient/onboarding/wizard.html:163
+msgid "กรอกเบอร์โทรศัพท์ 4 ตัวท้ายเพื่อยืนยันตัวตน (Identity Verification)"
+msgstr "Enter the last 4 digits of your phone number to verify your identity"
+
+#: templates/portal_patient/onboarding/wizard.html:165
+msgid "เช่น 4321"
+msgstr "e.g. 4321"
+
+#: templates/portal_patient/onboarding/wizard.html:170
+msgid "ตั้งรหัสผ่านสำหรับเข้าใช้งาน Patient Portal"
+msgstr "Set a password for the patient portal"
+
+#: templates/portal_patient/onboarding/wizard.html:172
+#: templates/portal_patient/onboarding/wizard.html:243
+msgid "อย่างน้อย 12 ตัวอักษร"
+msgstr "At least 12 characters"
+
+#: templates/portal_patient/onboarding/wizard.html:173
+msgid "ใช้สำหรับเข้าดูผลการตรวจ 39 แกนชีววิทยาในครั้งถัดไป"
+msgstr "Used to view your 39-axis results next time"
+
+#: templates/portal_patient/onboarding/wizard.html:178
+msgid "&larr; ไม่ใช่ข้อมูลของฉัน"
+msgstr "&larr; This isn't me"
+
+#: templates/portal_patient/onboarding/wizard.html:182
+msgid "ยืนยันและเข้าสู่ระบบ &rarr;"
+msgstr "Confirm and sign in &rarr;"
+
+#: templates/portal_patient/onboarding/wizard.html:192
+#: templates/portal_patient/onboarding/wizard.html:322
+msgid "ลงทะเบียนคนไข้ใหม่"
+msgstr "Register as a new patient"
+
+#: templates/portal_patient/onboarding/wizard.html:193
+msgid "กรอกข้อมูลเบื้องต้นเพื่อสร้างเวชระเบียนและเข้าสู่ระบบประเมินสุขภาพ AI"
+msgstr ""
+"Fill in basic details to create your medical record and start the AI health "
+"assessment"
+
+#: templates/portal_patient/onboarding/wizard.html:199
+msgid "ชื่อจริง (First Name) *"
+msgstr "First name *"
+
+#: templates/portal_patient/onboarding/wizard.html:203
+msgid "นามสกุล (Last Name) *"
+msgstr "Last name *"
+
+#: templates/portal_patient/onboarding/wizard.html:210
+msgid "เบอร์โทรศัพท์มือถือ *"
+msgstr "Mobile phone number *"
+
+#: templates/portal_patient/onboarding/wizard.html:214
+msgid "อีเมล (ถ้ามี)"
+msgstr "Email (optional)"
+
+#: templates/portal_patient/onboarding/wizard.html:221
+msgid "วันเดือนปีเกิด"
+msgstr "Date of birth"
+
+#: templates/portal_patient/onboarding/wizard.html:225
+msgid "เพศตามกำเนิด"
+msgstr "Sex at birth"
+
+#: templates/portal_patient/onboarding/wizard.html:227
+msgid "ชาย (Male)"
+msgstr "Male"
+
+#: templates/portal_patient/onboarding/wizard.html:228
+msgid "หญิง (Female)"
+msgstr "Female"
+
+#: templates/portal_patient/onboarding/wizard.html:229
+msgid "อื่นๆ / ไม่ระบุ (Other)"
+msgstr "Other / prefer not to say"
+
+#: templates/portal_patient/onboarding/wizard.html:236
+msgid "เลขบัตรประจำตัวประชาชน 13 หลัก (หรือ Passport)"
+msgstr "13-digit Thai ID number (or passport)"
+
+#: templates/portal_patient/onboarding/wizard.html:238
+msgid "เลข 13 หลัก หรือ Passport No."
+msgstr "13-digit number or passport no."
+
+#: templates/portal_patient/onboarding/wizard.html:242
+msgid "กำหนดรหัสผ่าน (Password) สำหรับเข้าดูผลตรวจ"
+msgstr "Set a password to view your results"
+
+#: templates/portal_patient/onboarding/wizard.html:249
+msgid "ข้าพเจ้ายินยอมให้ TSPI Clinic จัดเก็บและประมวลผลข้อมูลสุขภาพตาม"
+msgstr ""
+"I consent to TSPI Clinic storing and processing my health data under the"
+
+#: templates/portal_patient/onboarding/wizard.html:249
+msgid "นโยบายความเป็นส่วนตัว (PDPA)"
+msgstr "privacy policy (PDPA)"
+
+#: templates/portal_patient/onboarding/wizard.html:259
+msgid "สร้างเวชระเบียนและเริ่มทำแบบประเมิน AI &rarr;"
+msgstr "Create my record and start the AI assessment &rarr;"
+
+#: templates/portal_patient/onboarding/wizard.html:315
+msgid "ประวัติการรับบริการ"
+msgstr "Visit history"
+
+#: templates/portal_patient/onboarding/wizard.html:319
+msgid "ค้นหาประวัติเดิม"
+msgstr "Find your existing record"
+
+#: templates/portal_patient/onboarding/wizard.html:338
+#: templates/portal_patient/onboarding/wizard.html:340
+msgid "Passport Number / หมายเลขหนังสือเดินทาง"
+msgstr "Passport number"
+
+#: templates/portal_patient/onboarding/wizard.html:357
+msgid "กรุณาระบุเลขประจำตัวหรือหนังสือเดินทาง"
+msgstr "Please enter your ID or passport number"
+
+#: templates/portal_patient/onboarding/wizard.html:392
+msgid "ยืนยันตัวตนของคุณ"
+msgstr "Verify your identity"
+
+#: templates/portal_patient/onboarding/wizard.html:394
+msgid "ไม่พบข้อมูล กรุณาตรวจสอบอีกครั้งหรือลงทะเบียนเป็นคนไข้ใหม่"
+msgstr "No record found. Please check again or register as a new patient."
+
+#: templates/portal_patient/onboarding/wizard.html:397
+#: templates/portal_patient/onboarding/wizard.html:440
+#: templates/portal_patient/onboarding/wizard.html:485
+msgid "เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง"
+msgstr "Connection error. Please try again."
+
+#: templates/portal_patient/onboarding/wizard.html:437
+msgid "การยืนยันตัวตนไม่สำเร็จ กรุณาตรวจสอบเบอร์โทรศัพท์ 4 ตัวท้าย"
+msgstr ""
+"Verification failed. Please check the last 4 digits of your phone number."
+
+#: templates/portal_patient/onboarding/wizard.html:482
+msgid "ไม่สามารถลงทะเบียนได้ กรุณาตรวจสอบข้อมูล"
+msgstr "Registration failed. Please check your details."
+
+#: templates/portal_patient/rewards.html:4
+msgid "คะแนนการดูแลสุขภาพ — TSPI Health"
+msgstr "Health care points — TSPI Health"
+
+#: templates/portal_patient/rewards.html:10
+msgid "คะแนนสะสม"
+msgstr "Points"
+
+#: templates/portal_patient/rewards.html:11
+msgid "คะแนนความสม่ำเสมอในการดูแลตนเอง"
+msgstr "Self-care consistency points"
+
+#: templates/portal_patient/rewards.html:12
+msgid "สะสมคะแนนจากการทานสารสกัดตรงเวลา การบันทึกอาการ และการมาพบแพทย์ตามนัด"
+msgstr ""
+"Earn points by taking supplements on time, logging symptoms and attending "
+"appointments"
+
+#: templates/portal_patient/rewards.html:17
+msgid "ยังไม่เปิดให้บริการ"
+msgstr "Not available yet"
+
+#: templates/portal_patient/rewards.html:18
+msgid "เมื่อเปิดใช้งาน คะแนนของคุณจะแสดงที่นี่"
+msgstr "Your points will appear here once this feature launches"
+
+#: templates/portal_patient/settings.html:4
+msgid "ข้อมูลของฉัน — TSPI Health"
+msgstr "My details — TSPI Health"
+
+#: templates/portal_patient/settings.html:11
+msgid "บัญชีของฉัน"
+msgstr "My account"
+
+#: templates/portal_patient/settings.html:12
+msgid "ข้อมูลส่วนตัวและการเชื่อมต่อ"
+msgstr "Personal details and connections"
+
+#: templates/portal_patient/settings.html:13
+msgid "ข้อมูลที่คลินิกใช้ติดต่อคุณ หากข้อมูลไม่ถูกต้อง แจ้งเจ้าหน้าที่ให้แก้ไขได้"
+msgstr ""
+"The details the clinic uses to contact you. If anything is wrong, staff can "
+"correct it for you."
+
+#: templates/portal_patient/settings.html:20
+msgid "ข้อมูลผู้รับบริการ"
+msgstr "Patient details"
+
+#: templates/portal_patient/settings.html:24
+#: templates/portal_patient/settings.html:25
+msgid "ยังไม่ได้บันทึก"
+msgstr "Not recorded"
+
+#: templates/portal_patient/settings.html:34
+msgid "เชื่อมต่อแล้ว"
+msgstr "Connected"
+
+#: templates/portal_patient/settings.html:35
+msgid "รับการแจ้งเตือนและคุยกับผู้ช่วย AI ผ่าน LINE ได้"
+msgstr "Get notifications and chat with the AI assistant on LINE"
+
+#: templates/portal_patient/settings.html:37
+msgid "ยังไม่ได้เชื่อมต่อ"
+msgstr "Not connected"
+
+#: templates/portal_patient/settings.html:38
+msgid "เชื่อม LINE เพื่อคุยกับผู้ช่วย AI และรับข่าวสารจากคลินิก"
+msgstr "Connect LINE to chat with the AI assistant and get clinic news"
+
+#: templates/portal_patient/settings.html:43
+msgid "ความปลอดภัย"
+msgstr "Security"
+
+#: templates/portal_patient/settings.html:44
+msgid "เปลี่ยนรหัสผ่านที่ใช้เข้าสู่ระบบ"
+msgstr "Change the password you use to sign in"
+
+#: templates/portal_patient/settings.html:45
+msgid "เปลี่ยนรหัสผ่าน"
+msgstr "Change password"
+
+#: templates/portal_patient/settings.html:47
+msgid "ความยินยอมและ PDPA"
+msgstr "Consent and PDPA"
+
+#: templates/portal_patient/settings.html:47
+msgid "อ่านข้อตกลงการใช้ข้อมูล"
+msgstr "Read the data use agreement"

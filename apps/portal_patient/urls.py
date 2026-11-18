@@ -11,7 +11,6 @@ from patients.views_portal import (
     portal_logout_view,
     portal_dashboard_view,
     portal_report_detail_view,
-    portal_appointments_view,
     portal_create_line_token_view
 )
 from patients.views_line import (
@@ -72,7 +71,7 @@ urlpatterns = [
 
     # Clinical Reports & Appointments
     path('reports/<int:pk>/', portal_report_detail_view, name='portal_report_detail'),
-    path('appointments/', portal_appointments_view, name='portal_appointments'),
+    path('appointments/', views.patient_appointments, name='portal_appointments'),
 
     # LINE Integration & Webhook (Pillars 8, 14)
     path('webhook/', line_webhook_view, name='line_webhook'),

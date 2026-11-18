@@ -222,6 +222,52 @@ class PatientPortalTests(TestCase):
         self.assertEqual(resp.status_code, 302)
         self.assertIn(reverse('portal_patient:portal_login'), resp.url)
 
+    def test_new_portal_shows_real_appointment_and_reports(self):
+        """หน้า portal ใหม่: หน้าหลักสรุปนัดถัดไป/รายงานจากข้อมูลจริง, หน้านัดไม่มีเบอร์ตัวอย่าง"""
+        user = User.objects.create_user(username='anan_pt', password='PatientPass123!', role='patient', first_name='อนันต์')
+        self.patient1.user = user
+        self.patient1.save(update_fields=['user'])
+        self.client.force_login(user)
+
+        resp = self.client.get(reverse('portal_patient:dashboard'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'HN-2026-1001')
+        self.assertContains(resp, '10:30')
+        self.assertContains(resp, '1 ฉบับ')  # นับเฉพาะรายงานที่อนุมัติ ไม่นับฉบับร่าง
+
+        resp = self.client.get(reverse('portal_patient:portal_appointments'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'layouts/patient_base.html')
+        self.assertContains(resp, 'ยืนยันแล้ว')
+        self.assertNotContains(resp, '02-123-4567')
+
+        resp = self.client.get(reverse('portal_patient:patient_settings'))
+        self.assertContains(resp, '0811112222')
+
+    def test_ai_intake_saved_messages_cannot_break_out_of_script(self):
+        """ข้อความแชทที่บันทึกไว้ต้องไม่ปิด <script> ได้ (stored XSS)"""
+        user = User.objects.create_user(username='xss_pt', password='PatientPass123!', role='patient')
+        self.patient1.user = user
+        self.patient1.extra_data = {'intake_messages': [{'sender': 'user', 'text': '</script><script>alert(1)</script>'}]}
+        self.patient1.save(update_fields=['user', 'extra_data'])
+        self.client.force_login(user)
+        resp = self.client.get(reverse('portal_patient:patient_ai_intake'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotContains(resp, '<script>alert(1)</script>')
+        self.assertContains(resp, '\\u003c/script\\u003e')
+
+    def test_phone_match_alone_does_not_open_another_patients_portal(self):
+        """บัญชีคนไข้ที่ยังไม่ผูกเวชระเบียน แต่เบอร์ตรงกับคนไข้อื่น ต้องไม่เห็นข้อมูลของคนนั้น"""
+        stranger = User.objects.create_user(username='stranger_pt', password='PatientPass123!', role='patient',
+                                            phone=self.patient1.phone)
+        self.client.force_login(stranger)
+        resp = self.client.get(reverse('portal_patient:portal_dashboard'))
+        self.assertEqual(resp.status_code, 302)
+        resp = self.client.get(reverse('portal_patient:portal_report_detail', args=[self.report_approved.pk]))
+        self.assertEqual(resp.status_code, 302)
+        resp = self.client.get(reverse('portal_patient:portal_appointments'))
+        self.assertNotContains(resp, 'HN-2026-1001')
+
     def test_login_with_hn_and_phone_success(self):
         """ล็อกอินผ่าน HN และเบอร์โทรศัพท์สำเร็จ"""
         resp = self.client.post(reverse('portal_patient:portal_login'), {

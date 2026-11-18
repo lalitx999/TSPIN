@@ -1,10 +1,9 @@
 {% extends 'layouts/public_base.html' %}
-{% load static %}
+{% load i18n %}
 
-{% block title %}{{ article.title }} | TSPI CLINIC{% endblock %}
+{% block title %}{{ article.title }} — TSPI Clinic{% endblock %}
 
 {% block extra_head %}
-<!-- SEO & OpenGraph Meta Tags (Gotcha 1: PDPA & Sharing Integrity) -->
 <meta name="description" content="{{ meta_description }}">
 <meta property="og:title" content="{{ meta_title }}">
 <meta property="og:description" content="{{ meta_description }}">
@@ -16,168 +15,106 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ meta_title }}">
 <meta name="twitter:description" content="{{ meta_description }}">
-<style>
-    .article-content {
-        font-size: 1.15rem;
-        line-height: 1.8;
-        color: #1e293b;
-    }
-    .article-content h1, .article-content h2, .article-content h3, .article-content h4 {
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        color: #0f172a;
-        font-weight: 700;
-    }
-    .article-content p {
-        margin-bottom: 1.25rem;
-    }
-    .article-content ul, .article-content ol {
-        margin-bottom: 1.5rem;
-        padding-left: 1.5rem;
-    }
-    .article-content li {
-        margin-bottom: 0.5rem;
-    }
-    .article-content blockquote {
-        border-left: 4px solid #2E7D32;
-        padding-left: 1.25rem;
-        font-style: italic;
-        color: #475569;
-        margin: 1.5rem 0;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
-<div class="py-5">
-    <div class="container-xl">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb small">
-                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none text-muted">หน้าแรก</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'core:article_list' %}" class="text-decoration-none text-muted">สาระสุขภาพ</a></li>
-                <li class="breadcrumb-item active text-dark" aria-current="page">{{ article.get_category_display }}</li>
+<article>
+    <header class="f-page-hero pb-4">
+        <div class="f-hero-bg" aria-hidden="true">
+            <span class="f-glow green" style="width: 460px; height: 320px; left: 50%; top: -200px; transform: translateX(-55%);"></span>
+        </div>
+        <div class="container-xl">
+            <ol class="f-crumbs" aria-label="{% translate "ตำแหน่งหน้า" %}">
+                <li><a href="{% url 'core:home' %}">{% translate "หน้าแรก" %}</a></li>
+                <li><a href="{% url 'core:article_list' %}">{% translate "สาระสุขภาพ" %}</a></li>
+                <li><a href="{% url 'core:article_list' %}?category={{ article.category }}">{{ article.get_category_display }}</a></li>
             </ol>
-        </nav>
+            <h1 style="max-width: 24ch;">{{ article.title }}</h1>
+            <div class="f-byline mt-3">
+                <span class="who">
+                    <span class="f-avatar" aria-hidden="true"><i class="fas fa-user-md"></i></span>
+                    <span>{{ article.author_name }}{% if article.author_title %}<small>{{ article.author_title }}</small>{% endif %}</span>
+                </span>
+                <span><i class="far fa-calendar-alt me-1" aria-hidden="true"></i>{{ article.published_at|date:"j F Y" }}</span>
+                <span><i class="far fa-clock me-1" aria-hidden="true"></i>{% translate "อ่าน" %} {{ article.read_time_minutes }} {% translate "นาที" %}</span>
+            </div>
+        </div>
+    </header>
 
-        <div class="row g-5">
-            <!-- Main Article Column (8 cols) -->
-            <div class="col-lg-8">
-                <article class="bg-white p-4 p-md-5 rounded-4 border shadow-sm">
-                    <!-- Category Badge -->
-                    <div class="d-inline-flex align-items-center gap-2 badge-subtle-primary mb-3">
-                        <i class="fas fa-tag text-primary-clinic"></i>
-                        <span>{{ article.get_category_display }}</span>
-                    </div>
+    <div class="container-xl">
+        {% if article.cover_image_url %}
+        <figure class="f-cover mx-auto mb-5" style="max-width: 1040px;">
+            <img src="{{ article.cover_image_url }}" alt="{{ article.title }}">
+        </figure>
+        {% endif %}
 
-                    <!-- Article Title -->
-                    <h1 class="display-6 fw-bold text-dark lh-base mb-3">
-                        {{ article.title }}
-                    </h1>
+        <div class="mx-auto" style="max-width: 46rem;">
+            {% if article.excerpt %}<p class="f-lede">{{ article.excerpt }}</p>{% endif %}
 
-                    <!-- Author & Publishing Meta -->
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 py-3 border-top border-bottom mb-4 text-muted small">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 16px;">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <div>
-                                <div class="fw-bold text-dark fs-6">{{ article.author_name }}</div>
-                                <div class="text-muted small">{{ article.author_title }}</div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-center gap-3">
-                            <span><i class="far fa-calendar-alt text-primary-clinic me-1"></i> {{ article.published_at|date:"d F Y" }}</span>
-                            <span>&bull;</span>
-                            <span><i class="far fa-clock text-primary-clinic me-1"></i> {{ article.read_time_minutes }} นาที</span>
-                            <span>&bull;</span>
-                            <span><i class="far fa-eye text-primary-clinic me-1"></i> {{ article.view_count }} วิว</span>
-                        </div>
-                    </div>
-
-                    <!-- Cover Image -->
-                    {% if article.cover_image_url %}
-                    <div class="mb-4 rounded-4 overflow-hidden shadow-sm" style="max-height: 420px;">
-                        <img src="{{ article.cover_image_url }}" alt="{{ article.title }}" class="w-100 h-100" style="object-fit: cover;">
-                    </div>
-                    {% endif %}
-
-                    <!-- Excerpt Highlight -->
-                    <div class="p-3 bg-light rounded-3 border-start border-4 border-success mb-4 fs-6 text-muted lh-base">
-                        <strong>บทคัดย่อ:</strong> {{ article.excerpt }}
-                    </div>
-
-                    <!-- Sanitized Article Content (Strict XSS Protected) -->
-                    <div class="article-content">
-                        {{ rendered_content }}
-                    </div>
-
-                    <!-- Social Share & PDPA Notice -->
-                    <div class="pt-4 mt-5 border-top d-flex flex-wrap align-items-center justify-content-between gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="small fw-semibold text-dark">แชร์บทความนี้:</span>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;">
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                            <a href="https://social-plugins.line.me/lineit/share?url={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success rounded-circle" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;">
-                                <i class="fab fa-line"></i>
-                            </a>
-                            <button onclick="navigator.clipboard.writeText(window.location.href); alert('คัดลอกลิงก์เรียบร้อยแล้ว');" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-                                <i class="fas fa-link me-1"></i> คัดลอกลิงก์
-                            </button>
-                        </div>
-
-                        <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-primary btn-sm px-4 fw-bold rounded-pill">
-                            <i class="fas fa-play-circle me-1"></i> เริ่มต้นประเมินสุขภาพกับคลินิก
-                        </a>
-                    </div>
-                </article>
+            <div class="f-prose">
+                {{ rendered_content }}
             </div>
 
-            <!-- Sidebar (4 cols) -->
-            <div class="col-lg-4">
-                <!-- CTA Card -->
-                <div class="card border-0 shadow-sm p-4 mb-4 text-white" style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); border-radius: 1.25rem;">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-white text-success rounded-circle mb-3" style="width: 44px; height: 44px;">
-                        <i class="fas fa-heartbeat fs-5"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2">ประเมินสุขภาพ 39 แกนชีววิทยา</h5>
-                    <p class="small text-white-50 mb-4">
-                        เริ่มต้นวิเคราะห์หาสาเหตุเชิงลึกระดับเซลล์ด้วยระบบ AI Intake ของ TSPI คลินิก พร้อมรับรายงานผลการประเมิน
-                    </p>
-                    <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-light text-success fw-bold w-100 rounded-pill shadow-sm">
-                        <i class="fas fa-play-circle me-1"></i> เริ่มต้นใช้งานฟรี
-                    </a>
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-4 mt-5 border-top">
+                <div class="f-share">
+                    <span class="text-muted small me-1">{% translate "แชร์บทความ" %}</span>
+                    <a href="https://social-plugins.line.me/lineit/share?url={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener" class="f-icon-btn" aria-label="{% translate "แชร์ทาง LINE" %}"><i class="fab fa-line"></i></a>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener" class="f-icon-btn" aria-label="{% translate "แชร์ทาง Facebook" %}"><i class="fab fa-facebook-f"></i></a>
+                    <button type="button" class="f-icon-btn" id="copyLink" aria-label="{% translate "คัดลอกลิงก์" %}"><i class="fas fa-link"></i></button>
+                    <span class="small text-muted" id="copyMsg" role="status" aria-live="polite"></span>
                 </div>
+                <a href="{% url 'core:assistant' %}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-comment-medical" aria-hidden="true"></i> {% translate "สงสัยเรื่องนี้? ถาม AI" %}</a>
+            </div>
 
-                <!-- Related Articles -->
-                {% if related_articles %}
-                <div class="card border shadow-sm p-4" style="border-radius: 1.25rem;">
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">บทความที่เกี่ยวข้อง</h6>
-                    <div class="d-flex flex-column gap-3">
-                        {% for rel in related_articles %}
-                        <div class="d-flex gap-3 align-items-start">
-                            {% if rel.cover_image_url %}
-                            <img src="{{ rel.cover_image_url }}" alt="{{ rel.title }}" class="rounded-3" style="width: 70px; height: 60px; object-fit: cover;">
-                            {% endif %}
-                            <div>
-                                <h6 class="fs-6 mb-1 lh-sm">
-                                    <a href="{% url 'core:article_detail' slug=rel.slug %}" class="text-dark text-decoration-none hover-primary fw-semibold">
-                                        {{ rel.title }}
-                                    </a>
-                                </h6>
-                                <small class="text-muted" style="font-size: 11px;">
-                                    <i class="far fa-clock me-1"></i> {{ rel.read_time_minutes }} นาที
-                                </small>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
+            <div class="f-band f-card is-soft mt-4">
+                <div>
+                    <h3 class="mb-1">{% translate "ประเมินสุขภาพ 39 แกนชีววิทยา" %}</h3>
+                    <p class="text-muted mb-0">{% translate "ลงทะเบียนครั้งเดียว ทีมแพทย์จะติดต่อกลับเพื่อนัดประเมินหาสาเหตุเชิงลึก" %}</p>
                 </div>
-                {% endif %}
+                <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-primary">{% translate "เริ่มประเมินสุขภาพ" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
             </div>
         </div>
     </div>
-</div>
+</article>
+
+{% if related_articles %}
+<section class="f-section is-canvas mt-5" aria-labelledby="relatedTitle">
+    <div class="container-xl">
+        <div class="f-head-row">
+            <h2 class="f-title m-0" id="relatedTitle"><span class="soft">{% translate "อ่านต่อ" %}</span>{% translate "บทความที่เกี่ยวข้อง" %}</h2>
+            <a href="{% url 'core:article_list' %}" class="f-link">{% translate "ดูทั้งหมด" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="row g-3">
+            {% for rel in related_articles %}
+            <div class="col-md-4">
+                <a href="{% url 'core:article_detail' slug=rel.slug %}" class="f-post">
+                    <span class="thumb"{% if rel.cover_image_url %} style="background-image: url('{{ rel.cover_image_url }}');"{% endif %}>
+                        {% if not rel.cover_image_url %}<i class="fas fa-leaf" aria-hidden="true"></i>{% endif %}
+                    </span>
+                    <span class="body">
+                        <span class="meta d-block">{{ rel.get_category_display }} {% translate "· อ่าน" %} {{ rel.read_time_minutes }} {% translate "นาที" %}</span>
+                        <h3>{{ rel.title }}</h3>
+                    </span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    var btn = document.getElementById('copyLink'), msg = document.getElementById('copyMsg');
+    if (!btn || !navigator.clipboard) { if (btn) btn.hidden = true; return; }
+    btn.addEventListener('click', function () {
+        navigator.clipboard.writeText(window.location.href).then(function () {
+            msg.textContent = 'คัดลอกลิงก์แล้ว';
+            setTimeout(function () { msg.textContent = ''; }, 2500);
+        });
+    });
+})();
+</script>
 {% endblock %}

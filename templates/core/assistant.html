@@ -1,7 +1,8 @@
 {% extends 'layouts/public_base.html' %}
+{% load i18n %}
 {% load static %}
 
-{% block title %}คุยกับ AI | TSPI Clinic{% endblock %}
+{% block title %}{% translate "คุยกับ AI | TSPI Clinic" %}{% endblock %}
 {% block body_class %}site ai-app-body{% endblock %}
 
 {% block extra_public_head %}
@@ -22,7 +23,7 @@
     <div class="ai-backdrop" @click="mobileSideOpen = false"></div>
 
     <!-- Sidebar ซ้าย -->
-    <aside class="ai-side" aria-label="แถบนำทางผู้ช่วย AI">
+    <aside class="ai-side" aria-label="{% translate "แถบนำทางผู้ช่วย AI" %}">
         <a href="{% url 'core:home' %}" class="ai-brand">
             <span class="ai-spark"><i class="fas fa-star"></i></span>
             <span>TSPI <span class="text-primary">AI</span></span>
@@ -31,57 +32,57 @@
         <div class="ai-nav-group">
             <button type="button" class="ai-nav-btn" :class="{ 'active': !currentId }" @click="newThread()">
                 <i class="fas fa-edit"></i>
-                <span>แชทใหม่</span>
+                <span>{% translate "แชทใหม่" %}</span>
             </button>
             <a href="{% url 'core:home' %}" class="ai-nav-btn">
                 <i class="fas fa-home"></i>
-                <span>หน้าแรกคลินิก</span>
+                <span>{% translate "หน้าแรกคลินิก" %}</span>
             </a>
             <a href="{% url 'core:platform' %}" class="ai-nav-btn">
                 <i class="fas fa-project-diagram"></i>
-                <span>ระบบ 39 แกนชีววิทยา</span>
+                <span>{% translate "ระบบ 39 แกนชีววิทยา" %}</span>
             </a>
             {% if is_patient_logged_in %}
             <a href="{% url 'portal_patient:assistant' %}" class="ai-nav-btn text-primary">
                 <i class="fas fa-comments"></i>
-                <span>แชทคนไข้ (ไม่จำกัด)</span>
+                <span>{% translate "แชทคนไข้ (ไม่จำกัด)" %}</span>
             </a>
             {% endif %}
         </div>
 
         <div class="ai-search-wrap">
             <i class="fas fa-search"></i>
-            <input type="text" class="ai-search-input" placeholder="ค้นหาแชทในเครื่อง..." x-model="searchQuery">
+            <input type="text" class="ai-search-input" placeholder="{% translate "ค้นหาแชทในเครื่อง..." %}" x-model="searchQuery">
         </div>
 
-        <div class="ai-side-label">แชทล่าสุด (ในเครื่องนี้เท่านั้น)</div>
+        <div class="ai-side-label">{% translate "แชทล่าสุด (ในเครื่องนี้เท่านั้น)" %}</div>
         <div class="ai-thread-list">
             <template x-for="t in filteredThreads()" :key="t.id">
                 <div class="ai-thread-item" :class="{ 'active': currentId === t.id }" @click="openThread(t.id)">
                     <i class="far fa-comment text-muted flex-shrink-0"></i>
                     <span class="flex-grow-1 text-truncate" x-text="t.title"></span>
                     <div class="ai-thread-actions" @click.stop>
-                        <button type="button" class="ai-icon-btn text-danger" title="ลบแชทนี้" @click="deleteThread(t.id)">
+                        <button type="button" class="ai-icon-btn text-danger" title="{% translate "ลบแชทนี้" %}" @click="deleteThread(t.id)">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
                 </div>
             </template>
-            <p class="text-muted small text-center mt-3 px-2" x-show="filteredThreads().length === 0">ยังไม่มีประวัติแชท</p>
+            <p class="text-muted small text-center mt-3 px-2" x-show="filteredThreads().length === 0">{% translate "ยังไม่มีประวัติแชท" %}</p>
         </div>
 
         <div class="ai-side-foot">
             {% if is_patient_logged_in %}
                 <a href="{% url 'portal_patient:assistant' %}" class="btn btn-primary btn-sm w-100 rounded-pill fw-semibold">
-                    <i class="fas fa-arrow-right me-1"></i> เข้าสู่แชทผู้ป่วย
+                    <i class="fas fa-arrow-right me-1"></i> {% translate "เข้าสู่แชทผู้ป่วย" %}
                 </a>
             {% else %}
                 <div class="d-grid gap-2">
                     <a href="{% url 'accounts:patient_login' %}?next={% url 'portal_patient:assistant' %}" class="btn btn-primary btn-sm rounded-pill fw-semibold">
-                        เข้าสู่ระบบ (คุยไม่จำกัด)
+                        {% translate "เข้าสู่ระบบ (คุยไม่จำกัด)" %}
                     </a>
                     <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-outline-secondary btn-sm rounded-pill">
-                        ลงทะเบียนผู้ป่วยใหม่
+                        {% translate "ลงทะเบียนผู้ป่วยใหม่" %}
                     </a>
                 </div>
             {% endif %}
@@ -92,30 +93,30 @@
     <main class="ai-main">
         <header class="ai-topbar" :class="{ 'has-border': messages.length > 0 }">
             <div class="d-flex align-items-center gap-2 min-w-0">
-                <button type="button" class="ai-circle-btn d-none d-lg-inline-flex" @click="sideCollapsed = !sideCollapsed" aria-label="พับ/เปิดแถบข้าง">
+                <button type="button" class="ai-circle-btn d-none d-lg-inline-flex" @click="sideCollapsed = !sideCollapsed" aria-label="{% translate "พับ/เปิดแถบข้าง" %}">
                     <i class="fas fa-bars"></i>
                 </button>
-                <button type="button" class="ai-circle-btn d-lg-none" @click="mobileSideOpen = true" aria-label="เปิดเมนูแชท">
+                <button type="button" class="ai-circle-btn d-lg-none" @click="mobileSideOpen = true" aria-label="{% translate "เปิดเมนูแชท" %}">
                     <i class="fas fa-bars"></i>
                 </button>
                 <button type="button" class="ai-model-btn" @click="newThread()">
                     <span>TSPI</span>
-                    <span class="sub" x-text="'ฟรี ' + remaining + '/' + limit"></span>
+                    <span class="sub" x-text="'{% filter escapejs %}{% translate "ฟรี " %}{% endfilter %}' + remaining + '/' + limit"></span>
                 </button>
             </div>
 
             <div class="d-flex align-items-center gap-2">
-                <button type="button" class="ai-circle-btn" @click="newThread()" title="แชทใหม่" aria-label="แชทใหม่">
+                <button type="button" class="ai-circle-btn" @click="newThread()" title="{% translate "แชทใหม่" %}" aria-label="{% translate "แชทใหม่" %}">
                     <i class="fas fa-edit"></i>
                 </button>
                 {% if is_patient_logged_in %}
-                    <a href="{% url 'portal_patient:assistant' %}" class="ai-user-avatar" title="ไปยังแชทคนไข้เต็มรูปแบบ">
+                    <a href="{% url 'portal_patient:assistant' %}" class="ai-user-avatar" title="{% translate "ไปยังแชทคนไข้เต็มรูปแบบ" %}">
                         <i class="fas fa-user"></i>
                     </a>
                 {% else %}
                     <a href="{% url 'accounts:patient_login' %}?next={% url 'portal_patient:assistant' %}"
                        class="btn btn-sm btn-light border rounded-pill px-3 fw-semibold">
-                        เข้าสู่ระบบ
+                        {% translate "เข้าสู่ระบบ" %}
                     </a>
                 {% endif %}
             </div>
@@ -125,8 +126,8 @@
         <section class="ai-welcome-stage" x-show="messages.length === 0">
             <div class="ai-welcome-inner">
                 <span class="ai-spark ai-spark-lg"><i class="fas fa-star"></i></span>
-                <h1 class="ai-greeting">วันนี้ให้ TSPI AI ช่วยเรื่องอะไรดีคะ</h1>
-                <p class="ai-subgreeting">ถามข้อมูลสุขภาพ 39 แกน หรืออาการเบื้องต้นได้เลย (ทดลองฟรี 5 ครั้ง ไม่เก็บข้อมูล)</p>
+                <h1 class="ai-greeting">{% translate "วันนี้ให้ TSPI AI ช่วยเรื่องอะไรดีคะ" %}</h1>
+                <p class="ai-subgreeting">{% translate "ถามข้อมูลสุขภาพ 39 แกน หรืออาการเบื้องต้นได้เลย (ทดลองฟรี 5 ครั้ง ไม่เก็บข้อมูล)" %}</p>
 
                 <div class="ai-suggest-chips" x-show="!isLimited()">
                     <template x-for="q in examples" :key="q.text">
@@ -149,10 +150,10 @@
                             <div class="alert alert-danger d-flex gap-3 mb-0 w-100 rounded-4" role="alert">
                                 <i class="fas fa-ambulance fs-3 mt-1"></i>
                                 <div>
-                                    <strong class="d-block fs-5 mb-1">อาจเป็นภาวะฉุกเฉิน</strong>
+                                    <strong class="d-block fs-5 mb-1">{% translate "อาจเป็นภาวะฉุกเฉิน" %}</strong>
                                     <span x-text="m.content"></span>
                                     <div class="mt-2">
-                                        <a href="tel:1669" class="btn btn-danger btn-sm rounded-pill px-3"><i class="fas fa-phone-alt me-1"></i> โทร 1669</a>
+                                        <a href="tel:1669" class="btn btn-danger btn-sm rounded-pill px-3"><i class="fas fa-phone-alt me-1"></i> {% translate "โทร 1669" %}</a>
                                     </div>
                                 </div>
                             </div>
@@ -169,7 +170,7 @@
                                 </template>
 
                                 <div class="ai-general-box" x-show="parts(m).general">
-                                    <div class="ai-general-label"><i class="fas fa-robot me-1"></i> ความรู้ทั่วไปจาก AI <span class="fw-normal">· ไม่ใช่เอกสารของคลินิก</span></div>
+                                    <div class="ai-general-label"><i class="fas fa-robot me-1"></i> {% translate "ความรู้ทั่วไปจาก AI" %} <span class="fw-normal">{% translate "· ไม่ใช่เอกสารของคลินิก" %}</span></div>
                                     <template x-for="(b, bi) in blocks(parts(m).general)" :key="bi">
                                         <div class="ai-block">
                                             <p x-show="b.type === 'p'" x-text="b.items[0].map(s => s.t).join('')"></p>
@@ -181,7 +182,7 @@
                                 <div class="ai-sources" x-show="m.sources && m.sources.length">
                                     <button type="button" class="ai-sources-btn" @click="m.open = !m.open" :aria-expanded="!!m.open">
                                         <i class="fas fa-book-medical"></i>
-                                        <span x-text="'อ้างอิงเอกสาร TSPI ' + (m.sources ? m.sources.length : 0) + ' รายการ'"></span>
+                                        <span x-text="'{% filter escapejs %}{% translate "อ้างอิงเอกสาร TSPI " %}{% endfilter %}' + (m.sources ? m.sources.length : 0) + '{% filter escapejs %}{% translate " รายการ" %}{% endfilter %}'"></span>
                                         <i class="fas" :class="m.open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                                     </button>
                                     <ol class="small text-muted mt-2 mb-0 ps-3" x-show="m.open" x-transition>
@@ -192,16 +193,16 @@
                                 <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
                                     <button type="button" class="btn btn-sm btn-light rounded-pill" @click="copyMsg(m, i)">
                                         <i class="far" :class="copiedIndex === i ? 'fa-check text-success' : 'fa-copy'"></i>
-                                        <span x-text="copiedIndex === i ? 'คัดลอกแล้ว' : 'คัดลอก'"></span>
+                                        <span x-text="copiedIndex === i ? '{% filter escapejs %}{% translate "คัดลอกแล้ว" %}{% endfilter %}' : '{% filter escapejs %}{% translate "คัดลอก" %}{% endfilter %}'"></span>
                                     </button>
                                     <template x-if="i === messages.length - 1 && !sending && m.kind !== 'out_of_scope'">
                                         <div class="d-flex flex-wrap gap-2">
                                             <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill"
                                                     x-show="!isLimited()" @click="ask('อธิบายให้เข้าใจง่ายกว่านี้หน่อย')">
-                                                อธิบายง่ายขึ้น
+                                                {% translate "อธิบายง่ายขึ้น" %}
                                             </button>
                                             <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-sm btn-primary rounded-pill">
-                                                ให้แพทย์ดูต่อ
+                                                {% translate "ให้แพทย์ดูต่อ" %}
                                             </a>
                                         </div>
                                     </template>
@@ -229,9 +230,9 @@
 
                 <!-- สวิตช์โหมด (เฉพาะตอนหน้าแรก) -->
                 <div class="ai-seg-wrap" x-show="messages.length === 0 && !isLimited()">
-                    <div class="ai-seg-pill" role="tablist" aria-label="โหมดคำถาม">
-                        <button type="button" :class="{ 'active': selectedMode !== 'symptom' }" @click="setMode('general')">ถามข้อมูล</button>
-                        <button type="button" :class="{ 'active': selectedMode === 'symptom' }" @click="setMode('symptom')">เล่าอาการ</button>
+                    <div class="ai-seg-pill" role="tablist" aria-label="{% translate "โหมดคำถาม" %}">
+                        <button type="button" :class="{ 'active': selectedMode !== 'symptom' }" @click="setMode('general')">{% translate "ถามข้อมูล" %}</button>
+                        <button type="button" :class="{ 'active': selectedMode === 'symptom' }" @click="setMode('symptom')">{% translate "เล่าอาการ" %}</button>
                     </div>
                 </div>
 
@@ -239,22 +240,22 @@
                     <form class="ai-pill-composer" @submit.prevent="send()">
                         <div class="ai-pill-row">
                             <a href="{% url 'accounts:patient_login' %}?next={% url 'portal_patient:assistant' %}"
-                               class="ai-tool-btn text-decoration-none" title="เข้าสู่ระบบเพื่อแนบรูปภาพและคลิปเสียง">
+                               class="ai-tool-btn text-decoration-none" title="{% translate "เข้าสู่ระบบเพื่อแนบรูปภาพและคลิปเสียง" %}">
                                 <i class="fas fa-plus"></i>
                             </a>
-                            <label for="guest-q" class="visually-hidden">คำถามถึงผู้ช่วย</label>
+                            <label for="guest-q" class="visually-hidden">{% translate "คำถามถึงผู้ช่วย" %}</label>
                             <textarea id="guest-q" x-ref="input" class="ai-pill-textarea" rows="1" maxlength="1500"
-                                      :placeholder="selectedMode === 'symptom' ? 'เล่าอาการที่เป็นอยู่ได้เลย...' : 'ถาม TSPI AI...'"
+                                      :placeholder="selectedMode === 'symptom' ? '{% filter escapejs %}{% translate "เล่าอาการที่เป็นอยู่ได้เลย..." %}{% endfilter %}' : '{% filter escapejs %}{% translate "ถาม TSPI AI..." %}{% endfilter %}'"
                                       x-model="draft"
                                       @input="autoGrow($el)"
                                       @keydown.enter="if (!$event.shiftKey && !$event.isComposing) { $event.preventDefault(); send(); }"
                                       :disabled="sending"></textarea>
                             <button type="button" class="ai-tool-btn" x-show="speechSupported"
                                     :class="{ 'recording': listening }" @click="toggleMic()"
-                                    title="พูดด้วยเสียงภาษาไทย">
+                                    title="{% translate "พูดด้วยเสียงภาษาไทย" %}">
                                 <i class="fas" :class="listening ? 'fa-stop' : 'fa-microphone'"></i>
                             </button>
-                            <button type="submit" class="ai-send-btn" :disabled="sending || !draft.trim()" aria-label="ส่งคำถาม">
+                            <button type="submit" class="ai-send-btn" :disabled="sending || !draft.trim()" aria-label="{% translate "ส่งคำถาม" %}">
                                 <i class="fas fa-arrow-up"></i>
                             </button>
                         </div>
@@ -263,21 +264,21 @@
 
                 <template x-if="isLimited()">
                     <div class="ai-gate-card">
-                        <p class="fw-bold mb-1">ครบสิทธิ์ทดลองคุยฟรี 5 ครั้งแล้ว</p>
-                        <p class="small text-muted mb-3">เข้าสู่ระบบหรือลงทะเบียนผู้ป่วย เพื่อคุยต่อไม่จำกัด พร้อมส่งรูปภาพและคลิปเสียงให้แพทย์ตรวจ</p>
+                        <p class="fw-bold mb-1">{% translate "ครบสิทธิ์ทดลองคุยฟรี 5 ครั้งแล้ว" %}</p>
+                        <p class="small text-muted mb-3">{% translate "เข้าสู่ระบบหรือลงทะเบียนผู้ป่วย เพื่อคุยต่อไม่จำกัด พร้อมส่งรูปภาพและคลิปเสียงให้แพทย์ตรวจ" %}</p>
                         <div class="d-flex flex-wrap justify-content-center gap-2">
                             <a href="{% url 'accounts:patient_login' %}?next={% url 'portal_patient:assistant' %}" class="btn btn-sm btn-primary rounded-pill px-4 fw-semibold">
-                                เข้าสู่ระบบเพื่อคุยต่อ
+                                {% translate "เข้าสู่ระบบเพื่อคุยต่อ" %}
                             </a>
                             <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-semibold">
-                                ลงทะเบียนใหม่
+                                {% translate "ลงทะเบียนใหม่" %}
                             </a>
                         </div>
                     </div>
                 </template>
 
                 <div class="ai-micro-foot">
-                    ไม่ใช่การวินิจฉัยของแพทย์ &middot; ไม่เก็บข้อมูลบนเซิร์ฟเวอร์ &middot; ฉุกเฉิน <a href="tel:1669" class="text-decoration-none">1669</a>
+                    {% translate "ไม่ใช่การวินิจฉัยของแพทย์ &middot; ไม่เก็บข้อมูลบนเซิร์ฟเวอร์ &middot; ฉุกเฉิน" %} <a href="tel:1669" class="text-decoration-none">1669</a>
                 </div>
             </div>
         </div>
@@ -296,7 +297,7 @@ function guestChat() {
         if (!Array.isArray(initialThreads) || !initialThreads.length) {
             const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY) || '[]');
             if (Array.isArray(legacy) && legacy.length) {
-                initialThreads = [{ id: 't_' + Date.now(), title: (legacy[0].content || 'แชทเดิม').slice(0, 36), messages: legacy.slice(-20) }];
+                initialThreads = [{ id: 't_' + Date.now(), title: (legacy[0].content || '{% filter escapejs %}{% translate "แชทเดิม" %}{% endfilter %}').slice(0, 36), messages: legacy.slice(-20) }];
             }
         }
     } catch (e) { initialThreads = []; }
@@ -319,10 +320,10 @@ function guestChat() {
         listening: false,
         recognizer: null,
         examples: [
-            { text: 'ลำไส้รั่วคืออะไร รักษาอย่างไร' },
-            { text: 'อ่อนเพลียบ่อย เกี่ยวกับระบบไหน' },
-            { text: 'สะเก็ดเงินดูแลตัวเองอย่างไร' },
-            { text: 'นัดหมายคลินิกได้อย่างไร' },
+            { text: '{% filter escapejs %}{% translate "ลำไส้รั่วคืออะไร รักษาอย่างไร" %}{% endfilter %}' },
+            { text: '{% filter escapejs %}{% translate "อ่อนเพลียบ่อย เกี่ยวกับระบบไหน" %}{% endfilter %}' },
+            { text: '{% filter escapejs %}{% translate "สะเก็ดเงินดูแลตัวเองอย่างไร" %}{% endfilter %}' },
+            { text: '{% filter escapejs %}{% translate "นัดหมายคลินิกได้อย่างไร" %}{% endfilter %}' },
         ],
 
         init() {
@@ -421,10 +422,10 @@ function guestChat() {
                     this.messages.push({ role: 'assistant', content: d.answer, kind: d.kind, sources: d.sources || [], open: false });
                 } else {
                     if (d.limited) this.remaining = 0;
-                    this.error = d.error || 'ส่งคำถามไม่สำเร็จ กรุณาลองใหม่';
+                    this.error = d.error || '{% filter escapejs %}{% translate "ส่งคำถามไม่สำเร็จ กรุณาลองใหม่" %}{% endfilter %}';
                 }
             } catch (e) {
-                this.error = 'เชื่อมต่อไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่';
+                this.error = '{% filter escapejs %}{% translate "เชื่อมต่อไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่" %}{% endfilter %}';
             }
 
             const thread = this.threads.find(t => t.id === this.currentId);

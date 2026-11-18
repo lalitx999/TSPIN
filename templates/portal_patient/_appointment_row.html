@@ -1,0 +1,13 @@
+{% load i18n %}{# แถวนัดหมายหนึ่งรายการ (ใช้ในหน้าหลักและหน้านัดหมาย) — ต้องมีตัวแปร appt #}
+<div class="f-row {% if appt.status == 'completed' or appt.status == 'cancelled' %}is-muted{% endif %}">
+    <span class="f-date"><b>{{ appt.appointment_date|date:"j" }}</b><small>{{ appt.appointment_date|date:"M y" }}</small></span>
+    <div class="main">
+        <b>{{ appt.appointment_date|date:"l j F Y" }} · {{ appt.appointment_time|time:"H:i" }} {% translate "น." %}</b>
+        <small>{% if appt.doctor %}{{ appt.doctor.get_full_name|default:appt.doctor.username }}{% else %}{% translate "แพทย์ของคลินิก" %}{% endif %}</small>
+        {% if appt.notes %}<p class="small mb-0 mt-1">{{ appt.notes }}</p>{% endif %}
+    </div>
+    {% if appt.status == 'scheduled' %}<span class="badge bg-info">{% translate "รอยืนยัน" %}</span>
+    {% elif appt.status == 'confirmed' %}<span class="badge bg-success">{% translate "ยืนยันแล้ว" %}</span>
+    {% elif appt.status == 'completed' %}<span class="badge bg-secondary">{% translate "พบแพทย์แล้ว" %}</span>
+    {% elif appt.status == 'cancelled' %}<span class="badge bg-danger">{% translate "ยกเลิก" %}</span>{% endif %}
+</div>

@@ -1,0 +1,13 @@
+{% load i18n %}{# แผงพื้นเข้มข้างฟอร์มเข้าสู่ระบบ/ลงทะเบียน (แสดงเฉพาะจอใหญ่) — ใช้ด้วย {% include ... with kicker=... soft=... title=... %} #}
+<aside class="f-auth-side" aria-label="{% translate "สิ่งที่คุณจะได้รับ" %}">
+    <div>
+        <span class="f-pill">{% if kicker %}{{ kicker }}{% else %}{% translate "บัญชีผู้รับบริการ" %}{% endif %}</span>
+        <h2><span class="soft">{% if soft %}{{ soft }}{% else %}{% translate "ข้อมูลสุขภาพของคุณ" %}{% endif %}</span>{% if title %}{{ title }}{% else %}{% translate "อยู่ในที่เดียว" %}{% endif %}</h2>
+    </div>
+    <ul class="f-auth-points">
+        <li><i class="fas fa-project-diagram" aria-hidden="true"></i><span><b>{% translate "ผลประเมิน 39 แกน" %}</b>{% translate "ดูภาพรวมความสมดุลของร่างกายคุณ" %}</span></li>
+        <li><i class="far fa-calendar-check" aria-hidden="true"></i><span><b>{% translate "ใบนัดและประวัติการรักษา" %}</b>{% translate "เปิดดูได้ทุกเมื่อจากมือถือ" %}</span></li>
+        <li><i class="fas fa-comment-medical" aria-hidden="true"></i><span><b>{% translate "ผู้ช่วย AI ของคลินิก" %}</b>{% translate "ถามเรื่องสุขภาพ คำตอบอ้างอิงเอกสารคลินิก" %}</span></li>
+        <li><i class="fas fa-user-shield" aria-hidden="true"></i><span><b>{% translate "คุ้มครองข้อมูลตาม PDPA" %}</b>{% translate "ข้อมูลของคุณใช้เพื่อการดูแลรักษาเท่านั้น" %}</span></li>
+    </ul>
+</aside>

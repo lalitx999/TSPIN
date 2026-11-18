@@ -1,7 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'layouts/front_base.html' %}
+{% load i18n %}
+{# เดิม extends base.html ของ EMR — ย้ายมาโครงหน้าบ้าน (เฟส 5) ใช้สีชุดเดียวกับ /ai/ ผ่าน body.front.ai-app-body #}
 {% load static %}
 
-{% block title %}ผู้ช่วย AI | TSPI Health{% endblock %}
+{% block title %}{% translate "ผู้ช่วย AI | TSPI Health" %}{% endblock %}
 {% block body_class %}ai-app-body{% endblock %}
 
 {% block extra_head %}
@@ -20,7 +22,7 @@
     <div class="ai-backdrop" @click="mobileSideOpen = false"></div>
 
     <!-- Sidebar ซ้าย -->
-    <aside class="ai-side" aria-label="เมนูผู้ช่วย AI ของคนไข้">
+    <aside class="ai-side" aria-label="{% translate "เมนูผู้ช่วย AI ของคนไข้" %}">
         <a href="{% url 'portal_patient:dashboard' %}" class="ai-brand">
             <span class="ai-spark"><i class="fas fa-star"></i></span>
             <span>TSPI <span class="text-primary">Health AI</span></span>
@@ -29,49 +31,49 @@
         <div class="ai-nav-group">
             <button type="button" class="ai-nav-btn" :class="{ 'active': !current }" @click="startFresh()">
                 <i class="fas fa-edit"></i>
-                <span>แชทใหม่</span>
+                <span>{% translate "แชทใหม่" %}</span>
             </button>
             <a href="{% url 'portal_patient:dashboard' %}" class="ai-nav-btn">
                 <i class="fas fa-home"></i>
-                <span>แดชบอร์ดคนไข้</span>
+                <span>{% translate "แดชบอร์ดคนไข้" %}</span>
             </a>
             <a href="{% url 'portal_patient:patient_axes_result' %}" class="ai-nav-btn">
                 <i class="fas fa-chart-pie"></i>
-                <span>ผล 39 แกน</span>
+                <span>{% translate "ผล 39 แกน" %}</span>
             </a>
             <a href="{% url 'portal_patient:portal_appointments' %}" class="ai-nav-btn">
                 <i class="fas fa-calendar-alt"></i>
-                <span>นัดหมายพบแพทย์</span>
+                <span>{% translate "นัดหมายพบแพทย์" %}</span>
             </a>
             <a href="{% url 'portal_patient:patient_history' %}" class="ai-nav-btn">
                 <i class="fas fa-history"></i>
-                <span>ประวัติการรักษา</span>
+                <span>{% translate "ประวัติการรักษา" %}</span>
             </a>
         </div>
 
         <div class="ai-search-wrap">
             <i class="fas fa-search"></i>
-            <input type="text" class="ai-search-input" placeholder="ค้นหาแชท..." x-model="searchQuery">
+            <input type="text" class="ai-search-input" placeholder="{% translate "ค้นหาแชท..." %}" x-model="searchQuery">
         </div>
 
-        <div class="ai-side-label">แชทล่าสุด</div>
+        <div class="ai-side-label">{% translate "แชทล่าสุด" %}</div>
         <div class="ai-thread-list">
             <template x-for="t in filteredThreads()" :key="t.id">
                 <div class="ai-thread-item" :class="{ 'active': current && current.id === t.id }" @click="openThread(t.id)">
                     <i class="far fa-comment text-muted flex-shrink-0"></i>
                     <span class="flex-grow-1 text-truncate" x-text="t.title"></span>
-                    <i class="fas fa-check-circle text-success flex-shrink-0" x-show="t.submitted" title="ส่งให้ทีมแพทย์แล้ว"></i>
+                    <i class="fas fa-check-circle text-success flex-shrink-0" x-show="t.submitted" title="{% translate "ส่งให้ทีมแพทย์แล้ว" %}"></i>
                     <div class="ai-thread-actions" @click.stop>
-                        <button type="button" class="ai-icon-btn" title="เปลี่ยนชื่อ" @click="rename(t)">
+                        <button type="button" class="ai-icon-btn" title="{% translate "เปลี่ยนชื่อ" %}" @click="rename(t)">
                             <i class="fas fa-pen"></i>
                         </button>
-                        <button type="button" class="ai-icon-btn text-danger" title="ลบ/ซ่อนแชท" @click="remove(t)">
+                        <button type="button" class="ai-icon-btn text-danger" title="{% translate "ลบ/ซ่อนแชท" %}" @click="remove(t)">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
                 </div>
             </template>
-            <p class="text-muted small text-center mt-3 px-2" x-show="filteredThreads().length === 0">ยังไม่มีประวัติแชท</p>
+            <p class="text-muted small text-center mt-3 px-2" x-show="filteredThreads().length === 0">{% translate "ยังไม่มีประวัติแชท" %}</p>
         </div>
 
         <div class="ai-side-foot">
@@ -80,12 +82,12 @@
                 <div class="min-w-0 flex-grow-1">
                     <div class="fw-bold text-truncate small">{{ patient_display_name }}</div>
                     <div class="text-muted text-truncate" style="font-size: 0.76rem;">
-                        {% if patient_hn %}HN {{ patient_hn }}{% else %}บัญชีผู้ป่วย{% endif %}
+                        {% if patient_hn %}HN {{ patient_hn }}{% else %}{% translate "บัญชีผู้ป่วย" %}{% endif %}
                     </div>
                 </div>
                 <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
                     {% csrf_token %}
-                    <button type="submit" class="ai-icon-btn text-danger" title="ออกจากระบบ" aria-label="ออกจากระบบ">
+                    <button type="submit" class="ai-icon-btn text-danger" title="{% translate "ออกจากระบบ" %}" aria-label="{% translate "ออกจากระบบ" %}">
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </form>
@@ -98,15 +100,15 @@
         <!-- แถบบนโปร่งคลีนเหมือน Gemini Mobile -->
         <header class="ai-topbar" :class="{ 'has-border': current && messages.length > 0 }">
             <div class="d-flex align-items-center gap-2 min-w-0">
-                <button type="button" class="ai-circle-btn d-none d-lg-inline-flex" @click="sideCollapsed = !sideCollapsed" aria-label="พับ/เปิดแถบข้าง">
+                <button type="button" class="ai-circle-btn d-none d-lg-inline-flex" @click="sideCollapsed = !sideCollapsed" aria-label="{% translate "พับ/เปิดแถบข้าง" %}">
                     <i class="fas fa-bars"></i>
                 </button>
-                <button type="button" class="ai-circle-btn d-lg-none" @click="mobileSideOpen = true" aria-label="เปิดรายการแชท">
+                <button type="button" class="ai-circle-btn d-lg-none" @click="mobileSideOpen = true" aria-label="{% translate "เปิดรายการแชท" %}">
                     <i class="fas fa-bars"></i>
                 </button>
                 <button type="button" class="ai-model-btn text-truncate" @click="startFresh()">
                     <span>TSPI AI</span>
-                    <span class="sub d-none d-sm-inline" x-text="current ? '· ' + current.title : '· ผู้ช่วยสุขภาพ'"></span>
+                    <span class="sub d-none d-sm-inline" x-text="current ? '· ' + current.title : '{% filter escapejs %}{% translate "· ผู้ช่วยสุขภาพ" %}{% endfilter %}'"></span>
                 </button>
             </div>
 
@@ -115,21 +117,21 @@
                     <div>
                         <template x-if="current.submitted">
                             <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                <i class="fas fa-check-circle me-1"></i> ส่งแพทย์แล้ว
+                                <i class="fas fa-check-circle me-1"></i> {% translate "ส่งแพทย์แล้ว" %}
                             </span>
                         </template>
                         <template x-if="!current.submitted">
                             <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold"
                                     @click="submit()" :disabled="sending">
-                                <i class="fas fa-paper-plane me-1"></i> ส่งแพทย์
+                                <i class="fas fa-paper-plane me-1"></i> {% translate "ส่งแพทย์" %}
                             </button>
                         </template>
                     </div>
                 </template>
-                <button type="button" class="ai-circle-btn" @click="startFresh()" title="แชทใหม่" aria-label="แชทใหม่">
+                <button type="button" class="ai-circle-btn" @click="startFresh()" title="{% translate "แชทใหม่" %}" aria-label="{% translate "แชทใหม่" %}">
                     <i class="fas fa-edit"></i>
                 </button>
-                <a href="{% url 'portal_patient:dashboard' %}" class="ai-user-avatar" title="กลับแดชบอร์ดคนไข้">
+                <a href="{% url 'portal_patient:dashboard' %}" class="ai-user-avatar" title="{% translate "กลับแดชบอร์ดคนไข้" %}">
                     {{ patient_display_name|slice:":1"|upper }}
                 </a>
             </div>
@@ -143,8 +145,8 @@
         <section class="ai-welcome-stage" x-show="!current || messages.length === 0">
             <div class="ai-welcome-inner">
                 <span class="ai-spark ai-spark-lg"><i class="fas fa-star"></i></span>
-                <h1 class="ai-greeting">สวัสดี, คุณ{{ patient_display_name }}</h1>
-                <p class="ai-subgreeting">เราควรดูแลสุขภาพเรื่องอะไรดี พิมพ์ถาม แนบรูป หรืออัดเสียงส่งมาได้เลย</p>
+                <h1 class="ai-greeting">{% translate "สวัสดี, คุณ" %}{{ patient_display_name }}</h1>
+                <p class="ai-subgreeting">{% translate "เราควรดูแลสุขภาพเรื่องอะไรดี พิมพ์ถาม แนบรูป หรืออัดเสียงส่งมาได้เลย" %}</p>
 
                 <div class="ai-suggest-chips">
                     <template x-for="q in examples" :key="q">
@@ -163,7 +165,7 @@
                             <div class="ai-user-bubble">
                                 <div class="ai-msg-imgs" x-show="m.attachments && m.attachments.some(a => a.kind === 'image')">
                                     <template x-for="att in (m.attachments || []).filter(a => a.kind === 'image')" :key="att.media_id">
-                                        <img :src="att.url" alt="ภาพแนบจากคนไข้" @click="previewUrl = att.url">
+                                        <img :src="att.url" alt="{% translate "ภาพแนบจากคนไข้" %}" @click="previewUrl = att.url">
                                     </template>
                                 </div>
                                 <div class="ai-msg-audio" x-show="m.attachments && m.attachments.some(a => a.kind === 'audio')">
@@ -179,10 +181,10 @@
                             <div class="alert alert-danger d-flex gap-3 mb-0 w-100 rounded-4" role="alert">
                                 <i class="fas fa-ambulance fs-3 mt-1"></i>
                                 <div>
-                                    <strong class="d-block fs-5 mb-1">อาจเป็นภาวะฉุกเฉิน</strong>
+                                    <strong class="d-block fs-5 mb-1">{% translate "อาจเป็นภาวะฉุกเฉิน" %}</strong>
                                     <span x-text="m.content"></span>
                                     <div class="mt-2">
-                                        <a href="tel:1669" class="btn btn-danger btn-sm rounded-pill px-3"><i class="fas fa-phone-alt me-1"></i> โทร 1669</a>
+                                        <a href="tel:1669" class="btn btn-danger btn-sm rounded-pill px-3"><i class="fas fa-phone-alt me-1"></i> {% translate "โทร 1669" %}</a>
                                     </div>
                                 </div>
                             </div>
@@ -199,7 +201,7 @@
                                 </template>
 
                                 <div class="ai-general-box" x-show="parts(m).general">
-                                    <div class="ai-general-label"><i class="fas fa-robot me-1"></i> ความรู้ทั่วไปจาก AI <span class="fw-normal">· ไม่ใช่เอกสารของคลินิก</span></div>
+                                    <div class="ai-general-label"><i class="fas fa-robot me-1"></i> {% translate "ความรู้ทั่วไปจาก AI" %} <span class="fw-normal">{% translate "· ไม่ใช่เอกสารของคลินิก" %}</span></div>
                                     <template x-for="(b, bi) in blocks(parts(m).general)" :key="bi">
                                         <div class="ai-block">
                                             <p x-show="b.type === 'p'" x-text="b.items[0].map(s => s.t).join('')"></p>
@@ -211,7 +213,7 @@
                                 <div class="ai-sources" x-show="m.sources && m.sources.length">
                                     <button type="button" class="ai-sources-btn" @click="m.open = !m.open" :aria-expanded="!!m.open">
                                         <i class="fas fa-book-medical"></i>
-                                        <span x-text="'อ้างอิงเอกสาร TSPI ' + (m.sources ? m.sources.length : 0) + ' รายการ'"></span>
+                                        <span x-text="'{% filter escapejs %}{% translate "อ้างอิงเอกสาร TSPI " %}{% endfilter %}' + (m.sources ? m.sources.length : 0) + '{% filter escapejs %}{% translate " รายการ" %}{% endfilter %}'"></span>
                                         <i class="fas" :class="m.open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                                     </button>
                                     <ol class="small text-muted mt-2 mb-0 ps-3" x-show="m.open" x-transition>
@@ -222,11 +224,11 @@
                                 <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
                                     <button type="button" class="btn btn-sm btn-light rounded-pill" @click="copyMsg(m, i)">
                                         <i class="far" :class="copiedIndex === i ? 'fa-check text-success' : 'fa-copy'"></i>
-                                        <span x-text="copiedIndex === i ? 'คัดลอกแล้ว' : 'คัดลอก'"></span>
+                                        <span x-text="copiedIndex === i ? '{% filter escapejs %}{% translate "คัดลอกแล้ว" %}{% endfilter %}' : '{% filter escapejs %}{% translate "คัดลอก" %}{% endfilter %}'"></span>
                                     </button>
                                     <template x-if="i === messages.length - 1 && !sending && m.kind !== 'out_of_scope'">
                                         <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" @click="ask('อธิบายให้เข้าใจง่ายกว่านี้หน่อย')">
-                                            อธิบายง่ายขึ้น
+                                            {% translate "อธิบายง่ายขึ้น" %}
                                         </button>
                                     </template>
                                 </div>
@@ -253,9 +255,9 @@
 
                 <!-- สวิตช์โหมดด้านบนแคปซูล (เฉพาะตอนเริ่มต้น เหมือน แชท | งาน ใน Gemini) -->
                 <div class="ai-seg-wrap" x-show="!current || messages.length === 0">
-                    <div class="ai-seg-pill" role="tablist" aria-label="โหมดใช้งาน">
-                        <button type="button" :class="{ 'active': selectedMode !== 'symptom' }" @click="setMode('general')">แชท</button>
-                        <button type="button" :class="{ 'active': selectedMode === 'symptom' }" @click="setMode('symptom')">เล่าอาการ</button>
+                    <div class="ai-seg-pill" role="tablist" aria-label="{% translate "โหมดใช้งาน" %}">
+                        <button type="button" :class="{ 'active': selectedMode !== 'symptom' }" @click="setMode('general')">{% translate "แชท" %}</button>
+                        <button type="button" :class="{ 'active': selectedMode === 'symptom' }" @click="setMode('symptom')">{% translate "เล่าอาการ" %}</button>
                     </div>
                 </div>
 
@@ -264,8 +266,8 @@
                     <div class="ai-pending-strip" x-show="pendingImages.length || pendingAudio">
                         <template x-for="(img, idx) in pendingImages" :key="img.id">
                             <div class="ai-thumb-chip">
-                                <img :src="img.preview" alt="ภาพแนบ">
-                                <button type="button" class="ai-thumb-remove" @click="removePendingImage(idx)" aria-label="ลบรูป">
+                                <img :src="img.preview" alt="{% translate "ภาพแนบ" %}">
+                                <button type="button" class="ai-thumb-remove" @click="removePendingImage(idx)" aria-label="{% translate "ลบรูป" %}">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
@@ -274,7 +276,7 @@
                             <div class="ai-audio-chip">
                                 <i class="fas fa-volume-up text-primary"></i>
                                 <span x-text="pendingAudio.label"></span>
-                                <button type="button" class="ai-icon-btn text-danger" style="width:22px;height:22px;" @click="clearPendingAudio()" aria-label="ลบคลิปเสียง">
+                                <button type="button" class="ai-icon-btn text-danger" style="width:22px;height:22px;" @click="clearPendingAudio()" aria-label="{% translate "ลบคลิปเสียง" %}">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
@@ -283,26 +285,26 @@
 
                     <div class="ai-pill-row">
                         <div class="dropdown">
-                            <button type="button" class="ai-tool-btn" data-bs-toggle="dropdown" aria-expanded="false" title="แนบรูปภาพหรือไฟล์เสียง">
+                            <button type="button" class="ai-tool-btn" data-bs-toggle="dropdown" aria-expanded="false" title="{% translate "แนบรูปภาพหรือไฟล์เสียง" %}">
                                 <i class="fas fa-plus"></i>
                             </button>
                             <ul class="dropdown-menu shadow-sm border-0 rounded-4 p-1">
                                 <li>
                                     <button type="button" class="dropdown-item rounded-3 py-2" @click="$refs.imagePicker.click()">
-                                        <i class="far fa-image text-success me-2"></i> แนบรูปภาพ (สูงสุด 3 รูป)
+                                        <i class="far fa-image text-success me-2"></i> {% translate "แนบรูปภาพ (สูงสุด 3 รูป)" %}
                                     </button>
                                 </li>
                                 <li>
                                     <button type="button" class="dropdown-item rounded-3 py-2" @click="$refs.audioPicker.click()">
-                                        <i class="fas fa-file-audio text-primary me-2"></i> อัปโหลดไฟล์เสียง
+                                        <i class="fas fa-file-audio text-primary me-2"></i> {% translate "อัปโหลดไฟล์เสียง" %}
                                     </button>
                                 </li>
                             </ul>
                         </div>
 
-                        <label for="pt-q-input" class="visually-hidden">พิมพ์ข้อความถึงผู้ช่วย</label>
+                        <label for="pt-q-input" class="visually-hidden">{% translate "พิมพ์ข้อความถึงผู้ช่วย" %}</label>
                         <textarea id="pt-q-input" x-ref="input" class="ai-pill-textarea" rows="1" maxlength="1500"
-                                  :placeholder="selectedMode === 'symptom' ? 'เล่าอาการที่เป็นอยู่ได้เลย...' : 'ขอความช่วยเหลือจาก TSPI AI...'"
+                                  :placeholder="selectedMode === 'symptom' ? '{% filter escapejs %}{% translate "เล่าอาการที่เป็นอยู่ได้เลย..." %}{% endfilter %}' : '{% filter escapejs %}{% translate "ขอความช่วยเหลือจาก TSPI AI..." %}{% endfilter %}'"
                                   x-model="draft"
                                   @input="autoGrow($el)"
                                   @keydown.enter="if (!$event.shiftKey && !$event.isComposing) { $event.preventDefault(); send(); }"
@@ -310,25 +312,25 @@
 
                         <button type="button" class="ai-tool-btn" x-show="speechSupported"
                                 :class="{ 'recording': listening }" @click="toggleMic()"
-                                title="พูดด้วยเสียงเพื่อพิมพ์">
+                                title="{% translate "พูดด้วยเสียงเพื่อพิมพ์" %}">
                             <i class="fas" :class="listening ? 'fa-stop' : 'fa-microphone'"></i>
                         </button>
 
                         <!-- ถ้ายังว่างแสดงปุ่ม "พูด/อัดเสียง" แบบ Gemini, ถ้ามีข้อความ/ไฟล์แสดงปุ่มส่ง ↑ -->
                         <button type="button" class="ai-voice-pill" x-show="!hasInput()"
                                 :class="{ 'recording': recordingAudio }" @click="toggleAudioRecord()"
-                                title="อัดคลิปเสียงส่งให้ AI และทีมแพทย์">
+                                title="{% translate "อัดคลิปเสียงส่งให้ AI และทีมแพทย์" %}">
                             <i class="fas" :class="recordingAudio ? 'fa-stop-circle' : 'fa-wave-square'"></i>
-                            <span x-text="recordingAudio ? recordTimerLabel() : 'พูด'"></span>
+                            <span x-text="recordingAudio ? recordTimerLabel() : '{% filter escapejs %}{% translate "พูด" %}{% endfilter %}'"></span>
                         </button>
-                        <button type="submit" class="ai-send-btn" x-show="hasInput()" :disabled="!canSend()" aria-label="ส่งข้อความ">
+                        <button type="submit" class="ai-send-btn" x-show="hasInput()" :disabled="!canSend()" aria-label="{% translate "ส่งข้อความ" %}">
                             <i class="fas fa-arrow-up"></i>
                         </button>
                     </div>
                 </form>
 
                 <div class="ai-micro-foot">
-                    ไม่ใช่การวินิจฉัยของแพทย์ &middot; รูป/เสียงเข้ารหัสในระบบ &middot; ฉุกเฉิน <a href="tel:1669" class="text-decoration-none">1669</a>
+                    {% translate "ไม่ใช่การวินิจฉัยของแพทย์ &middot; รูป/เสียงเข้ารหัสในระบบ &middot; ฉุกเฉิน" %} <a href="tel:1669" class="text-decoration-none">1669</a>
                 </div>
             </div>
         </div>
@@ -338,8 +340,8 @@
     <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3"
          style="display: none; background: rgba(15, 23, 42, .82); z-index: 1080;"
          x-show="previewUrl" x-transition @click="previewUrl = ''">
-        <img :src="previewUrl" alt="ภาพขยาย" class="rounded-3 shadow-lg" style="max-width: 92vw; max-height: 88vh; object-fit: contain;" @click.stop>
-        <button type="button" class="btn btn-light rounded-circle position-absolute top-0 end-0 m-3" @click="previewUrl = ''" aria-label="ปิดรูป">
+        <img :src="previewUrl" alt="{% translate "ภาพขยาย" %}" class="rounded-3 shadow-lg" style="max-width: 92vw; max-height: 88vh; object-fit: contain;" @click.stop>
+        <button type="button" class="btn btn-light rounded-circle position-absolute top-0 end-0 m-3" @click="previewUrl = ''" aria-label="{% translate "ปิดรูป" %}">
             <i class="fas fa-times"></i>
         </button>
     </div>
@@ -382,10 +384,10 @@ function assistantApp() {
         recordSeconds: 0,
         recordTimer: null,
         examples: [
-            'ลำไส้รั่วคืออะไร รักษาอย่างไร',
-            'อ่อนเพลียบ่อย เกี่ยวกับระบบไหน',
-            'สะเก็ดเงินดูแลตัวเองอย่างไร',
-            'นัดหมายคลินิกได้อย่างไร',
+            '{% filter escapejs %}{% translate "ลำไส้รั่วคืออะไร รักษาอย่างไร" %}{% endfilter %}',
+            '{% filter escapejs %}{% translate "อ่อนเพลียบ่อย เกี่ยวกับระบบไหน" %}{% endfilter %}',
+            '{% filter escapejs %}{% translate "สะเก็ดเงินดูแลตัวเองอย่างไร" %}{% endfilter %}',
+            '{% filter escapejs %}{% translate "นัดหมายคลินิกได้อย่างไร" %}{% endfilter %}',
         ],
 
         async init() {
@@ -438,19 +440,19 @@ function assistantApp() {
             const files = Array.from(ev.target.files || []);
             for (const f of files) {
                 if (f.type.startsWith('video/')) {
-                    this.error = 'ยังไม่รองรับการส่งวิดีโอ กรุณาส่งเป็นข้อความ รูปภาพ หรือคลิปเสียง';
+                    this.error = '{% filter escapejs %}{% translate "ยังไม่รองรับการส่งวิดีโอ กรุณาส่งเป็นข้อความ รูปภาพ หรือคลิปเสียง" %}{% endfilter %}';
                     continue;
                 }
                 if (!['image/jpeg', 'image/png', 'image/webp'].includes(f.type)) {
-                    this.error = 'รองรับเฉพาะรูปภาพ JPG, PNG หรือ WEBP';
+                    this.error = '{% filter escapejs %}{% translate "รองรับเฉพาะรูปภาพ JPG, PNG หรือ WEBP" %}{% endfilter %}';
                     continue;
                 }
                 if (f.size > 5 * 1024 * 1024) {
-                    this.error = 'รูปภาพแต่ละรูปต้องมีขนาดไม่เกิน 5 MB';
+                    this.error = '{% filter escapejs %}{% translate "รูปภาพแต่ละรูปต้องมีขนาดไม่เกิน 5 MB" %}{% endfilter %}';
                     continue;
                 }
                 if (this.pendingImages.length >= 3) {
-                    this.error = 'ส่งรูปได้สูงสุด 3 รูปต่อครั้ง';
+                    this.error = '{% filter escapejs %}{% translate "ส่งรูปได้สูงสุด 3 รูปต่อครั้ง" %}{% endfilter %}';
                     break;
                 }
                 this.pendingImages.push({
@@ -471,14 +473,14 @@ function assistantApp() {
             ev.target.value = '';
             if (!f) return;
             if (f.type.startsWith('video/')) {
-                this.error = 'ยังไม่รองรับการส่งวิดีโอ กรุณาส่งเป็นไฟล์เสียงหรือรูปภาพ';
+                this.error = '{% filter escapejs %}{% translate "ยังไม่รองรับการส่งวิดีโอ กรุณาส่งเป็นไฟล์เสียงหรือรูปภาพ" %}{% endfilter %}';
                 return;
             }
             if (f.size > 10 * 1024 * 1024) {
-                this.error = 'ไฟล์เสียงต้องมีขนาดไม่เกิน 10 MB';
+                this.error = '{% filter escapejs %}{% translate "ไฟล์เสียงต้องมีขนาดไม่เกิน 10 MB" %}{% endfilter %}';
                 return;
             }
-            this.pendingAudio = { file: f, label: f.name || 'ไฟล์เสียง' };
+            this.pendingAudio = { file: f, label: f.name || '{% filter escapejs %}{% translate "ไฟล์เสียง" %}{% endfilter %}' };
         },
         clearPendingAudio() { this.pendingAudio = null; },
         recordTimerLabel() {
@@ -492,7 +494,7 @@ function assistantApp() {
                 return;
             }
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
-                this.error = 'เบราว์เซอร์นี้ไม่รองรับการอัดเสียงโดยตรง ลองกด + แล้วเลือกอัปโหลดไฟล์เสียงแทนได้ครับ';
+                this.error = '{% filter escapejs %}{% translate "เบราว์เซอร์นี้ไม่รองรับการอัดเสียงโดยตรง ลองกด + แล้วเลือกอัปโหลดไฟล์เสียงแทนได้ครับ" %}{% endfilter %}';
                 return;
             }
             this.error = '';
@@ -516,7 +518,7 @@ function assistantApp() {
                     if (blob.size > 0) {
                         const ext = outMime.includes('mp4') ? 'm4a' : 'webm';
                         const file = new File([blob], 'voice-note.' + ext, { type: outMime });
-                        this.pendingAudio = { file, label: 'คลิปเสียง (' + this.recordTimerLabel() + ')' };
+                        this.pendingAudio = { file, label: '{% filter escapejs %}{% translate "คลิปเสียง (" %}{% endfilter %}' + this.recordTimerLabel() + ')' };
                     }
                 };
                 mr.start();
@@ -528,7 +530,7 @@ function assistantApp() {
                 }, 1000);
             } catch (e) {
                 this.recordingAudio = false;
-                this.error = 'ไม่สามารถเปิดไมโครโฟนได้ กรุณาตรวจสอบสิทธิ์ไมโครโฟน';
+                this.error = '{% filter escapejs %}{% translate "ไม่สามารถเปิดไมโครโฟนได้ กรุณาตรวจสอบสิทธิ์ไมโครโฟน" %}{% endfilter %}';
             }
         },
         toggleMic() {
@@ -569,7 +571,7 @@ function assistantApp() {
             await this.ensureThread();
             if (!this.current) {
                 this.sending = false;
-                this.error = 'ไม่สามารถสร้างห้องแชทได้ กรุณาลองใหม่';
+                this.error = '{% filter escapejs %}{% translate "ไม่สามารถสร้างห้องแชทได้ กรุณาลองใหม่" %}{% endfilter %}';
                 return;
             }
 
@@ -580,7 +582,7 @@ function assistantApp() {
             this.messages.push({
                 id: 'tmp_' + Date.now(),
                 role: 'user',
-                content: text || (aud ? '[กำลังถอดความคลิปเสียง…]' : '[ส่งรูปภาพ]'),
+                content: text || (aud ? '{% filter escapejs %}{% translate "[กำลังถอดความคลิปเสียง…]" %}{% endfilter %}' : '{% filter escapejs %}{% translate "[ส่งรูปภาพ]" %}{% endfilter %}'),
                 attachments: localAtts,
                 sources: [],
             });
@@ -616,12 +618,12 @@ function assistantApp() {
                     this.current = d.thread;
                     this.threads = [d.thread, ...this.threads.filter(t => t.id !== d.thread.id)];
                 } else {
-                    this.error = d.error || 'ส่งข้อความไม่สำเร็จ';
+                    this.error = d.error || '{% filter escapejs %}{% translate "ส่งข้อความไม่สำเร็จ" %}{% endfilter %}';
                     this.draft = text;
                 }
             } catch (e) {
                 this.messages = this.messages.filter(m => !String(m.id).startsWith('tmp_'));
-                this.error = 'เชื่อมต่อไม่สำเร็จ กรุณาลองใหม่';
+                this.error = '{% filter escapejs %}{% translate "เชื่อมต่อไม่สำเร็จ กรุณาลองใหม่" %}{% endfilter %}';
                 this.draft = text;
             }
 
@@ -634,12 +636,12 @@ function assistantApp() {
             const th = target || this.current;
             if (!th) return;
             const res = await Swal.fire({
-                title: 'ตั้งชื่อแชทใหม่',
+                title: '{% filter escapejs %}{% translate "ตั้งชื่อแชทใหม่" %}{% endfilter %}',
                 input: 'text',
                 inputValue: th.title,
                 showCancelButton: true,
-                confirmButtonText: 'บันทึก',
-                cancelButtonText: 'ยกเลิก',
+                confirmButtonText: '{% filter escapejs %}{% translate "บันทึก" %}{% endfilter %}',
+                cancelButtonText: '{% filter escapejs %}{% translate "ยกเลิก" %}{% endfilter %}',
                 confirmButtonColor: '#1A73E8',
             });
             const title = (res.value || '').trim();
@@ -654,14 +656,14 @@ function assistantApp() {
             const th = target || this.current;
             if (!th) return;
             const res = await Swal.fire({
-                title: th.submitted ? 'ซ่อนแชทนี้?' : 'ลบแชทนี้ถาวร?',
+                title: th.submitted ? '{% filter escapejs %}{% translate "ซ่อนแชทนี้?" %}{% endfilter %}' : '{% filter escapejs %}{% translate "ลบแชทนี้ถาวร?" %}{% endfilter %}',
                 text: th.submitted
-                    ? 'แชทนี้ส่งให้คลินิกแล้ว จะซ่อนจากรายการของคุณเท่านั้น (คลินิกยังเก็บไว้ในเวชระเบียน)'
-                    : 'ข้อความและไฟล์แนบทั้งหมดในแชทนี้จะถูกลบออก',
+                    ? '{% filter escapejs %}{% translate "แชทนี้ส่งให้คลินิกแล้ว จะซ่อนจากรายการของคุณเท่านั้น (คลินิกยังเก็บไว้ในเวชระเบียน)" %}{% endfilter %}'
+                    : '{% filter escapejs %}{% translate "ข้อความและไฟล์แนบทั้งหมดในแชทนี้จะถูกลบออก" %}{% endfilter %}',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: th.submitted ? 'ซ่อนแชท' : 'ลบถาวร',
-                cancelButtonText: 'ยกเลิก',
+                confirmButtonText: th.submitted ? '{% filter escapejs %}{% translate "ซ่อนแชท" %}{% endfilter %}' : '{% filter escapejs %}{% translate "ลบถาวร" %}{% endfilter %}',
+                cancelButtonText: '{% filter escapejs %}{% translate "ยกเลิก" %}{% endfilter %}',
                 confirmButtonColor: '#DC2626',
             });
             if (!res.isConfirmed) return;
@@ -675,12 +677,12 @@ function assistantApp() {
         async submit() {
             if (!this.current) return;
             const res = await Swal.fire({
-                title: 'ส่งแชทให้ทีมแพทย์ตรวจ?',
-                text: 'ข้อความ รูปภาพ และคลิปเสียงในแชทนี้จะถูกส่งเข้าคิวซักถามของคลินิก TSPI',
+                title: '{% filter escapejs %}{% translate "ส่งแชทให้ทีมแพทย์ตรวจ?" %}{% endfilter %}',
+                text: '{% filter escapejs %}{% translate "ข้อความ รูปภาพ และคลิปเสียงในแชทนี้จะถูกส่งเข้าคิวซักถามของคลินิก TSPI" %}{% endfilter %}',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'ส่งให้ทีมแพทย์',
-                cancelButtonText: 'ยกเลิก',
+                confirmButtonText: '{% filter escapejs %}{% translate "ส่งให้ทีมแพทย์" %}{% endfilter %}',
+                cancelButtonText: '{% filter escapejs %}{% translate "ยกเลิก" %}{% endfilter %}',
                 confirmButtonColor: '#1A73E8',
             });
             if (!res.isConfirmed) return;
@@ -688,9 +690,9 @@ function assistantApp() {
             if (ok) {
                 this.current = d.thread;
                 this.threads = this.threads.map(t => t.id === d.thread.id ? d.thread : t);
-                Swal.fire({ icon: 'success', title: 'ส่งให้คลินิกเรียบร้อยแล้ว', timer: 1800, showConfirmButton: false });
+                Swal.fire({ icon: 'success', title: '{% filter escapejs %}{% translate "ส่งให้คลินิกเรียบร้อยแล้ว" %}{% endfilter %}', timer: 1800, showConfirmButton: false });
             } else {
-                this.error = d.error || 'ส่งไม่สำเร็จ';
+                this.error = d.error || '{% filter escapejs %}{% translate "ส่งไม่สำเร็จ" %}{% endfilter %}';
             }
         },
     };

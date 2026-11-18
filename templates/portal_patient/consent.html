@@ -1,44 +1,36 @@
 {% extends 'layouts/patient_base.html' %}
+{% load i18n %}
 
-{% block title %}หนังสือยินยอมรับการรักษาและ PDPA | TSPI Health{% endblock %}
+{% block title %}{% translate "ความยินยอมและ PDPA — TSPI Health" %}{% endblock %}
 
 {% block content %}
-<div class="container py-2" style="max-width: 900px;">
-
-    <div class="card border-0 shadow-xs mb-4">
-        <div class="card-body p-4 p-md-5">
-            <span class="badge bg-success-subtle text-success mb-2">
-                <i class="fas fa-file-contract me-1"></i> Patient Informed Consent
-            </span>
-            <h1 class="h4 fw-bold text-dark mb-1">หนังสือยินยอมรับการรักษาและนโยบายความเป็นส่วนตัว</h1>
-            <p class="small text-muted mb-0">ยินยอมให้ประมวลผลข้อมูลสุขภาพและข้อมูลทางพันธุศาสตร์/ผลแล็บตามมาตรฐาน PDPA</p>
+{# ข้อความยินยอมเดิมทุกคำ — ตัดบรรทัด "ท่านได้ลงนามยินยอมแล้ว / Consent Verified" ออก เพราะแสดงกับทุกคนโดยไม่ได้ตรวจจากข้อมูลจริง #}
+<div class="f-portal-narrow" style="max-width: 820px;">
+    <div class="f-portal-head">
+        <div>
+            <span class="f-pill">{% translate "ความยินยอม" %}</span>
+            <h1>{% translate "หนังสือยินยอมรับการรักษาและนโยบายความเป็นส่วนตัว" %}</h1>
+            <p>{% translate "ยินยอมให้ประมวลผลข้อมูลสุขภาพและข้อมูลทางพันธุศาสตร์/ผลแล็บตามมาตรฐาน PDPA" %}</p>
         </div>
     </div>
 
-    <div class="card border-0 shadow-xs">
-        <div class="card-body p-4 p-md-5 d-flex flex-column gap-3 small lh-base text-secondary">
-            <div class="p-3 bg-light rounded-3 border">
-                <h6 class="fw-bold text-dark mb-2">1. การยินยอมรับการประเมินและการรักษา</h6>
-                <p class="mb-0">
-                    ข้าพเจ้ายินยอมให้ทีมแพทย์ TSPI Clinic และระบบ AI Clinical Engine วิเคราะห์ข้อมูลสุขภาพ ผลการตรวจเลือด สัญญาณชีพ และประวัติครอบครัว 
-                    เพื่อการวางแผนบำบัดฟื้นฟูด้วยไฟโตเคมีคอลมาตรฐาน 200 โมดูล
-                </p>
-            </div>
-
-            <div class="p-3 bg-light rounded-3 border">
-                <h6 class="fw-bold text-dark mb-2">2. การคุ้มครองข้อมูลส่วนบุคคล (PDPA)</h6>
-                <p class="mb-0">
-                    ข้อมูลของท่านจะได้รับการเข้ารหัสตามมาตรฐานความปลอดภัยสูง และใช้เพื่อวัตถุประสงค์ในการดูแลรักษาเฉพาะบุคคลเท่านั้น 
-                    ท่านสามารถเพิกถอนความยินยอมหรือขอตรวจสอบประวัติการเข้าถึงข้อมูลได้ตลอดเวลา
-                </p>
-            </div>
-
-            <div class="pt-3 border-top d-flex align-items-center justify-content-between">
-                <span class="small text-success fw-semibold"><i class="fas fa-check-circle me-1"></i> ท่านได้ลงนามยินยอมทางอิเล็กทรอนิกส์แล้ว</span>
-                <span class="small text-muted font-monospace">Consent Verified</span>
-            </div>
+    <div class="d-grid gap-3">
+        <div class="f-card">
+            <h2 class="h5">{% translate "1. การยินยอมรับการประเมินและการรักษา" %}</h2>
+            <p class="text-muted mb-0">
+                {% translate "ข้าพเจ้ายินยอมให้ทีมแพทย์ TSPI Clinic และระบบ AI Clinical Engine วิเคราะห์ข้อมูลสุขภาพ ผลการตรวจเลือด สัญญาณชีพ และประวัติครอบครัว เพื่อการวางแผนบำบัดฟื้นฟูด้วยไฟโตเคมีคอลมาตรฐาน 200 โมดูล" %}
+            </p>
+        </div>
+        <div class="f-card">
+            <h2 class="h5">{% translate "2. การคุ้มครองข้อมูลส่วนบุคคล (PDPA)" %}</h2>
+            <p class="text-muted mb-0">
+                {% translate "ข้อมูลของท่านจะได้รับการเข้ารหัสตามมาตรฐานความปลอดภัยสูง และใช้เพื่อวัตถุประสงค์ในการดูแลรักษาเฉพาะบุคคลเท่านั้น ท่านสามารถเพิกถอนความยินยอมหรือขอตรวจสอบประวัติการเข้าถึงข้อมูลได้ตลอดเวลา" %}
+            </p>
+        </div>
+        <div class="f-card is-soft d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <p class="mb-0 text-muted">{% translate "ต้องการเพิกถอนความยินยอมหรือขอดูประวัติการเข้าถึงข้อมูล แจ้งเจ้าหน้าที่ของคลินิกได้" %}</p>
+            <a href="{% url 'core:privacy' %}" class="btn btn-outline-secondary btn-sm">{% translate "อ่านนโยบายฉบับเต็ม" %}</a>
         </div>
     </div>
-
 </div>
 {% endblock %}

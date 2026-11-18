@@ -12,6 +12,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib import messages
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from django_ratelimit.decorators import ratelimit
 from accounts.models import AuditLog, User
@@ -116,7 +117,7 @@ def patient_login_view(request):
                 user_agent=request.META.get('HTTP_USER_AGENT', '')[:500]
             )
 
-            messages.success(request, f"ยินดีต้อนรับ คุณ{user.get_full_name() or user.username}")
+            messages.success(request, _("ยินดีต้อนรับ คุณ%(name)s") % {'name': user.get_full_name() or user.username})
             next_url = request.GET.get('next')
             if _is_safe_next(request, next_url):
                 return redirect(next_url)

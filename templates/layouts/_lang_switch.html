@@ -1,0 +1,8 @@
+{% load i18n %}{% get_current_language as CUR_LANG %}
+{# ปุ่มสลับภาษา TH/EN (หน้าบ้านเท่านั้น) — ส่งไป set_language ของ Django แล้วกลับหน้าเดิม #}
+<form class="f-lang{% if extra_class %} {{ extra_class }}{% endif %}" action="{% url 'set_language' %}" method="post" aria-label="{% translate "เลือกภาษา" %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button type="submit" name="language" value="th" class="{% if CUR_LANG == 'th' %}on{% endif %}" lang="th" aria-pressed="{% if CUR_LANG == 'th' %}true{% else %}false{% endif %}" title="ภาษาไทย">TH</button>
+    <button type="submit" name="language" value="en" class="{% if CUR_LANG == 'en' %}on{% endif %}" lang="en" aria-pressed="{% if CUR_LANG == 'en' %}true{% else %}false{% endif %}" title="English">EN</button>
+</form>

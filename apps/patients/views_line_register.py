@@ -4,6 +4,7 @@
 จึงเปิดเวชระเบียนใหม่เสมอ ถ้าเบอร์ตรงกับคนไข้เดิมให้เจ้าหน้าที่ตรวจทีหลัง ไม่งั้นใครรู้เบอร์ก็เห็นผลตรวจของคนอื่นได้
 """
 
+from django.utils.translation import gettext_lazy as _
 import uuid
 
 from django import forms
@@ -25,14 +26,14 @@ from patients.views_liff import _next_hn
 
 
 class LineRegisterForm(forms.Form):
-    full_name = forms.CharField(max_length=150, error_messages={'required': 'กรุณากรอกชื่อ-นามสกุล'})
-    phone = forms.CharField(max_length=20, error_messages={'required': 'กรุณากรอกเบอร์โทรศัพท์'})
-    consent = forms.BooleanField(error_messages={'required': 'กรุณากดยอมรับก่อนส่งข้อมูล'})
+    full_name = forms.CharField(max_length=150, error_messages={'required': _('กรุณากรอกชื่อ-นามสกุล')})
+    phone = forms.CharField(max_length=20, error_messages={'required': _('กรุณากรอกเบอร์โทรศัพท์')})
+    consent = forms.BooleanField(error_messages={'required': _('กรุณากดยอมรับก่อนส่งข้อมูล')})
 
     def clean_phone(self):
         phone = self.cleaned_data['phone'].replace('-', '').replace(' ', '')
         if not (phone.isdigit() and phone.startswith('0') and 9 <= len(phone) <= 10):
-            raise forms.ValidationError('เบอร์โทรศัพท์ไม่ถูกต้อง')
+            raise forms.ValidationError(_('เบอร์โทรศัพท์ไม่ถูกต้อง'))
         return phone
 
 
@@ -46,7 +47,7 @@ def _find_by_phone(phone: str):
 
 
 def _create_and_bind(request: HttpRequest, line_user: LineUser, full_name: str, phone: str, duplicate_of) -> Patient:
-    first_name, _, last_name = full_name.partition(' ')
+    first_name, _sep, last_name = full_name.partition(" ")
     extra_data = {'registered_via': 'line_form', 'needs_staff_verification': True,
                   'pdpa_consent_at': timezone.now().isoformat()}
     if duplicate_of:
@@ -98,7 +99,7 @@ def line_register_view(request: HttpRequest) -> HttpResponse:
     if not line_user_id:
         return render(request, template, {'state': 'invalid'}, status=400)
 
-    line_user, _ = LineUser.objects.get_or_create(line_user_id=line_user_id, defaults={'display_name': 'LINE User'})
+    line_user, _created = LineUser.objects.get_or_create(line_user_id=line_user_id, defaults={'display_name': 'LINE User'})
     if _resolve_patient(line_user_id):
         return render(request, template, {'state': 'bound'})
 
@@ -106,7 +107,7 @@ def line_register_view(request: HttpRequest) -> HttpResponse:
     if request.method != 'POST':
         return render(request, template, {'state': 'form', 'form': form})
     if getattr(request, 'limited', False):
-        form.add_error(None, 'ส่งข้อมูลบ่อยเกินไป กรุณารอสักครู่แล้วลองใหม่')
+        form.add_error(None, _('ส่งข้อมูลบ่อยเกินไป กรุณารอสักครู่แล้วลองใหม่'))
         return render(request, template, {'state': 'form', 'form': form}, status=429)
     if not form.is_valid():
         return render(request, template, {'state': 'form', 'form': form})

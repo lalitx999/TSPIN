@@ -1,8 +1,9 @@
 {% extends 'layouts/public_base.html' %}
+{% load i18n %}
 {% load static %}
 {# หน้าแรก 2026 (เฟส 2 ของ docs/UI_REDESIGN_FASTWORK_2026-11.md) — ห้ามใส่ตัวเลขสถิติ รีวิว หรือรูปคนไข้ที่แต่งขึ้น #}
 
-{% block title %}TSPI Clinic — ดูแลสุขภาพเชิงระบบ 39 แกนชีววิทยา{% endblock %}
+{% block title %}{% translate "TSPI Clinic — ดูแลสุขภาพเชิงระบบ 39 แกนชีววิทยา" %}{% endblock %}
 
 {% block extra_head %}
 <script src="{% static 'js/botanical3d.js' %}?v={{ ASSET_VERSION }}" defer></script>
@@ -19,47 +20,47 @@
 
     <div class="f-floaters" aria-hidden="true">
         <a class="f-floater f1" href="{% url 'core:assistant' %}?q={{ 'ลำไส้รั่วคืออะไร รักษาอย่างไร'|urlencode }}" tabindex="-1">
-            <span class="k"><i class="fas fa-comment-medical"></i> ตัวอย่างคำถาม</span>
-            <span class="bubble">ลำไส้รั่วคืออะไร รักษาอย่างไร</span>
+            <span class="k"><i class="fas fa-comment-medical"></i> {% translate "ตัวอย่างคำถาม" %}</span>
+            <span class="bubble">{% translate "ลำไส้รั่วคืออะไร รักษาอย่างไร" %}</span>
         </a>
         <div class="f-floater f2">
-            <span class="k"><i class="fas fa-book-medical"></i> คำตอบมีที่มา</span>
-            <span class="q">อ้างอิงเอกสารของคลินิก<span class="cite">1</span><span class="cite">2</span></span>
+            <span class="k"><i class="fas fa-book-medical"></i> {% translate "คำตอบมีที่มา" %}</span>
+            <span class="q">{% translate "อ้างอิงเอกสารของคลินิก" %}<span class="cite">1</span><span class="cite">2</span></span>
         </div>
         <a class="f-floater f3" href="{% url 'core:platform' %}" tabindex="-1">
-            <span class="k"><i class="fas fa-dna"></i> 12 โดเมน</span>
-            <span class="q">ลำไส้ · ฮอร์โมน · ภูมิคุ้มกัน · การเผาผลาญ</span>
+            <span class="k"><i class="fas fa-dna"></i> {% translate "12 โดเมน" %}</span>
+            <span class="q">{% translate "ลำไส้ · ฮอร์โมน · ภูมิคุ้มกัน · การเผาผลาญ" %}</span>
         </a>
         <div class="f-floater f4">
-            <span class="k"><i class="fas fa-user-md"></i> แพทย์ของคลินิก</span>
-            <span class="q">AI ให้ข้อมูลเบื้องต้น การวินิจฉัยเป็นของแพทย์</span>
+            <span class="k"><i class="fas fa-user-md"></i> {% translate "แพทย์ของคลินิก" %}</span>
+            <span class="q">{% translate "AI ให้ข้อมูลเบื้องต้น การวินิจฉัยเป็นของแพทย์" %}</span>
         </div>
     </div>
 
     <div class="container-xl">
-        <span class="f-pill mx-auto">12 โดเมน · 39 แกนชีววิทยา</span>
-        <h1 id="heroTitle"><span class="soft">สุขภาพดีเริ่มจาก</span>เข้าใจร่างกาย<span class="f-accent">ทั้งระบบ</span></h1>
-        <p class="f-lead">สงสัยเรื่องโรค อาการ หรือการรักษา ถามผู้ช่วย AI ของ TSPI Clinic ได้ทันที คำตอบอ้างอิงจากเอกสารของคลินิก</p>
+        <span class="f-pill mx-auto">{% translate "12 โดเมน · 39 แกนชีววิทยา" %}</span>
+        <h1 id="heroTitle"><span class="soft">{% translate "สุขภาพดีเริ่มจาก" %}</span>{% translate "เข้าใจร่างกาย" %}<span class="f-accent">{% translate "ทั้งระบบ" %}</span></h1>
+        <p class="f-lead">{% translate "สงสัยเรื่องโรค อาการ หรือการรักษา ถามผู้ช่วย AI ของ TSPI Clinic ได้ทันที คำตอบอ้างอิงจากเอกสารของคลินิก" %}</p>
         <div class="f-hero-cta">
-            <a href="{% url 'core:assistant' %}" class="btn btn-primary btn-lg"><i class="fas fa-comment-medical" aria-hidden="true"></i> คุยกับ AI ตอนนี้</a>
-            <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-outline-secondary btn-lg">ลงทะเบียนพบแพทย์</a>
+            <a href="{% url 'core:assistant' %}" class="btn btn-primary btn-lg"><i class="fas fa-comment-medical" aria-hidden="true"></i> {% translate "คุยกับ AI ตอนนี้" %}</a>
+            <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-outline-secondary btn-lg">{% translate "ลงทะเบียนพบแพทย์" %}</a>
         </div>
         <ul class="f-checks">
-            <li><i class="fas fa-check-circle" aria-hidden="true"></i>ฟรี ไม่ต้องลงทะเบียน</li>
-            <li><i class="fas fa-check-circle" aria-hidden="true"></i>อ้างอิงเอกสารคลินิก</li>
-            <li><i class="fas fa-check-circle" aria-hidden="true"></i>คุ้มครองข้อมูลตาม PDPA</li>
+            <li><i class="fas fa-check-circle" aria-hidden="true"></i>{% translate "ฟรี ไม่ต้องลงทะเบียน" %}</li>
+            <li><i class="fas fa-check-circle" aria-hidden="true"></i>{% translate "อ้างอิงเอกสารคลินิก" %}</li>
+            <li><i class="fas fa-check-circle" aria-hidden="true"></i>{% translate "คุ้มครองข้อมูลตาม PDPA" %}</li>
         </ul>
     </div>
 </section>
 
 {# 2. ข้อเท็จจริงของแนวทางการดูแล (ไม่ใช่สถิติผู้ใช้) #}
-<section class="pb-4" aria-label="แนวทางการดูแลของคลินิก">
+<section class="pb-4" aria-label="{% translate "แนวทางการดูแลของคลินิก" %}">
     <div class="container-xl">
         <div class="f-facts">
-            <div class="f-fact rv"><b>39</b><span>แกนชีววิทยา</span></div>
-            <div class="f-fact rv" style="--d: 1"><b>12</b><span>โดเมนของร่างกาย</span></div>
-            <div class="f-fact rv" style="--d: 2"><b>9</b><span>ขั้นตอนแผนฟื้นฟู</span></div>
-            <div class="f-fact rv" style="--d: 3"><b>24 ชม.</b><span>ผู้ช่วย AI</span></div>
+            <div class="f-fact rv"><b>39</b><span>{% translate "แกนชีววิทยา" %}</span></div>
+            <div class="f-fact rv" style="--d: 1"><b>12</b><span>{% translate "โดเมนของร่างกาย" %}</span></div>
+            <div class="f-fact rv" style="--d: 2"><b>9</b><span>{% translate "ขั้นตอนแผนฟื้นฟู" %}</span></div>
+            <div class="f-fact rv" style="--d: 3"><b>{% translate "24 ชม." %}</b><span>{% translate "ผู้ช่วย AI" %}</span></div>
         </div>
     </div>
 </section>
@@ -68,8 +69,8 @@
 <section class="f-section">
     <div class="container-xl">
         <p class="f-statement rv">
-            <span class="soft">อาการหนึ่งอาจมีต้นเหตุจากหลายระบบที่เชื่อมกัน เช่น ลำไส้ ฮอร์โมน และการอักเสบ</span>
-            แพทย์ของ TSPI จึงประเมินทั้ง 39 แกน เพื่อหาต้นตอ แทนการรักษาแค่ปลายเหตุ
+            <span class="soft">{% translate "อาการหนึ่งอาจมีต้นเหตุจากหลายระบบที่เชื่อมกัน เช่น ลำไส้ ฮอร์โมน และการอักเสบ" %}</span>
+            {% translate "แพทย์ของ TSPI จึงประเมินทั้ง 39 แกน เพื่อหาต้นตอ แทนการรักษาแค่ปลายเหตุ" %}
         </p>
     </div>
 </section>
@@ -81,23 +82,23 @@
     <div class="container-xl">
         <div class="f-head-row">
             <div class="f-head">
-                <span class="f-pill">มองร่างกายเป็นระบบ</span>
-                <h2 class="f-title" id="domainsTitle"><span class="soft">ไม่ได้ดูแค่อาการเดียว</span>แพทย์ประเมินให้ทั้งระบบ</h2>
-                <p>ร่างกายแบ่งเป็น 12 โดเมนที่เชื่อมโยงกัน แพทย์ดูทุกแกนร่วมกันเพื่อหาต้นเหตุของอาการ</p>
+                <span class="f-pill">{% translate "มองร่างกายเป็นระบบ" %}</span>
+                <h2 class="f-title" id="domainsTitle"><span class="soft">{% translate "ไม่ได้ดูแค่อาการเดียว" %}</span>{% translate "แพทย์ประเมินให้ทั้งระบบ" %}</h2>
+                <p>{% translate "ร่างกายแบ่งเป็น 12 โดเมนที่เชื่อมโยงกัน แพทย์ดูทุกแกนร่วมกันเพื่อหาต้นเหตุของอาการ" %}</p>
             </div>
-            <a href="{% url 'core:platform' %}" class="f-link">ดู 39 แกนทั้งหมด <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="{% url 'core:platform' %}" class="f-link">{% translate "ดู 39 แกนทั้งหมด" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
         </div>
 
         <div class="f-bento">
             <div class="tile leaf rv">
-                <canvas data-botanical3d role="img" aria-label="ภาพใบไม้ที่มีเส้นใบ 39 เส้น แทน 39 แกนชีววิทยา ลากเพื่อหมุนได้"></canvas>
-                <div class="cap"><span><b>39 เส้นใบ = 39 แกนชีววิทยา</b></span><span class="text-muted small d-none d-sm-inline">ลากเพื่อหมุน</span></div>
+                <canvas data-botanical3d role="img" aria-label="{% translate "ภาพใบไม้ที่มีเส้นใบ 39 เส้น แทน 39 แกนชีววิทยา ลากเพื่อหมุนได้" %}"></canvas>
+                <div class="cap"><span><b>{% translate "39 เส้นใบ = 39 แกนชีววิทยา" %}</b></span><span class="text-muted small d-none d-sm-inline">{% translate "ลากเพื่อหมุน" %}</span></div>
             </div>
             {% for d in domains %}
             <a href="{% url 'core:platform' %}" class="tile rv" style="--d: {{ forloop.counter0|divisibleby:2|yesno:'0,1' }}">
                 <i class="fas {{ d.0 }} ico" aria-hidden="true"></i>
                 <h3>{{ d.1 }}</h3>
-                <p>ดูร่วมกับแกนอื่นเพื่อหาต้นเหตุ</p>
+                <p>{% translate "ดูร่วมกับแกนอื่นเพื่อหาต้นเหตุ" %}</p>
             </a>
             {% endfor %}
         </div>
@@ -108,8 +109,8 @@
 <section class="f-section" aria-labelledby="stepsTitle">
     <div class="container-xl">
         <div class="f-head is-center">
-            <span class="f-pill">เริ่มใช้บริการ</span>
-            <h2 class="f-title" id="stepsTitle"><span class="soft">เริ่มต้นง่าย ๆ</span>ใน 3 ขั้นตอน</h2>
+            <span class="f-pill">{% translate "เริ่มใช้บริการ" %}</span>
+            <h2 class="f-title" id="stepsTitle"><span class="soft">{% translate "เริ่มต้นง่าย ๆ" %}</span>{% translate "ใน 3 ขั้นตอน" %}</h2>
         </div>
         <div class="f-steps">
             {% for s in service_steps %}
@@ -121,12 +122,12 @@
             {% endfor %}
         </div>
         <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
-            <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-primary btn-lg">ลงทะเบียนพบแพทย์ <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-            <a href="{% url 'core:guide' %}" class="btn btn-outline-secondary btn-lg">วิธีใช้งาน</a>
+            <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-primary btn-lg">{% translate "ลงทะเบียนพบแพทย์" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="{% url 'core:guide' %}" class="btn btn-outline-secondary btn-lg">{% translate "วิธีใช้งาน" %}</a>
         </div>
         <div class="f-sos-band mt-4 mx-auto" style="max-width: 880px;" role="note">
             <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
-            <span>แน่นหน้าอก หายใจลำบาก หมดสติ หรือแขนขาอ่อนแรง อย่ารอถาม AI ให้ <a href="tel:1669">โทร 1669</a> หรือไปโรงพยาบาลใกล้บ้านทันที</span>
+            <span>{% translate "แน่นหน้าอก หายใจลำบาก หมดสติ หรือแขนขาอ่อนแรง อย่ารอถาม AI ให้" %} <a href="tel:1669">{% translate "โทร 1669" %}</a> {% translate "หรือไปโรงพยาบาลใกล้บ้านทันที" %}</span>
         </div>
     </div>
 </section>
@@ -136,11 +137,11 @@
     <div class="container-xl">
         <div class="f-head-row">
             <div class="f-head">
-                <span class="f-pill">ผู้ช่วย AI ของคลินิก</span>
-                <h2 class="f-title" id="askTitle"><span class="soft">สงสัยอะไร</span>ถามได้ตลอด 24 ชั่วโมง</h2>
-                <p>ตอบจากเอกสารของคลินิกพร้อมเลขอ้างอิง ไม่ต้องใส่ชื่อหรือเบอร์โทร</p>
+                <span class="f-pill">{% translate "ผู้ช่วย AI ของคลินิก" %}</span>
+                <h2 class="f-title" id="askTitle"><span class="soft">{% translate "สงสัยอะไร" %}</span>{% translate "ถามได้ตลอด 24 ชั่วโมง" %}</h2>
+                <p>{% translate "ตอบจากเอกสารของคลินิกพร้อมเลขอ้างอิง ไม่ต้องใส่ชื่อหรือเบอร์โทร" %}</p>
             </div>
-            <a href="{% url 'core:assistant' %}" class="f-link">เปิดหน้าคุยกับ AI <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="{% url 'core:assistant' %}" class="f-link">{% translate "เปิดหน้าคุยกับ AI" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
         </div>
         <div class="row g-3">
             {% for item in ask_examples %}
@@ -149,7 +150,7 @@
                     <span class="ico"><i class="fas {{ item.icon }}" aria-hidden="true"></i></span>
                     <span class="q">{{ item.q }}</span>
                     <span class="hint">{{ item.hint }}</span>
-                    <span class="go">ถามเลย <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                    <span class="go">{% translate "ถามเลย" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
                 </a>
             </div>
             {% endfor %}
@@ -159,11 +160,11 @@
             <div class="d-flex gap-3 align-items-start">
                 <span class="ico"><i class="fab fa-line" aria-hidden="true"></i></span>
                 <div>
-                    <h3>เป็นคนไข้ของคลินิก คุยกับบอทผ่าน LINE ได้</h3>
-                    <p>เล่าอาการ ถามเรื่องสุขภาพ ดูใบนัดและผลตรวจได้ในแชท กดปุ่มแล้ว LINE จะพิมพ์คำว่า &ldquo;เปิดบอท&rdquo; ไว้ให้ แค่กดส่ง</p>
+                    <h3>{% translate "เป็นคนไข้ของคลินิก คุยกับบอทผ่าน LINE ได้" %}</h3>
+                    <p>{% translate "เล่าอาการ ถามเรื่องสุขภาพ ดูใบนัดและผลตรวจได้ในแชท กดปุ่มแล้ว LINE จะพิมพ์คำว่า &ldquo;เปิดบอท&rdquo; ไว้ให้ แค่กดส่ง" %}</p>
                 </div>
             </div>
-            <a href="{{ LINE_BOT_URL }}" class="btn btn-primary btn-lg flex-shrink-0"><i class="fab fa-line" aria-hidden="true"></i> เปิดบอทใน LINE</a>
+            <a href="{{ LINE_BOT_URL }}" class="btn btn-primary btn-lg flex-shrink-0"><i class="fab fa-line" aria-hidden="true"></i> {% translate "เปิดบอทใน LINE" %}</a>
         </div>
         {% endif %}
     </div>
@@ -175,11 +176,11 @@
         <div class="row g-4 g-xl-5">
             <div class="col-lg-5">
                 <div class="f-head mb-4">
-                    <span class="f-pill">แนวทางการรักษา</span>
-                    <h2 class="f-title" id="phasesTitle"><span class="soft">แผนฟื้นฟู</span>9 ขั้นตอน 3 ระยะ</h2>
-                    <p>เริ่มจากตรวจประเมินและล้างของเสีย ปรับสมดุลระบบหลัก แล้วซ่อมแซมระยะยาว แพทย์จะเลือกขั้นตอนให้เหมาะกับแต่ละคน</p>
+                    <span class="f-pill">{% translate "แนวทางการรักษา" %}</span>
+                    <h2 class="f-title" id="phasesTitle"><span class="soft">{% translate "แผนฟื้นฟู" %}</span>{% translate "9 ขั้นตอน 3 ระยะ" %}</h2>
+                    <p>{% translate "เริ่มจากตรวจประเมินและล้างของเสีย ปรับสมดุลระบบหลัก แล้วซ่อมแซมระยะยาว แพทย์จะเลือกขั้นตอนให้เหมาะกับแต่ละคน" %}</p>
                 </div>
-                <a href="{% url 'core:protocol' %}" class="f-link">ดูรายละเอียดทั้งหมด <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                <a href="{% url 'core:protocol' %}" class="f-link">{% translate "ดูรายละเอียดทั้งหมด" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
             </div>
             <div class="col-lg-7">
                 <div class="accordion is-cards" id="phases">
@@ -189,7 +190,7 @@
                             <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#phase{{ forloop.counter }}"
                                     aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="phase{{ forloop.counter }}">
-                                <span class="f-phase-tag">ระยะ {{ forloop.counter }}</span> {{ phase.title }}
+                                <span class="f-phase-tag">{% translate "ระยะ" %} {{ forloop.counter }}</span> {{ phase.title }}
                             </button>
                         </h3>
                         <div id="phase{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#phases">
@@ -216,10 +217,10 @@
     <div class="container-xl">
         <div class="f-head-row">
             <div class="f-head">
-                <span class="f-pill">สาระสุขภาพ</span>
-                <h2 class="f-title" id="postsTitle"><span class="soft">อ่านก่อนมาคลินิก</span>บทความล่าสุด</h2>
+                <span class="f-pill">{% translate "สาระสุขภาพ" %}</span>
+                <h2 class="f-title" id="postsTitle"><span class="soft">{% translate "อ่านก่อนมาคลินิก" %}</span>{% translate "บทความล่าสุด" %}</h2>
             </div>
-            <a href="{% url 'core:article_list' %}" class="f-link">ดูบทความทั้งหมด <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="{% url 'core:article_list' %}" class="f-link">{% translate "ดูบทความทั้งหมด" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
         </div>
         <div class="row g-3">
             {% for art in latest_articles|slice:":3" %}
@@ -229,7 +230,7 @@
                         {% if not art.cover_image_url %}<i class="fas fa-leaf" aria-hidden="true"></i>{% endif %}
                     </span>
                     <span class="body">
-                        <span class="meta d-block">{{ art.get_category_display }} · อ่าน {{ art.read_time_minutes }} นาที</span>
+                        <span class="meta d-block">{{ art.get_category_display }} {% translate "· อ่าน" %} {{ art.read_time_minutes }} {% translate "นาที" %}</span>
                         <h3>{{ art.title }}</h3>
                     </span>
                 </a>
@@ -246,9 +247,9 @@
         <div class="row g-4 g-xl-5">
             <div class="col-lg-5">
                 <div class="f-head mb-4">
-                    <span class="f-pill">คำถามที่พบบ่อย</span>
-                    <h2 class="f-title" id="faqTitle"><span class="soft">ก่อนเริ่มใช้</span>มีคำถามไหม</h2>
-                    <p>ไม่พบคำตอบ? <a href="{% url 'core:assistant' %}">ถามผู้ช่วย AI</a> หรือทักเจ้าหน้าที่ทาง LINE</p>
+                    <span class="f-pill">{% translate "คำถามที่พบบ่อย" %}</span>
+                    <h2 class="f-title" id="faqTitle"><span class="soft">{% translate "ก่อนเริ่มใช้" %}</span>{% translate "มีคำถามไหม" %}</h2>
+                    <p>{% translate "ไม่พบคำตอบ?" %} <a href="{% url 'core:assistant' %}">{% translate "ถามผู้ช่วย AI" %}</a> {% translate "หรือทักเจ้าหน้าที่ทาง LINE" %}</p>
                 </div>
             </div>
             <div class="col-lg-7">

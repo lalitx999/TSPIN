@@ -24,6 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Core Public Pages & Landing
+    # สลับภาษา TH/EN (POST: language, next) — ใช้กับหน้าบ้านเท่านั้น
+    path('i18n/', include('django.conf.urls.i18n')),
     path('', include('core.urls')),
 
     # Unified Authentication & Session Portal

@@ -1,151 +1,84 @@
 {% extends 'layouts/public_base.html' %}
-{% load static %}
+{% load i18n %}
 
-{% block title %}งานวิจัยทางคลินิกและข้อมูลเชิงประจักษ์ — TSPI CLINIC{% endblock %}
+{% block title %}{% translate "งานวิจัยทางคลินิกและข้อมูลเชิงประจักษ์ — TSPI Clinic" %}{% endblock %}
 
 {% block content %}
-<div class="container-xl py-5">
-
-    <!-- Header -->
-    <div class="text-center mx-auto mb-5" style="max-width: 800px;">
-        <span class="badge-subtle-primary mb-2 d-inline-block">
-            Evidence-Based Precision Medicine
-        </span>
-        <h1 class="display-6 fw-bold text-dark mt-2 mb-3">
-            งานวิจัยทางคลินิกและข้อมูลเชิงประจักษ์
-        </h1>
-        <p class="lead text-muted fs-6 mb-0 lh-base">
-            รวบรวมหลักฐานทางวิทยาศาสตร์ การศึกษาไฟโตเคมีคอลมาตรฐาน 200 โมดูล และผลการทดสอบทางคลินิกในผู้ป่วยจริง 
-            เพื่อยืนยันประสิทธิผลของการรักษาด้วย 39 แกนชีววิทยา
+<section class="f-page-hero" aria-labelledby="pageTitle">
+    <div class="f-hero-bg" aria-hidden="true">
+        <span class="f-glow teal" style="width: 460px; height: 340px; left: 50%; top: -200px; transform: translateX(-50%);"></span>
+    </div>
+    <div class="container-xl">
+        <span class="f-pill mx-auto">{% if show_case_study %}{% translate "งานวิจัยและเคสจริง" %}{% else %}{% translate "งานวิจัย" %}{% endif %}</span>
+        <h1 id="pageTitle"><span class="soft">{% translate "หลักฐานเชิงประจักษ์" %}</span>{% translate "งานวิจัยทางคลินิก" %}</h1>
+        <p class="f-lead">
+            {% translate "รวบรวมหลักฐานทางวิทยาศาสตร์ การศึกษาไฟโตเคมีคอลมาตรฐาน 200 โมดูล และผลการทดสอบทางคลินิกในผู้ป่วยจริง เพื่อยืนยันประสิทธิผลของการรักษาด้วย 39 แกนชีววิทยา" %}
         </p>
     </div>
+</section>
 
-    <!-- Case Nikom Benchmark Card -->
-    <div class="card p-4 p-lg-5 mb-5 border shadow-sm">
-        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-4 mb-4 border-bottom gap-3">
-            <div>
-                <span class="badge bg-primary text-white px-3 py-1 rounded-pill fw-semibold mb-2">Clinical Landmark Case</span>
-                <h2 class="h4 fw-bold text-dark mb-1">กรณีศึกษาผู้ป่วยสะเก็ดเงินรุนแรง (เคสคุณนิคม)</h2>
-                <p class="small text-muted mb-0">ผลการฟื้นฟูด้วย TSPI 9-Step Mechanistic Protocol ระยะเวลา 16 สัปดาห์</p>
-            </div>
-            <div class="d-flex align-items-center gap-4">
-                <div class="text-center">
-                    <small class="text-muted d-block" style="font-size: 11px;">PASI Score ลดลง</small>
-                    <span class="h3 fw-bold text-primary-clinic font-monospace mb-0">-82%</span>
+<section class="pb-5">
+    <div class="container-xl">
+        {# กรณีศึกษา: ซ่อนจนกว่าคลินิกยืนยันว่าเป็นเคสจริงและได้รับความยินยอม (RESEARCH_SHOW_CASE_STUDY ใน apps/core/content.py) #}
+        {% if show_case_study %}
+        <div class="f-phase rv">
+            <div class="f-phase-head align-items-center">
+                <div>
+                    <span class="f-phase-tag">{% translate "กรณีศึกษา" %}</span>
+                    <h2>{% translate "กรณีศึกษาผู้ป่วยสะเก็ดเงินรุนแรง (เคสคุณนิคม)" %}</h2>
+                    <p>{% translate "ผลการฟื้นฟูด้วย TSPI 9-Step Mechanistic Protocol ระยะเวลา 16 สัปดาห์" %}</p>
                 </div>
-                <div class="vr opacity-25"></div>
-                <div class="text-center">
-                    <small class="text-muted d-block" style="font-size: 11px;">การใช้ยาสเตียรอยด์</small>
-                    <span class="h3 fw-bold text-success font-monospace mb-0">0% (หยุดใช้)</span>
+                <div class="d-flex gap-2">
+                    <div class="f-stat"><b>-82%</b><span>{% translate "PASI Score ลดลง" %}</span></div>
+                    <div class="f-stat"><b>0%</b><span>{% translate "การใช้ยาสเตียรอยด์ (หยุดใช้)" %}</span></div>
                 </div>
             </div>
+            <ol class="row g-3 list-unstyled mb-0">
+                <li class="col-md-4">
+                    <div class="f-step-card">
+                        <span class="k">{% translate "ก่อนการรักษา (Baseline)" %}</span>
+                        <h3>{% translate "ระยะเริ่มต้น" %}</h3>
+                        <p class="mb-0">{% translate "มีผื่นสะเก็ดเงินหนากระจายทั่วลำตัว ข้อศอก และศีรษะ ค่าการอักเสบ hsCRP 8.4 mg/L มีอาการคันและแสบผิวหนังรุนแรง ส่งผลกระทบต่อการนอนหลับและการใช้ชีวิตประจำวัน" %}</p>
+                    </div>
+                </li>
+                <li class="col-md-4">
+                    <div class="f-step-card">
+                        <span class="k">{% translate "โปรโตคอล" %}</span>
+                        <h3>{% translate "การฟื้นฟูด้วย 39 แกน" %}</h3>
+                        <p class="mb-0">{% translate "ได้รับโมดูล KERRA, MINOZA เพื่อลด NF-κB และไซโตไคน์อักเสบ ร่วมกับ CINNARA เพื่อฟื้นฟูเยื่อบุลำไส้รั่ว (Leaky Gut) พร้อมปรับสมดุลอาหารบำบัดเฉพาะบุคคล" %}</p>
+                    </div>
+                </li>
+                <li class="col-md-4">
+                    <div class="f-step-card">
+                        <span class="k">{% translate "ผลลัพธ์" %}</span>
+                        <h3>{% translate "หลังผ่าน 16 สัปดาห์" %}</h3>
+                        <p class="mb-0">{% translate "ผื่นสะเก็ดเงินยุบตัวลงอย่างชัดเจน ผิวหนังฟื้นฟูกลับสู่สภาพปกติ ค่า hsCRP ลดลงเหลือ 1.1 mg/L สุขภาพจิต ระดับพลังงาน และคุณภาพชีวิตดีขึ้นอย่างสมบูรณ์" %}</p>
+                    </div>
+                </li>
+            </ol>
         </div>
 
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <span class="badge bg-danger-subtle text-danger px-2.5 py-1 rounded">ระยะเริ่มต้น</span>
-                        <h3 class="h6 fw-bold text-dark mb-0">ก่อนการรักษา (Baseline)</h3>
-                    </div>
-                    <p class="small text-muted mb-0 lh-base">
-                        มีผื่นสะเก็ดเงินหนากระจายทั่วลำตัว ข้อศอก และศีรษะ ค่าการอักเสบ hsCRP 8.4 mg/L มีอาการคันและแสบผิวหนังรุนแรง ส่งผลกระทบต่อการนอนหลับและการใช้ชีวิตประจำวัน
-                    </p>
-                </div>
-            </div>
+        {% endif %}
 
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <span class="badge bg-primary-subtle text-primary px-2.5 py-1 rounded">โปรโตคอล</span>
-                        <h3 class="h6 fw-bold text-dark mb-0">การฟื้นฟูด้วย 39 แกน</h3>
-                    </div>
-                    <p class="small text-muted mb-0 lh-base">
-                        ได้รับโมดูล KERRA, MINOZA เพื่อลด NF-κB และไซโตไคน์อักเสบ ร่วมกับ CINNARA เพื่อฟื้นฟูเยื่อบุลำไส้รั่ว (Leaky Gut) พร้อมปรับสมดุลอาหารบำบัดเฉพาะบุคคล
-                    </p>
-                </div>
+        {# ตัวชี้วัดชีวภาพ #}
+        <div class="f-head-row {% if show_case_study %}mt-5{% endif %} mb-4">
+            <div class="f-head">
+                <h2 class="f-title mt-0"><span class="soft">{% translate "สิ่งที่ใช้ติดตามผล" %}</span>{% translate "ตัวชี้วัดชีวภาพหลัก" %}</h2>
+                <p>{% translate "สารบ่งชี้ระดับโมเลกุลที่ระบบ AI นำมาตรวจติดตามผลลัพธ์" %}</p>
             </div>
-
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <span class="badge bg-success-subtle text-success px-2.5 py-1 rounded">ผลลัพธ์</span>
-                        <h3 class="h6 fw-bold text-dark mb-0">หลังผ่าน 16 สัปดาห์</h3>
-                    </div>
-                    <p class="small text-muted mb-0 lh-base">
-                        ผื่นสะเก็ดเงินยุบตัวลงอย่างชัดเจน ผิวหนังฟื้นฟูกลับสู่สภาพปกติ ค่า hsCRP ลดลงเหลือ 1.1 mg/L สุขภาพจิต ระดับพลังงาน และคุณภาพชีวิตดีขึ้นอย่างสมบูรณ์
-                    </p>
-                </div>
-            </div>
+            <span class="f-chip">{% translate "6 ตัวชี้วัดสำคัญ" %}</span>
         </div>
-    </div>
-
-    <!-- Biomarker Correlation Matrix -->
-    <div class="card p-4 p-lg-5 mb-5 border shadow-sm">
-        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-2">
-            <div>
-                <h3 class="h5 fw-bold text-dark mb-1">ตัวชี้วัดชีวภาพหลัก (Key Clinical Biomarkers)</h3>
-                <p class="small text-muted mb-0">สารบ่งชี้ระดับโมเลกุลที่ระบบ AI นำมาตรวจติดตามผลลัพธ์</p>
-            </div>
-            <span class="badge bg-light text-muted border font-monospace px-3 py-2">6 ตัวชี้วัดสำคัญ</span>
-        </div>
-
         <div class="row g-3">
+            {% for code, label in biomarkers %}
             <div class="col-6 col-md-4 col-lg-2">
-                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
-                    <strong class="text-primary-clinic font-monospace d-block mb-1">hs-CRP</strong>
-                    <small class="text-muted d-block" style="font-size: 11px;">Systemic Inflammation</small>
+                <div class="f-card h-100 text-center rv" style="--d: {{ forloop.counter0 }}">
+                    <b class="d-block mb-1">{{ code }}</b>
+                    <span class="text-muted small">{{ label }}</span>
                 </div>
             </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
-                    <strong class="text-primary-clinic font-monospace d-block mb-1">Zonulin</strong>
-                    <small class="text-muted d-block" style="font-size: 11px;">Gut Barrier Integrity</small>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
-                    <strong class="text-primary-clinic font-monospace d-block mb-1">Fasting Insulin</strong>
-                    <small class="text-muted d-block" style="font-size: 11px;">Insulin Resistance</small>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
-                    <strong class="text-primary-clinic font-monospace d-block mb-1">8-OHdG</strong>
-                    <small class="text-muted d-block" style="font-size: 11px;">DNA Oxidative Damage</small>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
-                    <strong class="text-primary-clinic font-monospace d-block mb-1">IL-6 / TNF-α</strong>
-                    <small class="text-muted d-block" style="font-size: 11px;">Cytokine Cascade</small>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="p-3 bg-light rounded-3 text-center border h-100 card-hover">
-                    <strong class="text-primary-clinic font-monospace d-block mb-1">Cortisol Rhythm</strong>
-                    <small class="text-muted d-block" style="font-size: 11px;">HPA Axis Function</small>
-                </div>
-            </div>
+            {% endfor %}
         </div>
+        <p class="text-center text-muted small mt-4 mb-0">{% translate "แพทย์ดูรายละเอียดผลแล็บ กราฟชีวภาพ และคำนวณสูตรการรักษาเฉพาะบุคคลได้ใน" %} <a href="{% url 'accounts:doctor_login' %}">{% translate "ระบบ EMR" %}</a></p>
     </div>
-
-    <!-- CTA Section -->
-    <div class="card p-5 text-center shadow-sm border bg-white">
-        <h3 class="h4 fw-bold text-dark mb-2">เข้าถึงรายงานการแพทย์แม่นยำฉบับเต็ม</h3>
-        <p class="text-muted small mx-auto mb-4" style="max-width: 600px;">
-            แพทย์ผู้เชี่ยวชาญสามารถดูรายละเอียดผลแล็บ กราฟชีวภาพ และคำนวณสูตรการรักษาเฉพาะบุคคลผ่านระบบ EMR
-        </p>
-        <div class="d-flex justify-content-center gap-3">
-            <a href="{% url 'accounts:doctor_login' %}" class="btn btn-primary d-inline-flex align-items-center gap-2">
-                <i class="fas fa-stethoscope"></i>
-                <span>เข้าสู่ระบบแพทย์ (Doctor EMR)</span>
-            </a>
-            <a href="{% url 'core:home' %}" class="btn btn-light d-inline-flex align-items-center gap-2 text-dark">
-                <span>กลับสู่หน้าแรก</span>
-            </a>
-        </div>
-    </div>
-
-</div>
+</section>
 {% endblock %}

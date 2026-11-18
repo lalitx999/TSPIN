@@ -1,93 +1,69 @@
 {% extends 'layouts/patient_base.html' %}
-{% load static %}
+{% load i18n %}
 
-{% block title %}แบบจำลอง Digital Twin ของคุณ | TSPI Health{% endblock %}
+{% block title %}Digital Twin — TSPI Health{% endblock %}
 
 {% block content %}
-<div class="container py-2" style="max-width: 900px;">
-
-    <div class="card border-0 shadow-xs mb-4">
-        <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-            <div>
-                <span class="badge bg-primary-subtle text-primary mb-2">
-                    <i class="fas fa-child me-1"></i> My Health Avatar &bull; Live Bio-Twin
-                </span>
-                <h1 class="h4 fw-bold text-dark mb-1">แบบจำลองสรีรวิทยา Digital Twin ส่วนบุคคล</h1>
-                <p class="small text-muted mb-0">ประมวลผลความสมดุลของอวัยวะและจุดที่ต้องเฝ้าระวังจากข้อมูล 39 แกนชีววิทยาจริง</p>
-            </div>
-            <a href="{% url 'portal_patient:patient_axes_result' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                <i class="fas fa-chart-pie me-1"></i> ดูคะแนน 39 แกนฉบับเต็ม
-            </a>
+<div class="f-portal-narrow">
+    <div class="f-portal-head">
+        <div>
+            <span class="f-pill">Digital Twin</span>
+            <h1>{% translate "จุดที่ร่างกายควรเฝ้าระวัง" %}</h1>
+            <p>{% translate "แสดงอวัยวะที่คะแนนตั้งแต่ 60 ขึ้นไป จากผลประเมิน 39 แกนล่าสุด" %}</p>
         </div>
+        <a href="{% url 'portal_patient:patient_axes_result' %}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-chart-pie" aria-hidden="true"></i> {% translate "ดูผล 39 แกน" %}</a>
     </div>
 
-    <!-- Avatar Overview Card -->
-    <div class="card border-0 shadow-xs text-center p-4 p-md-5">
-        <div class="card-body">
-            <div class="mx-auto position-relative d-flex align-items-center justify-content-center mb-4" style="width: 200px; height: 320px;">
-                <svg viewBox="0 0 200 400" class="w-100 h-100" style="stroke: #2E7D32; stroke-width: 2.2; fill: rgba(46, 125, 50, 0.04);">
-                    <!-- Head & Brain (Neuro/Stress Axis 34) -->
-                    <circle cx="100" cy="45" r="28" />
-                    <!-- Neck -->
-                    <rect x="92" y="73" width="16" height="18" rx="4" />
-                    <!-- Torso (Immune, Liver, Gut Axes) -->
-                    <path d="M 60,95 Q 100,85 140,95 L 132,230 Q 100,235 68,230 Z" />
-                    <!-- Arms -->
-                    <path d="M 58,95 L 35,210 Q 30,225 35,235" stroke-linecap="round" />
-                    <path d="M 142,95 L 165,210 Q 170,225 165,235" stroke-linecap="round" />
-                    <!-- Legs -->
-                    <path d="M 80,230 L 75,370" stroke-linecap="round" />
-                    <path d="M 120,230 L 125,370" stroke-linecap="round" />
-                </svg>
-
-                <!-- Dynamic Hotspots based on Real Axis Scores -->
-                {% if immune_score is not None and immune_score >= 60 %}
-                <div class="position-absolute rounded-circle {% if immune_score >= 70 %}bg-danger{% else %}bg-warning{% endif %} animate-pulse" 
-                     style="top: 105px; left: 93px; width: 14px; height: 14px; border: 2px solid #fff;"
-                     title="Immune & Inflammatory Load: {{ immune_score }}/100"></div>
-                {% endif %}
-
-                {% if liver_score is not None and liver_score >= 60 %}
-                <div class="position-absolute rounded-circle {% if liver_score >= 70 %}bg-danger{% else %}bg-warning{% endif %} animate-pulse" 
-                     style="top: 135px; left: 82px; width: 14px; height: 14px; border: 2px solid #fff;"
-                     title="Liver Detoxification: {{ liver_score }}/100"></div>
-                {% endif %}
-
-                {% if gut_score is not None and gut_score >= 60 %}
-                <div class="position-absolute rounded-circle {% if gut_score >= 70 %}bg-danger{% else %}bg-warning{% endif %} animate-pulse" 
-                     style="top: 165px; left: 93px; width: 14px; height: 14px; border: 2px solid #fff;"
-                     title="Gut Barrier Permeability: {{ gut_score }}/100"></div>
-                {% endif %}
+    <div class="row g-3 align-items-stretch">
+        <div class="col-md-5">
+            <div class="f-card h-100 d-grid place-items-center text-center" style="place-items: center;">
+                <div class="position-relative mx-auto" style="width: 200px; height: 320px;">
+                    <svg viewBox="0 0 200 400" class="w-100 h-100" aria-hidden="true" style="stroke: var(--f-ink-2); stroke-width: 2; fill: var(--f-canvas);">
+                        <circle cx="100" cy="45" r="28" />
+                        <rect x="92" y="73" width="16" height="18" rx="4" />
+                        <path d="M 60,95 Q 100,85 140,95 L 132,230 Q 100,235 68,230 Z" />
+                        <path d="M 58,95 L 35,210 Q 30,225 35,235" stroke-linecap="round" fill="none" />
+                        <path d="M 142,95 L 165,210 Q 170,225 165,235" stroke-linecap="round" fill="none" />
+                        <path d="M 80,230 L 75,370" stroke-linecap="round" />
+                        <path d="M 120,230 L 125,370" stroke-linecap="round" />
+                    </svg>
+                    {% if immune_score is not None and immune_score >= 60 %}
+                    <span class="position-absolute rounded-circle {% if immune_score >= 70 %}bg-danger{% else %}bg-warning{% endif %}" style="top: 105px; left: 93px; width: 14px; height: 14px; border: 2px solid #fff;" title="{% translate "ภูมิคุ้มกันและการอักเสบ" %} {{ immune_score }}/100"></span>
+                    {% endif %}
+                    {% if liver_score is not None and liver_score >= 60 %}
+                    <span class="position-absolute rounded-circle {% if liver_score >= 70 %}bg-danger{% else %}bg-warning{% endif %}" style="top: 135px; left: 82px; width: 14px; height: 14px; border: 2px solid #fff;" title="{% translate "ตับและการขับสารพิษ" %} {{ liver_score }}/100"></span>
+                    {% endif %}
+                    {% if gut_score is not None and gut_score >= 60 %}
+                    <span class="position-absolute rounded-circle {% if gut_score >= 70 %}bg-danger{% else %}bg-warning{% endif %}" style="top: 165px; left: 93px; width: 14px; height: 14px; border: 2px solid #fff;" title="{% translate "เยื่อบุลำไส้" %} {{ gut_score }}/100"></span>
+                    {% endif %}
+                </div>
             </div>
-
-            <!-- Organ Alert Cards (Dynamic from Database) -->
-            <div class="row g-3 text-start mx-auto" style="max-width: 680px;">
+        </div>
+        <div class="col-md-7">
+            <div class="f-list">
                 {% for alert in organ_alerts %}
-                <div class="col-12 col-sm-6">
-                    <div class="p-3 bg-{{ alert.level }}-subtle border border-{{ alert.level }}-subtle rounded-3 small h-100">
-                        <div class="d-flex align-items-center justify-content-between mb-1">
-                            <span class="fw-bold text-{{ alert.level }}">
-                                &bull; {{ alert.organ }}
-                            </span>
-                            <span class="badge bg-{{ alert.level }} text-white font-monospace">{{ alert.score }}/100</span>
-                        </div>
-                        <span class="text-secondary lh-sm d-block">{{ alert.desc }}</span>
+                <div class="f-row">
+                    <span class="ico" style="background: var(--f-{% if alert.level == 'danger' %}bad{% else %}warn{% endif %}-bg); color: var(--f-{% if alert.level == 'danger' %}bad{% else %}warn{% endif %});"><i class="fas fa-exclamation" aria-hidden="true"></i></span>
+                    <div class="main">
+                        <b>{{ alert.organ }}</b>
+                        <small>{{ alert.desc }}</small>
                     </div>
+                    <div class="f-score {% if alert.level == 'danger' %}critical{% else %}warning{% endif %}"><b>{{ alert.score }}</b><small>/100</small></div>
                 </div>
                 {% empty %}
-                <div class="col-12">
-                    <div class="p-3 bg-light border rounded-3 small text-secondary text-center">
-                        {% if has_bio_record %}
-                        ยังไม่พบแกนชีวภาพที่ต้องเฝ้าระวังจากผลประเมินล่าสุด
-                        {% else %}
-                        ยังไม่มีผลประเมิน 39 แกนจากแพทย์ แบบจำลองจะแสดงผลหลังแพทย์ประเมินแล้ว
-                        {% endif %}
-                    </div>
+                <div class="f-empty">
+                    <i class="fas fa-child d-block" aria-hidden="true"></i>
+                    {% if has_bio_record %}
+                        <h2 class="h5">{% translate "ยังไม่พบจุดที่ต้องเฝ้าระวัง" %}</h2>
+                        <p class="text-muted mb-0">{% translate "จากผลประเมินล่าสุด ไม่มีอวัยวะที่คะแนนถึงเกณฑ์เฝ้าระวัง" %}</p>
+                    {% else %}
+                        <h2 class="h5">{% translate "ยังไม่มีผลประเมิน 39 แกน" %}</h2>
+                        <p class="text-muted mb-0">{% translate "แบบจำลองจะแสดงผลหลังแพทย์ประเมินแล้ว" %}</p>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
-
 </div>
 {% endblock %}

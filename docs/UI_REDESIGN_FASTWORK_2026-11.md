@@ -1,7 +1,16 @@
 # แผนปรับ UI หน้าบ้าน 2026 (แนว Fastwork) — 18 พ.ย. 2026
 
-สถานะ (18 พ.ย.): ผู้ใช้เลือกตามข้อแนะนำ D1–D4 · **เฟส 1 และ 2 เสร็จ ยังไม่ commit**
+สถานะ (18 พ.ย.): ผู้ใช้เลือกตามข้อแนะนำ D1–D4 · **เฟส 1–2 commit แล้ว (9f95962) · เฟส 3–5 เสร็จ ยังไม่ commit**
 - เฟส 2: `core/home.html` ทำใหม่ทั้งหน้า (hero + การ์ดลอย, แถวข้อเท็จจริง, ประโยคเปิดเรื่อง, ส่วนพื้นเข้ม bento ใบไม้ 39 เส้น + โดเมน, 3 ขั้นตอน + แถบฉุกเฉิน 1669, คำถามตัวอย่าง + LINE, แผน 9 ขั้นตอน, บทความ, FAQ) คลาสใหม่ `f-*` อยู่ท้าย `front.css` ใช้ต่อในเฟส 3; เผยเนื้อหาตอนเลื่อน `.rv` (ปิดเมื่อลดการเคลื่อนไหว); ตรวจแล้วที่ 1440 / 1100 / 768 / 375 px ไม่มีเลื่อนแนวนอน
+- เฟส 3: about, guide, install, platform, protocol, research, บทความ (รวม/อ่าน), privacy, terms ทำใหม่ด้วยคลาส `f-*`; เนื้อหายาวย้ายไป `apps/core/content.py` (ข้อความเดิมทุกคำ + ชื่อโดเมนภาษาไทย); หน้าติดตั้งใช้โดเมนจริงแทน tspiclinic.com; ตัดคำภายในอย่าง "Pillar 15" / "Clinical Intelligence OS" ออกจากหน้าสาธารณะ
+- เคส "คุณนิคม" ในหน้างานวิจัย: ผู้ใช้ไม่แน่ใจว่าจริง/ยินยอม จึงซ่อนไว้ (`RESEARCH_SHOW_CASE_STUDY = False` ใน `apps/core/content.py`, มีเทสต์กัน) และเปลี่ยนเมนูจาก "งานวิจัยและเคสจริง" เป็น "งานวิจัย"
+- เฟส 4: login / register / ลงทะเบียน LINE ใช้โครงสองฝั่ง `f-auth` (ฟอร์ม + แผงพื้นเข้ม `_front_auth_side.html`), ปุ่มแสดงรหัสผ่าน `.f-pw-toggle` (สคริปต์ใน front_base); onboarding wizard ใช้สไตล์ใหม่ (คง id/คลาสที่สคริปต์ใช้), การ์ดตัวเลือกเป็น `<button>` กดด้วยคีย์บอร์ดได้, ช่องยินยอม PDPA ไม่ติ๊กไว้ให้แล้ว (มีเทสต์); `/ai/` ทับตัวแปรสีของ assistant_shell.css เฉพาะหน้านี้
+- เฟส 5: portal คนไข้ทุกหน้าใช้คลาส `f-*` ใหม่; หน้าหลักสรุปข้อมูลจริง (นัดถัดไป, พบแพทย์ล่าสุด, รายงานที่อนุมัติ) และบอกตรง ๆ ถ้ายังไม่ผูกเวชระเบียน; ลบข้อมูลปลอม: เบอร์/อีเมลตัวอย่างและปุ่มบันทึกที่ไม่ทำงานในหน้าตั้งค่า, ข้อความ "ลงนามยินยอมแล้ว / Consent Verified", ป้าย "Active EMR", เบอร์ 02-123-4567 ในหน้านัด; หน้านัด (`portal/portal_appointments.html`) และผู้ช่วย AI ใน portal ย้ายออกจากโครงเก่า/EMR; เทสต์กันข้อมูลปลอมกลับมา
+- ยังไม่ได้ทำ: หน้า portal รุ่นเก่าอื่นใน `templates/portal/` (dashboard, login, report detail, LINE binding) ยังใช้ base_portal.html เดิม
+- 18 พ.ย. (ต่อ): ปุ่มสลับภาษา TH/EN (`layouts/_lang_switch.html`) ใช้ระบบแปลของ Django — msgid เป็นข้อความไทยเดิม, คำแปลอยู่ `locale/en/LC_MESSAGES/django.po` (811 ข้อความ, commit ไฟล์ .mo ด้วย) — `core.middleware.FrontLanguageMiddleware` ใช้ภาษาที่เลือก (คุกกี้ `tspi_lang`) เฉพาะ URL หน้าบ้าน ที่เหลือ (EMR) บังคับไทย ไม่อ่านภาษาเบราว์เซอร์; เพิ่มข้อความใหม่ในหน้าบ้านต้องห่อ `{% translate %}` / `_()` แล้ว `makemessages -l en` + เติมคำแปล + `compilemessages`; บทความ/ข้อมูลคนไข้/คำตอบ AI ไม่ถูกแปล
+- นัดหมายใน portal: view ใหม่ `portal_patient.views.patient_appointments` (เดิมเด้งไป login ของ portal รุ่นเก่า) + หน้าหลักแสดงนัดที่กำลังจะถึง 3 รายการ
+- แก้ช่องโหว่: decorator `patient_portal_required` เลิกเดาคนไข้จากเบอร์โทรอย่างเดียว; stored XSS ใน ai_intake (`saved_messages|safe`); wizard ใช้ textContent แทน innerHTML; โค้ดซ้ำ `patient_ai_intake`
+- รอผู้ใช้ยืนยัน: ข้อความ "AI ... ที่ผ่านการรับรอง" ในนโยบาย PDPA มีการรับรองจริงหรือไม่
 - ไฟล์ใหม่: `static/css/front.css`, `templates/layouts/front_base.html`, ฟอนต์ `static/fonts/IBMPlexSansThai-*.ttf` (+ OFL)
 - แก้: `layouts/public_base.html`, `layouts/patient_base.html` (เลิก extends `base.html`), เทสต์กันชน EMR 3 ข้อใน `apps/core/tests.py`
 - ต่างจากแผนเดิม: ยังโหลด `theme.css` (อ่านอย่างเดียว) และ `site.css` เพราะเนื้อหาหน้าเดิมยังใช้คลาสในนั้น; ยังใช้ Font Awesome 5 (เนื้อหาทุกหน้าใช้ `fas fa-*`) — ไอคอน sprite เลื่อนไปทำพร้อมหน้าใหม่; โหมดมืดเลื่อนไปหลังเฟส 5

@@ -3,6 +3,7 @@ Forms for Authentication & Registration (Pillars 1, 2, 3).
 Enforces Strict Input Validation, Role Filtering, and Clean Methods.
 """
 
+from django.utils.translation import gettext_lazy as _
 import re
 from django import forms
 from django.conf import settings
@@ -89,20 +90,20 @@ class PatientLoginForm(forms.Form):
     ฟอร์มเข้าสู่ระบบสำหรับคนไข้ (Patient Portal)
     """
     identifier = forms.CharField(
-        label="เลขบัตรประชาชน 13 หลัก หรือ HN",
+        label=_("เลขบัตรประชาชน 13 หลัก หรือ HN"),
         max_length=50,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'ระบุเลขบัตรประชาชน 13 หลัก หรือ หมายเลข HN',
+            'placeholder': _('ระบุเลขบัตรประชาชน 13 หลัก หรือ หมายเลข HN'),
             'autocomplete': 'username',
             'required': True,
         })
     )
     password = forms.CharField(
-        label="รหัสผ่าน",
+        label=_("รหัสผ่าน"),
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'รหัสผ่านของคุณ',
+            'placeholder': _('รหัสผ่านของคุณ'),
             'autocomplete': 'current-password',
             'required': True,
         })
@@ -150,14 +151,14 @@ class PatientLoginForm(forms.Form):
         username = self.resolve_username(identifier)
         user = authenticate(request=self.request, username=username, password=password)
         if not user:
-            raise ValidationError("ข้อมูลประจำตัวหรือรหัสผ่านไม่ถูกต้อง")
+            raise ValidationError(_("ข้อมูลประจำตัวหรือรหัสผ่านไม่ถูกต้อง"))
 
         if not user.is_active:
-            raise ValidationError("บัญชีผู้ป่วยถูกปิดการใช้งาน กรุณาติดต่อคลินิก")
+            raise ValidationError(_("บัญชีผู้ป่วยถูกปิดการใช้งาน กรุณาติดต่อคลินิก"))
 
         # บังคับว่าต้องเป็น Role Patient
         if user.role != User.Role.PATIENT:
-            raise ValidationError("บัญชีเจ้าหน้าที่กรุณาเข้าสู่ระบบผ่านช่องทางแพทย์")
+            raise ValidationError(_("บัญชีเจ้าหน้าที่กรุณาเข้าสู่ระบบผ่านช่องทางแพทย์"))
 
         cleaned_data['user'] = user
         return cleaned_data
@@ -168,7 +169,7 @@ class PatientRegistrationForm(forms.ModelForm):
     ฟอร์มลงทะเบียนคนไข้ใหม่ พร้อมตรวจสอบความถูกต้องของข้อมูล (Input Validation - Pillar 3)
     """
     id_card = forms.CharField(
-        label="เลขประจำตัวประชาชน 13 หลัก",
+        label=_("เลขประจำตัวประชาชน 13 หลัก"),
         max_length=17,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -177,7 +178,7 @@ class PatientRegistrationForm(forms.ModelForm):
         })
     )
     phone = forms.CharField(
-        label="เบอร์โทรศัพท์มือถือ",
+        label=_("เบอร์โทรศัพท์มือถือ"),
         max_length=20,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -186,25 +187,25 @@ class PatientRegistrationForm(forms.ModelForm):
         })
     )
     password = forms.CharField(
-        label="กำหนดรหัสผ่าน (ขั้นต่ำ 8 ตัวอักษร)",
+        label=_("กำหนดรหัสผ่าน (ขั้นต่ำ 8 ตัวอักษร)"),
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'ความยาวอย่างน้อย 8 ตัวอักษร',
+            'placeholder': _('ความยาวอย่างน้อย 8 ตัวอักษร'),
             'autocomplete': 'new-password',
             'required': True,
         })
     )
     confirm_password = forms.CharField(
-        label="ยืนยันรหัสผ่านอีกครั้ง",
+        label=_("ยืนยันรหัสผ่านอีกครั้ง"),
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'ยืนยันรหัสผ่านเดิม',
+            'placeholder': _('ยืนยันรหัสผ่านเดิม'),
             'autocomplete': 'new-password',
             'required': True,
         })
     )
     pdpa_accepted = forms.BooleanField(
-        label="ข้าพเจ้ายินยอมให้นำข้อมูลสุขภาพไปใช้ในการวิเคราะห์ทางการแพทย์ตามนโยบาย PDPA",
+        label=_("ข้าพเจ้ายินยอมให้นำข้อมูลสุขภาพไปใช้ในการวิเคราะห์ทางการแพทย์ตามนโยบาย PDPA"),
         required=True,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
@@ -221,29 +222,29 @@ class PatientRegistrationForm(forms.ModelForm):
     def clean_id_card(self):
         raw_id = self.cleaned_data.get('id_card', '').strip().replace('-', '').replace(' ', '')
         if len(raw_id) != 13 or not raw_id.isdigit():
-            raise ValidationError("กรุณาระบุเลขประจำตัวประชาชน 13 หลัก (ตัวเลขล้วน)")
+            raise ValidationError(_("กรุณาระบุเลขประจำตัวประชาชน 13 หลัก (ตัวเลขล้วน)"))
             
         # ในโหมด Production ให้ตรวจสอบ Modulo 11 Checksum อย่างเข้มงวด
         # ในโหมด Development/Debug ยอมรับเลข 13 หลักเพื่อความสะดวกในการทดสอบระบบ
         if not settings.DEBUG and not validate_thai_id_card(raw_id):
-            raise ValidationError("เลขประจำตัวประชาชน 13 หลักไม่ถูกต้องตามสูตรคำนวณมาตรฐาน")
+            raise ValidationError(_("เลขประจำตัวประชาชน 13 หลักไม่ถูกต้องตามสูตรคำนวณมาตรฐาน"))
         
         # ตรวจสอบว่ามีผู้ใช้นี้อยู่แล้วหรือไม่
         if User.objects.filter(username=raw_id).exists():
-            raise ValidationError("เลขบัตรประชาชนนี้ได้ลงทะเบียนไว้ในระบบแล้ว กรุณาเข้าสู่ระบบ")
+            raise ValidationError(_("เลขบัตรประชาชนนี้ได้ลงทะเบียนไว้ในระบบแล้ว กรุณาเข้าสู่ระบบ"))
             
         return raw_id
 
     def clean_phone(self):
         phone = self.cleaned_data.get('phone', '').strip().replace('-', '').replace(' ', '')
         if not re.match(r'^0[689]\d{8}$', phone):
-            raise ValidationError("กรุณาระบุหมายเลขโทรศัพท์มือถือไทยที่ถูกต้อง (เช่น 0812345678)")
+            raise ValidationError(_("กรุณาระบุหมายเลขโทรศัพท์มือถือไทยที่ถูกต้อง (เช่น 0812345678)"))
         return phone
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
         if len(password) < 8:
-            raise ValidationError("รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร")
+            raise ValidationError(_("รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร"))
         return password
 
     def clean(self):
@@ -251,5 +252,5 @@ class PatientRegistrationForm(forms.ModelForm):
         p1 = cleaned_data.get('password')
         p2 = cleaned_data.get('confirm_password')
         if p1 and p2 and p1 != p2:
-            self.add_error('confirm_password', "รหัสผ่านทั้งสองช่องไม่ตรงกัน")
+            self.add_error('confirm_password', _("รหัสผ่านทั้งสองช่องไม่ตรงกัน"))
         return cleaned_data

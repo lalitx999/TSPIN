@@ -1,34 +1,16 @@
 {% extends 'layouts/patient_base.html' %}
+{% load i18n %}
 
-{% block title %}เช็คอินเข้ารับการตรวจ | TSPI Health{% endblock %}
+{% block title %}{% translate "เช็คอินพบแพทย์ — TSPI Health" %}{% endblock %}
 
 {% block content %}
-<div class="container py-4" style="max-width: 500px;">
-
-    <div class="card border-0 shadow-xs text-center p-4 p-md-5">
-        <div class="card-body">
-            <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
-                <i class="fas fa-qrcode fs-3"></i>
-            </div>
-            <h1 class="h4 fw-bold text-dark mb-2">เช็คอินเข้าพบแพทย์</h1>
-            <p class="small text-muted mb-4">
-                เมื่อท่านเดินทางมาถึงคลินิก กรุณากดปุ่มด้านล่างเพื่อแจ้งระบบและเข้าสู่คิวรอตรวจของแพทย์ทันที
-            </p>
-
-            <div class="p-3 bg-light rounded-3 border text-start small mb-4">
-                <div class="d-flex justify-content-between mb-1.5">
-                    <span class="text-muted">คนไข้:</span>
-                    <span class="fw-semibold text-dark">{{ request.user.get_full_name|default:request.user.username }}</span>
-                </div>
-            </div>
-
-            {# ระบบเช็คอินออนไลน์ยังไม่บันทึกคิวจริง (เฟส 3) จึงไม่แสดงว่าเช็คอินสำเร็จ #}
-            <button type="button" class="btn btn-secondary w-100 py-2.5" disabled>
-                <i class="fas fa-clock me-1"></i> เช็คอินออนไลน์ยังไม่เปิดให้บริการ
-            </button>
-            <p class="small text-muted mt-2 mb-0">กรุณาแจ้งเจ้าหน้าที่ที่เคาน์เตอร์เมื่อมาถึงคลินิก</p>
-        </div>
+<div class="f-portal-narrow" style="max-width: 520px;">
+    <div class="f-card text-center p-4 p-md-5">
+        <span class="f-result-ico warn" aria-hidden="true"><i class="fas fa-qrcode"></i></span>
+        <h1 class="h4 mb-2">{% translate "เช็คอินเข้าพบแพทย์" %}</h1>
+        <p class="text-muted mb-4">{% translate "เช็คอินออนไลน์ยังไม่เปิดให้บริการ เมื่อมาถึงคลินิก กรุณาแจ้งเจ้าหน้าที่ที่เคาน์เตอร์" %}</p>
+        {# ระบบเช็คอินออนไลน์ยังไม่บันทึกคิวจริง จึงไม่แสดงปุ่มที่ทำให้เข้าใจว่าเช็คอินสำเร็จ #}
+        <a href="{% url 'portal_patient:portal_appointments' %}" class="btn btn-outline-secondary w-100">{% translate "ดูนัดหมายของฉัน" %}</a>
     </div>
-
 </div>
 {% endblock %}

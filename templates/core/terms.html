@@ -1,45 +1,36 @@
 {% extends 'layouts/public_base.html' %}
+{% load i18n %}
 
-{% block title %}เงื่อนไขและข้อตกลงการใช้บริการ | TSPI Clinic{% endblock %}
+{% block title %}{% translate "ข้อตกลงและเงื่อนไขการใช้บริการ — TSPI Clinic" %}{% endblock %}
 
 {% block content %}
-<div class="container py-5" style="max-width: 900px;">
-    <div class="card border-0 shadow-sm p-4 p-md-5">
-        <div class="card-body">
-            <span class="badge bg-secondary-subtle text-secondary border mb-3">
-                Terms of Service
-            </span>
-            <h1 class="h3 fw-bold text-dark mb-4">
-                ข้อตกลงและเงื่อนไขการใช้บริการ
-            </h1>
+<section class="f-page-hero" aria-labelledby="pageTitle">
+    <div class="container-xl">
+        <span class="f-pill mx-auto">{% translate "ข้อกำหนดการใช้งาน" %}</span>
+        <h1 id="pageTitle"><span class="soft">{% translate "ข้อตกลงและเงื่อนไข" %}</span>{% translate "การใช้บริการ" %}</h1>
+    </div>
+</section>
 
-            <div class="small text-secondary lh-lg d-flex flex-column gap-3">
+<section class="pb-5">
+    <div class="container-xl" style="max-width: 860px;">
+        <div class="f-card p-4 p-md-5">
+            <div class="f-prose mx-auto">
                 <p>
-                    ยินดีต้อนรับสู่ระบบ TSPI Clinic EMR &amp; Clinical Intelligence Platform การเข้าใช้งานระบบนี้ถือว่าท่านได้รับทราบและยอมรับข้อตกลงและเงื่อนไขดังต่อไปนี้:
+                    {% translate "ยินดีต้อนรับสู่ระบบ TSPI Clinic EMR &amp; Clinical Intelligence Platform การเข้าใช้งานระบบนี้ถือว่าท่านได้รับทราบและยอมรับข้อตกลงและเงื่อนไขดังต่อไปนี้:" %}
                 </p>
 
-                <h5 class="fw-bold text-dark mt-2 mb-1">
-                    1. ขอบเขตการให้บริการของระบบปัญญาประดิษฐ์
-                </h5>
+                <h2>{% translate "1. ขอบเขตการให้บริการของระบบปัญญาประดิษฐ์" %}</h2>
                 <p>
-                    รายงานผลและการวิเคราะห์ทางชีววิทยาที่เกิดจากระบบปัญญาประดิษฐ์ มีวัตถุประสงค์เพื่อเป็นข้อมูลสนับสนุนการตัดสินใจของแพทย์ผู้รักษา (Clinical Decision Support) เท่านั้น ไม่ถือเป็นการวินิจฉัยโรคขั้นสุดท้ายโดยปราศจากการตรวจสอบและลงนามจากแพทย์ผู้เชี่ยวชาญ
+                    {% translate "รายงานผลและการวิเคราะห์ทางชีววิทยาที่เกิดจากระบบปัญญาประดิษฐ์ มีวัตถุประสงค์เพื่อเป็นข้อมูลสนับสนุนการตัดสินใจของแพทย์ผู้รักษา (Clinical Decision Support) เท่านั้น ไม่ถือเป็นการวินิจฉัยโรคขั้นสุดท้ายโดยปราศจากการตรวจสอบและลงนามจากแพทย์ผู้เชี่ยวชาญ" %}
                 </p>
 
-                <h5 class="fw-bold text-dark mt-2 mb-1">
-                    2. การรักษาความปลอดภัยบัญชีผู้ใช้งาน
-                </h5>
+                <h2>{% translate "2. การรักษาความปลอดภัยบัญชีผู้ใช้งาน" %}</h2>
                 <p>
-                    ผู้ใช้งานมีหน้าที่รักษาความลับของรหัสผ่านและข้อมูลประจำตัว ห้ามส่งต่อหรือเปิดเผยให้บุคคลอื่นเข้าถึงบัญชีของตนเอง หากตรวจพบการพยายามเจาะระบบหรือสวมสิทธิ์ ระบบจะทำการระงับการเข้าใช้งานทันทีและดำเนินการตามกฎหมาย
+                    {% translate "ผู้ใช้งานมีหน้าที่รักษาความลับของรหัสผ่านและข้อมูลประจำตัว ห้ามส่งต่อหรือเปิดเผยให้บุคคลอื่นเข้าถึงบัญชีของตนเอง หากตรวจพบการพยายามเจาะระบบหรือสวมสิทธิ์ ระบบจะทำการระงับการเข้าใช้งานทันทีและดำเนินการตามกฎหมาย" %}
                 </p>
-            </div>
-
-            <div class="pt-4 mt-4 border-top d-flex align-items-center justify-content-between">
-                <a href="{% url 'core:home' %}" class="btn btn-sm btn-outline-secondary">
-                    &larr; กลับสู่หน้าแรก
-                </a>
-                <small class="text-muted">TSPI Clinical OS</small>
             </div>
         </div>
+        <p class="text-center text-muted small mt-4 mb-0">{% translate "อ่านเพิ่ม:" %} <a href="{% url 'core:privacy' %}">{% translate "นโยบายคุ้มครองข้อมูลส่วนบุคคล" %}</a></p>
     </div>
-</div>
+</section>
 {% endblock %}

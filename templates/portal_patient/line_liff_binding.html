@@ -1,18 +1,19 @@
 {% extends 'layouts/patient_base.html' %}
+{% load i18n %}
 {% load static %}
 
-{% block title %}ยืนยันตัวตนและเชื่อมต่อบัญชี LINE OA | TSPI Clinic{% endblock %}
+{% block title %}{% translate "ยืนยันตัวตนและเชื่อมต่อบัญชี LINE OA | TSPI Clinic" %}{% endblock %}
 
 {% block content %}
 <div class="container py-4 py-md-5" style="max-width: 520px;" x-data="liffBindingFlow()">
     <!-- Header Card -->
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-3">
-        <div class="card-header bg-primary text-white py-3 px-4 text-center border-0">
+        <div class="card-header text-white py-4 px-4 text-center border-0" style="background: var(--f-night);">
             <div class="d-inline-flex align-items-center justify-content-center bg-white bg-opacity-20 rounded-circle mb-2" style="width: 54px; height: 54px;">
                 <i class="fab fa-line fs-2 text-white"></i>
             </div>
-            <h5 class="fw-bold mb-0">เชื่อมต่อ LINE OA กับเวชระเบียน</h5>
-            <small class="text-white-50">TSPI Clinical Platform • Level 2 Identity Hub</small>
+            <h5 class="fw-bold mb-0">{% translate "เชื่อมต่อ LINE OA กับเวชระเบียน" %}</h5>
+            <small class="text-white-50">{% translate "ยืนยันตัวตนเพื่อเชื่อมแชทกับข้อมูลของคุณ" %}</small>
         </div>
 
         <div class="card-body p-4">
@@ -24,17 +25,17 @@
                 <div class="d-flex flex-column align-items-center position-relative" style="z-index: 3;">
                     <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-xs" 
                          :class="step >= 1 ? 'bg-primary text-white' : 'bg-light text-muted'" style="width: 34px; height: 34px;">1</div>
-                    <small class="mt-1 small" :class="step >= 1 ? 'fw-bold text-primary' : 'text-muted'">ข้อมูลผู้ป่วย</small>
+                    <small class="mt-1 small" :class="step >= 1 ? 'fw-bold text-primary' : 'text-muted'">{% translate "ข้อมูลผู้ป่วย" %}</small>
                 </div>
                 <div class="d-flex flex-column align-items-center position-relative" style="z-index: 3;">
                     <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-xs" 
                          :class="step >= 2 ? 'bg-primary text-white' : 'bg-light text-muted'" style="width: 34px; height: 34px;">2</div>
-                    <small class="mt-1 small" :class="step >= 2 ? 'fw-bold text-primary' : 'text-muted'">ยืนยัน OTP</small>
+                    <small class="mt-1 small" :class="step >= 2 ? 'fw-bold text-primary' : 'text-muted'">{% translate "ยืนยัน OTP" %}</small>
                 </div>
                 <div class="d-flex flex-column align-items-center position-relative" style="z-index: 3;">
                     <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-xs" 
                          :class="step === 3 ? 'bg-success text-white' : 'bg-light text-muted'" style="width: 34px; height: 34px;">3</div>
-                    <small class="mt-1 small" :class="step === 3 ? 'fw-bold text-success' : 'text-muted'">สำเร็จ</small>
+                    <small class="mt-1 small" :class="step === 3 ? 'fw-bold text-success' : 'text-muted'">{% translate "สำเร็จ" %}</small>
                 </div>
             </div>
 
@@ -49,18 +50,18 @@
             <form x-show="step === 1" @submit.prevent="requestOtp()">
                 <div class="mb-3">
                     <label class="form-label fw-bold text-dark small mb-1">
-                        <i class="fas fa-id-card text-primary me-1"></i> เลขบัตรประชาชน 13 หลัก หรือ HN
+                        <i class="fas fa-id-card text-primary me-1"></i> {% translate "เลขบัตรประชาชน 13 หลัก หรือ HN" %}
                     </label>
                     <input type="text" class="form-control form-control-lg rounded-3 fs-6" inputmode="text"
-                           placeholder="เช่น 1-1004-00123-45-6 หรือ HN-2026-0001" x-model="identifier" required>
+                           placeholder="{% translate "เช่น 1-1004-00123-45-6 หรือ HN-2026-0001" %}" x-model="identifier" required>
                     <div class="form-text text-muted" style="font-size: 0.8rem;">
-                        ระบบจะส่งรหัส OTP ไปที่อีเมลที่ลงทะเบียนไว้กับคลินิก
+                        {% translate "ระบบจะส่งรหัส OTP ไปที่อีเมลที่ลงทะเบียนไว้กับคลินิก" %}
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label fw-bold text-dark small mb-1">
-                        <i class="fas fa-users text-primary me-1"></i> ความสัมพันธ์กับผู้ป่วย (Caregiver Role)
+                        <i class="fas fa-users text-primary me-1"></i> {% translate "ความสัมพันธ์กับผู้ป่วย (Caregiver Role)" %}
                     </label>
                     <select class="form-select form-select-lg rounded-3 fs-6" x-model="role" required>
                         {% for code, label in roles %}
@@ -68,7 +69,7 @@
                         {% endfor %}
                     </select>
                     <div class="form-text text-muted" style="font-size: 0.8rem;">
-                        รองรับผู้ดูแล 1 ท่าน ดูแลผู้ป่วยได้หลายรายโดยไม่ปะปนข้อมูล
+                        {% translate "รองรับผู้ดูแล 1 ท่าน ดูแลผู้ป่วยได้หลายรายโดยไม่ปะปนข้อมูล" %}
                     </div>
                 </div>
 
@@ -77,31 +78,31 @@
                     <img :src="pictureUrl || 'https://via.placeholder.com/40'" class="rounded-circle border" style="width: 40px; height: 40px; object-fit: cover;">
                     <div class="overflow-hidden flex-grow-1">
                         <div class="fw-bold text-truncate text-dark small" x-text="displayName || 'LINE User (Simulator)'"></div>
-                        <div class="text-muted font-monospace" style="font-size: 0.7rem;" x-text="lineUserId ? 'UID: ' + lineUserId.substring(0, 10) + '...' : 'โหมดจำลอง Dev'"></div>
+                        <div class="text-muted font-monospace" style="font-size: 0.7rem;" x-text="lineUserId ? 'UID: ' + lineUserId.substring(0, 10) + '...' : '{% filter escapejs %}{% translate "โหมดจำลอง Dev" %}{% endfilter %}'"></div>
                     </div>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.7rem;">พร้อมผูกบัญชี</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.7rem;">{% translate "พร้อมผูกบัญชี" %}</span>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 shadow-xs fw-bold" :disabled="isLoading">
-                    <span x-show="!isLoading"><i class="fas fa-paper-plane me-1"></i> ขอรหัส OTP ยืนยันตัวตน</span>
-                    <span x-show="isLoading"><i class="fas fa-spinner fa-spin me-1"></i> กำลังตรวจสอบข้อมูล...</span>
+                    <span x-show="!isLoading"><i class="fas fa-paper-plane me-1"></i> {% translate "ขอรหัส OTP ยืนยันตัวตน" %}</span>
+                    <span x-show="isLoading"><i class="fas fa-spinner fa-spin me-1"></i> {% translate "กำลังตรวจสอบข้อมูล..." %}</span>
                 </button>
             </form>
 
             <!-- STEP 1b: ลงทะเบียนผู้รับบริการใหม่ (เมื่อไม่พบเวชระเบียน) -->
             <form x-show="step === 'register'" @submit.prevent="register()" x-cloak>
-                <p class="small text-muted mb-3">ไม่พบเวชระเบียน กรุณากรอกข้อมูลเพื่อลงทะเบียน ระบบจะส่งรหัส OTP ไปยืนยันอีเมล</p>
-                <input type="text" class="form-control mb-2" placeholder="ชื่อ" x-model="reg.first_name" required>
-                <input type="text" class="form-control mb-2" placeholder="นามสกุล" x-model="reg.last_name" required>
-                <input type="text" class="form-control mb-2" placeholder="เลขบัตรประชาชน 13 หลัก" inputmode="numeric" x-model="reg.national_id" required>
-                <input type="tel" class="form-control mb-2" placeholder="เบอร์โทรศัพท์" x-model="reg.phone" required>
-                <input type="email" class="form-control mb-2" placeholder="อีเมล" x-model="reg.email" required>
+                <p class="small text-muted mb-3">{% translate "ไม่พบเวชระเบียน กรุณากรอกข้อมูลเพื่อลงทะเบียน ระบบจะส่งรหัส OTP ไปยืนยันอีเมล" %}</p>
+                <input type="text" class="form-control mb-2" placeholder="{% translate "ชื่อ" %}" x-model="reg.first_name" required>
+                <input type="text" class="form-control mb-2" placeholder="{% translate "นามสกุล" %}" x-model="reg.last_name" required>
+                <input type="text" class="form-control mb-2" placeholder="{% translate "เลขบัตรประชาชน 13 หลัก" %}" inputmode="numeric" x-model="reg.national_id" required>
+                <input type="tel" class="form-control mb-2" placeholder="{% translate "เบอร์โทรศัพท์" %}" x-model="reg.phone" required>
+                <input type="email" class="form-control mb-2" placeholder="{% translate "อีเมล" %}" x-model="reg.email" required>
                 <div class="form-check small mb-3">
                     <input class="form-check-input" type="checkbox" id="pdpa" x-model="reg.pdpa_consent" required>
-                    <label class="form-check-label" for="pdpa">ยินยอมให้คลินิกเก็บและใช้ข้อมูลสุขภาพเพื่อการรักษา ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล</label>
+                    <label class="form-check-label" for="pdpa">{% translate "ยินยอมให้คลินิกเก็บและใช้ข้อมูลสุขภาพเพื่อการรักษา ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล" %}</label>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 rounded-3 fw-bold mb-2" :disabled="isLoading">ลงทะเบียนและรับรหัส OTP</button>
-                <button type="button" class="btn btn-outline-secondary w-100 rounded-3 btn-sm" @click="step = 1">ย้อนกลับ</button>
+                <button type="submit" class="btn btn-primary w-100 rounded-3 fw-bold mb-2" :disabled="isLoading">{% translate "ลงทะเบียนและรับรหัส OTP" %}</button>
+                <button type="button" class="btn btn-outline-secondary w-100 rounded-3 btn-sm" @click="step = 1">{% translate "ย้อนกลับ" %}</button>
             </form>
 
             <!-- STEP 1c: ไม่มีอีเมลในเวชระเบียน -> ยืนยันกับเจ้าหน้าที่ -->
@@ -109,44 +110,44 @@
                 <p class="small text-muted mb-3" x-text="infoMessage"></p>
                 <button type="button" class="btn btn-outline-info text-dark w-100 rounded-3 fw-semibold mb-2"
                         @click="requestStaffAssisted()" :disabled="isLoading">
-                    <i class="fas fa-user-nurse me-1 text-primary"></i> ขอให้เจ้าหน้าที่ยืนยันตัวตน
+                    <i class="fas fa-user-nurse me-1 text-primary"></i> {% translate "ขอให้เจ้าหน้าที่ยืนยันตัวตน" %}
                 </button>
-                <button type="button" class="btn btn-outline-secondary w-100 rounded-3 btn-sm" @click="step = 1">ย้อนกลับ</button>
+                <button type="button" class="btn btn-outline-secondary w-100 rounded-3 btn-sm" @click="step = 1">{% translate "ย้อนกลับ" %}</button>
             </div>
 
             <!-- STEP 2: Verify OTP -->
             <form x-show="step === 2" @submit.prevent="verifyOtp()" x-cloak>
                 <div class="text-center mb-3">
-                    <div class="text-muted small mb-1">รหัสยืนยันถูกส่งไปที่อีเมล</div>
+                    <div class="text-muted small mb-1">{% translate "รหัสยืนยันถูกส่งไปที่อีเมล" %}</div>
                     <div class="fw-bold fs-6 font-monospace text-primary" x-text="maskedEmail"></div>
-                    <div class="text-muted" style="font-size: 0.75rem;">รหัสมีอายุ 10 นาที หากไม่พบ ให้ดูในกล่องจดหมายขยะ</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">{% translate "รหัสมีอายุ 10 นาที หากไม่พบ ให้ดูในกล่องจดหมายขยะ" %}</div>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label fw-bold text-dark small mb-1 text-center d-block">
-                        ระบุรหัส OTP 6 หลัก
+                        {% translate "ระบุรหัส OTP 6 หลัก" %}
                     </label>
                     <input type="text" class="form-control form-control-lg rounded-3 text-center font-monospace fw-bold fs-3 letter-spacing-2" 
                            placeholder="••••••" maxlength="6" x-model="otpCode" required autofocus>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 shadow-xs fw-bold mb-2" :disabled="isLoading">
-                    <span x-show="!isLoading"><i class="fas fa-check-circle me-1"></i> ยืนยันและเชื่อมต่อบัญชี</span>
-                    <span x-show="isLoading"><i class="fas fa-spinner fa-spin me-1"></i> กำลังตรวจสอบ OTP...</span>
+                    <span x-show="!isLoading"><i class="fas fa-check-circle me-1"></i> {% translate "ยืนยันและเชื่อมต่อบัญชี" %}</span>
+                    <span x-show="isLoading"><i class="fas fa-spinner fa-spin me-1"></i> {% translate "กำลังตรวจสอบ OTP..." %}</span>
                 </button>
 
                 <button type="button" class="btn btn-outline-secondary w-100 rounded-3 btn-sm mb-3" @click="step = 1">
-                    <i class="fas fa-arrow-left me-1"></i> ย้อนกลับไปแก้ไขข้อมูล
+                    <i class="fas fa-arrow-left me-1"></i> {% translate "ย้อนกลับไปแก้ไขข้อมูล" %}
                 </button>
 
                 <!-- Staff-Assisted Fallback Option -->
                 <div class="pt-3 border-top text-center">
                     <div class="text-muted small mb-2" style="font-size: 0.8rem;">
-                        <i class="fas fa-info-circle me-1 text-primary"></i> ไม่ได้รับอีเมล?
+                        <i class="fas fa-info-circle me-1 text-primary"></i> {% translate "ไม่ได้รับอีเมล?" %}
                     </div>
                     <button type="button" class="btn btn-outline-info text-dark w-100 rounded-3 btn-sm fw-semibold" 
                             @click="requestStaffAssisted()" :disabled="isLoading">
-                        <i class="fas fa-user-nurse me-1 text-primary"></i> ขอให้พยาบาลยืนยัน (Staff-Assisted Fallback)
+                        <i class="fas fa-user-nurse me-1 text-primary"></i> {% translate "ขอให้พยาบาลยืนยัน (Staff-Assisted Fallback)" %}
                     </button>
                 </div>
             </form>
@@ -156,27 +157,27 @@
                 <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-3" style="width: 72px; height: 72px;">
                     <i class="fas fa-check-circle fs-1"></i>
                 </div>
-                <h5 class="fw-bold text-dark mb-1">เชื่อมต่อบัญชีสำเร็จ!</h5>
+                <h5 class="fw-bold text-dark mb-1">{% translate "เชื่อมต่อบัญชีสำเร็จ!" %}</h5>
                 <p class="text-muted small mb-4" x-text="successMessage"></p>
 
                 <div class="card bg-light border-0 rounded-3 p-3 mb-4 text-start">
                     <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted small">ชื่อผู้ป่วย:</span>
+                        <span class="text-muted small">{% translate "ชื่อผู้ป่วย:" %}</span>
                         <strong class="text-dark small" x-text="boundPatient.name"></strong>
                     </div>
                     <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted small">รหัส HN:</span>
+                        <span class="text-muted small">{% translate "รหัส HN:" %}</span>
                         <strong class="font-monospace text-primary small" x-text="boundPatient.hn"></strong>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <span class="text-muted small">บทบาทผู้ติดต่อ:</span>
+                        <span class="text-muted small">{% translate "บทบาทผู้ติดต่อ:" %}</span>
                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle" x-text="boundPatient.role"></span>
                     </div>
                 </div>
 
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-success btn-lg rounded-3 fw-bold shadow-xs" @click="closeLiffOrReturn()">
-                        <i class="fas fa-comment-dots me-1"></i> กลับไปยังหน้าแชท LINE
+                        <i class="fas fa-comment-dots me-1"></i> {% translate "กลับไปยังหน้าแชท LINE" %}
                     </button>
                 </div>
             </div>
@@ -185,8 +186,8 @@
 
     <!-- Security & PDPA Governance Footer -->
     <div class="text-center text-muted small" style="font-size: 0.75rem;">
-        <i class="fas fa-shield-alt text-primary me-1"></i> คุ้มครองความปลอดภัยตามมาตรฐาน PDPA & JCI Scope of Practice<br>
-        รหัสการเชื่อมโยงถูกเข้ารหัสแบบความปลอดภัยสูง ห้ามส่งต่อรหัส OTP ให้ผู้อื่น
+        <i class="fas fa-shield-alt text-primary me-1"></i> {% translate "คุ้มครองความปลอดภัยตามมาตรฐาน PDPA & JCI Scope of Practice" %}<br>
+        {% translate "รหัสการเชื่อมโยงถูกเข้ารหัสแบบความปลอดภัยสูง ห้ามส่งต่อรหัส OTP ให้ผู้อื่น" %}
     </div>
 </div>
 
@@ -202,7 +203,7 @@ function liffBindingFlow() {
         infoMessage: '',
         role: 'SELF',
         lineUserId: 'U' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-        displayName: 'ผู้ติดต่อ LINE',
+        displayName: '{% filter escapejs %}{% translate "ผู้ติดต่อ LINE" %}{% endfilter %}',
         pictureUrl: '',
         token: '',
         maskedEmail: '',
@@ -256,7 +257,7 @@ function liffBindingFlow() {
             .then(({ status, data }) => this.handleOtpResponse(data))
             .catch(err => {
                 this.isLoading = false;
-                this.errorMessage = 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง';
+                this.errorMessage = '{% filter escapejs %}{% translate "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง" %}{% endfilter %}';
             });
         },
 
@@ -274,7 +275,7 @@ function liffBindingFlow() {
                 if (/^[0-9-\s]{13,17}$/.test(this.identifier)) this.reg.national_id = this.identifier;
                 this.step = 'register';
             } else {
-                this.errorMessage = data.message || 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล';
+                this.errorMessage = data.message || '{% filter escapejs %}{% translate "เกิดข้อผิดพลาดในการตรวจสอบข้อมูล" %}{% endfilter %}';
                 if (data.status === 'exists') this.step = 1;
             }
         },
@@ -291,7 +292,7 @@ function liffBindingFlow() {
             .then(data => this.handleOtpResponse(data))
             .catch(() => {
                 this.isLoading = false;
-                this.errorMessage = 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง';
+                this.errorMessage = '{% filter escapejs %}{% translate "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง" %}{% endfilter %}';
             });
         },
 
@@ -321,17 +322,17 @@ function liffBindingFlow() {
                     this.boundPatient = data.patient;
                     this.step = 3;
                 } else {
-                    this.errorMessage = data.message || 'รหัส OTP ไม่ถูกต้อง';
+                    this.errorMessage = data.message || '{% filter escapejs %}{% translate "รหัส OTP ไม่ถูกต้อง" %}{% endfilter %}';
                 }
             })
             .catch(err => {
                 this.isLoading = false;
-                this.errorMessage = 'ไม่สามารถตรวจสอบ OTP ได้ กรุณาลองใหม่อีกครั้ง';
+                this.errorMessage = '{% filter escapejs %}{% translate "ไม่สามารถตรวจสอบ OTP ได้ กรุณาลองใหม่อีกครั้ง" %}{% endfilter %}';
             });
         },
 
         requestStaffAssisted() {
-            if (!confirm('ต้องการส่งคำขอนี้ให้พยาบาลที่เคาน์เตอร์คลินิกตรวจสอบและยืนยันหรือไม่?')) return;
+            if (!confirm('{% filter escapejs %}{% translate "ต้องการส่งคำขอนี้ให้พยาบาลที่เคาน์เตอร์คลินิกตรวจสอบและยืนยันหรือไม่?" %}{% endfilter %}')) return;
             this.isLoading = true;
             this.errorMessage = '';
 
@@ -354,18 +355,18 @@ function liffBindingFlow() {
                 if (status === 200 && data.status === 'ok') {
                     this.successMessage = data.message;
                     this.boundPatient = {
-                        name: 'รอการยืนยันจากพยาบาลที่เคาน์เตอร์',
+                        name: '{% filter escapejs %}{% translate "รอการยืนยันจากพยาบาลที่เคาน์เตอร์" %}{% endfilter %}',
                         hn: this.identifier,
-                        role: 'รอตรวจสอบ'
+                        role: '{% filter escapejs %}{% translate "รอตรวจสอบ" %}{% endfilter %}'
                     };
                     this.step = 3;
                 } else {
-                    this.errorMessage = data.message || 'เกิดข้อผิดพลาดในการส่งคำขอ';
+                    this.errorMessage = data.message || '{% filter escapejs %}{% translate "เกิดข้อผิดพลาดในการส่งคำขอ" %}{% endfilter %}';
                 }
             })
             .catch(err => {
                 this.isLoading = false;
-                this.errorMessage = 'ไม่สามารถส่งคำขอได้ กรุณาลองใหม่อีกครั้ง';
+                this.errorMessage = '{% filter escapejs %}{% translate "ไม่สามารถส่งคำขอได้ กรุณาลองใหม่อีกครั้ง" %}{% endfilter %}';
             });
         },
 

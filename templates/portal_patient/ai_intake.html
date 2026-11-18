@@ -1,24 +1,17 @@
 {% extends 'layouts/patient_base.html' %}
+{% load i18n %}
 {% load static %}
 
-{% block title %}ซักประวัติอาการกับ AI (AI Clinical Intake) | TSPI Health{% endblock %}
+{% block title %}{% translate "ซักประวัติอาการกับ AI (AI Clinical Intake) | TSPI Health" %}{% endblock %}
 
 {% block content %}
-<div class="container py-2" style="max-width: 900px;" x-data="aiIntakeApp()">
+<div class="f-portal-narrow" x-data="aiIntakeApp()">
 
-    <!-- Header Card -->
-    <div class="card border-0 shadow-xs mb-4">
-        <div class="card-body p-4 d-flex align-items-center justify-content-between">
-            <div>
-                <span class="badge bg-primary-subtle text-primary mb-2">
-                    <i class="fas fa-robot me-1"></i> AI Clinical Anamnesis &bull; 15s Guardrail
-                </span>
-                <h1 class="h5 fw-bold text-dark mb-1">ซักประวัติสุขภาพและอาการเบื้องต้นกับ AI</h1>
-                <p class="small text-muted mb-0">ข้อมูลอาการจะถูกบันทึกลงในเวชระเบียนจริงของท่าน และจัดระเบียบให้แพทย์วิเคราะห์ล่วงหน้า</p>
-            </div>
-            <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
-                <i class="fas fa-stethoscope fs-5"></i>
-            </div>
+    <div class="f-portal-head">
+        <div>
+            <span class="f-pill">{% translate "ซักประวัติล่วงหน้า" %}</span>
+            <h1>{% translate "เล่าอาการให้ AI ช่วยจดก่อนพบแพทย์" %}</h1>
+            <p>{% translate "ข้อมูลอาการจะถูกบันทึกลงในเวชระเบียนจริงของท่าน และจัดระเบียบให้แพทย์วิเคราะห์ล่วงหน้า" %}</p>
         </div>
     </div>
 
@@ -31,12 +24,12 @@
                         <i class="fas fa-check-circle fs-5"></i>
                     </div>
                     <div>
-                        <h6 class="fw-bold text-dark mb-0">บันทึกข้อมูลอาการเข้าสู่เวชระเบียนเรียบร้อยแล้ว</h6>
-                        <small class="text-muted">ระบบได้แมปอาการเบื้องต้นกับแกนชีววิทยาที่เกี่ยวข้องเรียบร้อยแล้ว</small>
+                        <h6 class="fw-bold text-dark mb-0">{% translate "บันทึกข้อมูลอาการเข้าสู่เวชระเบียนเรียบร้อยแล้ว" %}</h6>
+                        <small class="text-muted">{% translate "ระบบได้แมปอาการเบื้องต้นกับแกนชีววิทยาที่เกี่ยวข้องเรียบร้อยแล้ว" %}</small>
                     </div>
                 </div>
                 <a href="{% url 'portal_patient:patient_axes_result' %}" class="btn btn-success fw-bold px-3 rounded-pill">
-                    ดูผลวิเคราะห์คะแนน 39 แกน &rarr;
+                    {% translate "ดูผลวิเคราะห์คะแนน 39 แกน &rarr;" %}
                 </a>
             </div>
         </div>
@@ -48,19 +41,19 @@
             <div class="d-flex align-items-start gap-3 mb-3">
                 <i class="fas fa-exclamation-triangle fs-4 text-warning mt-1"></i>
                 <div>
-                    <h6 class="fw-bold text-dark mb-1">การเชื่อมต่อ AI มีความล่าช้า หรือใช้เวลาเกิน 15 วินาที</h6>
-                    <p class="small text-muted mb-0">ท่านสามารถใช้แบบฟอร์มด้านล่างเพื่อพิมพ์อาการและส่งตรงถึงคณะแพทย์ได้ทันที</p>
+                    <h6 class="fw-bold text-dark mb-1">{% translate "AI ตอบช้ากว่าปกติ" %}</h6>
+                    <p class="small text-muted mb-0">{% translate "ท่านสามารถใช้แบบฟอร์มด้านล่างเพื่อพิมพ์อาการและส่งตรงถึงคณะแพทย์ได้ทันที" %}</p>
                 </div>
             </div>
             <form @submit.prevent="submitFallback()">
                 <div class="mb-3">
-                    <textarea x-model="fallbackText" class="form-control form-control-sm" rows="3" placeholder="ระบุอาการสำคัญของคุณ เช่น มีผื่นคัน, ท้องอืด, เหนื่อยล้า..." required></textarea>
+                    <textarea x-model="fallbackText" class="form-control form-control-sm" rows="3" placeholder="{% translate "ระบุอาการสำคัญของคุณ เช่น มีผื่นคัน, ท้องอืด, เหนื่อยล้า..." %}" required></textarea>
                 </div>
                 <div class="d-flex justify-content-end gap-2">
-                    <button type="button" @click="showFallback = false" class="btn btn-sm btn-light border">ปิด</button>
+                    <button type="button" @click="showFallback = false" class="btn btn-sm btn-light border">{% translate "ปิด" %}</button>
                     <button type="submit" class="btn btn-sm btn-primary fw-bold px-3" :disabled="isSubmittingFallback">
                         <span x-show="isSubmittingFallback" class="spinner-border spinner-border-sm me-1"></span>
-                        <span>ส่งข้อมูลให้แพทย์โดยตรง</span>
+                        <span>{% translate "ส่งข้อมูลให้แพทย์โดยตรง" %}</span>
                     </button>
                 </div>
             </form>
@@ -88,7 +81,7 @@
             <!-- Thinking Indicator -->
             <div x-show="isThinking" class="d-flex align-items-center gap-2 small text-muted ps-4">
                 <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
-                <span>AI กำลังประมวลผลข้อมูลชีววิทยา (Timeout Guard 15s)...</span>
+                <span>{% translate "AI กำลังพิมพ์..." %}</span>
             </div>
         </div>
 
@@ -98,13 +91,13 @@
                    x-model="userInput" 
                    @keydown.enter="sendMessage()" 
                    :disabled="isThinking"
-                   placeholder="พิมพ์บอกเล่าอาการของคุณที่นี่... (เช่น มีผื่นคัน, แน่นท้อง, อ่อนเพลีย)" 
+                   placeholder="{% translate "พิมพ์บอกเล่าอาการของคุณที่นี่... (เช่น มีผื่นคัน, แน่นท้อง, อ่อนเพลีย)" %}" 
                    class="form-control">
             <button @click="sendMessage()" type="button" class="btn btn-primary d-flex align-items-center gap-1.5 px-4 flex-shrink-0" :disabled="isThinking">
-                <span>ส่งข้อความ</span>
+                <span>{% translate "ส่งข้อความ" %}</span>
                 <i class="fas fa-paper-plane small"></i>
             </button>
-            <button @click="showFallback = !showFallback" type="button" class="btn btn-outline-secondary btn-sm px-2 flex-shrink-0" title="สลับเป็นฟอร์มกรอกอาการเอง">
+            <button @click="showFallback = !showFallback" type="button" class="btn btn-outline-secondary btn-sm px-2 flex-shrink-0" title="{% translate "สลับเป็นฟอร์มกรอกอาการเอง" %}">
                 <i class="fas fa-edit"></i>
             </button>
         </div>

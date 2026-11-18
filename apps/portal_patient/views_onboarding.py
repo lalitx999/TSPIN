@@ -7,6 +7,7 @@ Handles:
 4. New patient onboarding form
 """
 
+from django.utils.translation import gettext_lazy as _
 import time
 import hashlib
 from datetime import datetime
@@ -37,7 +38,7 @@ CLAIM_LOCK_SECONDS = 15 * 60
 def password_errors(password: str, user=None):
     """คืนข้อความ error ภาษาไทยถ้ารหัสผ่านไม่ผ่านนโยบาย AUTH_PASSWORD_VALIDATORS ของระบบ"""
     if not password:
-        return 'กรุณากำหนดรหัสผ่าน'
+        return _('กรุณากำหนดรหัสผ่าน')
     try:
         validate_password(password, user=user)
     except ValidationError as e:
@@ -95,7 +96,7 @@ def onboarding_lookup_api(request):
         )
         return JsonResponse({
             'success': False,
-            'message': 'คุณทำรายการเกินจำนวนครั้งที่กำหนด กรุณารอ 1 นาทีแล้วลองใหม่อีกครั้ง'
+            'message': _('คุณทำรายการเกินจำนวนครั้งที่กำหนด กรุณารอ 1 นาทีแล้วลองใหม่อีกครั้ง')
         }, status=429)
 
 
@@ -107,7 +108,7 @@ def onboarding_lookup_api(request):
     if not identifier:
         return JsonResponse({
             'success': False,
-            'message': 'กรุณาระบุเลขประจำตัวประชาชนหรือหมายเลขพาสปอร์ต'
+            'message': _('กรุณาระบุเลขประจำตัวประชาชนหรือหมายเลขพาสปอร์ต')
         }, status=400)
 
     # ค้นได้เฉพาะเลขบัตร ปชช. 13 หลักแบบตรงทั้งหมด (เดิมค้นด้วยเบอร์โทรบางส่วนได้ ทำให้ไล่ดูผู้ป่วยได้)
@@ -133,7 +134,7 @@ def onboarding_lookup_api(request):
         # Anti-leak message (Gotcha 2)
         return JsonResponse({
             'success': False,
-            'message': 'ไม่พบข้อมูลประวัติเวชระเบียน กรุณาติดต่อเจ้าหน้าที่คลินิก หรือเลือก "เป็นคนไข้ใหม่" เพื่อเริ่มต้นลงทะเบียน'
+            'message': _('ไม่พบข้อมูลประวัติเวชระเบียน กรุณาติดต่อเจ้าหน้าที่คลินิก หรือเลือก "เป็นคนไข้ใหม่" เพื่อเริ่มต้นลงทะเบียน')
         }, status=404)
 
     # Prepare safe masked data for confirmation
@@ -158,17 +159,17 @@ def onboarding_claim_account_api(request):
     phone_confirm = request.POST.get('phone_last4', '').strip()
 
     if not patient_uuid:
-        return JsonResponse({'success': False, 'message': 'ไม่พบรหัสอ้างอิงคนไข้'}, status=400)
+        return JsonResponse({'success': False, 'message': _('ไม่พบรหัสอ้างอิงคนไข้')}, status=400)
 
     patient = Patient.objects.alive().filter(uuid=patient_uuid).first()
     if not patient:
-        return JsonResponse({'success': False, 'message': 'ไม่พบข้อมูลในระบบ'}, status=404)
+        return JsonResponse({'success': False, 'message': _('ไม่พบข้อมูลในระบบ')}, status=404)
 
     # บัญชีที่ตั้งรหัสผ่านแล้วห้ามยึดซ้ำผ่าน onboarding (เดิมรีเซ็ตรหัสผ่านทับได้)
     if patient.user and patient.user.has_usable_password():
         return JsonResponse({
             'success': False,
-            'message': 'เวชระเบียนนี้มีบัญชีผู้ใช้อยู่แล้ว กรุณาเข้าสู่ระบบ หรือติดต่อเจ้าหน้าที่หากลืมรหัสผ่าน'
+            'message': _('เวชระเบียนนี้มีบัญชีผู้ใช้อยู่แล้ว กรุณาเข้าสู่ระบบ หรือติดต่อเจ้าหน้าที่หากลืมรหัสผ่าน')
         }, status=409)
 
     attempts_key = f"onboarding_claim_{patient.pk}"
@@ -178,7 +179,7 @@ def onboarding_claim_account_api(request):
                         'Onboarding claim locked after repeated phone mismatches', ip_address=get_client_ip(request))
         return JsonResponse({
             'success': False,
-            'message': 'ยืนยันตัวตนไม่สำเร็จหลายครั้ง กรุณารอ 15 นาที หรือติดต่อเจ้าหน้าที่คลินิก'
+            'message': _('ยืนยันตัวตนไม่สำเร็จหลายครั้ง กรุณารอ 15 นาที หรือติดต่อเจ้าหน้าที่คลินิก')
         }, status=429)
 
     # ต้องยืนยันเลขท้ายเบอร์โทร 4 หลักเสมอ (เดิมถ้าไม่ส่งมาจะข้ามการตรวจ)
@@ -189,7 +190,7 @@ def onboarding_claim_account_api(request):
                         'Phone last-4 verification failed', ip_address=get_client_ip(request))
         return JsonResponse({
             'success': False,
-            'message': 'เบอร์โทรศัพท์ 4 ตัวท้ายไม่ตรงกับข้อมูลในระบบ กรุณาตรวจสอบอีกครั้ง'
+            'message': _('เบอร์โทรศัพท์ 4 ตัวท้ายไม่ตรงกับข้อมูลในระบบ กรุณาตรวจสอบอีกครั้ง')
         }, status=400)
 
     error = password_errors(password)
@@ -258,7 +259,7 @@ def onboarding_new_patient_api(request):
     if not first_name or not last_name or not phone:
         return JsonResponse({
             'success': False,
-            'message': 'กรุณากรอกชื่อ นามสกุล และเบอร์โทรศัพท์ให้ครบถ้วน'
+            'message': _('กรุณากรอกชื่อ นามสกุล และเบอร์โทรศัพท์ให้ครบถ้วน')
         }, status=400)
 
     error = password_errors(password)

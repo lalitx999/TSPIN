@@ -1,105 +1,90 @@
 {% extends 'layouts/patient_base.html' %}
+{% load i18n %}
 
-{% block title %}หน้าหลักคนไข้ | TSPI Health Portal{% endblock %}
+{% block title %}{% translate "หน้าหลัก — TSPI Health" %}{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column gap-4">
+{% firstof patient.get_full_name patient.username as display_name %}
+<div class="f-portal-narrow d-grid gap-4">
 
-    <!-- Welcome Hero Card -->
-    <div class="card border-0 shadow-xs">
-        <div class="card-body p-4 p-md-5">
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+    {# การ์ดโปรไฟล์: แสดงเฉพาะข้อมูลจริงจากเวชระเบียน #}
+    <section class="f-profile" aria-labelledby="hello">
+        <div class="f-profile-cover" aria-hidden="true"></div>
+        <div class="f-profile-body">
+            <div class="f-profile-top">
+                <span class="f-profile-avatar" aria-hidden="true"><i class="fas fa-user"></i></span>
+                <a href="{% url 'portal_patient:assistant' %}" class="btn btn-primary"><i class="fas fa-comment-medical" aria-hidden="true"></i> {% translate "ปรึกษาผู้ช่วย AI" %}</a>
+            </div>
+            <h1 id="hello">{% translate "สวัสดีคุณ" %}{{ display_name }}</h1>
+            <div class="meta">
+                {% if patient_record %}
+                    <span><i class="fas fa-id-badge me-1" aria-hidden="true"></i>{{ patient_record.hn }}</span>
+                {% endif %}
+                <span><i class="far fa-clock me-1" aria-hidden="true"></i>{% translate "เข้าสู่ระบบล่าสุด" %} {% if patient.last_login %}{{ patient.last_login|date:"j M Y H:i" }}{% else %}{% translate "ครั้งแรก" %}{% endif %}</span>
+            </div>
+
+            {% if patient_record %}
+            <div class="f-stats">
                 <div>
-                    <span class="badge bg-success-subtle text-success mb-2">
-                        <i class="fas fa-check-circle me-1"></i> ยืนยันตัวตนคนไข้สำเร็จ (Active EMR)
-                    </span>
-                    <h2 class="h4 fw-bold text-dark mb-1">
-                        สวัสดีคุณ {{ patient.get_full_name|default:patient.username }}
-                    </h2>
-                    <p class="small text-muted mb-0">
-                        HN: <span class="font-monospace fw-semibold text-dark">{% if patient_record %}{{ patient_record.hn }}{% else %}ยังไม่เชื่อมเวชระเบียน{% endif %}</span> &bull; 
-                        เข้าสู่ระบบครั้งล่าสุด: {{ patient.last_login|date:"d M Y H:i"|default:"ครั้งแรก" }}
-                    </p>
+                    <span>{% translate "นัดครั้งถัดไป" %}</span>
+                    {% if next_appt %}
+                        <b>{{ next_appt.appointment_date|date:"j M Y" }} · {{ next_appt.appointment_time|time:"H:i" }} {% translate "น." %}</b>
+                    {% else %}
+                        <b>{% translate "ยังไม่มีนัด" %}</b>
+                    {% endif %}
                 </div>
                 <div>
-                    <a href="{% url 'portal_patient:assistant' %}" class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 py-2.5">
-                        <i class="fas fa-comment-medical"></i> ปรึกษาอาการกับ AI
-                    </a>
+                    <span>{% translate "พบแพทย์ครั้งล่าสุด" %}</span>
+                    <b>{% if last_visit %}{{ last_visit.visit_date|date:"j M Y" }}{% else %}{% translate "ยังไม่มีบันทึก" %}{% endif %}</b>
+                </div>
+                <div>
+                    <span>{% translate "รายงานที่แพทย์อนุมัติ" %}</span>
+                    <b>{% if report_count %}{{ report_count }} {% translate "ฉบับ" %}{% else %}{% translate "ยังไม่มี" %}{% endif %}</b>
                 </div>
             </div>
+            {% else %}
+            <div class="alert alert-warning mt-3 mb-0" role="status">
+                <i class="fas fa-info-circle me-1" aria-hidden="true"></i>
+                {% translate "บัญชีนี้ยังไม่ได้เชื่อมกับเวชระเบียนของคลินิก กรุณาติดต่อเจ้าหน้าที่เพื่อเชื่อมข้อมูล" %}
+            </div>
+            {% endif %}
         </div>
+    </section>
+
+    {% if patient_record %}
+    <section aria-labelledby="nextTitle">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <h2 class="h5 m-0" id="nextTitle">{% translate "นัดหมายจากแพทย์" %}</h2>
+            <a href="{% url 'portal_patient:portal_appointments' %}" class="f-link">{% translate "ดูนัดทั้งหมด" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="f-list">
+            {% for appt in upcoming %}
+                {% include 'portal_patient/_appointment_row.html' %}
+            {% empty %}
+                <div class="f-row is-muted">
+                    <span class="ico"><i class="far fa-calendar" aria-hidden="true"></i></span>
+                    <div class="main"><b>{% translate "ยังไม่มีนัดที่กำลังจะถึง" %}</b><small>{% translate "เมื่อแพทย์นัดคุณ จะแสดงที่นี่ทันที" %}</small></div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <section aria-labelledby="menuTitle">
+        <h2 class="h5 mb-3" id="menuTitle">{% translate "เมนูของคุณ" %}</h2>
+        <div class="f-tiles">
+            <a class="f-tile" href="{% url 'portal_patient:patient_axes_result' %}"><span class="ico"><i class="fas fa-chart-pie" aria-hidden="true"></i></span><span><b>{% translate "ผล 39 แกน" %}</b><small>{% translate "คะแนนสมดุลของร่างกาย" %}</small></span><i class="fas fa-chevron-right" aria-hidden="true"></i></a>
+            <a class="f-tile" href="{% url 'portal_patient:portal_appointments' %}"><span class="ico"><i class="far fa-calendar-check" aria-hidden="true"></i></span><span><b>{% translate "นัดหมาย" %}</b><small>{% translate "วันเวลานัดพบแพทย์" %}</small></span><i class="fas fa-chevron-right" aria-hidden="true"></i></a>
+            <a class="f-tile" href="{% url 'portal_patient:patient_history' %}"><span class="ico"><i class="fas fa-history" aria-hidden="true"></i></span><span><b>{% translate "ประวัติการรักษา" %}</b><small>{% translate "บันทึกการพบแพทย์" %}</small></span><i class="fas fa-chevron-right" aria-hidden="true"></i></a>
+            <a class="f-tile" href="{% url 'portal_patient:patient_download' %}"><span class="ico"><i class="far fa-file-pdf" aria-hidden="true"></i></span><span><b>{% translate "รายงานสุขภาพ" %}</b><small>{% translate "ดาวน์โหลด PDF" %}</small></span><i class="fas fa-chevron-right" aria-hidden="true"></i></a>
+            <a class="f-tile" href="{% url 'portal_patient:patient_digital_twin' %}"><span class="ico"><i class="fas fa-child" aria-hidden="true"></i></span><span><b>Digital Twin</b><small>{% translate "จุดที่ควรเฝ้าระวัง" %}</small></span><i class="fas fa-chevron-right" aria-hidden="true"></i></a>
+            <a class="f-tile" href="{% url 'portal_patient:patient_settings' %}"><span class="ico"><i class="fas fa-user-cog" aria-hidden="true"></i></span><span><b>{% translate "ข้อมูลของฉัน" %}</b><small>{% translate "ช่องทางติดต่อ · LINE" %}</small></span><i class="fas fa-chevron-right" aria-hidden="true"></i></a>
+        </div>
+    </section>
+
+    <div class="f-sos-band" role="note">
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+        <span>{% translate "มีอาการฉุกเฉิน เช่น แน่นหน้าอก หายใจลำบาก หมดสติ" %} <a href="tel:1669">{% translate "โทร 1669" %}</a> {% translate "ทันที" %}</span>
     </div>
-
-    <!-- Quick Navigation Cards Grid -->
-    <div class="row g-4">
-
-        <!-- 39 Axes Card -->
-        <div class="col-12 col-md-4">
-            <div class="card border-0 shadow-xs h-100 hover-shadow transition">
-                <div class="card-body p-4 d-flex flex-column justify-content-between">
-                    <div>
-                        <div class="rounded-3 bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
-                            <i class="fas fa-chart-pie fs-5"></i>
-                        </div>
-                        <h5 class="fw-bold text-dark mb-2">ผลการวิเคราะห์ 39 แกน (12 โดเมน)</h5>
-                        <p class="small text-muted mb-3">
-                            ติดตามคะแนนความสมดุลของร่างกายระดับเซลล์ ไมโตคอนเดรีย และการอักเสบระบบ
-                        </p>
-                    </div>
-                    <div class="pt-2 border-top">
-                        <a href="{% url 'portal_patient:patient_axes_result' %}" class="text-primary text-decoration-none fw-semibold small d-inline-flex align-items-center gap-1">
-                            ดูผลคะแนนล่าสุด &rarr;
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Appointments Card -->
-        <div class="col-12 col-md-4">
-            <div class="card border-0 shadow-xs h-100 hover-shadow transition">
-                <div class="card-body p-4 d-flex flex-column justify-content-between">
-                    <div>
-                        <div class="rounded-3 bg-warning-subtle text-warning d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
-                            <i class="fas fa-calendar-check fs-5"></i>
-                        </div>
-                        <h5 class="fw-bold text-dark mb-2">นัดหมายพบแพทย์</h5>
-                        <p class="small text-muted mb-3">
-                            ตรวจสอบวันเวลานัดหมายแพทย์ผู้เชี่ยวชาญ และประวัติการรับคำปรึกษา
-                        </p>
-                    </div>
-                    <div class="pt-2 border-top">
-                        <a href="{% url 'portal_patient:portal_appointments' %}" class="text-warning text-decoration-none fw-semibold small d-inline-flex align-items-center gap-1">
-                            ดูตารางนัดหมาย &rarr;
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Precision Report Card -->
-        <div class="col-12 col-md-4">
-            <div class="card border-0 shadow-xs h-100 hover-shadow transition">
-                <div class="card-body p-4 d-flex flex-column justify-content-between">
-                    <div>
-                        <div class="rounded-3 bg-info-subtle text-info d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
-                            <i class="fas fa-file-pdf fs-5"></i>
-                        </div>
-                        <h5 class="fw-bold text-dark mb-2">รายงานสุขภาพ Precision Report</h5>
-                        <p class="small text-muted mb-3">
-                            ดาวน์โหลดเล่มรายงานสรุปผลการวิเคราะห์สุขภาพและแผนการฟื้นฟูที่แพทย์ลงนามแล้ว
-                        </p>
-                    </div>
-                    <div class="pt-2 border-top">
-                        <a href="{% url 'portal_patient:patient_download' %}" class="text-info text-decoration-none fw-semibold small d-inline-flex align-items-center gap-1">
-                            ดาวน์โหลดรายงาน PDF &rarr;
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
 </div>
 {% endblock %}

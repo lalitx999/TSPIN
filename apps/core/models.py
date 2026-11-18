@@ -6,6 +6,7 @@ Provides Soft Delete, QuerySet Filtering, and Fernet AES-256 Encryption.
 import base64
 import hashlib
 from typing import Optional
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
@@ -144,11 +145,11 @@ class MedicalArticle(SoftDeleteModel):
     เผยแพร่โดยแพทย์หรือแอดมิน เพื่อให้ความรู้ประชาชนบนหน้า Landing Page
     """
     CATEGORY_CHOICES = [
-        ('systems_biology', '39 แกนชีววิทยา & เวชศาสตร์แม่นยำ'),
-        ('immune_recovery', 'ภูมิคุ้มกันบำบัด & การอักเสบระดับเซลล์'),
-        ('metabolic_longevity', 'เมตาบอลิซึม & ชะลอวัยระดับเซลล์'),
-        ('gut_microbiome', 'ระบบทางเดินอาหาร & ไมโครไบโอม'),
-        ('clinical_news', 'ข่าวสารคลินิก & นวัตกรรมการแพทย์'),
+        ('systems_biology', _('39 แกนชีววิทยา & เวชศาสตร์แม่นยำ')),
+        ('immune_recovery', _('ภูมิคุ้มกันบำบัด & การอักเสบระดับเซลล์')),
+        ('metabolic_longevity', _('เมตาบอลิซึม & ชะลอวัยระดับเซลล์')),
+        ('gut_microbiome', _('ระบบทางเดินอาหาร & ไมโครไบโอม')),
+        ('clinical_news', _('ข่าวสารคลินิก & นวัตกรรมการแพทย์')),
     ]
 
     title = models.CharField(max_length=255, help_text="หัวข้อบทความ")

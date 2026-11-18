@@ -34,9 +34,11 @@ def patient_portal_required(view_func):
         # กรณีล็อกอินด้วย User บัญชีทางการ
         if not patient and request.user.is_authenticated:
             if request.user.role == User.Role.PATIENT:
+                # ใช้เฉพาะเวชระเบียนที่ผูกกับบัญชีนี้ เดิมมีการเดาจากเบอร์โทรอย่างเดียว
+                # (Patient.objects.filter(phone=...)) ทำให้ใครที่เบอร์ตรงกับคนไข้อื่นเห็นข้อมูลคนอื่นได้
                 patient = getattr(request.user, 'patient_record', None)
-                if not patient:
-                    patient = Patient.objects.filter(phone=request.user.phone).first()
+                if patient is not None and patient.is_deleted:
+                    patient = None
 
         if not patient:
             return redirect('portal_patient:portal_login')

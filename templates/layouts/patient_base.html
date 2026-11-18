@@ -1,4 +1,5 @@
 {% extends 'layouts/front_base.html' %}
+{% load i18n %}
 {% load static %}
 {# portal คนไข้: แถบบนกระจก + เมนูล่างแบบเม็ดยาลอยบนมือถือ (ดีไซน์ใน static/css/front.css) #}
 {# เดิม extends base.html ของ EMR — แยกออกมาเพื่อให้ปรับหน้าบ้านได้โดยไม่แตะ EMR #}
@@ -20,49 +21,51 @@
 {% block body_class %}portal has-tabbar{% endblock %}
 
 {% block layout %}
-{% with url_name=request.resolver_match.url_name first_name=request.user.first_name|default:request.user.username %}
-<header class="f-nav" aria-label="ส่วนหัว">
+{% translate "คนไข้" as patient_word %}{% firstof request.user.first_name request.user.username patient.first_name patient_word as first_name %}
+{% with url_name=request.resolver_match.url_name %}
+<header class="f-nav" aria-label="{% translate "ส่วนหัว" %}">
     <div class="container-xl">
         <div class="f-nav-bar">
             <a class="f-brand" href="{% url 'portal_patient:dashboard' %}">
                 <span class="f-brand-mark" aria-hidden="true"><i class="fas fa-leaf"></i></span>
-                <span>TSPI Health<small>พอร์ทัลสุขภาพของคุณ</small></span>
+                <span>TSPI Health<small>{% translate "พอร์ทัลสุขภาพของคุณ" %}</small></span>
             </a>
 
-            <nav class="d-none d-lg-block mx-auto" aria-label="เมนู portal">
+            <nav class="d-none d-lg-block mx-auto" aria-label="{% translate "เมนู portal" %}">
                 <ul class="f-links">
-                    <li><a class="{% if url_name == 'dashboard' %}active{% endif %}" href="{% url 'portal_patient:dashboard' %}">หน้าหลัก</a></li>
-                    <li><a class="{% if url_name == 'assistant' %}active{% endif %}" href="{% url 'portal_patient:assistant' %}">ผู้ช่วย AI</a></li>
-                    <li><a class="{% if url_name == 'patient_axes_result' %}active{% endif %}" href="{% url 'portal_patient:patient_axes_result' %}">ผล 39 แกน</a></li>
-                    <li><a class="{% if url_name == 'portal_appointments' %}active{% endif %}" href="{% url 'portal_patient:portal_appointments' %}">นัดหมาย</a></li>
-                    <li><a class="{% if url_name == 'patient_history' %}active{% endif %}" href="{% url 'portal_patient:patient_history' %}">ประวัติ</a></li>
+                    <li><a class="{% if url_name == 'dashboard' %}active{% endif %}" href="{% url 'portal_patient:dashboard' %}">{% translate "หน้าหลัก" %}</a></li>
+                    <li><a class="{% if url_name == 'assistant' %}active{% endif %}" href="{% url 'portal_patient:assistant' %}">{% translate "ผู้ช่วย AI" %}</a></li>
+                    <li><a class="{% if url_name == 'patient_axes_result' %}active{% endif %}" href="{% url 'portal_patient:patient_axes_result' %}">{% translate "ผล 39 แกน" %}</a></li>
+                    <li><a class="{% if url_name == 'portal_appointments' %}active{% endif %}" href="{% url 'portal_patient:portal_appointments' %}">{% translate "นัดหมาย" %}</a></li>
+                    <li><a class="{% if url_name == 'patient_history' %}active{% endif %}" href="{% url 'portal_patient:patient_history' %}">{% translate "ประวัติ" %}</a></li>
                     <li class="dropdown">
                         <a class="nav-link {% if url_name in 'patient_digital_twin patient_download' %}active{% endif %}" href="#" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">อื่น ๆ <i class="fas fa-chevron-down small" aria-hidden="true"></i></a>
+                           data-bs-toggle="dropdown" aria-expanded="false">{% translate "อื่น ๆ" %} <i class="fas fa-chevron-down small" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{% url 'portal_patient:patient_digital_twin' %}">Digital Twin</a></li>
-                            <li><a class="dropdown-item" href="{% url 'portal_patient:patient_download' %}">ดาวน์โหลดรายงาน</a></li>
+                            <li><a class="dropdown-item" href="{% url 'portal_patient:patient_download' %}">{% translate "ดาวน์โหลดรายงาน" %}</a></li>
                         </ul>
                     </li>
                 </ul>
             </nav>
 
             <div class="f-actions ms-auto ms-lg-0">
+                {% include 'layouts/_lang_switch.html' %}
                 <div class="dropdown">
-                    <button class="btn btn-link f-user px-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="เมนูบัญชี">
-                        <span class="f-avatar" aria-hidden="true">{{ first_name|slice:":1"|upper }}</span>
-                        <span class="d-none d-sm-inline">คุณ{{ first_name }}</span>
+                    <button class="btn btn-link f-user px-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{% translate "เมนูบัญชี" %}">
+                        <span class="f-avatar" aria-hidden="true"><i class="fas fa-user"></i></span>
+                        <span class="d-none d-sm-inline">{% translate "คุณ" %}{{ first_name }}</span>
                         <i class="fas fa-chevron-down small" aria-hidden="true"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li class="d-lg-none"><a class="dropdown-item" href="{% url 'portal_patient:patient_digital_twin' %}">Digital Twin</a></li>
-                        <li class="d-lg-none"><a class="dropdown-item" href="{% url 'portal_patient:patient_download' %}">ดาวน์โหลดรายงาน</a></li>
-                        <li><a class="dropdown-item" href="{% url 'portal_patient:patient_settings' %}"><i class="fas fa-cog me-2" aria-hidden="true"></i>ตั้งค่าบัญชี</a></li>
+                        <li class="d-lg-none"><a class="dropdown-item" href="{% url 'portal_patient:patient_download' %}">{% translate "ดาวน์โหลดรายงาน" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'portal_patient:patient_settings' %}"><i class="fas fa-cog me-2" aria-hidden="true"></i>{% translate "ตั้งค่าบัญชี" %}</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
                                 {% csrf_token %}
-                                <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2" aria-hidden="true"></i>ออกจากระบบ</button>
+                                <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2" aria-hidden="true"></i>{% translate "ออกจากระบบ" %}</button>
                             </form>
                         </li>
                     </ul>
@@ -78,7 +81,7 @@
     {% for message in messages %}
         <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show mb-2" role="alert">
             {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="ปิด"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% translate "ปิด" %}"></button>
         </div>
     {% endfor %}
 </div>
@@ -89,12 +92,12 @@
     {% block content %}{% endblock %}
 </main>
 
-<nav class="f-tabbar d-lg-none" aria-label="เมนูหลัก portal">
-    <a class="{% if url_name == 'dashboard' %}active{% endif %}" href="{% url 'portal_patient:dashboard' %}" {% if url_name == 'dashboard' %}aria-current="page"{% endif %}><i class="fas fa-home" aria-hidden="true"></i><span>หน้าหลัก</span></a>
-    <a class="{% if url_name == 'assistant' %}active{% endif %}" href="{% url 'portal_patient:assistant' %}"><i class="fas fa-comment-medical" aria-hidden="true"></i><span>ผู้ช่วย AI</span></a>
-    <a class="{% if url_name == 'patient_axes_result' %}active{% endif %}" href="{% url 'portal_patient:patient_axes_result' %}"><i class="fas fa-chart-pie" aria-hidden="true"></i><span>39 แกน</span></a>
-    <a class="{% if url_name == 'portal_appointments' %}active{% endif %}" href="{% url 'portal_patient:portal_appointments' %}"><i class="fas fa-calendar-alt" aria-hidden="true"></i><span>นัดหมาย</span></a>
-    <a class="{% if url_name == 'patient_history' %}active{% endif %}" href="{% url 'portal_patient:patient_history' %}"><i class="fas fa-history" aria-hidden="true"></i><span>ประวัติ</span></a>
+<nav class="f-tabbar d-lg-none" aria-label="{% translate "เมนูหลัก portal" %}">
+    <a class="{% if url_name == 'dashboard' %}active{% endif %}" href="{% url 'portal_patient:dashboard' %}" {% if url_name == 'dashboard' %}aria-current="page"{% endif %}><i class="fas fa-home" aria-hidden="true"></i><span>{% translate "หน้าหลัก" %}</span></a>
+    <a class="{% if url_name == 'assistant' %}active{% endif %}" href="{% url 'portal_patient:assistant' %}"><i class="fas fa-comment-medical" aria-hidden="true"></i><span>{% translate "ผู้ช่วย AI" %}</span></a>
+    <a class="{% if url_name == 'patient_axes_result' %}active{% endif %}" href="{% url 'portal_patient:patient_axes_result' %}"><i class="fas fa-chart-pie" aria-hidden="true"></i><span>{% translate "39 แกน" %}</span></a>
+    <a class="{% if url_name == 'portal_appointments' %}active{% endif %}" href="{% url 'portal_patient:portal_appointments' %}"><i class="fas fa-calendar-alt" aria-hidden="true"></i><span>{% translate "นัดหมาย" %}</span></a>
+    <a class="{% if url_name == 'patient_history' %}active{% endif %}" href="{% url 'portal_patient:patient_history' %}"><i class="fas fa-history" aria-hidden="true"></i><span>{% translate "ประวัติ" %}</span></a>
 </nav>
 {% endwith %}
 {% endblock layout %}

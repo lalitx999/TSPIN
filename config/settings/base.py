@@ -119,6 +119,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'core.middleware.FrontLanguageMiddleware',
     'csp.middleware.CSPMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -150,6 +151,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.asset_version',
                 'core.context_processors.line_oa',
+                'django.template.context_processors.i18n',
             ],
             # ⚠️ ห้ามปิด autoescape เด็ดขาด ป้องกัน Stored/Reflected XSS
             'autoescape': True,
@@ -166,6 +168,12 @@ ASGI_APPLICATION = 'config.asgi.application'
 LANGUAGE_CODE = 'th'
 TIME_ZONE = 'Asia/Bangkok'
 USE_I18N = True
+# ภาษาอังกฤษใช้ได้เฉพาะหน้าบ้าน (หน้าเว็บสาธารณะ + portal คนไข้) — EMR เป็นภาษาไทยเสมอ ดู core.middleware.FrontLanguageMiddleware
+LANGUAGES = [('th', 'ไทย'), ('en', 'English')]
+LOCALE_PATHS = [BASE_DIR / 'locale']
+LANGUAGE_COOKIE_NAME = 'tspi_lang'
+LANGUAGE_COOKIE_AGE = 60 * 60 * 24 * 365
+LANGUAGE_COOKIE_SAMESITE = 'Lax'
 USE_TZ = True
 
 # ==============================================================================

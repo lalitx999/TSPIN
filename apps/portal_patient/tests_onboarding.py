@@ -37,7 +37,11 @@ class PatientOnboardingTests(TestCase):
         response = self.client.get(reverse('portal_patient:onboarding'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'portal_patient/onboarding/wizard.html')
-        self.assertContains(response, "Smart Patient Onboarding")
+        self.assertContains(response, 'id="step-1"')
+        self.assertContains(response, 'id="step-3-new"')
+        # ความยินยอม PDPA ต้องให้ผู้ใช้ติ๊กเอง ห้ามติ๊กไว้ให้ล่วงหน้า
+        self.assertContains(response, 'id="new-consent" required>')
+        self.assertNotContains(response, 'id="new-consent" required checked')
 
     def test_onboarding_lookup_existing_patient_returns_masked_data(self):
         """ค้นหาคนไข้เดิมด้วยเลข 13 หลัก ต้องได้ข้อมูลแบบ Masked เพื่อความปลอดภัยตาม PDPA"""

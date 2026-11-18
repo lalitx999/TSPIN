@@ -93,6 +93,57 @@ class CorePagesLayoutTests(TestCase):
         self.assertContains(resp, 'class="f-tabbar')
         self.assertNotContains(resp, 'css/admin.css')
 
+    def test_portal_pages_show_no_placeholder_data(self):
+        """portal ต้องไม่แสดงข้อมูลตัวอย่างที่ดูเหมือนจริง (เบอร์/อีเมลปลอม, 'ลงนามแล้ว' ที่ไม่ได้ตรวจ, 'Active EMR')"""
+        self.client.force_login(self.patient)
+        checks = {
+            'portal_patient:patient_settings': ['081-234-5678', 'patient@example.com', 'บันทึกการแก้ไข'],
+            'portal_patient:patient_consent': ['Consent Verified', 'ลงนามยินยอมทางอิเล็กทรอนิกส์แล้ว'],
+            'portal_patient:dashboard': ['Active EMR', 'ยืนยันตัวตนคนไข้สำเร็จ'],
+        }
+        for name, banned in checks.items():
+            resp = self.client.get(reverse(name))
+            self.assertEqual(resp.status_code, 200, name)
+            for text in banned:
+                self.assertNotContains(resp, text, msg_prefix=name)
+        # บัญชีนี้ยังไม่ผูกเวชระเบียน ต้องบอกตรง ๆ
+        self.assertContains(self.client.get(reverse('portal_patient:dashboard')), 'ยังไม่ได้เชื่อมกับเวชระเบียน')
+
+    def test_portal_assistant_uses_front_layout(self):
+        self.client.force_login(self.patient)
+        resp = self.client.get(reverse('portal_patient:assistant'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'layouts/front_base.html')
+        self.assertTemplateNotUsed(resp, 'base.html')
+        self.assertNotContains(resp, 'css/admin.css')
+
+    # ---- สลับภาษา TH/EN: ใช้ได้เฉพาะหน้าบ้าน EMR เป็นภาษาไทยเสมอ ----
+
+    def test_language_switch_translates_front_pages(self):
+        from django.conf import settings
+        resp = self.client.post('/i18n/setlang/', {'language': 'en', 'next': '/about/'})
+        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, 'en')
+        home = self.client.get(reverse('core:home'))
+        self.assertContains(home, '<html lang="en">', html=False)
+        self.assertContains(home, 'Chat with AI now')
+        self.assertNotContains(home, 'คุยกับ AI ตอนนี้')
+        login = self.client.get(reverse('accounts:patient_login'))
+        self.assertContains(login, 'Welcome back')
+
+    def test_default_language_is_thai_and_ignores_browser_language(self):
+        resp = self.client.get(reverse('core:home'), HTTP_ACCEPT_LANGUAGE='en-US,en;q=0.9')
+        self.assertContains(resp, '<html lang="th">', html=False)
+        self.assertContains(resp, 'คุยกับ AI ตอนนี้')
+
+    def test_emr_stays_thai_even_with_english_cookie(self):
+        from django.conf import settings
+        self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = 'en'
+        self.client.force_login(self.doctor)
+        resp = self.client.get(reverse('patients:dashboard'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.headers.get('Content-Language'), 'th')
+
     def test_emr_dashboard_does_not_load_front_css(self):
         self.client.force_login(self.doctor)
         resp = self.client.get(reverse('patients:dashboard'))
@@ -101,6 +152,14 @@ class CorePagesLayoutTests(TestCase):
         self.assertTemplateNotUsed(resp, 'layouts/front_base.html')
         self.assertContains(resp, 'css/admin.css')
         self.assertNotContains(resp, 'css/front.css')
+
+    def test_research_case_study_hidden_until_clinic_confirms(self):
+        """เคสคนไข้ที่มีชื่อ/ตัวเลขผลลัพธ์ต้องไม่ขึ้นหน้าสาธารณะ จนกว่าคลินิกยืนยันว่าจริงและได้รับความยินยอม"""
+        resp = self.client.get(reverse('core:research'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotContains(resp, 'นิคม')
+        self.assertNotContains(resp, '-82%')
+        self.assertContains(resp, 'Zonulin')
 
     def test_health_check_endpoint_returns_healthy(self):
         """Pillar 6: ตรวจสอบสถานะความพร้อมระบบผ่าน /health/ ต้องคืนค่า 200 และสถานะ healthy"""

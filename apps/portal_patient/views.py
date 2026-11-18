@@ -3,6 +3,7 @@ Patient Portal Views for TSPI Health (Pillars 1, 8, 14).
 Clean Medical UI, Zero 404s, Full Legacy Feature Parity.
 """
 
+from django.utils.translation import gettext_lazy as _
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from clinical.models import AnalysisRecord
@@ -14,19 +15,24 @@ def patient_dashboard(request):
     """
     หน้าหลักคนไข้ (Patient Dashboard)
     """
+    from datetime import date
+    record = get_current_patient(request.user)
+    next_appt = last_visit = None
+    upcoming = []
+    report_count = 0
+    if record:
+        upcoming = list(record.appointments.filter(appointment_date__gte=date.today(), status__in=['scheduled', 'confirmed'])
+                        .select_related('doctor').order_by('appointment_date', 'appointment_time')[:3])
+        next_appt = upcoming[0] if upcoming else None
+        last_visit = record.histories.order_by('-visit_date').first()
+        report_count = AnalysisRecord.objects.filter(patient=record, status__in=['approved', 'released']).count()
     return render(request, 'portal_patient/dashboard.html', {
         'patient': request.user,
-        'patient_record': get_current_patient(request.user),
-    })
-
-
-@login_required
-def patient_ai_intake(request):
-    """
-    ซักประวัติอาการกับ AI (AI Anamnesis Intake)
-    """
-    return render(request, 'portal_patient/ai_intake.html', {
-        'patient': request.user,
+        'patient_record': record,
+        'next_appt': next_appt,
+        'upcoming': upcoming,
+        'last_visit': last_visit,
+        'report_count': report_count,
     })
 
 
@@ -83,7 +89,8 @@ def patient_ai_intake(request):
 
     return render(request, 'portal_patient/ai_intake.html', {
         'patient': patient or request.user,
-        'saved_messages': json.dumps(saved_messages),
+        # ฝังใน <script> ด้วย |safe ต้องกัน '</script>' ในข้อความคนไข้ (stored XSS) — escape < > & เป็น \uXXXX
+        'saved_messages': json.dumps(saved_messages).replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026'),
     })
 
 
@@ -203,16 +210,16 @@ def patient_axes_result(request):
 
     # Descriptions for common clinical axes
     axis_desc_map = {
-        1: "ภาระการอักเสบระดับเซลล์ (hs-CRP, IL-6, TNF-a) ควบคุมด้วยสารต้านอนุมูลอิสระและปรับอาหาร",
-        2: "ความสมดุลของระบบภูมิคุ้มกันแต่กำเนิดและภูมิคุ้มกันจำเพาะ (Innate & Adaptive Immunity)",
-        5: "ความไวต่ออินซูลินและสมดุลน้ำตาล (HOMA-IR, HbA1c) ควบคุมคาร์โบไฮเดรตเชิงเดี่ยว",
-        8: "ประสิทธิภาพการสร้างพลังงาน ATP และสุขภาพไมโทคอนเดรีย (Mitochondrial Network)",
-        15: "ประสิทธิภาพการขับสารพิษของตับ Phase 1 & Phase 2 (Detoxification Capacity)",
-        16: "ประสิทธิภาพการย่อยและดูดซึมสารอาหารของกระเพาะและลำไส้ส่วนบน",
-        17: "ความสมบูรณ์ของเยื่อบุทางเดินอาหาร (Zonulin, Intestinal Barrier Permeability)",
-        18: "ความหลากหลายของจุลินทรีย์ไมโครไบโอมในลำไส้ (Microbiome Diversity)",
-        19: "การเชื่อมโยงระบบทางเดินอาหาร ภูมิคุ้มกัน และการอักเสบทั้งระบบ",
-        34: "วงจรการนอนหลับ สมดุลความเครียด และการกำจัดของเสียในสมอง (Glymphatic System)",
+        1: _("ภาระการอักเสบระดับเซลล์ (hs-CRP, IL-6, TNF-a) ควบคุมด้วยสารต้านอนุมูลอิสระและปรับอาหาร"),
+        2: _("ความสมดุลของระบบภูมิคุ้มกันแต่กำเนิดและภูมิคุ้มกันจำเพาะ (Innate & Adaptive Immunity)"),
+        5: _("ความไวต่ออินซูลินและสมดุลน้ำตาล (HOMA-IR, HbA1c) ควบคุมคาร์โบไฮเดรตเชิงเดี่ยว"),
+        8: _("ประสิทธิภาพการสร้างพลังงาน ATP และสุขภาพไมโทคอนเดรีย (Mitochondrial Network)"),
+        15: _("ประสิทธิภาพการขับสารพิษของตับ Phase 1 & Phase 2 (Detoxification Capacity)"),
+        16: _("ประสิทธิภาพการย่อยและดูดซึมสารอาหารของกระเพาะและลำไส้ส่วนบน"),
+        17: _("ความสมบูรณ์ของเยื่อบุทางเดินอาหาร (Zonulin, Intestinal Barrier Permeability)"),
+        18: _("ความหลากหลายของจุลินทรีย์ไมโครไบโอมในลำไส้ (Microbiome Diversity)"),
+        19: _("การเชื่อมโยงระบบทางเดินอาหาร ภูมิคุ้มกัน และการอักเสบทั้งระบบ"),
+        34: _("วงจรการนอนหลับ สมดุลความเครียด และการกำจัดของเสียในสมอง (Glymphatic System)"),
     }
 
     axes_data = []
@@ -220,7 +227,7 @@ def patient_axes_result(request):
         name = CANONICAL_39_AXES.get(num, f"Axis {num}")
         score = getattr(bio_record, f'axis_{num}', None) if bio_record else None
         status = get_status(score)
-        desc = axis_desc_map.get(num, f"การประเมินการทำงานของแกนชีวภาพ {name} ตามมาตรฐาน TSPI Systems Biology")
+        desc = axis_desc_map.get(num) or _("การประเมินการทำงานของแกนชีวภาพ %(name)s ตามมาตรฐาน TSPI Systems Biology") % {'name': name}
 
         axes_data.append({
             "code": f"A{num:02d}",
@@ -231,7 +238,10 @@ def patient_axes_result(request):
             "desc": desc,
         })
 
+    counts = {k: sum(1 for a in axes_data if a['status'] == k) for k in ('critical', 'warning', 'optimal', 'unassessed')}
     return render(request, 'portal_patient/axes_result.html', {
+        'counts': counts,
+        'record_date': getattr(bio_record, 'record_date', None),
         'patient': patient_obj or request.user,
         'axes_data': axes_data,
         'total_axes': 39,
@@ -258,24 +268,24 @@ def patient_digital_twin(request):
     organ_alerts = []
     if liver_score is not None and liver_score >= 60:
         organ_alerts.append({
-            'organ': 'ตับและระบบขจัดสารพิษ (Liver & Detoxification)',
+            'organ': _('ตับและระบบขจัดสารพิษ (Liver & Detoxification)'),
             'score': liver_score,
             'level': 'danger' if liver_score >= 70 else 'warning',
-            'desc': 'ภาระการทำงานขับสารพิษสูง ควรเสริมสารสกัดปกป้องเซลล์ตับตามคำแนะนำแพทย์'
+            'desc': _('ภาระการทำงานขับสารพิษสูง ควรเสริมสารสกัดปกป้องเซลล์ตับตามคำแนะนำแพทย์')
         })
     if gut_score is not None and gut_score >= 60:
         organ_alerts.append({
-            'organ': 'ระบบทางเดินอาหารและเยื่อบุลำไส้ (Gut Barrier)',
+            'organ': _('ระบบทางเดินอาหารและเยื่อบุลำไส้ (Gut Barrier)'),
             'score': gut_score,
             'level': 'danger' if gut_score >= 70 else 'warning',
-            'desc': 'พบภาวะเยื่อบุลำไส้ซึมผ่านง่าย (Leaky Gut) อยู่ระหว่างโปรโตคอลฟื้นฟูเยื่อบุ'
+            'desc': _('พบภาวะเยื่อบุลำไส้ซึมผ่านง่าย (Leaky Gut) อยู่ระหว่างโปรโตคอลฟื้นฟูเยื่อบุ')
         })
     if immune_score is not None and immune_score >= 60:
         organ_alerts.append({
-            'organ': 'ระบบภูมิคุ้มกันและการอักเสบ (Immune Load)',
+            'organ': _('ระบบภูมิคุ้มกันและการอักเสบ (Immune Load)'),
             'score': immune_score,
             'level': 'danger' if immune_score >= 70 else 'warning',
-            'desc': 'พบภาวะการอักเสบเรื้อรังระดับเซลล์ ควรหลีกเลี่ยงสารกระตุ้นการแพ้'
+            'desc': _('พบภาวะการอักเสบเรื้อรังระดับเซลล์ ควรหลีกเลี่ยงสารกระตุ้นการแพ้')
         })
 
     return render(request, 'portal_patient/digital_twin.html', {
@@ -335,8 +345,12 @@ def patient_settings(request):
     """
     ตั้งค่าข้อมูลส่วนตัวและการยินยอม (Consent)
     """
+    record = get_current_patient(request.user)
     return render(request, 'portal_patient/settings.html', {
         'patient': request.user,
+        'patient_record': record,
+        'phone': (record.phone if record else '') or getattr(request.user, 'phone', '') or '',
+        'line_linked': bool(record and record.line_user_id),
     })
 
 
@@ -347,4 +361,31 @@ def patient_consent(request):
     """
     return render(request, 'portal_patient/consent.html', {
         'patient': request.user,
+    })
+
+
+def patient_appointments(request):
+    """
+    นัดหมายของคนไข้ (ใน portal ใหม่)
+    เดิมชี้ไป patients.views_portal.portal_appointments_view ซึ่งเด้งไปหน้า login ของ portal รุ่นเก่า
+    และเดาคนไข้จากเบอร์โทรอย่างเดียวได้ — ตอนนี้ใช้เฉพาะเวชระเบียนที่ผูกกับบัญชีนี้ (หรือ session portal เดิม)
+    """
+    from django.urls import reverse
+    from django.utils.http import urlencode
+    patient = get_current_patient(request.user) if request.user.is_authenticated else None
+    if patient is None and request.session.get('portal_patient_id'):
+        patient = Patient.objects.filter(pk=request.session['portal_patient_id']).first()
+    if patient is None and not request.user.is_authenticated:
+        return redirect(reverse('accounts:patient_login') + '?' + urlencode({'next': request.get_full_path()}))
+    appointments = (patient.appointments.select_related('doctor').order_by('-appointment_date', '-appointment_time')
+                    if patient else Appointment.objects.none())
+    today = timezone.localdate()
+    upcoming = [a for a in appointments if a.appointment_date >= today and a.status in ('scheduled', 'confirmed')]
+    upcoming.sort(key=lambda a: (a.appointment_date, a.appointment_time))
+    past = [a for a in appointments if a not in upcoming]
+    return render(request, 'portal_patient/appointments.html', {
+        'patient': patient,
+        'upcoming': upcoming,
+        'past': past,
+        'has_patient_record': bool(patient),
     })

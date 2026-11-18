@@ -1,12 +1,12 @@
-{% load static %}<!DOCTYPE html>
+{% load i18n %}{% load static %}<!DOCTYPE html>
 {# โครงหน้าบ้าน (หน้าเว็บสาธารณะ + portal คนไข้) — ไม่ใช้ base.html ของ EMR และไม่โหลด admin.css #}
 {# แผน: docs/UI_REDESIGN_FASTWORK_2026-11.md #}
-<html lang="th">
+{% get_current_language as LANGUAGE_CODE %}<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#ffffff">
-    <title>{% block title %}TSPI CLINIC — ดูแลสุขภาพเชิงระบบ 39 แกนชีววิทยา{% endblock %}</title>
+    <title>{% block title %}{% translate "TSPI CLINIC — ดูแลสุขภาพเชิงระบบ 39 แกนชีววิทยา" %}{% endblock %}</title>
 
     <link rel="preload" href="{% static 'fonts/IBMPlexSansThai-Regular.ttf' %}" as="font" type="font/ttf" crossorigin>
     <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
@@ -46,6 +46,18 @@
         }, {rootMargin: '0px 0px -8% 0px', threshold: 0.08});
         items.forEach(function (el) { io.observe(el); });
     })();
+    /* ปุ่มแสดง/ซ่อนรหัสผ่าน: <div class="f-pw"><input type="password">...<button class="f-pw-toggle"> */
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.f-pw-toggle');
+        if (!btn) return;
+        var input = btn.parentElement.querySelector('input');
+        if (!input) return;
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+        btn.setAttribute('aria-label', show ? '{% filter escapejs %}{% translate "ซ่อนรหัสผ่าน" %}{% endfilter %}' : '{% filter escapejs %}{% translate "แสดงรหัสผ่าน" %}{% endfilter %}');
+        btn.innerHTML = show ? '<i class="far fa-eye-slash" aria-hidden="true"></i>' : '<i class="far fa-eye" aria-hidden="true"></i>';
+    });
     </script>
     {% block front_scripts %}{% endblock %}
     {% block extra_scripts %}{% endblock %}

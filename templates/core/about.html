@@ -1,60 +1,64 @@
 {% extends 'layouts/public_base.html' %}
+{% load i18n %}
 {% load static %}
 
-{% block title %}เกี่ยวกับ TSPI Clinic — การแพทย์เชิงกลไกแห่งอนาคต{% endblock %}
+{% block title %}{% translate "เกี่ยวกับ TSPI Clinic — การแพทย์เชิงกลไก 39 แกนชีววิทยา" %}{% endblock %}
 
 {% block content %}
-<div class="container-xl py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10 col-xl-9">
-            <div class="card p-4 p-lg-5 shadow-sm border">
-                <span class="badge-subtle-primary mb-3 d-inline-block align-self-start">
-                    TSPI Clinical Philosophy
-                </span>
+<section class="f-page-hero" aria-labelledby="pageTitle">
+    <div class="f-hero-bg" aria-hidden="true">
+        <span class="f-glow green" style="width: 480px; height: 360px; left: 50%; top: -200px; transform: translateX(-55%);"></span>
+    </div>
+    <div class="container-xl">
+        <span class="f-pill mx-auto">{% translate "เกี่ยวกับคลินิก" %}</span>
+        <h1 id="pageTitle"><span class="soft">TSPI Clinic</span>{% translate "มองร่างกายเป็นระบบเดียว" %}</h1>
+        <p class="f-lead">{% translate "การแพทย์เชิงกลไก (Mechanistic Medicine) ที่มองร่างกายเป็นเครือข่ายชีวภาพที่เชื่อมโยงกัน ไม่แยกดูทีละอวัยวะ" %}</p>
+    </div>
+</section>
 
-                <h1 class="display-6 fw-bold text-dark mb-4">
-                    เกี่ยวกับ TSPI Clinic และระบบการแพทย์ 39 แกนชีววิทยา (12 โดเมน)
-                </h1>
-
-                <div class="text-muted lh-lg mb-4 space-y-4">
-                    <p class="fs-6">
-                        <strong class="text-dark">TSPI Clinic</strong> เป็นผู้นำด้านการแพทย์เชิงกลไก (Mechanistic Medicine) ที่มองร่างกายมนุษย์ในฐานะ 
-                        <em class="text-dark">"ระบบเครือข่ายชีวภาพที่เชื่อมโยงถึงกันอย่างสมบูรณ์ (Interconnected Biological Network)"</em> มิใช่การมองแยกส่วนตามอวัยวะเดี่ยว
+<section class="pb-5">
+    <div class="container-xl">
+        <div class="row g-4 g-xl-5 justify-content-center">
+            <div class="col-lg-7">
+                <div class="f-prose rv">
+                    <p>
+                        <strong>TSPI Clinic</strong> {% translate "เป็นผู้นำด้านการแพทย์เชิงกลไก (Mechanistic Medicine) ที่มองร่างกายมนุษย์ในฐานะ" %}
+                        <em>{% translate "“ระบบเครือข่ายชีวภาพที่เชื่อมโยงถึงกันอย่างสมบูรณ์ (Interconnected Biological Network)”" %}</em> {% translate "มิใช่การมองแยกส่วนตามอวัยวะเดี่ยว" %}
                     </p>
-
-                    <h2 class="h5 fw-bold text-dark pt-3 mb-2">
-                        ปรัชญาการรักษา: 3 Keys &amp; 9-Step Restoration Ladder
-                    </h2>
-                    <p class="small">
-                        เราไม่ได้มุ่งเน้นเพียงแค่การใช้ยาเพื่อกดอาการที่ปลายเหตุ แต่ใช้ปัญญาประดิษฐ์และความฉลาดทางการแพทย์ในการตรวจวิเคราะห์หาจุดติดขัด (Bottleneck) 
-                        หรือความผิดปกติในระดับไมโทคอนเดรีย ดีท็อกซิฟิเคชัน การอักเสบระดับเซลล์ และแกนประสาทต่อมไร้ท่อ 
-                        เพื่อฟื้นฟูกลไกธรรมชาติของร่างกายให้กลับมาทำงานได้อย่างเต็มประสิทธิภาพ
+                    <h2>{% translate "ปรัชญาการรักษา: 3 Keys &amp; 9-Step Restoration Ladder" %}</h2>
+                    <p>
+                        {% translate "เราไม่ได้มุ่งเน้นเพียงแค่การใช้ยาเพื่อกดอาการที่ปลายเหตุ แต่ใช้ปัญญาประดิษฐ์และความฉลาดทางการแพทย์ในการตรวจวิเคราะห์หาจุดติดขัด (Bottleneck) หรือความผิดปกติในระดับไมโทคอนเดรีย ดีท็อกซิฟิเคชัน การอักเสบระดับเซลล์ และแกนประสาทต่อมไร้ท่อ เพื่อฟื้นฟูกลไกธรรมชาติของร่างกายให้กลับมาทำงานได้อย่างเต็มประสิทธิภาพ" %}
                     </p>
-
-                    <div class="p-3 my-3 rounded-3 bg-light border-start border-4 border-success">
-                        <p class="text-dark mb-0 small fst-italic">
-                            "AI เป็นเครื่องมือเสริมพลังแพทย์ ไม่ใช่ผู้ตัดสินใจแทนแพทย์ผู้เชี่ยวชาญ ทุกคำแนะนำต้องผ่านการตรวจสอบจากแพทย์ผู้รักษาตัวจริงเสมอ (Pillar 15 Physician Invariant)"
-                        </p>
-                    </div>
-
-                    <h2 class="h5 fw-bold text-dark pt-3 mb-2">
-                        มาตรฐานและการกำกับดูแลตามกฎหมาย
-                    </h2>
-                    <p class="small">
-                        ระบบของเราจัดเก็บข้อมูลตามมาตรฐาน PDPA ของประเทศไทย พร้อมโครงข่ายความปลอดภัยระดับสากล 
-                        ให้ความสำคัญกับความเป็นส่วนตัวของผู้ป่วยและความถูกต้องของประวัติการรักษาเป็นลำดับสูงสุด
+                    <blockquote><p>{% translate "“AI เป็นเครื่องมือเสริมพลังแพทย์ ไม่ใช่ผู้ตัดสินใจแทนแพทย์ผู้เชี่ยวชาญ ทุกคำแนะนำต้องผ่านการตรวจสอบจากแพทย์ผู้รักษาตัวจริงเสมอ”" %}</p></blockquote>
+                    <h2>{% translate "มาตรฐานและการกำกับดูแลตามกฎหมาย" %}</h2>
+                    <p>
+                        {% translate "ระบบของเราจัดเก็บข้อมูลตามมาตรฐาน PDPA ของประเทศไทย พร้อมโครงข่ายความปลอดภัยระดับสากล ให้ความสำคัญกับความเป็นส่วนตัวของผู้ป่วยและความถูกต้องของประวัติการรักษาเป็นลำดับสูงสุด" %}
                     </p>
                 </div>
-
-                <div class="pt-4 border-top d-flex flex-column flex-sm-row align-items-center justify-content-between gap-3">
-                    <a href="{% url 'core:home' %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>กลับสู่หน้าแรก</span>
-                    </a>
-                    <span class="small text-muted font-monospace">Dr. Patt Clinical Intelligence OS &bull; 2026</span>
+            </div>
+            <div class="col-lg-4">
+                <div class="d-grid gap-3">
+                    <div class="f-card rv">
+                        <span class="f-num is-soft mb-3"><i class="fas fa-project-diagram" aria-hidden="true"></i></span>
+                        <h3>{% translate "39 แกนชีววิทยา" %}</h3>
+                        <p class="text-muted">{% translate "ประเมินร่างกาย 12 โดเมนร่วมกัน เพื่อหาต้นเหตุของอาการ" %}</p>
+                        <a href="{% url 'core:platform' %}" class="f-link mt-2">{% translate "ดู 39 แกน" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="f-card rv" style="--d: 1">
+                        <span class="f-num is-soft mb-3"><i class="fas fa-stream" aria-hidden="true"></i></span>
+                        <h3>{% translate "แผนฟื้นฟู 9 ขั้นตอน" %}</h3>
+                        <p class="text-muted">{% translate "จากตรวจประเมิน ล้างของเสีย ปรับสมดุล ถึงดูแลระยะยาว" %}</p>
+                        <a href="{% url 'core:protocol' %}" class="f-link mt-2">{% translate "ดูแผนฟื้นฟู" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="f-card rv" style="--d: 2">
+                        <span class="f-num is-soft mb-3"><i class="fas fa-user-shield" aria-hidden="true"></i></span>
+                        <h3>{% translate "ข้อมูลของคุณปลอดภัย" %}</h3>
+                        <p class="text-muted">{% translate "จัดเก็บตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล" %}</p>
+                        <a href="{% url 'core:privacy' %}" class="f-link mt-2">{% translate "อ่านนโยบาย" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

@@ -1,4 +1,5 @@
 {% extends 'layouts/front_base.html' %}
+{% load i18n %}
 {% load static %}
 {# หน้าเว็บสาธารณะ: แถบบนกระจก + เนื้อหา + แถบชวนเริ่ม + ส่วนท้าย (ดีไซน์ใน static/css/front.css) #}
 
@@ -14,40 +15,41 @@
 {% block layout %}
 {% with url_name=request.resolver_match.url_name %}
 {% block site_header %}
-<header class="f-nav" aria-label="ส่วนหัว">
+<header class="f-nav" aria-label="{% translate "ส่วนหัว" %}">
     <div class="container-xl">
-        <nav class="f-nav-bar" aria-label="เมนูหลัก">
+        <nav class="f-nav-bar" aria-label="{% translate "เมนูหลัก" %}">
             <a class="f-brand" href="{% url 'core:home' %}">
                 <span class="f-brand-mark" aria-hidden="true"><i class="fas fa-leaf"></i></span>
                 <span>TSPI Clinic</span>
             </a>
 
             <ul class="f-links d-none d-lg-flex">
-                <li><a class="{% if url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}" {% if url_name == 'home' %}aria-current="page"{% endif %}>หน้าแรก</a></li>
+                <li><a class="{% if url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}" {% if url_name == 'home' %}aria-current="page"{% endif %}>{% translate "หน้าแรก" %}</a></li>
                 <li class="dropdown">
                     <a class="nav-link {% if url_name in 'platform protocol research' %}active{% endif %}" href="#" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">การรักษาของเรา <i class="fas fa-chevron-down small" aria-hidden="true"></i></a>
+                       data-bs-toggle="dropdown" aria-expanded="false">{% translate "การรักษาของเรา" %} <i class="fas fa-chevron-down small" aria-hidden="true"></i></a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'core:platform' %}">39 แกนชีววิทยา<small>ดูร่างกายเป็นระบบ 12 โดเมน</small></a></li>
-                        <li><a class="dropdown-item" href="{% url 'core:protocol' %}">แผนฟื้นฟู 9 ขั้นตอน<small>จากตรวจประเมินถึงดูแลระยะยาว</small></a></li>
-                        <li><a class="dropdown-item" href="{% url 'core:research' %}">งานวิจัยและเคสจริง<small>ผลการดูแลผู้ป่วยของคลินิก</small></a></li>
+                        <li><a class="dropdown-item" href="{% url 'core:platform' %}">{% translate "39 แกนชีววิทยา" %}<small>{% translate "ดูร่างกายเป็นระบบ 12 โดเมน" %}</small></a></li>
+                        <li><a class="dropdown-item" href="{% url 'core:protocol' %}">{% translate "แผนฟื้นฟู 9 ขั้นตอน" %}<small>{% translate "จากตรวจประเมินถึงดูแลระยะยาว" %}</small></a></li>
+                        <li><a class="dropdown-item" href="{% url 'core:research' %}">{% translate "งานวิจัย" %}<small>{% translate "หลักฐานและตัวชี้วัดที่ใช้ติดตามผล" %}</small></a></li>
                     </ul>
                 </li>
-                <li><a class="{% if 'article' in url_name %}active{% endif %}" href="{% url 'core:article_list' %}">สาระสุขภาพ</a></li>
-                <li><a class="{% if url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">เกี่ยวกับคลินิก</a></li>
+                <li><a class="{% if 'article' in url_name %}active{% endif %}" href="{% url 'core:article_list' %}">{% translate "สาระสุขภาพ" %}</a></li>
+                <li><a class="{% if url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">{% translate "เกี่ยวกับคลินิก" %}</a></li>
             </ul>
 
             <div class="f-actions">
+                {% include 'layouts/_lang_switch.html' %}
                 {% if request.user.is_authenticated and request.user.role == 'patient' %}
-                    <a href="{% url 'portal_patient:dashboard' %}" class="btn btn-link d-none d-md-inline-flex">พอร์ทัลของฉัน</a>
+                    <a href="{% url 'portal_patient:dashboard' %}" class="btn btn-link d-none d-md-inline-flex">{% translate "พอร์ทัลของฉัน" %}</a>
                 {% else %}
-                    <a href="{% url 'accounts:patient_login' %}" class="btn btn-link d-none d-md-inline-flex">เข้าสู่ระบบ</a>
+                    <a href="{% url 'accounts:patient_login' %}" class="btn btn-link d-none d-md-inline-flex">{% translate "เข้าสู่ระบบ" %}</a>
                 {% endif %}
                 <a href="{% url 'core:assistant' %}" class="btn btn-primary d-none d-sm-inline-flex">
-                    คุยกับ AI <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    {% translate "คุยกับ AI" %} <i class="fas fa-arrow-right" aria-hidden="true"></i>
                 </a>
                 <button class="f-menu-btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#frontMenu"
-                        aria-controls="frontMenu" aria-label="เปิดเมนู"></button>
+                        aria-controls="frontMenu" aria-label="{% translate "เปิดเมนู" %}"></button>
             </div>
         </nav>
     </div>
@@ -57,28 +59,29 @@
 <div class="offcanvas offcanvas-end f-sheet" tabindex="-1" id="frontMenu" aria-labelledby="frontMenuLabel">
     <div class="offcanvas-header">
         <span class="f-brand" id="frontMenuLabel"><span class="f-brand-mark" aria-hidden="true"><i class="fas fa-leaf"></i></span>TSPI Clinic</span>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="ปิดเมนู"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="{% translate "ปิดเมนู" %}"></button>
     </div>
     <div class="offcanvas-body">
         <ul class="f-sheet-links">
-            <li><a class="{% if url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">หน้าแรก <i class="fas fa-arrow-right"></i></a></li>
-            <li><a class="{% if url_name == 'platform' %}active{% endif %}" href="{% url 'core:platform' %}"><span>39 แกนชีววิทยา<small>ดูร่างกายเป็นระบบ 12 โดเมน</small></span><i class="fas fa-arrow-right"></i></a></li>
-            <li><a class="{% if url_name == 'protocol' %}active{% endif %}" href="{% url 'core:protocol' %}"><span>แผนฟื้นฟู 9 ขั้นตอน<small>จากตรวจประเมินถึงดูแลระยะยาว</small></span><i class="fas fa-arrow-right"></i></a></li>
-            <li><a class="{% if url_name == 'research' %}active{% endif %}" href="{% url 'core:research' %}"><span>งานวิจัยและเคสจริง<small>ผลการดูแลผู้ป่วยของคลินิก</small></span><i class="fas fa-arrow-right"></i></a></li>
-            <li><a class="{% if 'article' in url_name %}active{% endif %}" href="{% url 'core:article_list' %}">สาระสุขภาพ <i class="fas fa-arrow-right"></i></a></li>
-            <li><a class="{% if url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">เกี่ยวกับคลินิก <i class="fas fa-arrow-right"></i></a></li>
+            <li><a class="{% if url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">{% translate "หน้าแรก" %} <i class="fas fa-arrow-right"></i></a></li>
+            <li><a class="{% if url_name == 'platform' %}active{% endif %}" href="{% url 'core:platform' %}"><span>{% translate "39 แกนชีววิทยา" %}<small>{% translate "ดูร่างกายเป็นระบบ 12 โดเมน" %}</small></span><i class="fas fa-arrow-right"></i></a></li>
+            <li><a class="{% if url_name == 'protocol' %}active{% endif %}" href="{% url 'core:protocol' %}"><span>{% translate "แผนฟื้นฟู 9 ขั้นตอน" %}<small>{% translate "จากตรวจประเมินถึงดูแลระยะยาว" %}</small></span><i class="fas fa-arrow-right"></i></a></li>
+            <li><a class="{% if url_name == 'research' %}active{% endif %}" href="{% url 'core:research' %}"><span>{% translate "งานวิจัย" %}<small>{% translate "หลักฐานและตัวชี้วัดที่ใช้ติดตามผล" %}</small></span><i class="fas fa-arrow-right"></i></a></li>
+            <li><a class="{% if 'article' in url_name %}active{% endif %}" href="{% url 'core:article_list' %}">{% translate "สาระสุขภาพ" %} <i class="fas fa-arrow-right"></i></a></li>
+            <li><a class="{% if url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">{% translate "เกี่ยวกับคลินิก" %} <i class="fas fa-arrow-right"></i></a></li>
         </ul>
         <div class="f-sheet-foot">
-            <a href="{% url 'core:assistant' %}" class="btn btn-primary btn-lg"><i class="fas fa-comment-medical" aria-hidden="true"></i> คุยกับ AI</a>
+            {% include 'layouts/_lang_switch.html' with extra_class="is-wide" %}
+            <a href="{% url 'core:assistant' %}" class="btn btn-primary btn-lg"><i class="fas fa-comment-medical" aria-hidden="true"></i> {% translate "คุยกับ AI" %}</a>
             {% if request.user.is_authenticated and request.user.role == 'patient' %}
-                <a href="{% url 'portal_patient:dashboard' %}" class="btn btn-outline-secondary btn-lg">พอร์ทัลของฉัน</a>
+                <a href="{% url 'portal_patient:dashboard' %}" class="btn btn-outline-secondary btn-lg">{% translate "พอร์ทัลของฉัน" %}</a>
             {% else %}
                 <div class="d-grid gap-2" style="grid-template-columns: 1fr 1fr;">
-                    <a href="{% url 'accounts:patient_login' %}" class="btn btn-outline-secondary">เข้าสู่ระบบ</a>
-                    <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-outline-secondary">ลงทะเบียน</a>
+                    <a href="{% url 'accounts:patient_login' %}" class="btn btn-outline-secondary">{% translate "เข้าสู่ระบบ" %}</a>
+                    <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-outline-secondary">{% translate "ลงทะเบียน" %}</a>
                 </div>
             {% endif %}
-            <a href="tel:1669" class="btn btn-outline-danger"><i class="fas fa-phone" aria-hidden="true"></i> เหตุฉุกเฉิน โทร 1669</a>
+            <a href="tel:1669" class="btn btn-outline-danger"><i class="fas fa-phone" aria-hidden="true"></i> {% translate "เหตุฉุกเฉิน โทร 1669" %}</a>
         </div>
     </div>
 </div>
@@ -93,14 +96,14 @@
 {% block footer %}
 <div class="container-xl">
     <section class="f-cta" aria-labelledby="ctaTitle">
-        <h2 id="ctaTitle"><span class="soft">สงสัยเรื่องสุขภาพ</span>เริ่มคุยกับเราได้เลย</h2>
-        <p>ถามผู้ช่วย AI ได้ทันทีโดยไม่ต้องลงทะเบียน คำตอบอ้างอิงจากเอกสารของคลินิก หรือทัก LINE ของคลินิกเพื่อคุยกับทีมงาน</p>
+        <h2 id="ctaTitle"><span class="soft">{% translate "สงสัยเรื่องสุขภาพ" %}</span>{% translate "เริ่มคุยกับเราได้เลย" %}</h2>
+        <p>{% translate "ถามผู้ช่วย AI ได้ทันทีโดยไม่ต้องลงทะเบียน คำตอบอ้างอิงจากเอกสารของคลินิก หรือทัก LINE ของคลินิกเพื่อคุยกับทีมงาน" %}</p>
         <div class="d-flex flex-wrap justify-content-center gap-2">
-            <a href="{% url 'core:assistant' %}" class="btn btn-white btn-lg">คุยกับ AI <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="{% url 'core:assistant' %}" class="btn btn-white btn-lg">{% translate "คุยกับ AI" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
             {% if LINE_BOT_URL %}
-                <a href="{{ LINE_BOT_URL }}" class="btn btn-ghost-light btn-lg"><i class="fab fa-line" aria-hidden="true"></i> ทัก LINE คลินิก</a>
+                <a href="{{ LINE_BOT_URL }}" class="btn btn-ghost-light btn-lg"><i class="fab fa-line" aria-hidden="true"></i> {% translate "ทัก LINE คลินิก" %}</a>
             {% else %}
-                <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-ghost-light btn-lg">ลงทะเบียนพบแพทย์</a>
+                <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-ghost-light btn-lg">{% translate "ลงทะเบียนพบแพทย์" %}</a>
             {% endif %}
         </div>
     </section>
@@ -112,54 +115,54 @@
             <div class="col-lg-4">
                 <a class="f-brand mb-3" href="{% url 'core:home' %}">
                     <span class="f-brand-mark" aria-hidden="true"><i class="fas fa-leaf"></i></span>
-                    <span>TSPI Clinic<small>ศูนย์การแพทย์และการฟื้นฟูสุขภาพ</small></span>
+                    <span>TSPI Clinic<small>{% translate "ศูนย์การแพทย์และการฟื้นฟูสุขภาพ" %}</small></span>
                 </a>
-                <p class="f-about">ดูแลสุขภาพเชิงระบบด้วย 39 แกนชีววิทยา โดยทีมแพทย์ของคลินิก ข้อมูลสุขภาพของคุณได้รับการคุ้มครองตาม PDPA</p>
-                <a href="tel:1669" class="f-sos"><i class="fas fa-phone" aria-hidden="true"></i> เหตุฉุกเฉิน โทร 1669</a>
+                <p class="f-about">{% translate "ดูแลสุขภาพเชิงระบบด้วย 39 แกนชีววิทยา โดยทีมแพทย์ของคลินิก ข้อมูลสุขภาพของคุณได้รับการคุ้มครองตาม PDPA" %}</p>
+                <a href="tel:1669" class="f-sos"><i class="fas fa-phone" aria-hidden="true"></i> {% translate "เหตุฉุกเฉิน โทร 1669" %}</a>
             </div>
             <div class="col-6 col-lg-2">
-                <h2>การรักษา</h2>
+                <h2>{% translate "การรักษา" %}</h2>
                 <ul>
-                    <li><a href="{% url 'core:platform' %}">39 แกนชีววิทยา</a></li>
-                    <li><a href="{% url 'core:protocol' %}">แผนฟื้นฟู 9 ขั้นตอน</a></li>
-                    <li><a href="{% url 'core:research' %}">งานวิจัยและเคสจริง</a></li>
-                    <li><a href="{% url 'core:article_list' %}">สาระสุขภาพ</a></li>
+                    <li><a href="{% url 'core:platform' %}">{% translate "39 แกนชีววิทยา" %}</a></li>
+                    <li><a href="{% url 'core:protocol' %}">{% translate "แผนฟื้นฟู 9 ขั้นตอน" %}</a></li>
+                    <li><a href="{% url 'core:research' %}">{% translate "งานวิจัย" %}</a></li>
+                    <li><a href="{% url 'core:article_list' %}">{% translate "สาระสุขภาพ" %}</a></li>
                 </ul>
             </div>
             <div class="col-6 col-lg-2">
-                <h2>ผู้รับบริการ</h2>
+                <h2>{% translate "ผู้รับบริการ" %}</h2>
                 <ul>
-                    <li><a href="{% url 'portal_patient:onboarding' %}">ลงทะเบียน</a></li>
-                    <li><a href="{% url 'accounts:patient_login' %}">เข้าสู่ระบบ</a></li>
-                    <li><a href="{% url 'core:guide' %}">วิธีใช้งาน</a></li>
-                    <li><a href="{% url 'core:about' %}">เกี่ยวกับคลินิก</a></li>
+                    <li><a href="{% url 'portal_patient:onboarding' %}">{% translate "ลงทะเบียน" %}</a></li>
+                    <li><a href="{% url 'accounts:patient_login' %}">{% translate "เข้าสู่ระบบ" %}</a></li>
+                    <li><a href="{% url 'core:guide' %}">{% translate "วิธีใช้งาน" %}</a></li>
+                    <li><a href="{% url 'core:about' %}">{% translate "เกี่ยวกับคลินิก" %}</a></li>
                 </ul>
             </div>
             <div class="col-lg-4">
-                <h2>เวลาทำการ</h2>
+                <h2>{% translate "เวลาทำการ" %}</h2>
                 <div class="f-hours">
-                    <div><span>จันทร์ – เสาร์</span><span>09:00 – 18:00</span></div>
-                    <div><span>อาทิตย์และวันหยุด</span><span>ปิด</span></div>
+                    <div><span>{% translate "จันทร์ – เสาร์" %}</span><span>09:00 – 18:00</span></div>
+                    <div><span>{% translate "อาทิตย์และวันหยุด" %}</span><span>{% translate "ปิด" %}</span></div>
                 </div>
                 {% if LINE_BOT_URL %}
-                    <a href="{{ LINE_BOT_URL }}"><i class="fab fa-line me-2" aria-hidden="true"></i>LINE ของคลินิก {{ LINE_OA_ID }}</a>
+                    <a href="{{ LINE_BOT_URL }}"><i class="fab fa-line me-2" aria-hidden="true"></i>{% translate "LINE ของคลินิก" %} {{ LINE_OA_ID }}</a>
                 {% else %}
-                    <span><i class="fab fa-line me-2" aria-hidden="true"></i>LINE ของคลินิก {{ LINE_OA_ID }}</span>
+                    <span><i class="fab fa-line me-2" aria-hidden="true"></i>{% translate "LINE ของคลินิก" %} {{ LINE_OA_ID }}</span>
                 {% endif %}
             </div>
         </div>
         <div class="f-bar">
-            <span>&copy; {% now "Y" %} TSPI Clinic สงวนลิขสิทธิ์</span>
+            <span>&copy; {% now "Y" %} {% translate "TSPI Clinic สงวนลิขสิทธิ์" %}</span>
             <span>
-                <a href="{% url 'core:privacy' %}">นโยบายความเป็นส่วนตัว</a><span class="sep">·</span>
-                <a href="{% url 'core:terms' %}">ข้อกำหนดการใช้งาน</a><span class="sep">·</span>
-                <a href="{% url 'accounts:doctor_login' %}">สำหรับบุคลากร</a>
+                <a href="{% url 'core:privacy' %}">{% translate "นโยบายความเป็นส่วนตัว" %}</a><span class="sep">·</span>
+                <a href="{% url 'core:terms' %}">{% translate "ข้อกำหนดการใช้งาน" %}</a><span class="sep">·</span>
+                <a href="{% url 'accounts:doctor_login' %}">{% translate "สำหรับบุคลากร" %}</a>
             </span>
         </div>
     </div>
 </footer>
 
-<a href="{% url 'core:assistant' %}" class="f-fab" id="frontFab" aria-label="ถามผู้ช่วย AI"><i class="fas fa-comment-medical" aria-hidden="true"></i><span>ถาม AI</span></a>
+<a href="{% url 'core:assistant' %}" class="f-fab" id="frontFab" aria-label="{% translate "ถามผู้ช่วย AI" %}"><i class="fas fa-comment-medical" aria-hidden="true"></i><span>{% translate "ถาม AI" %}</span></a>
 <script>
 (function () {
     var fab = document.getElementById('frontFab');

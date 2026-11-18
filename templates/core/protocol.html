@@ -1,201 +1,70 @@
 {% extends 'layouts/public_base.html' %}
-{% load static %}
+{% load i18n %}
 
-{% block title %}9-Step Clinical Recovery Protocol — TSPI CLINIC{% endblock %}
+{% block title %}{% translate "แผนฟื้นฟู 9 ขั้นตอน (9-Step Recovery Protocol) — TSPI Clinic" %}{% endblock %}
 
 {% block content %}
-<div class="container-xl py-5">
-
-    <!-- Header -->
-    <div class="text-center mx-auto mb-5" style="max-width: 800px;">
-        <span class="badge-subtle-primary mb-2 d-inline-block">
-            Mechanistic Treatment Ladder
-        </span>
-        <h1 class="display-6 fw-bold text-dark mt-2 mb-3">
-            TSPI 9-Step Recovery Protocol
-        </h1>
-        <p class="lead text-muted fs-6 mb-0 lh-base">
-            ลำดับขั้นการฟื้นฟูสุขภาพที่ออกแบบตามหลักสรีรวิทยาเชิงกลไก โดยเน้นการขจัดสารพิษและรักษาลำไส้ก่อน 
-            เพื่อเปิดทางให้การฟื้นฟูระบบเผาผลาญและระดับเซลล์ทำงานได้อย่างมีประสิทธิภาพสูงสุด
+<section class="f-page-hero" aria-labelledby="pageTitle">
+    <div class="f-hero-bg" aria-hidden="true">
+        <span class="f-glow green" style="width: 480px; height: 360px; left: 50%; top: -200px; transform: translateX(-55%);"></span>
+    </div>
+    <div class="container-xl">
+        <span class="f-pill mx-auto">9-Step Recovery Protocol</span>
+        <h1 id="pageTitle"><span class="soft">{% translate "แผนฟื้นฟู" %}</span>{% translate "9 ขั้นตอน 3 ระยะ" %}</h1>
+        <p class="f-lead">
+            {% translate "ลำดับขั้นการฟื้นฟูสุขภาพที่ออกแบบตามหลักสรีรวิทยาเชิงกลไก โดยเน้นการขจัดสารพิษและรักษาลำไส้ก่อน เพื่อเปิดทางให้การฟื้นฟูระบบเผาผลาญและระดับเซลล์ทำงานได้อย่างมีประสิทธิภาพสูงสุด" %}
         </p>
+        <div class="f-jump mt-4" aria-label="{% translate "ไปยังระยะ" %}">
+            {% for p in phases %}<a href="#phase-{{ p.n }}"><b>{% translate "ระยะ" %} {{ p.n }}</b>{{ p.en }}</a>{% endfor %}
+        </div>
     </div>
+</section>
 
-    <!-- Phase 1: Assess & Cleanse -->
-    <div class="card p-4 p-lg-5 mb-5 border shadow-sm">
-        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-2">
+<section class="pb-5">
+    <div class="container-xl">
+        {% for p in phases %}
+        <div class="f-phase rv" id="phase-{{ p.n }}" style="scroll-margin-top: 110px;">
+            <div class="f-phase-head">
+                <div>
+                    <span class="f-phase-tag">{% translate "ระยะ" %} {{ p.n }} · {{ p.weeks }}</span>
+                    <h2>{{ p.en }}</h2>
+                    <p>{{ p.summary }}</p>
+                </div>
+                <span class="f-chip"><i class="far fa-clock" aria-hidden="true"></i> {% translate "ระยะเวลา:" %} {{ p.duration }}</span>
+            </div>
+            <div class="row g-3">
+                {% for s in p.steps %}
+                <div class="col-md-4">
+                    <div class="f-step-card">
+                        <span class="k">{% translate "ขั้นตอนที่" %} {{ s.n }}</span>
+                        <h3>{{ s.en }}</h3>
+                        <p>{{ s.desc }}</p>
+                        <div class="f-chips" aria-label="{% translate "โมดูลที่ใช้" %}">
+                            {% for m in s.modules %}<span class="f-chip">{{ m }}</span>{% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <p class="text-center text-muted mt-4 mb-0">{% translate "แพทย์จะเลือกขั้นตอนและโมดูลให้เหมาะกับผลประเมินของแต่ละคน" %}</p>
+    </div>
+</section>
+
+<section class="pb-2">
+    <div class="container-xl">
+        <div class="f-band f-card is-soft rv">
             <div>
-                <span class="badge bg-primary-subtle text-primary-emphasis px-3 py-1 rounded-pill fw-semibold mb-2">PHASE 1</span>
-                <h2 class="h4 fw-bold text-dark mb-1">Assess &amp; Cleanse (สัปดาห์ที่ 1 - 8)</h2>
-                <p class="small text-muted mb-0">ประเมินเชิงลึก กำจัดภาระสารพิษตับ และฟื้นฟูเกราะป้องกันลำไส้</p>
+                <h3 class="mb-1">{% translate "เริ่มต้นโปรโตคอลการรักษากับแพทย์ผู้เชี่ยวชาญ" %}</h3>
+                <p class="text-muted mb-0">{% translate "รับการประเมิน 39 แกนชีววิทยา เพื่อเลือกบันไดการฟื้นฟูสุขภาพที่ตรงกับสภาพร่างกายของคุณที่สุด" %}</p>
             </div>
-            <span class="badge bg-light text-muted border font-monospace px-3 py-2">ระยะเวลา: 6-8 สัปดาห์</span>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <span class="badge bg-white text-primary-clinic border fw-bold mb-2">STEP 01</span>
-                    <h3 class="h6 fw-bold text-dark mb-2">Deep Assessment</h3>
-                    <p class="small text-muted mb-3 lh-base">
-                        วิเคราะห์ข้อมูลสุขภาพ 39 แกนชีววิทยา (12 โดเมน) ด้วย AI ประเมินชีวเคมีเลือด สัญญาณการอักเสบ และตรวจคัดกรอง Leaky Gut
-                    </p>
-                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
-                        <strong>โมดูลที่ใช้:</strong> AI Intake, Blood Panel, Digital Twin
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <span class="badge bg-white text-primary-clinic border fw-bold mb-2">STEP 02</span>
-                    <h3 class="h6 fw-bold text-dark mb-2">Detoxification</h3>
-                    <p class="small text-muted mb-3 lh-base">
-                        กระตุ้นเอนไซม์ Cytochrome P450 และ Conjugation ในตับ ขับสารพิษสะสม โลหะหนัก และลดภาระตับคั่งไขมัน
-                    </p>
-                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
-                        <strong>โมดูลที่ใช้:</strong> HEPA-1, HEPA-3, Glutathione Support
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <span class="badge bg-white text-primary-clinic border fw-bold mb-2">STEP 03</span>
-                    <h3 class="h6 fw-bold text-dark mb-2">Gut Restoration</h3>
-                    <p class="small text-muted mb-3 lh-base">
-                        ซ่อมแซม Tight Junctions ที่ผนังลำไส้ ลดการรั่วไหลของ Endotoxin สู่กระแสเลือด และปรับสมดุล Microbiome
-                    </p>
-                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
-                        <strong>โมดูลที่ใช้:</strong> CINNARA, GUT-1, Glutamine Complex
-                    </div>
-                </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{% url 'accounts:patient_register' %}" class="btn btn-primary">{% translate "ลงทะเบียนรับคำปรึกษา" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                <a href="{% url 'accounts:patient_login' %}" class="btn btn-outline-secondary">{% translate "เข้าสู่ระบบคนไข้" %}</a>
             </div>
         </div>
     </div>
-
-    <!-- Phase 2: Rebalance Core -->
-    <div class="card p-4 p-lg-5 mb-5 border shadow-sm">
-        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-2">
-            <div>
-                <span class="badge bg-info-subtle text-info-emphasis px-3 py-1 rounded-pill fw-semibold mb-2">PHASE 2</span>
-                <h2 class="h4 fw-bold text-dark mb-1">Rebalance Core (สัปดาห์ที่ 9 - 16)</h2>
-                <p class="small text-muted mb-0">ปรับสมดุลการเผาผลาญ ฟื้นฟูต่อมไร้ท่อ และควบคุมการอักเสบระดับเซลล์</p>
-            </div>
-            <span class="badge bg-light text-muted border font-monospace px-3 py-2">ระยะเวลา: 8 สัปดาห์</span>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <span class="badge bg-white text-info border fw-bold mb-2">STEP 04</span>
-                    <h3 class="h6 fw-bold text-dark mb-2">Metabolic Reset</h3>
-                    <p class="small text-muted mb-3 lh-base">
-                        ปรับปรุงความไวของตัวรับอินซูลิน ลดภาวะไขมันพอกตับ และเพิ่มความยืดหยุ่นในการสลับแหล่งพลังงาน (Metabolic Flexibility)
-                    </p>
-                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
-                        <strong>โมดูลที่ใช้:</strong> MET-1, Berberine Synergy, Alpha-Lipoic Acid
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <span class="badge bg-white text-info border fw-bold mb-2">STEP 05</span>
-                    <h3 class="h6 fw-bold text-dark mb-2">Hormonal Balance</h3>
-                    <p class="small text-muted mb-3 lh-base">
-                        ปรับจังหวะการหลั่งคอร์ติซอล ฟื้นฟูต่อมหมวกไตล้า สมดุลฮอร์โมนไทรอยด์ และสร้างเสถียรภาพแก่ฮอร์โมนเพศ
-                    </p>
-                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
-                        <strong>โมดูลที่ใช้:</strong> ADREN-1, Ashwagandha KSM-66, Thyroid Support
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <span class="badge bg-white text-info border fw-bold mb-2">STEP 06</span>
-                    <h3 class="h6 fw-bold text-dark mb-2">Immune Modulation</h3>
-                    <p class="small text-muted mb-3 lh-base">
-                        กดการส่งสัญญาณ NF-κB, ปรับสัดส่วน Th1/Th2 และ M1/M2 Macrophages เพื่อหยุดวงจรการโจมตีเนื้อเยื่อตนเอง
-                    </p>
-                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
-                        <strong>โมดูลที่ใช้:</strong> KERRA, MINOZA, Curcumin Phospholipid
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Phase 3: Repair & Longevity -->
-    <div class="card p-4 p-lg-5 mb-5 border shadow-sm">
-        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-2">
-            <div>
-                <span class="badge bg-success-subtle text-success-emphasis px-3 py-1 rounded-pill fw-semibold mb-2">PHASE 3</span>
-                <h2 class="h4 fw-bold text-dark mb-1">Repair &amp; Longevity (สัปดาห์ที่ 17+)</h2>
-                <p class="small text-muted mb-0">กระตุ้นการซ่อมแซมดีเอ็นเอ ยืดความยาวเทโลเมียร์ และคงสภาพเซลล์อ่อนเยาว์</p>
-            </div>
-            <span class="badge bg-light text-muted border font-monospace px-3 py-2">ระยะเวลา: ต่อเนื่องระยะยาว</span>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <span class="badge bg-white text-success border fw-bold mb-2">STEP 07</span>
-                    <h3 class="h6 fw-bold text-dark mb-2">Cellular Repair</h3>
-                    <p class="small text-muted mb-3 lh-base">
-                        เร่งการกำจัดเซลล์ชราภาพ (Senescent Cells) ผ่านกระบวนการ Autophagy และกระตุ้นเอนไซม์ซ่อมแซมรหัสพันธุกรรม PARP
-                    </p>
-                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
-                        <strong>โมดูลที่ใช้:</strong> CELL-1, Spermidine, Resveratrol Active
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <span class="badge bg-white text-success border fw-bold mb-2">STEP 08</span>
-                    <h3 class="h6 fw-bold text-dark mb-2">Neuroplasticity</h3>
-                    <p class="small text-muted mb-3 lh-base">
-                        ส่งเสริมการสร้างเซลล์ประสาทใหม่ (BDNF) ฟื้นฟูไมอีลิน และเพิ่มประสิทธิภาพการชะล้างของเสียสมองช่วงหลับลึก
-                    </p>
-                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
-                        <strong>โมดูลที่ใช้:</strong> NEURO-1, Lion's Mane Dual-Extract, Phosphatidylserine
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="p-4 rounded-3 bg-light border h-100 card-hover">
-                    <span class="badge bg-white text-success border fw-bold mb-2">STEP 09</span>
-                    <h3 class="h6 fw-bold text-dark mb-2">Longevity Protocol</h3>
-                    <p class="small text-muted mb-3 lh-base">
-                        ออกแบบโปรแกรมบำรุงรักษาสุขภาพเฉพาะบุคคล เพื่อป้องกันการเกิดโรคซ้ำ และคงสภาวะความอ่อนเยาว์ในระดับโมเลกุล
-                    </p>
-                    <div class="small text-muted pt-2 border-top" style="font-size: 11px;">
-                        <strong>โมดูลที่ใช้:</strong> LONGEV-MAX, NMN Synergy, CoQ10 Ubiquinol
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- CTA Section -->
-    <div class="card p-5 text-center shadow-sm border bg-white">
-        <h3 class="h4 fw-bold text-dark mb-2">เริ่มต้นโปรโตคอลการรักษากับแพทย์ผู้เชี่ยวชาญ</h3>
-        <p class="text-muted small mx-auto mb-4" style="max-width: 600px;">
-            รับการประเมิน 39 แกนชีววิทยา เพื่อเลือกบันไดการฟื้นฟูสุขภาพที่ตรงกับสภาพร่างกายของคุณที่สุด
-        </p>
-        <div class="d-flex justify-content-center gap-3">
-            <a href="{% url 'accounts:patient_login' %}" class="btn btn-primary d-inline-flex align-items-center gap-2">
-                <i class="fas fa-user-circle"></i>
-                <span>เข้าสู่ระบบคนไข้</span>
-            </a>
-            <a href="{% url 'accounts:patient_register' %}" class="btn btn-light d-inline-flex align-items-center gap-2 text-dark">
-                <i class="fas fa-user-plus text-primary-clinic"></i>
-                <span>ลงทะเบียนรับคำปรึกษา</span>
-            </a>
-        </div>
-    </div>
-
-</div>
+</section>
 {% endblock %}

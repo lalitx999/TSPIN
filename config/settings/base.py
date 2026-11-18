@@ -207,8 +207,8 @@ LINE_LIFF_ID = os.environ.get('LINE_LIFF_ID', '')
 LINE_DISPATCH_INLINE = 'test' in sys.argv
 # URL webhook ของระบบเก่า ส่งต่อข้อความของคนที่ไม่ได้เปิดบอทเรา (ว่าง = ไม่ส่งต่อ)
 LINE_RELAY_URL = os.environ.get('LINE_RELAY_URL', '')
-# OA ที่ลิงก์ "เปิดบอท" บนเว็บชี้ไป
-LINE_OA_ID = os.environ.get('LINE_OA_ID', '@505bfkpi')
+# OA ที่ลิงก์ "เปิดบอท" บนเว็บชี้ไป — ใช้ Premium ID ของ OA เดิม (@505bfkpi คือ Basic ID ของบัญชีเดียวกัน)
+LINE_OA_ID = os.environ.get('LINE_OA_ID', '@doctorpat1')
 # เปิดเมื่อ webhook ของ OA นั้นชี้มาที่ระบบนี้แล้วเท่านั้น ไม่งั้นข้อความเปิดบอทจะไปโผล่ในแชทขายของโดยไม่มีบอทตอบ
 LINE_BOT_LINK_ENABLED = os.environ.get('LINE_BOT_LINK_ENABLED', 'false').lower() == 'true'
 # เงียบนานเท่านี้ (นาที) บอทปิดเองโดยไม่แจ้ง ข้อความถัดไปไปถึงทีมขายตามปกติ

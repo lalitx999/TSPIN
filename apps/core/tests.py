@@ -268,12 +268,27 @@ class LineBotLinkTests(TestCase):
 
     @override_settings(LINE_BOT_LINK_ENABLED=True, LINE_OA_ID='@testoa')
     def test_link_prefills_the_exact_word_the_webhook_expects(self):
+        """ลิงก์ oaMessage (ใช้กับโปสเตอร์ QR ที่เคาน์เตอร์) ต้องพิมพ์คำเปิดบอทไว้ให้ตรงกับที่ webhook รอ"""
         from urllib.parse import unquote, urlsplit
         from patients.line_service import BOT_ON_WORD, line_bot_url
         url = line_bot_url()
         self.assertTrue(url.startswith('https://line.me/R/oaMessage/@testoa/?'))
         self.assertEqual(unquote(urlsplit(url).query), BOT_ON_WORD)
-        self.assertContains(self.client.get('/'), url)
+
+    @override_settings(LINE_OA_ID='@doctorpat1')
+    def test_web_buttons_open_the_oa_profile_in_line_app(self):
+        """ปุ่ม LINE บนเว็บเปิดหน้าโปรไฟล์ OA (Premium ID) ในแอป LINE"""
+        from patients.line_service import line_profile_url
+        self.assertEqual(line_profile_url(), 'https://line.me/R/ti/p/%40doctorpat1')
+        resp = self.client.get('/')
+        self.assertContains(resp, 'https://line.me/R/ti/p/%40doctorpat1')
+        self.assertContains(resp, '@doctorpat1')
+
+    def test_default_oa_is_premium_id(self):
+        from django.conf import settings
+        import os
+        if not os.environ.get('LINE_OA_ID'):
+            self.assertEqual(settings.LINE_OA_ID, '@doctorpat1')
 
 
 class GuestAssistantApiTests(TestCase):

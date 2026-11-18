@@ -155,16 +155,16 @@
             </div>
             {% endfor %}
         </div>
-        {% if LINE_BOT_URL %}
+        {% if LINE_PROFILE_URL %}
         <div class="f-band is-line mt-4 rv">
             <div class="d-flex gap-3 align-items-start">
                 <span class="ico"><i class="fab fa-line" aria-hidden="true"></i></span>
                 <div>
                     <h3>{% translate "เป็นคนไข้ของคลินิก คุยกับบอทผ่าน LINE ได้" %}</h3>
-                    <p>{% translate "เล่าอาการ ถามเรื่องสุขภาพ ดูใบนัดและผลตรวจได้ในแชท กดปุ่มแล้ว LINE จะพิมพ์คำว่า &ldquo;เปิดบอท&rdquo; ไว้ให้ แค่กดส่ง" %}</p>
+                    <p>{% translate "เล่าอาการ ถามเรื่องสุขภาพ ดูใบนัดและผลตรวจได้ในแชท กดปุ่มเพื่อเปิดโปรไฟล์คลินิกในแอป LINE เพิ่มเพื่อน แล้วพิมพ์ว่า &ldquo;เปิดบอท&rdquo;" %}</p>
                 </div>
             </div>
-            <a href="{{ LINE_BOT_URL }}" class="btn btn-primary btn-lg flex-shrink-0"><i class="fab fa-line" aria-hidden="true"></i> {% translate "เปิดบอทใน LINE" %}</a>
+            <a href="{{ LINE_PROFILE_URL }}" class="btn btn-primary btn-lg flex-shrink-0"><i class="fab fa-line" aria-hidden="true"></i> {% translate "เปิดบอทใน LINE" %}</a>
         </div>
         {% endif %}
     </div>

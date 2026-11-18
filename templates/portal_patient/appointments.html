@@ -43,6 +43,6 @@
         {% endif %}
     {% endif %}
 
-    <p class="text-muted small mt-4 mb-0"><i class="fas fa-info-circle me-1" aria-hidden="true"></i>{% translate "ต้องการเลื่อนนัด กรุณาแจ้งเจ้าหน้าที่ล่วงหน้าอย่างน้อย 1 วัน" %}{% if LINE_BOT_URL %} {% translate "ทาง" %} <a href="{{ LINE_BOT_URL }}">{% translate "LINE ของคลินิก" %}</a>{% endif %}</p>
+    <p class="text-muted small mt-4 mb-0"><i class="fas fa-info-circle me-1" aria-hidden="true"></i>{% translate "ต้องการเลื่อนนัด กรุณาแจ้งเจ้าหน้าที่ล่วงหน้าอย่างน้อย 1 วัน" %}{% if LINE_PROFILE_URL %} {% translate "ทาง" %} <a href="{{ LINE_PROFILE_URL }}">{% translate "LINE ของคลินิก" %}</a>{% endif %}</p>
 </div>
 {% endblock %}

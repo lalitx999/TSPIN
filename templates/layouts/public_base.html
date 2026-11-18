@@ -100,8 +100,8 @@
         <p>{% translate "ถามผู้ช่วย AI ได้ทันทีโดยไม่ต้องลงทะเบียน คำตอบอ้างอิงจากเอกสารของคลินิก หรือทัก LINE ของคลินิกเพื่อคุยกับทีมงาน" %}</p>
         <div class="d-flex flex-wrap justify-content-center gap-2">
             <a href="{% url 'core:assistant' %}" class="btn btn-white btn-lg">{% translate "คุยกับ AI" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-            {% if LINE_BOT_URL %}
-                <a href="{{ LINE_BOT_URL }}" class="btn btn-ghost-light btn-lg"><i class="fab fa-line" aria-hidden="true"></i> {% translate "ทัก LINE คลินิก" %}</a>
+            {% if LINE_PROFILE_URL %}
+                <a href="{{ LINE_PROFILE_URL }}" class="btn btn-ghost-light btn-lg"><i class="fab fa-line" aria-hidden="true"></i> {% translate "ทัก LINE คลินิก" %}</a>
             {% else %}
                 <a href="{% url 'portal_patient:onboarding' %}" class="btn btn-ghost-light btn-lg">{% translate "ลงทะเบียนพบแพทย์" %}</a>
             {% endif %}
@@ -144,8 +144,8 @@
                     <div><span>{% translate "จันทร์ – เสาร์" %}</span><span>09:00 – 18:00</span></div>
                     <div><span>{% translate "อาทิตย์และวันหยุด" %}</span><span>{% translate "ปิด" %}</span></div>
                 </div>
-                {% if LINE_BOT_URL %}
-                    <a href="{{ LINE_BOT_URL }}"><i class="fab fa-line me-2" aria-hidden="true"></i>{% translate "LINE ของคลินิก" %} {{ LINE_OA_ID }}</a>
+                {% if LINE_PROFILE_URL %}
+                    <a href="{{ LINE_PROFILE_URL }}"><i class="fab fa-line me-2" aria-hidden="true"></i>{% translate "LINE ของคลินิก" %} {{ LINE_OA_ID }}</a>
                 {% else %}
                     <span><i class="fab fa-line me-2" aria-hidden="true"></i>{% translate "LINE ของคลินิก" %} {{ LINE_OA_ID }}</span>
                 {% endif %}

@@ -36,7 +36,7 @@
                     {% else %}
                         <span class="badge bg-secondary">{% translate "ยังไม่ได้เชื่อมต่อ" %}</span>
                         <p class="text-muted small mt-2 mb-3">{% translate "เชื่อม LINE เพื่อคุยกับผู้ช่วย AI และรับข่าวสารจากคลินิก" %}</p>
-                        {% if LINE_BOT_URL %}<a href="{{ LINE_BOT_URL }}" class="btn btn-success btn-sm"><i class="fab fa-line" aria-hidden="true"></i> {% translate "เปิดบอทใน LINE" %}</a>{% endif %}
+                        {% if LINE_PROFILE_URL %}<a href="{{ LINE_PROFILE_URL }}" class="btn btn-success btn-sm"><i class="fab fa-line" aria-hidden="true"></i> {% translate "เปิดบอทใน LINE" %}</a>{% endif %}
                     {% endif %}
                 </div>
                 <div class="f-card">

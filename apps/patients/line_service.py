@@ -65,6 +65,11 @@ def line_bot_link() -> str:
     return f"https://line.me/R/oaMessage/{quote(settings.LINE_OA_ID, safe='@')}/?{quote(BOT_ON_WORD)}"
 
 
+def line_profile_url() -> str:
+    """ลิงก์เปิดหน้าโปรไฟล์ OA ในแอป LINE (ปุ่มเพิ่มเพื่อน/แชท) — บนคอมจะเห็นหน้า QR ให้สแกน"""
+    return f"https://line.me/R/ti/p/{quote(settings.LINE_OA_ID, safe='')}"
+
+
 def line_bot_url() -> str:
     """ลิงก์สำหรับเว็บสาธารณะ (ว่างถ้ายังไม่เปิดใช้)"""
     return line_bot_link() if settings.LINE_BOT_LINK_ENABLED else ''

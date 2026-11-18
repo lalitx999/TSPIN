@@ -8,7 +8,7 @@ import time
 
 from django.conf import settings
 
-from patients.line_service import line_bot_url
+from patients.line_service import line_bot_url, line_profile_url
 
 ASSET_VERSION = os.environ.get('ASSET_VERSION') or str(int(time.time()))
 
@@ -18,4 +18,4 @@ def asset_version(request):
 
 
 def line_oa(request):
-    return {'LINE_OA_ID': settings.LINE_OA_ID, 'LINE_BOT_URL': line_bot_url()}
+    return {'LINE_OA_ID': settings.LINE_OA_ID, 'LINE_BOT_URL': line_bot_url(), 'LINE_PROFILE_URL': line_profile_url()}
